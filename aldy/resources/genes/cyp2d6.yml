@@ -1,0 +1,2249 @@
+{
+  "cnv_region": ["chr22", 42547463, 42548249], 
+  "pseudogenes": {
+    "CYP2D7": {
+      "special_regions": {
+        "pce": [42534090, 42535690], 
+        "rep": [42531290, 42534090], 
+        "0i": [42540465, 42545394], 
+        "ins": [42535690, 42536290]
+      }, 
+      "exons": {
+        "1": [42540284, 42540465], 
+        "3": [42538728, 42538881], 
+        "2": [42539410, 42539582], 
+        "5": [42537877, 42538054], 
+        "4": [42538479, 42538640], 
+        "7": [42537161, 42537349], 
+        "6": [42537543, 42537685], 
+        "9": [42536290, 42536467], 
+        "8": [42536565, 42536707]
+      }
+    }
+  }, 
+  "name": "CYP2D6", 
+  "rev_comp": 1,
+  "exons": {
+    "1": [42526613, 42526793], 
+    "3": [42525034, 42525187], 
+    "2": [42525739, 42525911], 
+    "5": [42524175, 42524352], 
+    "4": [42524785, 42524946], 
+    "7": [42523448, 42523636], 
+    "6": [42523843, 42523985], 
+    "9": [42522575, 42522754], 
+    "8": [42522852, 42522994]
+  }, 
+  "max_cn": {
+  }, 
+  "alleles": {
+    "CYP2D6*1": {
+      "phenotype": {"invivo": "Normal", "invitro": "Normal"}, 
+      "mutations": []
+    }, 
+    "CYP2D6*1B": {
+      "phenotype": {"invivo": "Normal  (d, s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42522964, "op": "SNP.CT", "old": "3828:G>A", "functional": 0, "dbsnp": ["rs28371732"]}
+      ]
+    }, 
+    "CYP2D6*1C": {
+      "phenotype": {"invivo": "Normal (s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524814, "op": "SNP.GA", "old": "1978:C>T", "functional": 0, "dbsnp": ["rs150163869"]}
+      ]
+    }, 
+    "CYP2D6*1D": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524217, "op": "SNP.GT", "old": "2575:C>A", "functional": 0, "dbsnp": ["rs28371718"]}
+      ]
+    }, 
+    "CYP2D6*1E": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524923, "op": "SNP.AG", "old": "1869:T>C", "functional": 0, "dbsnp": ["rs111606937"]}
+      ]
+    }, 
+    "CYP2D6*2A": {
+      "phenotype": {"invivo": "Normal  (dx,d,s)", "invitro": "Normal (b, dx)"}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2AW": {
+      "phenotype": {"invivo": "Normal  (dx,d,s)", "invitro": "Normal (b, dx)"}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2B": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2BW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2C": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524322, "op": "SNP.AG", "old": "2470:T>C", "functional": 0, "dbsnp": ["rs17002852"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2CW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524322, "op": "SNP.AG", "old": "2470:T>C", "functional": 0, "dbsnp": ["rs17002852"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2D": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2DW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2E": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2EW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2F": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525068, "op": "SNP.GA", "old": "1724:C>T", "functional": 0, "dbsnp": ["rs74962936"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2FW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525068, "op": "SNP.GA", "old": "1724:C>T", "functional": 0, "dbsnp": ["rs74962936"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2G": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524322, "op": "SNP.AG", "old": "2470:T>C", "functional": 0, "dbsnp": ["rs17002852"]}, 
+        {"pos": 42524217, "op": "SNP.GT", "old": "2575:C>A", "functional": 0, "dbsnp": ["rs28371718"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2GW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524322, "op": "SNP.AG", "old": "2470:T>C", "functional": 0, "dbsnp": ["rs17002852"]}, 
+        {"pos": 42524217, "op": "SNP.GT", "old": "2575:C>A", "functional": 0, "dbsnp": ["rs28371718"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2H": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524312, "op": "SNP.GA", "old": "2480:C>T", "functional": 0, "dbsnp": ["rs267608298"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2HW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524312, "op": "SNP.GA", "old": "2480:C>T", "functional": 0, "dbsnp": ["rs267608298"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2K": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522677, "op": "SNP.GA", "old": "4115:C>T", "functional": 0, "dbsnp": ["rs150445731"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2KW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522677, "op": "SNP.GA", "old": "4115:C>T", "functional": 0, "dbsnp": ["rs150445731"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}
+      ]
+    }, 
+    "CYP2D6*2L": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528095, "op": "SNP.CT", "old": "-1298:G>A", "functional": 0, "dbsnp": ["rs59099247"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525279, "op": "SNP.GA", "old": "1513:C>T", "functional": 0, "dbsnp": ["rs67497403"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525035, "op": "SNP.GA", "old": "1757:C>T", "functional": 0, "dbsnp": ["rs199849357"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*2LW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528095, "op": "SNP.CT", "old": "-1298:G>A", "functional": 0, "dbsnp": ["rs59099247"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525279, "op": "SNP.GA", "old": "1513:C>T", "functional": 0, "dbsnp": ["rs67497403"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525035, "op": "SNP.GA", "old": "1757:C>T", "functional": 0, "dbsnp": ["rs199849357"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}
+      ]
+    }, 
+    "CYP2D6*2M": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527541, "op": "DEL.TC", "old": "-750:delGA", "functional": 0, "dbsnp": ["rs536645539"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*2MW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527541, "op": "DEL.TC", "old": "-750:delGA", "functional": 0, "dbsnp": ["rs536645539"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}
+      ]
+    }, 
+    "CYP2D6*3A": {
+      "phenotype": {"invivo": "None  (d, s)", "invitro": "None  (b)"}, 
+      "mutations": [
+        {"pos": 42524243, "op": "DEL.T", "old": "2549:delA", "functional": 3, "dbsnp": ["rs35742686"]}
+      ]
+    }, 
+    "CYP2D6*3B": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525043, "op": "SNP.TC", "old": "1749:A>G", "functional": 1, "dbsnp": ["rs1135824"]}, 
+        {"pos": 42524243, "op": "DEL.T", "old": "2549:delA", "functional": 3, "dbsnp": ["rs35742686"]}
+      ]
+    }, 
+    "CYP2D6*4A": {
+      "phenotype": {"invivo": "None  (d, s)", "invitro": "None  (b)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4AW": {
+      "phenotype": {"invivo": "None  (d, s)", "invitro": "None  (b)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4B": {
+      "phenotype": {"invivo": "None  (d, s)", "invitro": "None  (b)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4BW": {
+      "phenotype": {"invivo": "None  (d, s)", "invitro": "None  (b)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4C": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522905, "op": "SNP.AG", "old": "3887:T>C", "functional": 1, "dbsnp": ["rs72549345"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4CW": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522905, "op": "SNP.AG", "old": "3887:T>C", "functional": 1, "dbsnp": ["rs72549345"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4D": {
+      "phenotype": {"invivo": "None (dx)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4DW": {
+      "phenotype": {"invivo": "None (dx)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4E": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4EW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4F": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42524934, "op": "SNP.GA", "old": "1858:C>T", "functional": 1, "dbsnp": ["rs67780109(k)", "rs370249680"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4FW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42524934, "op": "SNP.GA", "old": "1858:C>T", "functional": 1, "dbsnp": ["rs67780109(k)", "rs370249680"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4G": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42523854, "op": "SNP.GA", "old": "2938:C>T", "functional": 1, "dbsnp": ["rs140513104"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4GW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42523854, "op": "SNP.GA", "old": "2938:C>T", "functional": 1, "dbsnp": ["rs140513104"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4H": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522915, "op": "SNP.CG", "old": "3877:G>C", "functional": 1, "dbsnp": []}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4HW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522915, "op": "SNP.CG", "old": "3877:G>C", "functional": 1, "dbsnp": []}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4J": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}
+      ]
+    }, 
+    "CYP2D6*4JW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4K": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4KW": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4L": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*4LW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4M": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4N": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": "pseudogene", "op": "e9+", "old": "", "functional": 0, "dbsnp": []}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*4P": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524946, "op": "SNP.CT", "old": "1846:G>A", "functional": 2, "dbsnp": ["rs3892097"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42524216, "op": "SNP.GA", "old": "2576:C>T", "functional": 1, "dbsnp": []}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523357, "op": "SNP.GT", "old": "3435:C>A", "functional": 0, "dbsnp": ["rs28371729"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*5": {
+      "phenotype": {"invivo": "None (d, s)", "invitro": ""}, 
+      "mutations": [
+        {"op": "deletion"}
+      ]
+    }, 
+    "CYP2D6*6A": {
+      "phenotype": {"invivo": "None  (d, dx)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525085, "op": "DEL.A", "old": "1707:delT", "functional": 3, "dbsnp": ["rs5030655"]}
+      ]
+    }, 
+    "CYP2D6*6B": {
+      "phenotype": {"invivo": "None  (s, d)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525085, "op": "DEL.A", "old": "1707:delT", "functional": 3, "dbsnp": ["rs5030655"]}, 
+        {"pos": 42524816, "op": "SNP.CT", "old": "1976:G>A", "functional": 1, "dbsnp": ["rs5030866(k)", "rs139779104"]}
+      ]
+    }, 
+    "CYP2D6*6C": {
+      "phenotype": {"invivo": "None (s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525085, "op": "DEL.A", "old": "1707:delT", "functional": 3, "dbsnp": ["rs5030655"]}, 
+        {"pos": 42524816, "op": "SNP.CT", "old": "1976:G>A", "functional": 1, "dbsnp": ["rs5030866(k)", "rs139779104"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*6D": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525085, "op": "DEL.A", "old": "1707:delT", "functional": 3, "dbsnp": ["rs5030655"]}, 
+        {"pos": 42523504, "op": "SNP.CT", "old": "3288:G>A", "functional": 1, "dbsnp": ["rs150552908"]}
+      ]
+    }, 
+    "CYP2D6*7": {
+      "phenotype": {"invivo": "None  (s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523857, "op": "SNP.TG", "old": "2935:A>C", "functional": 1, "dbsnp": ["rs5030867"]}
+      ]
+    }, 
+    "CYP2D6*8": {
+      "phenotype": {"invivo": "None  (d, s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525034, "op": "SNP.CA", "old": "1758:G>T", "functional": 1, "dbsnp": ["rs5030865"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*9": {
+      "phenotype": {"invivo": "Decr  (b,s,d)", "invitro": "Decr  (b,s,d)"}, 
+      "mutations": [
+        {"pos": 42524175, "op": "DEL.CTT", "old": "2615:delAAG", "functional": 1, "dbsnp": ["rs5030656"]}
+      ]
+    }, 
+    "CYP2D6*10A": {
+      "phenotype": {"invivo": "Decr  (s)", "invitro": "Decr (b, dx)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*10AW": {
+      "phenotype": {"invivo": "Decr  (s)", "invitro": "Decr (b, dx)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}
+      ]
+    }, 
+    "CYP2D6*10B": {
+      "phenotype": {"invivo": "Decr  (d)", "invitro": "Decr  (b)"}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*10BW": {
+      "phenotype": {"invivo": "Decr  (d)", "invitro": "Decr  (b)"}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}
+      ]
+    }, 
+    "CYP2D6*10D": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*10DW": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}
+      ]
+    }, 
+    "CYP2D6*11": {
+      "phenotype": {"invivo": "None  (s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525911, "op": "SNP.CG", "old": "883:G>C", "functional": 2, "dbsnp": ["rs201377835"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*11W": {
+      "phenotype": {"invivo": "None  (s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525911, "op": "SNP.CG", "old": "883:G>C", "functional": 2, "dbsnp": ["rs201377835"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}
+      ]
+    }, 
+    "CYP2D6*12": {
+      "phenotype": {"invivo": "None  (s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526669, "op": "SNP.CT", "old": "124:G>A", "functional": 1, "dbsnp": ["rs5030862"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*13": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": "pseudogene", "op": "i1-", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*14A": {
+      "phenotype": {"invivo": "None  (d)", "invitro": "None (b, dx)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525034, "op": "SNP.CT", "old": "1758:G>A", "functional": 1, "dbsnp": ["rs5030865"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*14AW": {
+      "phenotype": {"invivo": "None  (d)", "invitro": "None (b, dx)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525034, "op": "SNP.CT", "old": "1758:G>A", "functional": 1, "dbsnp": ["rs5030865"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}
+      ]
+    }, 
+    "CYP2D6*14B": {
+      "phenotype": {"invivo": "", "invitro": "Decr (b)"}, 
+      "mutations": [
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525034, "op": "SNP.CT", "old": "1758:G>A", "functional": 1, "dbsnp": ["rs5030865"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*14BW": {
+      "phenotype": {"invivo": "", "invitro": "Decr (b)"}, 
+      "mutations": [
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525034, "op": "SNP.CT", "old": "1758:G>A", "functional": 1, "dbsnp": ["rs5030865"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}
+      ]
+    }, 
+    "CYP2D6*15": {
+      "phenotype": {"invivo": "None  (d, dx)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526656, "op": "INS.a", "old": "137:insT", "functional": 3, "dbsnp": ["rs72549357"]}
+      ]
+    }, 
+    "CYP2D6*16": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": "pseudogene", "op": "e7-", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*17": {
+      "phenotype": {"invivo": "Decr  (d)", "invitro": "Decr  (b)"}, 
+      "mutations": [
+        {"pos": 42525771, "op": "SNP.GA", "old": "1023:C>T", "functional": 1, "dbsnp": ["rs28371706"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*17W": {
+      "phenotype": {"invivo": "Decr  (d)", "invitro": "Decr  (b)"}, 
+      "mutations": [
+        {"pos": 42525771, "op": "SNP.GA", "old": "1023:C>T", "functional": 1, "dbsnp": ["rs28371706"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}
+      ]
+    }, 
+    "CYP2D6*18": {
+      "phenotype": {"invivo": "None (s)", "invitro": "Decr (b, dx)"}, 
+      "mutations": [
+        {"pos": 42522667, "op": "INS.agtgggcac", "old": "4125:insGTGCCCACT", "functional": 1, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*19": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524250, "op": "DEL.AGTT", "old": "2539:delAACT", "functional": 3, "dbsnp": ["rs72549353(k)", "rs758320086"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*20": {
+      "phenotype": {"invivo": "None (m)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524819, "op": "INS.c", "old": "1973:insG", "functional": 3, "dbsnp": ["rs72549354(k)", "rs763609904"]}, 
+        {"pos": 42524814, "op": "SNP.GA", "old": "1978:C>T", "functional": 1, "dbsnp": ["rs150163869"]}, 
+        {"pos": 42524813, "op": "SNP.AG", "old": "1979:T>C", "functional": 1, "dbsnp": ["rs199535154"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*21A": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42527421, "op": "SNP.TC", "old": "-629:A>G", "functional": 0, "dbsnp": []}, 
+        {"pos": 42526579, "op": "SNP.CG", "old": "214:G>C", "functional": 0, "dbsnp": ["rs1080995"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old": "221:C>A", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old": "223:C>G", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old": "227:T>C", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524213, "op": "INS.g", "old": "2579:insC", "functional": 3, "dbsnp": []}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*21B": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524213, "op": "INS.g", "old": "2579:insC", "functional": 3, "dbsnp": []}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*22": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526711, "op": "SNP.GA", "old": "82:C>T", "functional": 1, "dbsnp": ["rs138100349"]}
+      ]
+    }, 
+    "CYP2D6*23": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525837, "op": "SNP.GA", "old": "957:C>T", "functional": 1, "dbsnp": ["rs267608310"]}
+      ]
+    }, 
+    "CYP2D6*24": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523939, "op": "SNP.TG", "old": "2853:A>C", "functional": 1, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*25": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523594, "op": "SNP.GC", "old": "3198:C>G", "functional": 1, "dbsnp": ["rs267608295"]}
+      ]
+    }, 
+    "CYP2D6*26": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523515, "op": "SNP.AG", "old": "3277:T>C", "functional": 1, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*27": {
+      "phenotype": {"invivo": "", "invitro": "Normal (b, dx)"}, 
+      "mutations": [
+        {"pos": 42522939, "op": "SNP.CT", "old": "3853:G>A", "functional": 1, "dbsnp": ["rs61737947(k)", "rs769157652"]}
+      ]
+    }, 
+    "CYP2D6*28": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526774, "op": "SNP.CT", "old": "19:G>A", "functional": 1, "dbsnp": ["rs72552268(k)", "rs72549358"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525088, "op": "SNP.GC", "old": "1704:C>G", "functional": 1, "dbsnp": ["rs78482768"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*28W": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526774, "op": "SNP.CT", "old": "19:G>A", "functional": 1, "dbsnp": ["rs72552268(k)", "rs72549358"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525088, "op": "SNP.GC", "old": "1704:C>G", "functional": 1, "dbsnp": ["rs78482768"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}
+      ]
+    }, 
+    "CYP2D6*29": {
+      "phenotype": {"invivo": "Decr.", "invitro": "Decr."}, 
+      "mutations": [
+        {"pos": 42525133, "op": "SNP.CT", "old": "1659:G>A", "functional": 1, "dbsnp": ["rs61736512"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523609, "op": "SNP.CT", "old": "3183:G>A", "functional": 1, "dbsnp": ["rs59421388"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*30": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524929, "op": "INS.ggggcgaaa", "old": "1863:insTTTCGCCCC", "functional": 1, "dbsnp": ["rs72549356"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*31": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522750, "op": "SNP.CT", "old": "4042:G>A", "functional": 1, "dbsnp": ["rs267608319"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*32": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522939, "op": "SNP.CT", "old": "3853:G>A", "functional": 1, "dbsnp": ["rs61737947(k)", "rs769157652"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*33": {
+      "phenotype": {"invivo": "Normal (s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524309, "op": "SNP.CA", "old": "2483:G>T", "functional": 1, "dbsnp": ["rs28371717"]}
+      ]
+    }, 
+    "CYP2D6*34": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}
+      ]
+    }, 
+    "CYP2D6*35A": {
+      "phenotype": {"invivo": "Normal (s)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42526762, "op": "SNP.CT", "old": "31:G>A", "functional": 1, "dbsnp": ["rs769258"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*35B": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526930, "op": "SNP.TC", "old": "-138:A>G", "functional": 0, "dbsnp": ["rs267608272"]}, 
+        {"pos": 42526762, "op": "SNP.CT", "old": "31:G>A", "functional": 1, "dbsnp": ["rs769258"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*36": {
+      "phenotype": {"invivo": "Negligible  (d)", "invitro": "Negligible (b, dx)"}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": "pseudogene", "op": "e9+", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*37": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524849, "op": "SNP.CT", "old": "1943:G>A", "functional": 1, "dbsnp": ["rs72549355(k)", "rs745365204"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*38": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524202, "op": "DEL.AGTC", "old": "2587:delGACT", "functional": 3, "dbsnp": ["rs72549351"]}
+      ]
+    }, 
+    "CYP2D6*39": {
+      "phenotype": {"invivo": "", "invitro": "Normal (b, dx)"}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*40": {
+      "phenotype": {"invivo": "None (dx)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525771, "op": "SNP.GA", "old": "1023:C>T", "functional": 1, "dbsnp": ["rs28371706"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524929, "op": "INS.ggggcgaaaggggcgaaa", "old": "1863:insTTTCGCCCCTTTCGCCCC", "functional": 1, "dbsnp": []}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*41": {
+      "phenotype": {"invivo": "Decr (s)", "invitro": "Decr"}, 
+      "mutations": [
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523804, "op": "SNP.CT", "old": "2988:G>A", "functional": 2, "dbsnp": ["rs28371725"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*42": {
+      "phenotype": {"invivo": "None (dx)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523533, "op": "INS.ac", "old": "3259:insGT", "functional": 3, "dbsnp": ["rs72549346"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*43": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526716, "op": "SNP.CT", "old": "77:G>A", "functional": 1, "dbsnp": ["rs28371696"]}
+      ]
+    }, 
+    "CYP2D6*44": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526711, "op": "SNP.GA", "old": "82:C>T", "functional": 1, "dbsnp": ["rs138100349"]}, 
+        {"pos": 42523842, "op": "SNP.CG", "old": "2950:G>C", "functional": 2, "dbsnp": ["rs72549349"]}
+      ]
+    }, 
+    "CYP2D6*45A": {
+      "phenotype": {"invivo": "Functional (normal or decreased)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528398, "op": "SNP.CA", "old": "-1601:G>T", "functional": 0, "dbsnp": ["rs545591749"]}, 
+        {"pos": 42528397, "op": "SNP.TA", "old": "-1600:A>T", "functional": 0, "dbsnp": ["rs576829306"]}, 
+        {"pos": 42527886, "op": "INS.t", "old": "-1094:insA", "functional": 0, "dbsnp": []}, 
+        {"pos": 42527803, "op": "SNP.AG", "old": "-1011:T>C", "functional": 0, "dbsnp": ["rs59360719"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525076, "op": "SNP.CT", "old": "1716:G>A", "functional": 1, "dbsnp": ["rs28371710"]}, 
+        {"pos": 42524663, "op": "SNP.TG", "old": "2129:A>C", "functional": 0, "dbsnp": ["rs267608290"]}, 
+        {"pos": 42524217, "op": "SNP.GT", "old": "2575:C>A", "functional": 0, "dbsnp": ["rs28371718"]}, 
+        {"pos": 42524131, "op": "SNP.CT", "old": "2661:G>A", "functional": 0, "dbsnp": ["rs76015180"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523538, "op": "SNP.AG", "old": "3254:T>C", "functional": 0, "dbsnp": ["rs28371726"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*45B": {
+      "phenotype": {"invivo": "Functional (normal or decreased)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528340, "op": "SNP.CT", "old": "-1543:G>A", "functional": 0, "dbsnp": ["rs76210340"]}, 
+        {"pos": 42528095, "op": "SNP.CT", "old": "-1298:G>A", "functional": 0, "dbsnp": ["rs59099247"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527886, "op": "INS.t", "old": "-1094:insA", "functional": 0, "dbsnp": []}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527484, "op": "DEL.CACA", "old": "-695:delTGTG", "functional": 0, "dbsnp": ["rs534009571"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525076, "op": "SNP.CT", "old": "1716:G>A", "functional": 1, "dbsnp": ["rs28371710"]}, 
+        {"pos": 42524217, "op": "SNP.GT", "old": "2575:C>A", "functional": 0, "dbsnp": ["rs28371718"]}, 
+        {"pos": 42524131, "op": "SNP.CT", "old": "2661:G>A", "functional": 0, "dbsnp": ["rs76015180"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523538, "op": "SNP.AG", "old": "3254:T>C", "functional": 0, "dbsnp": ["rs28371726"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*46": {
+      "phenotype": {"invivo": "Functional (normal or decreased)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528340, "op": "SNP.CT", "old": "-1543:G>A", "functional": 0, "dbsnp": ["rs76210340"]}, 
+        {"pos": 42528095, "op": "SNP.CT", "old": "-1298:G>A", "functional": 0, "dbsnp": ["rs59099247"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42526716, "op": "SNP.CT", "old": "77:G>A", "functional": 1, "dbsnp": ["rs28371696"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525076, "op": "SNP.CT", "old": "1716:G>A", "functional": 1, "dbsnp": ["rs28371710"]}, 
+        {"pos": 42524217, "op": "SNP.GT", "old": "2575:C>A", "functional": 0, "dbsnp": ["rs28371718"]}, 
+        {"pos": 42524131, "op": "SNP.CT", "old": "2661:G>A", "functional": 0, "dbsnp": ["rs76015180"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523762, "op": "SNP.CT", "old": "3030:G>A", "functional": 0, "dbsnp": ["rs267608291"]}, 
+        {"pos": 42523538, "op": "SNP.AG", "old": "3254:T>C", "functional": 0, "dbsnp": ["rs28371726"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523301, "op": "SNP.CT", "old": "3491:G>A", "functional": 0, "dbsnp": ["rs267608292"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*47": {
+      "phenotype": {"invivo": "", "invitro": "Negligible (b, dx)"}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526720, "op": "SNP.GA", "old": "73:C<T", "functional": 1, "dbsnp": ["rs267608313"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*48": {
+      "phenotype": {"invivo": "", "invitro": "Normal (b, dx)"}, 
+      "mutations": [
+        {"pos": 42525822, "op": "SNP.GA", "old": "972:C>T", "functional": 1, "dbsnp": ["rs267608309"]}
+      ]
+    }, 
+    "CYP2D6*49": {
+      "phenotype": {"invivo": "", "invitro": "Decr. (b, dx)"}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525181, "op": "SNP.AT", "old": "1611:T>A", "functional": 1, "dbsnp": ["rs1135822"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*50": {
+      "phenotype": {"invivo": "", "invitro": "Decr (b, dx)"}, 
+      "mutations": [
+        {"pos": 42525072, "op": "SNP.TG", "old": "1720:A>C", "functional": 1, "dbsnp": ["rs267608302"]}
+      ]
+    }, 
+    "CYP2D6*51": {
+      "phenotype": {"invivo": "", "invitro": "Negligible (b, dx)"}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523620, "op": "SNP.TG", "old": "3172:A>C", "functional": 1, "dbsnp": ["rs72549348"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*52": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522915, "op": "SNP.CT", "old": "3877:G>A", "functional": 1, "dbsnp": ["rs28371733(k)", "rs149157808"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*53": {
+      "phenotype": {"invivo": "", "invitro": "Incr (b, dx)"}, 
+      "mutations": [
+        {"pos": 42525194, "op": "SNP.TC", "old": "1598:A>G", "functional": 0, "dbsnp": ["rs267608305"]}, 
+        {"pos": 42525181, "op": "SNP.AT", "old": "1611:T>A", "functional": 1, "dbsnp": ["rs1135822"]}, 
+        {"pos": 42525175, "op": "SNP.CA", "old": "1617:G>T", "functional": 1, "dbsnp": ["rs1135823"]}
+      ]
+    }, 
+    "CYP2D6*54": {
+      "phenotype": {"invivo": "", "invitro": "Decr (b, dx)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524236, "op": "SNP.GA", "old": "2556:C>T", "functional": 1, "dbsnp": ["rs267608297"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*55": {
+      "phenotype": {"invivo": "", "invitro": "Decr (b, dx)"}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522957, "op": "SNP.TG", "old": "3835:A>C", "functional": 1, "dbsnp": []}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*56A": {
+      "phenotype": {"invivo": "", "invitro": "None"}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523591, "op": "SNP.GA", "old": "3201:C>T", "functional": 1, "dbsnp": ["rs147960066"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*56B": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523591, "op": "SNP.GA", "old": "3201:C>T", "functional": 1, "dbsnp": ["rs147960066"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*57": {
+      "phenotype": {"invivo": "", "invitro": "Negligible (b, dx)"}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525907, "op": "SNP.GA", "old": "887:C>T", "functional": 1, "dbsnp": ["rs267608311"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": "pseudogene", "op": "e9+", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*58": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525771, "op": "SNP.GA", "old": "1023:C>T", "functional": 1, "dbsnp": ["rs28371706"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524929, "op": "INS.ggggcgaaa", "old": "1863:insTTTCGCCCC", "functional": 1, "dbsnp": ["rs72549356"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*59": {
+      "phenotype": {"invivo": "", "invitro": "Decr"}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524501, "op": "SNP.CT", "old": "2291:G>A", "functional": 0, "dbsnp": ["rs267608300"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523853, "op": "SNP.CT", "old": "2939:G>A", "functional": 2, "dbsnp": ["rs79292917"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*60": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524905, "op": "INS.ta", "old": "1887:insTA", "functional": 3, "dbsnp": []}, 
+        {"pos": 42524489, "op": "SNP.GA", "old": "2303:C>T", "functional": 0, "dbsnp": ["rs79738337"]}
+      ]
+    }, 
+    "CYP2D6*61": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": "pseudogene", "op": "i7+", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*62": {
+      "phenotype": {"invivo": "", "invitro": "None"}, 
+      "mutations": [
+        {"pos": 42522748, "op": "SNP.GA", "old": "4044:C>T", "functional": 1, "dbsnp": ["rs730882171"]}
+      ]
+    }, 
+    "CYP2D6*63": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:G>A", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": "pseudogene", "op": "e8+", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*64": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525771, "op": "SNP.GA", "old": "1023:C>T", "functional": 1, "dbsnp": ["rs28371706"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*65": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*67": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": "pseudogene", "op": "e5-", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*68": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": "pseudogene", "op": "i1+", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*69": {
+      "phenotype": {"invivo": "Decr.", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525732, "op": "SNP.TC", "old": "1062:A>G", "functional": 0, "dbsnp": ["rs267608289"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523804, "op": "SNP.CT", "old": "2988:G>A", "functional": 2, "dbsnp": ["rs28371725"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*70": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526968, "op": "SNP.CT", "old": "-176:G>A", "functional": 0, "dbsnp": ["rs1080993"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525184, "op": "SNP.CT", "old": "1608:G>A", "functional": 1, "dbsnp": ["rs374616348"]}, 
+        {"pos": 42525133, "op": "SNP.CT", "old": "1659:G>A", "functional": 1, "dbsnp": ["rs61736512"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523609, "op": "SNP.CT", "old": "3183:G>A", "functional": 1, "dbsnp": ["rs59421388"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*71": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528381, "op": "SNP.GC", "old": "-1584:C>G", "functional": 2, "dbsnp": ["rs1080985"]}, 
+        {"pos": 42526668, "op": "SNP.CT", "old": "125:G>A", "functional": 1, "dbsnp": ["rs118203758"]}, 
+        {"pos": 42525298, "op": "SNP.AG", "old": "1494:T>C", "functional": 0, "dbsnp": ["rs267608306"]}
+      ]
+    }, 
+    "CYP2D6*72": {
+      "phenotype": {"invivo": "", "invitro": "Decr."}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523474, "op": "SNP.CT", "old": "3318:G>A", "functional": 1, "dbsnp": ["rs75386357"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*73": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525781, "op": "SNP.CT", "old": "1013:G>A", "functional": 1, "dbsnp": ["rs267608308"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522257, "op": "INS.a", "old": "4535:insT", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*74": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42523183, "op": "SNP.CA", "old": "3609:G>T", "functional": 0, "dbsnp": ["rs267608322"]}
+      ]
+    }, 
+    "CYP2D6*75": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42522747, "op": "SNP.CT", "old": "4045:G>A", "functional": 1, "dbsnp": ["rs113940699(k)", "rs532668079"]}
+      ]
+    }, 
+    "CYP2D6*76": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": "pseudogene", "op": "e9-", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*77": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": "pseudogene", "op": "i7-", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*78": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": "pseudogene", "op": "i4-", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*79": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": "pseudogene", "op": "e2-", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*80": {
+      "phenotype": {"invivo": "None", "invitro": "None"}, 
+      "mutations": [
+        {"pos": "pseudogene", "op": "i2-", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*81": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524213, "op": "SNP.GA", "old": "2579:C>T", "functional": 1, "dbsnp": ["rs367543000"]}, 
+        {"pos": 42524186, "op": "SNP.CT", "old": "2606:G>A", "functional": 1, "dbsnp": ["rs77913725"]}, 
+        {"pos": 42524182, "op": "SNP.AT", "old": "2610:T>A", "functional": 1, "dbsnp": ["rs201830078(k)", "rs1135828"]}
+      ]
+    }, 
+    "CYP2D6*82": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525820, "op": "SNP.GT", "old": "974:C>A", "functional": 1, "dbsnp": ["rs28371703"]}, 
+        {"pos": 42525810, "op": "SNP.TC", "old": "984:A>G", "functional": 1, "dbsnp": ["rs28371704"]}, 
+        {"pos": 42525797, "op": "SNP.GC", "old": "997:C>G", "functional": 0, "dbsnp": ["rs28371705"]}, 
+        {"pos": 42525780, "op": "SNP.AG", "old": "1014:T>C", "functional": 1, "dbsnp": ["rs76187628"]}, 
+        {"pos": 42525772, "op": "SNP.TA", "old": "1022:A>T", "functional": 1, "dbsnp": ["rs74802369"]}, 
+        {"pos": 42525771, "op": "SNP.GT", "old": "1023:C>A", "functional": 1, "dbsnp": ["rs28371706"]}, 
+        {"pos": 42525766, "op": "SNP.TC", "old": "1028:A>G", "functional": 1, "dbsnp": ["rs78459009"]}, 
+        {"pos": 42525758, "op": "SNP.AG", "old": "1036:T>C", "functional": 0, "dbsnp": ["rs1135821"]}
+      ]
+    }, 
+    "CYP2D6*83": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": "pseudogene", "op": "e9+", "old": "", "functional": 0, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*84": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42527470, "op": "SNP.TC", "old": "-678:A>G", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42526775, "op": "SNP.CT", "old": "18:G>A", "functional": 0, "dbsnp": ["rs148382141"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524218, "op": "SNP.GT", "old": "2574:C>A", "functional": 1, "dbsnp": ["rs148769737"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523301, "op": "SNP.CT", "old": "3491:G>A", "functional": 0, "dbsnp": ["rs267608292"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*85": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528095, "op": "SNP.CT", "old": "-1298:G>A", "functional": 0, "dbsnp": ["rs59099247"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
+        {"pos": 42526691, "op": "SNP.TC", "old": "102:A>G", "functional": 0, "dbsnp": ["rs151226748"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526187, "op": "SNP.CT", "old": "607:G>A", "functional": 0, "dbsnp": ["rs575159870"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525279, "op": "SNP.GA", "old": "1513:C>T", "functional": 0, "dbsnp": ["rs67497403"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524484, "op": "SNP.CT", "old": "2308:G>A", "functional": 0, "dbsnp": ["rs188062577"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522635, "op": "SNP.AC", "old": "4157:T>G", "functional": 1, "dbsnp": []}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*86": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524186, "op": "SNP.CT", "old": "2606:G>A", "functional": 1, "dbsnp": ["rs77913725"]}, 
+        {"pos": 42524182, "op": "SNP.AT", "old": "2610:T>A", "functional": 1, "dbsnp": ["rs201830078(k)", "rs1135828"]}
+      ]
+    }, 
+    "CYP2D6*87": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526779, "op": "SNP.GA", "old": "14:C>T", "functional": 1, "dbsnp": ["rs773790593"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*88": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525780, "op": "SNP.AG", "old": "1014:T>C", "functional": 1, "dbsnp": ["rs76187628"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*89": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525114, "op": "SNP.AG", "old": "1678:T>C", "functional": 1, "dbsnp": ["rs375135093"]}
+      ]
+    }, 
+    "CYP2D6*90": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525099, "op": "SNP.TC", "old": "1693:A>G", "functional": 1, "dbsnp": ["rs569229126"]}
+      ]
+    }, 
+    "CYP2D6*91": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525057, "op": "SNP.CG", "old": "1735:G>C", "functional": 1, "dbsnp": []}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523804, "op": "SNP.CT", "old": "2988:G>A", "functional": 2, "dbsnp": ["rs28371725"]}
+      ]
+    }, 
+    "CYP2D6*92": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524797, "op": "DEL.G", "old": "1995:delC", "functional": 3, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*93": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524273, "op": "SNP.TG", "old": "2519:A>C", "functional": 1, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*94A": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523611, "op": "SNP.TC", "old": "3181:A>G", "functional": 1, "dbsnp": ["rs748712690"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*94B": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523611, "op": "SNP.TC", "old": "3181:A>G", "functional": 1, "dbsnp": ["rs748712690"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*95": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523458, "op": "SNP.CT", "old": "3334:G>A", "functional": 1, "dbsnp": ["rs77312092"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*96": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42522897, "op": "SNP.GA", "old": "3895:C>T", "functional": 1, "dbsnp": ["rs763964554"]}
+      ]
+    }, 
+    "CYP2D6*97": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42522698, "op": "SNP.GT", "old": "4094:C>A", "functional": 1, "dbsnp": []}
+      ]
+    }, 
+    "CYP2D6*98": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523208, "op": "SNP.CT", "old": "3584:G>A", "functional": 0, "dbsnp": ["rs28371730"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522682, "op": "SNP.GC", "old": "4110:C>G", "functional": 1, "dbsnp": []}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
+    "CYP2D6*100": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527901, "op": "SNP.GA", "old": "-1109:C>T", "functional": 0, "dbsnp": ["rs267608271"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523964, "op": "DEL.G", "old": "2828:delC", "functional": 3, "dbsnp": ["rs267608279"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*101": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42528223, "op": "SNP.GA", "old": "-1426:C>T", "functional": 0, "dbsnp": ["rs28588594"]}, 
+        {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
+        {"pos": 42527792, "op": "SNP.CT", "old": "-1000:G>A", "functional": 0, "dbsnp": ["rs1080989"]}, 
+        {"pos": 42526693, "op": "SNP.GA", "old": "100:C>T", "functional": 1, "dbsnp": ["rs1065852"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525755, "op": "SNP.GA", "old": "1039:C>T", "functional": 0, "dbsnp": ["rs1081003"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42524695, "op": "SNP.TC", "old": "2097:A>G", "functional": 0, "dbsnp": ["rs2267447"]}, 
+        {"pos": 42523847, "op": "DEL.CACATCCGGATGTAGGATC", "old": "2927:delGATCCTACATCCGGATGTG", "functional": 3, "dbsnp": ["rs730882170"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523210, "op": "SNP.TC", "old": "3582:A>G", "functional": 0, "dbsnp": ["rs2004511"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522391, "op": "SNP.GA", "old": "4401:C>T", "functional": 0, "dbsnp": ["rs28371738"]}
+      ]
+    }, 
+    "CYP2D6*102": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525822, "op": "SNP.GA", "old": "972:C>T", "functional": 1, "dbsnp": ["rs267608309"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*103": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525822, "op": "SNP.GA", "old": "972:C>T", "functional": 1, "dbsnp": ["rs267608309"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525043, "op": "SNP.TC", "old": "1749:A>G", "functional": 1, "dbsnp": ["rs1135824"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*104": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42525072, "op": "SNP.TA", "old": "1720:A>T", "functional": 1, "dbsnp": []}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*105": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
+        {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
+        {"pos": 42526561, "op": "SNP.CG", "old_pos": 5504, "old": "CYP2D7:i1:5504", "functional": 0, "dbsnp": ["rs75276289"]}, 
+        {"pos": 42526566, "op": "SNP.AG", "old_pos": 5509, "old": "CYP2D7:i1:5509", "functional": 0, "dbsnp": ["rs76312385"]}, 
+        {"pos": 42526570, "op": "SNP.GC", "old_pos": 5513, "old": "CYP2D7:i1:5513", "functional": 0, "dbsnp": ["rs74644586"]}, 
+        {"pos": 42526572, "op": "SNP.GT", "old_pos": 5515, "old": "CYP2D7:i1:5515", "functional": 0, "dbsnp": ["rs1080996"]}, 
+        {"pos": 42526483, "op": "SNP.CA", "old": "310:G>T", "functional": 0, "dbsnp": ["rs28371699"]}, 
+        {"pos": 42526048, "op": "SNP.GC", "old": "746:C>G", "functional": 0, "dbsnp": ["rs28371701"]}, 
+        {"pos": 42525951, "op": "SNP.AC", "old": "843:T>G", "functional": 0, "dbsnp": ["rs28371702"]}, 
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523524, "op": "SNP.AG", "old": "3268:T>C", "functional": 1, "dbsnp": []}, 
+        {"pos": 42523408, "op": "SNP.TG", "old": "3384:A>C", "functional": 0, "dbsnp": ["rs1985842"]}, 
+        {"pos": 42523002, "op": "SNP.GA", "old": "3790:C>T", "functional": 0, "dbsnp": ["rs4987144"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}, 
+        {"pos": 42522311, "op": "SNP.CT", "old": "4481:G>A", "functional": 0, "dbsnp": ["rs12169962"]}
+      ]
+    }, 
+    "CYP2D6*107": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525133, "op": "SNP.CT", "old": "1659:G>A", "functional": 1, "dbsnp": ["rs61736512"]}
+      ]
+    }, 
+    "CYP2D6*108": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42523566, "op": "SNP.TC", "old": "3226:A>G", "functional": 1, "dbsnp": ["rs61736517"]}, 
+        {"pos": 42523557, "op": "SNP.TC", "old": "3235:A>G", "functional": 1, "dbsnp": ["rs202102799"]}
+      ]
+    }, 
+    "CYP2D6*109": {
+      "phenotype": {"invivo": "", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42527752, "op": "SNP.CG", "old": "-960:G>C", "functional": 0, "dbsnp": ["rs1080990"]}, 
+        {"pos": 42524175, "op": "DEL.CTT", "old": "2615:delAAG", "functional": 1, "dbsnp": ["rs5030656"]}, 
+        {"pos": 42523609, "op": "SNP.CT", "old": "3183:G>A", "functional": 1, "dbsnp": ["rs59421388"]}
+      ]
+    }
+  }, 
+  "region": ["chr22", 42518900, 42546000], 
+  "special_regions": {
+    "rep": [42519175, 42521975], 
+    "0i": [42526793, 42528416], 
+    "ins": [42521975, 42522575]
+  }, 
+  "common_tandems": [
+    ['13', '1'],
+    ['77', '2'],
+    ['79', '2'],
+    ['78', '2'],
+    ['76', '1'],
+    ['36', '10'],
+    ['57', '10'],
+    ['68', '4']
+ ],
+  "unique_regions": ["1e", "1i", "2e", "2i", "3e", "5e", "5i", "6e", "6i", "9e", "pce"], 
+  "seq": "CACCACACCCAGCCAGTATTTTAATTTTTTGTAGAGATGGGGTCTCCTTAGGTGGCCCAGGCTGGTGTTGAATTCCTAGGCTCAAACAATCCTCCTGCCTTAGCCTCCCAAAATGCTGGGATTACAGGCATGAGCTAAGGCACCCAGACTATATTTTTGTCAAGAATTAGTGGTGGTGGGTGTTTGAACATTTTTATTTTAGACCCTCCTATTCTTATTTCATGAATGCAAAGTTTTATCTTTCTAAAGATATCAATTATAGATTTTTTTTTTAAGACAGTTTCACTCTTGTTGACCAGGCTGGAGTGCAATGATGCGATCTCGGCTCACTGCAGCCTCTGCCTCCCAGGTTCAAGCAATTCTCCTGCCTCAGCCTCCTGAGTAGCTGGGATTACAGGCACCCACCACCACGCCCAGCTAATTTTTTGTATTTTTAGTAGAGACGGGGTTTCACCATGTTGGCCAGGCTGGTCTCGAACATCTGACCTCAGGTGATCCACCCATCTCGGCCTCCCAAAGTGCTGGGATTACAGGCGTGAGCCACCCTGCCCAGCCCAATTATAGATTTTTTTAGGTTTAGGTGTTGACAGTAGCTCTCACCTCAGCCTGTTCTCTCTCCTTGTCATGCAGCCCACAGGGGAGATGGTCAGGCCAGTGTGGGGGCTAATGAATAAATGCTACACTGTGCCCACTCAGGTGGGTAAGGGCTGGCACTCCTCTTCCCCTGGAGTGGGGCGGCTGTGCTGGCACCCTTGGCAGACACAGTAAGGGGGACTGCACCTGGAAAGGATGGGCCAGTCGGGGCAGGACTACTCATCACTCATAGTGTGGGTGTCAGGGTTGTGTCACCCCTCCCACCTCCCTCTGCAGAGACGCAAAGTCAAGAGTAGGAAGAAGCCAACCTCTGAGGTAAGGCTTCCCCTGGAAGGCCCAGGGCTGGGGCTCTCTCCTTTCAGAGCTCAGTTAGACCCAGACACACGGCAGGGAGTCCCAAGGGTAGTGGCAGGCCCCCTCCAGGAAACTCACAAGGTTACCACAGCTCAACTGAAAAGGAAGAACTTCCCAGGACTGTGACACCCCAGTGTGAGAACAGGAGGATGAGGTGCTCTGAAGGCCTTTCTGCCCAGTCTGCCCTCTTATTCCTCCTGCAGGTCACGACCCCCAGGAGACCTGGAGGACTGAATGCTGCTGCCCCCAAGGAGGAGGCTGCCGTCTTATCCCAGGAGGGAGAGCAGGTGAAGTCCCCAGGGGAGGAAGCACCTAGCCCCATTCCTGCTGAGCAGGAGGTGGCAGGTACCCCAGACTGGGAGGTAAGGACAGCCCGGGGCTTCGACTGAACGTCTCCAGCGTGGGTCCAACTGAGCAGCCATGGAGCACTGCAGAGTGGGAGGCAGCAGGGCAGGGAGGCAGTGCTGGAGGCTGGCTCAACCCCAAGACCAGCAGGCCAAGCTGCCATCCCAGGGGAGCGAGGACGTCTGTGCAGAGCTGAGAGGCAGCAGCCATGTGTGAACAGACTGGGCCTCATCCTGGCCCCACCGACTTTGTGTGGACAGAGCCTGTTTCCCTGTCTGTGCAACACAGAACCTGCCTGATCTCACTGCTGGATCCCTCTTCTTCCTGCCAGGAAAATAAAAAGGTTCAAAAGGAAGTTGCTGCGTATCCATCTGGTAAGACCACTGACCCAGCGTGCTGCAGGGGGCTGCTTCCACCCTGCTTCTCAGTGACTGCCAGGGTCACAGACACCCCAGCCCTTTCCCACCTTCCTGACCTGGGGAGGGGAGGGGAGGGAAGCAGCCCAGGAGTCAGGTGCCTTGACCTTCCTGGGAGCCTCCTTGGGTGGGCAGGAACTCTGGGCCACTCCCCTGAGCTGGCTGCATCCCTACCTTTCACCACAGCTGACCTGGCCCCGGGGCATCTCAGAGGGAGGGTTGGTTGCTCCCAGGAGGGGACTCACAAGGCTGCCTGTTTCTACTTTGCAGAGGCCTCTGAGGACAGCAAAGAGCAAAGGCCCTGGGACCGGGTCTACGTGCCCATGACAGAGCTCTGGCTGGACTGGTTCTGAGCCTCTAACACCCCCAAGACTCAGAACCGTGAAGAAAATCTTTCCAATAAATCCAAGAGTTGCTGCTGCTATAGGCCAGGCTGCCACCTTTCGGGGCCTCCGTCTTCAGACAAACCCAGCCTGGCTTCATCCACACTCCCTGTCCCCACAGCTGCAGGAACAGCACTTCCTGCCACCGAGCCGTGTGACCACAGTGGATTGTCTCTGGAGGGGCCCAAGGGGGCCCTGGCCACCCTTCTGACTGACTCGGTGCCAGGGGACAGACCAACGTCCCTCTCGTGCTGACAGCCGGGCCGCACCCTGGCATGAGGGCATTTACAGAAATGCTGGCGGAACTGCTGCCAGGGAGGCTGTAGGGTCCTCTGGCAAAAGAGGCCTCAGGTGGCTCCTCAGAGTGTCTGTGGTTCTCTGTCCCAGGCTGTTCCCTAAGAAGGTCTGCCCAGGACTCAGGTAATCATATGCTCATTAGAAACTCTTGGGCACTGCCTGTGTGCCCAGCCCAGCCCATTATGTCGGTGAGGACAGACGTGGAGGACAGCAGTCCCTGCCCTTGGTTGGGGCTCCAGGCCAGCAAGGGCCACAGCCCCAGAAGGCAGAGCAGGAAGACAGGACTCGGGGCAGGTGAAGCAGCCTTCTCGTTGGCAGAAGGGAAACAGAAGCCCGGGGTGGGGAAGGGTGGGGAAGGGTGGGGAAGGGTGGGCCCGGGGTCACACGGGGTAATGGCAGAGCAAGGACTAGGGTCAGGGTCTCTGGCTCTCAGCTGCCCATGCCACCTCCTCCTTCTCTGCCCGCCCCAGTGCCTTATGGGTCCAAGGTTGACTCCTGTCCCTAGGGCAGGCCTGTGGGCCCTGCCTGATCCCTACTGGGAGGATGGTACCTAGGGTTGGAGCCAAACAAGTGTCCTCCTCCAGCGCCAGCCTGGCCCTGAGTGCGAACTCGTCACTGGTCAGGGGTCTGTACAGCAGCATCCCTGAGGGCCCAGAGAGGTAGCCAGTCCTGTGGTGAGGTGACGAGGCTGAGGGTGGTGGCTCAGTCCTGGGCTTCCATGGGGCCTTCCCAGGGAACGTTCTGGCACCTGCCGACTGAGCCCTGGGAGGTAGGTAGCCCTGGCATATAGCTCCCTGACGCCATGATTTGTCTTCCGTTTTGGGGTGTCATATATGAAGGGAGGTGACTGTGATGGTGCTGGCAGGACTGCTGTCCCTGATGTGGGGTGGGCTGAGTTAGGCCTGAAATATGGGCCTCCAGGCTGAGTCCTGCCCTCTCCACCACATCCAGGGCTGACTGACACCTCTAGTCAGCCCATTCTGGCCCCTTCCCCACATGCCAGGACAATGTAGTCCTTGTCACCAATCTGGGCAGTCAGAGTTGGGTCAGTGGGGGACATGGGATTATGGGCAAGGGTAACTGACATCTGCTCAGCCTCAACGTACCCCTGTCTCAAATGCGGCCAGGCGGTGGGGTAAGCAGGAATGAGGCAGGGGTGGGGTTGCCCTGAGGAGGATGATCCCAACGAGGGCGTGAGCAGGGGACCCGAGTTGGAACTACCACATTGCTTTATTGTACATTAGAGCCTCTGGCTAGGGAGCAGGCTGGGGACTAGGTACCCCATTCTAGCGGGGCACAGCACAAAGCTCATAGGGGGATGGGCTCACCAGGAAAGCAAAGACACCATGGTGGCTGGGCCGGGGCTGTCCAGTGGGCACCGAGAAGCTGAAGTGCTGCAGCAGGGAGGTGAAGAAGAGGAAGAGCTCCATGCGGGCCAGGGGCTCCCCGAGGCATGCACGGCGGCCTGTGGGGAGGGGAGGGGCGTCAGTGAGCCTGGCTCCTGGGTGATACCCCTGCAAGACTCCACGGAAGGGGACAGGGAGCCGGGCTCCCCACAGGCACCTGCTGAGAAAGGCAGGAAGGCCTCCGGCTTCACAAAGTGGCCCTGGGCATCCAGGAAGTGTTCGGGGTGGAAGCGGAAGGGCTTCTCCCAGACGGCCTCATCCTTCAGCACCGATGACAGGTTGGTGATGAGTGTCGTTCCCTGGGCAGGAGATGCAGGGTGAGAGTGGGGACTGGACTCTAGGATGCTGGGACCCCTGCCACCAAACACACGGGGGACACACACTGCCTGGCACACAGCTGGACTCTGTCAACTAGTCCTGCGCCCGAGAAGCTCCACAGTACCCTCTCCGACCCCACAGCAGGGCGCAGTCACACCTCTCAGAGGCACCCACACTGCCCCCTCTCCCTGCAGGCGTTGGGTCCTCCAACATTCTGGCAGGTCCTGGTTTGTCTCCCCACTAGACGGGGGCTCTGGATGGACAGGCCAGCCCTGCCTATACTCTGGACCCCCCACCCAAGTGGGGACAGTCAGTGTGGTGGCATTGAGGACTAGGTGGCCAGGGTTCCTAGAGTGGGCCCACCTGGCAGTAGCCATGCTGGGGCTATCACCAGGTGCTGGTGCTGAGCTGGGGTGAGGAGGGCGCCAGGCCTACCTTAGGGATGCGGAAGCCCTGTACTTCGATGTCACGGGATGTCATATGGGTCACACCCAGGGGGACGATGTCCCCAAAGCGCTGCACCTCATGAATCACGGCAGTGGTGTAGGGCATGTGAGCCTGGTCACCCATCTCTGGTCGCCGCACCTGCCCTATCACGTCGTCGATCTCCTGTTGGACACGGCCTGGACAGACATGCGTCCCCACAATGGGTCAGCACCCAGGGGGTCCGGCCCTGACACTCCTTCTTGCCTCCTATGTTGGAGGAGGTCAGGCTTACAGGATCCTGGTCAAGCCTGTGCTTGGAGCCCCGGGTGTCCCAGCAAAGTTCATGGGCCCCCGCCTGTACCCTTCCTCCCTCGGCCCCTGCACTGTTTCCCAGATGGGCTCACGCTGCACATCCGGATGTAGGATCATGAGCAGGAGGCCCCAGGCCAGCGTGGTCGAGGTGGTCACCATCCCGGCAGAGAACAGGTCAGCCACCACTATGCGCAGGTTCTCATCATTGAAGCTGCTCTCAGGGTTCCCCTTGGCCTGAGCAGGGCCGAGAGCATACTCGGGACAGAACGGGGTAGCCCCCAAATGACCTCCAATTCTGCACCTGTCAGCCCAGATGCGGCTCGCCGGGTGATGCACTGGTCCAACCTTTTGCCCAGCCTCCCCTCATTCCTCCTGGGACGCTCAACCCACCACCCTTGCCCCCCACCGTGGCAGCCACTCTCACCTTCTCCATCTCTGCCAGGAAGGCCTCAGTCAGGTCTCGGGGGGGCTGGGCTGGGTCCCAGGTCATCCTGTGCTCAGTTAGCAGCTCATCCAGCTGGGTCAGGAAAGCCTTTTGGAAGCGTAGGACCTTGCCAGCCAGCGCTGGGATATGCAGGAGGACGGGGACAGCATTCAGCACCTACACCAGACAGAACGGGGTCTCAATCCCTCCTGTGCTCTGCGTTCACCTGGACAAGTCTCAGGCCCCAGCCATCTCCAGGTAGACCCAGGGCCTGCCTGTCCTTACCACTGACCTCACCAAGTCCCTCCCCAAGTGCCAGCCTCCACCCTCTCTCCTTGCCCAGAGGAGAAACCTAAAATCGAAATCTCTGACGTGGATAGGAGGTACAGAGTCCTTGGCCTCTCCTGGTGCCCCCTGACCCGGGCACACCTCTCCCACGACCATGTCTGAGATGTCCCCTCCTCCTCCAGGCCCTTCTTACAGTGGGGTCTCCTGGAATGTCCTTTCCCAAACCCATCTATGCAAATCCTGCTCTTCCGAGGCCCCAGTCCAGCCCCGGCACCTCTCGGGAGCTCGCCCTGCAGAGACTCCTCGGTCTCTCGCTCCGCACCTCGCGCAGAAAGCCCGACTCCTCCTTCAGTCCCTCCTGAGCTAGGTCCAGCAGCCTGAGGAAGCGAGGGTCGTCGTACTCGAAGCGGCGCCCGCAGGTGAGGGAGGCGATCACGTTGCTCACGGCTTTGTCCAAGAGACCGTTGGGGCGAAAGGGGCGTCCTGGGGGTGGGAGATGCGGGTAAGGGGTCGCCTTCCCCGTCCCCCGCCTTCCCAGTTCCCGCTTTGTGCCCTTCTGCCCATCACCCACCGGAGTGGTTGGCGAAGGCGGCACAAAGGCAGGCGGCCTCCTCGGTCACCCACTGCTCCAGCGACTTCTTGCCCAGGCCCAAGTTGCGCAAGGTGGACACGGAGAAGCGCCTCTGCTCGCGCCACGCGGGCCCATAGCGCGCCAGGAACACCCCTGGGGGTGGGACGGGCACGTGCGCGTGGCCATGAAGGCATTAGCCCCACCATCCACCACCCACTCCAACCCTATGCTCCCCCTGGTCTCCCGCAGTCCCTGGCTCTGTCCAGCTGGTCACAGGGCCCACTCTTTGTGCATCCACCTTGCTCCCTTGGCTGGGGCAGGGCTTTGCCCCACCTCGTCTCTGCCCACCCTGACCGCCTTTGCACTCAGGGAAGACCCCGCGGGCCCCGCGCCACCCACACTGAGCTTACAGCACAGGTGCGGTCCCCGCCCCCCACTTCGACACCGGATTCCAGCTGGGAAATGCGCCACGCTCACCCATTGGGCTCCTGCCAGGTCTCGGCAGTGGCCCCGCCCACTCGTCACAAGCCCCGCCCTCGTCCCCATGCTCACACCTCCCTAGTGCAGGTGGTTTCTTGGCCCGCTGTCCCCACTCGCTGGCCTGTTTCATGTCCACGACCCCGCGCCCTCTCTGCCCAGCTCGGACTACGGTCATCACCCACCCGGGTCCCACGGAAATCTGTCTCTGTCCCCACCGCTGCTTGCCTTGGGAACGCGGCCCGAAACCCAGGATCTGGGTGATGGGCACAGGCGGGCGGTCGGCGGTGTCCTCGCCGTGGGTCACCAGCGCCTCGCGCACGGCCGCCAGCCCATTGAGCACGACCACCGGCGTCCAGGCCAGCTGCAGGCTGAACACGTCCCCGAAGCGGCGCCGCAACTGCAGAGGGAGGGTCAGGGCCTCTTGTCAAGCCAGGATCACCCCAGACTACAGGTCCTAGTCCTATTTGAACCTTGGACGACCCCCGGGGCTACCAGGAGTGAGCAGGTGGAAGGAGGAGACCCAGCCTCCTGATCGTGGGGCGGGGGTGGGGGTCACACCTTCTGTGATGGAGGAACTCAGTTTGGATGCGTCACCCAGGTATGACCTTGCAAGAGTCACCAAAATTGCCGAGAGGCCCCAGTTAGCATCCCATTCCCAGATGATGGTCCATGCCGGTGAGCAGTGAGGCCCGAGGACCCACAGTGCAAAAGGTTTGAACCGGGTCACTGCACCCCCTTCATCCTCGATTTCGTGATTTAAACGGCACTCAGGACTAACTCATCTTCCATTCCCAAGGCCTTTCCTTCTGGTGTCAGCAGAAGGGACTTTGTACTCCATAACATATGTTGCCCAATGGGCTTGCATGCCCACTGCCAAGTCCAGCTCCACCTCCAGGCCCTTGCCCTACTCTTCCTTGGCCTTTGGAAAATCCAGTCCTTCATGCCATGTATAAATGCCCTTCTCCAGGACGTCCCCCAAACCTGCTTCCCCTTCTCAGCCTGGCTTCTGGTCCAGCCTGTGGTTTCACCCACCATCCATGTTTGCTTCTGGTAGGGGAGCCTCAGCACCTCTGCCGCCCTCCAGGACCTCCTCCCTCACCTGGTCGAAGCAGTATGGTGTGTTCTGGAAGTCCACATGCAGCAGGTTGCCCAGCCCGGGCAGTGGCAGGGGGCCTGGTGGGTAGCGTGCAGCCCAGCGTTGGCGCCGGTGCATCAGGTCCACCAGGAGCAGGAAGATGGCCACTATCACGGCCAGGGGCACCAGTGCTTCTAGCCCCATACCTGCCTCACTACCAAATGGGCTCCTCTGGACACACCTGGCACCCCCACCCCACCAGGCACAGAGGACCAGGCAGGACACTCTCAGCACACCGAGCGCGTGACCCTTCCCTTATAAAGGGAGCTGATGATGGCCTTTGCCCTCTGCTGTGAGTGAACCTGCTGTGTTGACTGTGCTGCCAGTGGCAGAGTCAGGCCAGGGCGGGTATGGGCTGCTCCAGAGGTTCTTGCCCCTGCTTCCTGCTCCAGGCCCTTACCCAGGGTAGGCCGGTGGAGGGGCCTGGTCGGAGAAGTCACCCCCTCTCCCCACTCCAAGCTCCTGAAGCCTGCAAAGCCTTCTGGGATAACCAGGGTTTCAGTGGACCCGGCCATCCACCTCCCAGCTAGGCTCATACACCCTAATGTAGTCACAACCCCTCCTCCAGAACATGGCCTTGCCCTTTCCCTACCCCCACCTGCCCACTCCAGAGTGACCTTCAGCACCCTTATCTGTCACTGGCACTTACCTGGGGCCTTAGAGCTCCTGATGATGAGTGGCATCATGGGCCTGGTCCCTTCACTTCACCTTGCACTCTTGACATGCACAGACGCTATGCACACACCTGATGGTGCACAGATCTCTTGTCCACTCCCAGACACTTGTCCACTTGTTCACACTTGCAGGGACACGATTACACACGCAGAAAATCACCCACACAAAGACAATATTCACACATACACAGACTCACACTGACACTTAGGGCACACATTCTCTCTCACACACACCAGTCACACACACATACAGACCCGGCACCAAGTACCCCACTTCCCAGCCATGCCGGAGGTTTCCTGGATGGGACCACTCCTGTCCAGAGGCTGCTCCCAGCCCAGCCCACATTCCTGGGCTCTGGCCGGGCTATGGCTTCTTGTTTGCAACAGGGCTGTTCCCAGAGCTCCCAGTTGGTAGCCGGAAGGCCCTTGCCCCAGCCTGTGACAACATCCTCCCGGGCTGCCTGAGGGTCGTCCTCCTCCACTGCTTTCTGGCCTCCATGTTTCTGATTAGAAATCTGGTGGGAACGTTATGGAGGATCCTTTGTTCAGGATATGTTGCTTTATTTTTTTTTTCTTTAGACAGGGTCTCACTCTGTTGCCCAGGCCGGAGTGCAGTGGCAGGATCATGGCTCACTGCAGTCTCGACATCAAGTGGACCCCCTGCCTCCCAAGTAGCTGGGACTACAGGCACCACCCAGCCTAATTCTTTTTTTTTTTTTTTTTTTTTTTTTTTGGAGACGGAGATTTCCTCTTGTTGCCCAGGCTGGTGGCTCCCCTCCATTGTGCAATGATGCAATCTCGGCTCACTACAACCTTCACCTCTAGGCTTCAAGCAATTCTCCTGCCTCAGCCTCCTAAGTAGCTGGGATTACAGGTGTGTGCCACCACGTCTAGCTTTTTGTATTTTCAGTAGAGATAGGGTTTCACCATGTTGGCCAGGCTAGTCTTGAACTCCTGACTTCAGGTGATCCACCCACCTCAGGCTCCCAAAGTGCTGGGATTATAGGCATGAGCCACCGCACCCAATCCCAGCTAATTTTGTATTTTTTGTAGAGACCGGGTTCTTCCAAGTTGTCCAGGCTGGTCTTGAATTCCTGGGGTGAAGCGATCCTCCCACCTGGGCCTCCCAAAGTGCTGGGATTACAGGCCTGAGCCACTGTGACTACCTGATACGTCTCTTCTCTCTTGCTGCTTTCAAAATCCTGTCTTTTGTGGGAGGGCAGCTGCCGAGCTCTGGACTTCTATGGGATCATCCACTGAGGACAGGAGGACCGGGCCCTCTACAGGTGGATTGTATGGCAGCTGCCATGCTTGGAGCCAGTGCTCACCGAGCACGTGGCGGCTGTGGAGCTGGACGCGGGGTTGATAAGTCCGCTGGGGGTGACGGGCTCATCCATGAGTGGTACTTGATGTGGCTGCAGAAGGCGGATGTGGTGGTGGCAGAAGTGACACAACTGTCCCTGGGTATAGGCTATGATCTGTGCCAGGCCACAGCCCTCAATAAGTGAATCCTGTGCCTGCTCCAGCAGCAGTCCGGTGGAGTGCTGTCGGCCATGATCTGGGAAGAGGCAGATGGCTCTGGGTTCCAGGTGTGGGACTACGGAGAGGGACAGGTGGAGGCCCTGCTGCATGGATAGGTTGAGGCTGATCCTCCCGAGCAGGTTGCCTCCCCTAACCCAACCATTGGACCTAATCCCATTTTATTAAATTCTTCTCATCCCAGACACTGCTCTAGTACCAGTCCTGGCTCTTTGCCCCAGGAGCAAATTAAAAGGTACATTTAAAATTCTAAAAAAAGAAAAATCTGTCTTTTGACAGTGATTATGATGATGCGTATGGCTGAAGATCTCTTTGAGTTTACCCTACTTGGAGTTTGATGAGCTTTTTGGATGTACAGATTAATATTTTTCATCAGATTTGGGAGGTTTTTCAGCCATTAATTCTTCAACTATTCCTTTACTCCTTTCTCCCTGTCTTCTTTCCTGGGACTCCCATTGCGTGTATGTCGGAAAGCTTGACGGCGTCTCCAGGTCTCTGGATCTCTGTGCATTGCTCTTCATGCTTGTTCCTGTTCCTCAGAGGGGACTACCTCAGGTGGCCTCTCTCCATAGTCACAGGCTCTTTCTTCCAATTGTTCCAATCTGCTCTTGGGCCCCTGGGATGAATTTTCATTTATTTTACCCTACAACTCCAGAATTTTTATTTGGTTCCTTTTTCAACTTTTTTTTTGTTTTTTGTTTTGTTTTGTTTTTTGGAGTATCGCTCTGTCACCCAGGCTGTAGTGCAGTGGTGCAATCTCGGCTCACTGCAATCTCTGCCTCTCGGGTTCAAGCGATTCTCCTGCCTCAGCCTCCCGAGTAGCTGGGATTACAGGCACGTGCCACCACGCCCGGCTAATTTTTGTATTTTAAGTAGAGACGGGGTTTCACCATGTTGGCCAGGCTGGTCTCAATCTCTTGACCTCATGATATGCCCGCCTCAGCCTCCCAAAGTGCTGGGATTATAGGCATGAGCCACCATGCCCAGCCCCTTTTTATAAGGTTCATCCCATTATTGATATTCTCTAATTGGTGAGACATTGTTCCCACACTTTCGTTAGTTCTTTTGACATGGTTCTTTTCTTTTTCTTGGGAGAGGGTCTCTCTGTCGCCCAAGCTGGAGTGCAGTGATGCAGTCATGGCTCACTGCAGCCTCAACTTCCTGGGCTGAAGTGATCCTCCTACCTCAGCATCCTGAGAGGCTGGGACCATAGGCAGCCAGCTAATTTTTTAAATTTTTTGTAGAGATGGGGGTCTCACCACATTTCCCAAGCTGCTCTCAAACTCCTGGGCTCAAGCAATCCACGGGCCTCAGCTTCCCAGAGTGCTAGGATTATAGGTGTGAGCCACTGCACCAGGCCTACACGTGGTTTCTCCCTTTGAAGTACTAGCCAGGCCTGACCATGCTTAGCTTCCGAGATCAGCAGGTTCCAGCCGGTGCAGCCTCAGATGCAGCATGTTTTAGGTCTTTGAACATATTTAAATGAGCTGACTGAACGTCTTTGTCTAGCAATTGCAGCATCGGGCTGGTCCCATTGGTGACTTTTCCCGTGTCTGGGTCGTCCTTTCGGTTTCCTTTCCATGTCTCATAATTTGTTAAAACCTGGACATTTCACGGGCGATAATGTGGCAACTCCGGAAGTCAGATTCTCTTCCCTGCCAAGGATGTGTTGTTGTTGTTGCCTGTTGGAGCTGTTTCTTTGCTGGGTGACTTTTCTGAACTAATTCTGACTAAGCATTAATGTCTCCATTCCCTGCGAGCTGTGGCCACTGAAGCCGCTCTTCAGTTACGGCAGTGGTCAGCTAATGACTGGTCAGAGAGTTCCTTAGGTGCCTGGAAGCGAAGTCTTTGCCGAGTGGGTCTCTCTCTGTGTGCCGGGCGTGGCTTCAGTGCTCGGCTAGGCAGTGCTCAACTTTCCCTTAGCCGTCACCTGCTGTCTGCACAGCACCTCAGGTCAGTCACGGGTGAGGGCTCAGGGCCTTGCCGGCCTTCCTGAATATGGGCACAGCTGCAGACAGCCTTACCCACGTGCAGGGCACCTAGATTCCCAAGAAGGGGCAAGAGCTGTTCAAAACCACTACAAGCTGGACATGGTGGCTCACACCTGTAGTGTCAGTGACTCAGAAGGCTGTAATGGGAGGATGACTTGAGGCCAGGAGTTTGAGACCTAGCAAGACCCCATCCCCCACCCAAAAAAACAAAAACAACAACAAAAACTCACTGTGGACCGCTCATGCCCCAGCTGCTGCTTTTTAACCCCAGCTGTTATCCATCACCACAGGCAGCTTCGATTTTCAATCATGGATCTGATGACTTTCAACAAACTTTCCTGAGGAAAGTGCTGTTCCCACCAGAAGAGATCTCAGGACAAATGTAGACAGCCCTGGCAAGTGGGGTCTCCCTGGGAGCTAGCAGACAGGTGAAAGACTGACAGTTCTTGGGGAATTAGGCTTTTCTTTTGTTTTGGAGATGGCGTTTCATACTTATCACCCAGACTGGAGTGCAATGGTGTGATCTCGGCTCACTGCAACCTCTGCCTCCCAGGTTCAAGCAATTCTCCTGCCTCAGCCTCCTGAGTAGCTGGGATTACAGGCACCCACCACCACGCCCAGCTAATTTTTTGTATTTTTAGTAGAGACGGGGTTTCACCATGTTGGCCAGGCTGGTCTCGAACATCTGACCTCAGGTGATCCACCCATCTCGGCCTCCCAAAGTGCTGGGATTACAGGCGTGAGCCACCCTGCCCAGCCCAATTATAGATTTTTTAGGTTTAGGTGTTGACAGTAGCTCTCACCTCAGCCTGTTCTCTCTCCTTGTCATGCAGCCCACAGGGGAGACGGTCAGGCCAGTGTGGGGGCTAATGAATAAATGCTACACTGTGCCCACTCAGGTGGGTAAGGGCTGGCACTCCTCTTCCCCTGGAGTGGGGTGGCTGTGCTGGCACCCTTGGCAGACACAGTAAGGGGGACTGCACCTGGAAAGGATGGGCCAGTCGGGGCAGGACTACTCATCACTCATAGTGTGGGTGTCAGGGTTGTGTCACCCCTCCCACCTCCCTCTGCAGAGACGCAAAGTCAAGAGTAGGAAGAAGCCAACCTCTGAGGTAAGGCTTCCCCTGGAAGGCCCAGGGCTGGGGCTCTCTCCTTTCAGAGCTCAGTTAGACCCAGACACACGGCAGGGAGTCCCAAGGGTAGTGGCAGGCCCCCTCCAGGAAACTCACAAGGTTACCACAGCTCAACTGAAAAGGAAGAACTTCCCAGGACTGTGACACCCCAGTGTGAGAACAGGAGGATGAGGTGCTCTGAAGGCCTTTCTGCCCAGTCTGCCCTCTTATTCCTCCTGCAGGTCACGACCCCCAGGAGACCTGGAGGACTGAATGCTGCTGCCCCCAAGGAGGAGGCTGCTGTCTTATCCCAGGAGGGAGAGCAGGTGAAGTCCCCAGGGGAGGAAGCACCTAGCCCCATTCCTGCTGAGCAGGAGGTGGCAGGTACCCCAGACTGGGAGGTAAGGACAGCCCGGGGCTTCGACTGAACGTCTCCAGCGTGGGTCCAACTGAGCAGCCATGGAGCACTGCAGAGTGGGAGGCAGCAGGGCAGGGAGGCAGTGCTGGAGGCTGGCTCAACCCCAAGACCAGCAGGCCAAGCTGCCATCCCAGGGGAGCGAGGACGTCTGTGCAGAGCTGAGAGGCAGCAGCCATGTGTGAACAGACTGGGCCTCATCCTGGCCCCACCGACTTTGTGTGGACAGAGCCTGTTTCCCTGTCTGTGCAACACAGAACCTGCCTGATCTCACTGCTGGATCCCTCTTCTTCCTGCCAGGAAAATAAAAAGGTTCAAAAGGAAGTTGCTGCGTATCCATCTGGTAAGACCACTGACCCAGCGTGCTGCAGGGGGCTGCTTCCACCCTGCTTCTCAGTGACTGCCAGGGTCACAGACACCCCAGCCCTTTCCCACCTTCCTGACCTGGGGAGGGGAGGGGAGGGAAGCAGCCCAGGAGTCAGGTGCCTTGACCTTCCTGGGAGCCTCCTTGGGTGGGCAGGAACTCTGGGCCACTCCCCTGAGCTGGCTGCATCCCTACCTTTCACCACAGCTGACCTAGCCCCGGGGCATCTCAGAGGGAGGGTTGGTTGCTCCCAGGAGGGGACTCACAAGGCTGCCTGTTTCTACTTTGCAGAGGCCTCTGAGGACAGCAAAGAGCAAAGGCCCTGGGACCGGGTCTACGTGCCCATGACAGAGCTCTGGCTGGACTGGTTCTGAGCCTCTAACACCCCCAAGACTCAGAACCGTGAAGAAAATCTTTCCAATAAATCCAAGAGTTGCTGCTGCTATAGGCCAGGCTGCCACCTTTCGGGGCCTCCGTCTTCAGACAAACCCAGCCTGGCTTCATCCACACTCCCTGTCCCCACAGCTGCAGGAACAGCACTTCCTGCCACCGAGCCGTGTGACCACAGTGGATTGTCTCTGGAGGGGCCCAAGGGGGCCCTGGCCACCCTTCTGACTGACTCGGTGCCAGGGGACAGACCAACGTCCCTCTCGTGCTGACAGCCGGGCCGCACCCTGGCATGAGGGCATTTACAGAAATGCTGGCGGAACTGCTGCCAGGGAGGCTGTAGGGTCCTCTGGCAAAAGAGGCCTCAGGTGGCTCCTCAGAGTGTCTGTGGTTCTCTGTCCCAGGCTGTTCCCTAAGAAGGTCTGCCCAGGACTCAGGTAATCATATGCTCATTAGAAACTCTTGGGCACTGCCTGTGTGCCCAGCCCAGCCCATTATGTCGGTGAGGACAGACGTGGAGGACAGCAGTCCCTGCCCTTGGTTGGGGCTCCAGGCCAGCAAGGGCCACAGCCCCAGAAGGCAGAGCAGGAAGACAGGACTCGGGGCAGGTGAAGCAGCCTTCTCGTTGGCAGAAGGGAAACAGAAGCCCGGGGTGGGGAAGGGTGGGGAAGGGTGGGGAAGGGTGGGCCCGGGGTCACACGGGGTAATGGCAGAGCAAGGACTAGGGTCAGGGTCTCTGGCTCTCAGCTGCCCATGCCACCTCCTCCTTCTCTACCCGCCCCAGTGCCTTATGGGTCCAAGGTTGACTCCTGTCCCTAGGGCAGGCCTGTGGGCCCTGCCTGATCCCTACTGGGAGGATGGTACCTAGGGTTGGAGCCAAACAAGTGTCCTCCTCCAGCGCCAGCCTGGCCCTGAGTGCAAACTCGTCACTGGTCAGGGGTCCGGACAGCAGCATCCCTGAGGGCCCAGAGAGGTGGCCAGTCCTGTGGTGAGGGTGAGAGGTGTCAACGTGCTGGCGGTCCTCGCTCGCTCTCAGCGCCTCCTCGGCCTCAGCTTCTGCTCTGACCACACTTGAGGAGCCCTTCAGCCCAGCGCTGCACTGTGGGAGCCCCTCTCTGGACTGGTGGAGGCTGGAGCCGGCTCCCTCTGCTTGCGGGGAGGTATGGAGGGAGAGGCGTGTGCGGGAACCTGGGTTGCTCGCGGGCCAGCACCAGTTCTGGGTGGGCAGGGGCTCAGCGGGCCCTGCACTCGGAGCGGCCGGCTGGTGCCTCTGGCCCCAGGCAGTGAGGGGCTTAGCACCTGGGCCAGCAGCTGCAGAGGGGGCACCGGGTCCCCCAGTACTGCTGGCCTGCCGGCGCTCACCACACTTGAATTGTCGCCAGGCCTCAGTCACCTCCCCGCGGGGCAGGGCTCAGGACTTGCAGCCTGCCATGCCCAAGCCTCCCTACGGTGGGCTCCCTGCGAGGCCTGAGCCTCCCGGATGGGTGCCTCCCACTGCTCCACGGCACCTGGTCCCGTCCACTGCCCAAGGGCTGAGGAGTACAGGTGCCTGGTGTGGGACTAGCAGGCAGCTCTGCCTGTGGCCCTGGCATAGGATCCACTAGGCGAAGCTGGCTGGGCTCCTGAGTCAGGTGGGGACTTGGAGAACTTTTATGTCTAGCCAGAGGATTGTATATGCACCAATCAGCACTCTGTGTCTAGCTCCGGGTTCGTGCATGCACCAATTAGCACTCTGTATCTAGCTAATCTGGTGGGGACTTGGGGAACCTTTATTTCTAGCTAAAAGATTGTAAATACACCAATCAGCACTCTGTGTCTAGCTCAAGGTTTGTAAACACACCAGTCAGCACCCTGTGTCTAACTCAAGGTTTGTAAACGCACCAATCAGTGCTCTCTGTCTACTCTATCTAGCTAATCTAGTGGGGACTGGGACAACCTTTATGTCTAGCTAAGGGATTGTAAATACACCATTCAGCACTCTGTGTCTAGCTCAAGGTTTGTAAATATACCAATCAGTACTCTGTGTCTAGCTCAGGGATTGTAAATGCACCAATCAGCTCTCTGTAAGTGGACCAATCCACTGTCTGTAAAATGGGCCAATCAGCAGGATGTGGGTGGGGGTCAGATAAGGGAATAAAAGCAGGCTGCCTGAAGTAGCAGCGGCAACCTGGTTGCCATCATTCTTTTGCTGTTTGCAGTAAGTCTTGCTGCTGCTGCTCCCTCATTGGGTCCACACTGCCTTTATGAGTTGTAACACTGGAAGGACTGCAGTTTCACTCCTGAGGCCAGTGAGACCACAAACCCACCAGGAAGAATGAACAACTCCGTACGTGCAGCCTTAAGAGCCGTAACACTCACTGTGAAGGTCTGCAGCTTCACTCCTGAAGCCAGCAAGACCACGCACCCACCAGAAGGAAGAAACTCTGAACACGTCTTAACATCAGAAGGAACAAACTCTGAACACACCATCTTTAAGAACTGTAACACTCACCGTGAGGGTCCACGGCTTCATTCTTGAAGTCAGTGAGACCAAGAACCCACCAATTTTGGACACAAGGTGACAGGCTGAGGGCGGTGGCTCGGTCCTGGGTTTTCCTGGGGCCTTCCCAGGGAATGTTCTGGCACCTGCCGACTGAGCCCTGGGAGGTAGCCCTGGCATATAGCTCCCTGACATGATTTGTCTTCCATTTTGGGGTGTCATATATGAAGGGAGGTGACTGTTGTGATGGTGCTGGCAGGACTGCTGTCCCTGATGTGGGGTGGGCTGAGTTAGGCCTGAAATATGGGCCTCCAGGCTGAGTCCTGCCCTCTCCACCACATCCAGGGCTGACTGACACCTCTAGTCAGCCCATTCTGGCCCCTTCCCCACATGCCAGGACAATGTAGTCCTTGTCACCAATCTGGGCAGTCAGAGTTGGGTCAGTGGGGGACATGGGATTATGGGCAAGGGTAACTGACATCTGCTCAGCCTCAACGTACCCGTCTCAAATGCGGCCAGGCGGTGGGGTAAGCAGGAATGAGGCAGGGGTGGGGTTGCCCTGAGGAGGATGATCCCAACGAGGGCGTGAGCAGGGGACCCGAGTTGGAACTACCACATTGCTTTATTGTACATTAGAGCCTCTGGCTAGGGAGCAGGCTGGGGACTAGGTACCCCATTCTAGCGGGGCACAGCACAAAGCTCGTAGGGGGATGGGGTCACCAGAAAGCTGACGACACGAGAGTGGCTGGGCCGGGGCTGTCCGGCGGCCACGGAGAAGCTGAAGTGCTGCAGCAGGGAGGTGAAGAAGAGGAAGAGCTCCATGCGGGCCAGGGGCTCCCCGAGGCATGCACGGCGGCCTGTGGGGAGGGGAGGGGCGTCAGTGAGCCTGGCTCCTGGGTGATACCCCTGCAAGACTCCACGGAAGGGGACAGGGAGCCGGGCTCCCCACAGGCACCTGCTGAGAAAGGCAGGAAGGCCTCCGGCTTCACAAAGTGGCCCTGGGCATCCAGGAAGTGTTCGGGGTGGAAGCGGAAGGGCTTCTTCCAGACGGCCTCATCCTTCAGCACCGATGACAGGTTGGTGATGAGTGTCGTTCCCTGGGCAGGAGATGCAGGGTGAGAGTGGGGACTGGACTCTAGGATGCTGGGACCCCTGCCACCAAACACACGGGGGACACACACTGCCTGGCACACAGCTGGACTCTGTCAACTAGTCCTGCGCCCGAGAAGCTCCACAGTACCCTCTCCGACCCCACAGCAGGGCGCAGTCACACCTCTCAGAGGCACCCACACTGCCCCCTCTCCCTGCAGGCGCTGGGTCCTCCAACATTCTGGCAGGTCCTGATTTGTCTTCCCCACTAGACGGGGGCTCTGGATGGACAGGCCAGCCCTGCCTATACTCTGGACCCCCCATCCAAGCGGGGACAGTCAGTGTGGTGGCATTGAGGACTAGGTGGCCAGGGTTCCTAGAGTGGGCCCACCTGGCAGTAGCCATGCTGGGGCTACCACCGGGGCTGATGCTGAGCTGGGGTGAGGAGGGCGCCAGGCCTACCTTAGGGATGCGGAAGCCCTGTACTTCGATGTCATGGGATGTCATATGGGTCACACTCAGGGGGATGATGTCCCCAAAGCGCTGCACCTCGTGAATCACGGCAGTGGTGTAGGGCATGTGAGCCTGGTCACCCATCTCTGGTCGCCGCACCTGCCCTATCACGTCGTCGATCTCCTGTTGGACACGGACTGGACAGACATGCGTCCCCACAATGGGTCAGCACCCAGGGGACACTCTCCTTCGTCCTGTGTTGGAGGAAGTTAGGCTTACAGGAGCCTGGCCACGCCTGTGCTGGAAGCCCCGGGTGTCCCAGCTAAGCCCAGGGGCCCCCAGCTGTACCCTTCCTCCCTCAGTCCCTGCCTTGGGCCCCAGCTGGGCTCACGCTGCACATCCAGGTGTAGGATCATGAGCAGGAGGCCCCAGGCCAGCGTGGTCAAGGTGGTCACCATCCCGGCAAGGAACAGGTTACCCACCACTATGCGCAGGTTCTCATCATTGAAGCTGCTCTCAGGGCTCCCCTTGGCCTGAGCAGGGCCGAGAGGATACTCAGGGGATAGAACGGGGTAGCCCCCAAATGACCTCCAATTCTGCACCTGTCAGCCCAGATGCGGCTCGCCGGGTGATGCACTGGTCCAACCTTTTGCCCAGCCTCCCCTCATTCCTCCTGGGACGTTCAACCCACCACCCTTGCCCCCCACCGTGGCAGCCACTCTCACCTTCTCCTTCTTTGCCAGGAAGGCCTCAGTCAGGTCTCGGGGTGGCTGGGCTGGGTCCCAGGTCATCCTGTGCTCAGTTAGCAGCTCATCCAGCTGGGTCAGGAAAGCCTTTTGGAAGCGTAGGACCTTGCCAGCCAGCGCTGGGATGTGCAGGAGGACGGGGACAGCATTCAGCACCTACACCAGACAGAACGGGGTCTCAATCCCTCCTGTGCTCTGCGTTCATCTGGACCAGTCTCAGGCCCCAGCCATCTCCAGGAAGACCCAGGGCCTGCCTGTCCTTACCACTGACCTCACCAAGTCCCTCCCCAAGTGCCAGCCTCCACCCTCTCTCTCCTTGCCCAGAGGAGAGACCTAAAATCGAAATCTCCAACGTGGACGGGGGTACAGAGTCCTTGGCCTCTCCTGGTGCCCCCTGACCCGGGCACACCTCTCCCACGACCATGTCTGAGATGTCCCCTCCTCCTCCAGGCCCTTCTTACAGTGGGGTCTCCTGGAATGTCCTTTCCCAAACCCATCTACGCAAATCCTGCCCTTCGGAGGCCCCAGTCCAGCCCCGGCACCTCTCAGGAGCTCGCCCTGCAAAGACCCTTGCTCCGCACCTCGCGCAGGAAGCCCGACTCCTCCTTCAGTCCCTCCTGAGCTAGGTCCAGCAGCCTGAGGAAGCGAGGGTCGTCGTACTCGAAGCGGCGCCCGCAGGTGAGGGAGGCGATCACGTTGCTCACGGCTTTGTCCAAGAGACCGTTGGGGCGAAAGGGGCGTCCTGGGGGTGGGAGATGCGGGTAAGGGGTCGCCTTCTCCGTCCCCCGCCTTCCCAGTTCCCGCTGTGTGCCCTTCTGCCCATCACCCACCGGCTTGGTCGGCGAAGGCGGCACAAAGGCAGGCGGCCTCCTCGGTCACCCACTGCTCCAGCGACTTCTTGCCCAGGCCCAAGTTGCGCAAGGTGGACACGGAGAAGCGCCTCTGCTCGCGCCACGCGGGCCCATAGCGCGACAGGAACACCCCTGGGGGCGGGACGGACACGTGGGCGTTGCCATGAAGGCCTTGGCCCCACCCTCCGCCACCCACTCCAACCCTGGCGCTCCACAAGGTCTCCCGCAGTCCCTAGCCCGGTCCAGCTGGGCACAGGGCCCACTCTTTGCTCACCCACATTGCTCCCCTGCCTGGGGCGGGGTTTGGCCCCACCTCGTCTCTGCCCACCCTGACCACCTTTCCACTCAAGGAAGATCCCGCCCGTCCCGCCCACACTGAGCCCGCAGCATAGGCGCGGTCCCCGCCACCGCCACTTCGACGCATCAGCCTCGCCCACCGGGCTTCTGGCGGGTCTGGGCAGTAGCCCCGCCCCCTCCCAGCCCACAGACTCGCACCTCCCCCGTGCAGGTGGTTTCCTGGCCCACTGTCCTCAGCCCACTCGCTGGCCTTTATCTCTGTTTCACGTCCAGGACCCCACGCCCTGTCGGCGCTGCTTGGGCTACGGTCACTGTCCACCCGGGGCCCACGGAAACGCGGTCTCTGTCCCCCACCGCCGCTTGCCTTGGGAACGCGGCCCGAAGCCCAGGACCTGGTAGATGGGCGCAGGCGGGCGGTCGGCCGTGTCCTCGCCGCGGGTCACCATCGCCTCGCGCACGGCCGCCAGCCCATTGAGCACGACCACCGGCGTCCAGGCCAGCTGCAGGCTGAACACGTCCCCGAAGCGGCGCCGCAACTGCAGAGGGAGGGTCAGGGCCTCTTGTCAAGCCAGGATCCCCCCAGACTACAGGTCCTAGTCCTATTTGAACCTTGGACGACCCCCGGGGCTACCAGGAGTGAGCAGGTGGAAGGAGGAGACCCAGCCTCCTGATCCTGGGGCGGGGGTGGGGGTCACACCTTCTGTGATGGAGGAACTCAGTTTGGATGCGTCACCCAGGTATGACCTTGCAAGAGTCACCAAAATTGCCGAGAGGCCCCAGTTAGCATCCCATTCCCAGATGATGGTCCATGCCGGTGAGCAGTGAGGCCCGAGGACCCACAGTGCAAAAGGTTTGAACCGGGTCACTGCACCCCCTTCATCCTCGATTTCGTGATTTAAACGGCACTCAGGACTAACTCATCTTCCATTCCCAAGGCCTTTCCTTCTGGTGTCAGCAGAAGGGACTTTGTACTCCATAACATATGTTGCCCAATGGGCTTGCATGCCCACTGCCAAGTCCAGCTCCACCTCCAGGCCCTTGCCCTACTCTTCCTTGGCCTTTGGAAAATCCAGTCCTTCATGCCATGTATAAATGTCCTTCCCCAGGACGTCCCCCAAACCTGCTTCCCCTTCTCAGCCTGGCTTCTGATCCAGCCTGTGGTTTAACCCACCACCCATGTTTGCTGGTGGTGGGGCATCCTCAGGACCTCTGCCGCCCTCCAGGACCTCCTCCCTCACCTGGTCGAAGCAGTATGGTGTGTTCTGGAAGTCCACATGCAGCAAGGTTGCCCAGCCCGGGCAGTGGCAGGGGACCTGGCGGGTAGCGTGCAGCCCAGCGTTGGTGCCGGTGCATCAGGTCCACCAGGAGCAGGAAGATGGCCACTATCATGGCCAGGGGCACCAGTGCTTCTAGCCCCATGGCTGCCTCACTACCAACTGGGCTCCTCTGGACACACCTGGCACCCCCACCCCACCAGGCACAGAGGACCAGGCAGGACACTCTCAGCACACCGAGCGCGTGACCCTTCCCTTATAAAGGGAGCTGATGATGGCCTTCGCCCTCTGCTGTGAGTGAACCTGCTGTGTTGACTGTGCTGCCAGTGGCAGAGTCAGGCCAGGGCAGGTATGGGCTGCTCCAGAGGTCCTTGCCGCTGCTTCCTGCTCCAGGCCCTTACCCAGGGTAGGGTGGTAGAAAGGCCTGGTCGGAGAAGTCACCCCCTCTCCCCACTCCAAGCTCCCCAAGCCCACACAGGCTTCTGGGATAACCAGGGTCTCAGTGGACCCGGCCATCCACCTCCCAGCTAGGCTCATACACCCTAATGTAGTCACAACCCCTCCTCCAGAACATGACCTTGCCCTTTCCCTACCCCCACCTGCCCACTCCAGAGTGACCTTCAGCACCCTTATCTGTCACTGGCACTTACCTGGGGCCTTAGAGCTCCTGATGATGAGTGGCATCATGGGCCTGGTCCCTTCACTTCACCTTGCACTCTTGACATGCACAGACGCTATGCACACACCTGATGGTGCACAGATCTCTTGTCCACTCCCAGACACTTGTCCACTTGTTCACACTTGCAGGGACACGATTACACATGCAGAAAATCACCCACACAAAGACAATATTCACACATACACAGACTCACACTGACACTCAGGGCACACATTCTCTCTCACACACACCAGTCACACACACATACAGACCCGGCACCAAGTACCCCACTTCCCAGCCATGCCCGAGGTTTCCTGGATGGGACCTCTCCTGTCCAGAGGCTGCTCCCGGTGAGCCTCAAAGCTGTCACGTGGATCCCAGCTCAGCCCACATTCTGGGCTCTGGCCGGGCCATGACTTCCTGTTTGCAACAGGGCTGTTCCCAGAGCTCCCAGTTGGTAGCCTGAAGGCCCTTGCCCCAGCCTGTGACAGCATCCTCCAGGGCTGCCTGAGGGTCGTCATTCTCCACTGCTTCCTGGCCTCCATGTTTCTGATTAGAAATCTGGTGGAAACATTATGGAGGATCCTTTATTTAGGATATGTTGCTTTTTTATTTTTATTTTTTCTTTAGACAGGGTCTCACTCTGTTGCCCGGGCCGGAGTGCAGTGGCAGGATCATGGCTCACTGCAATCTCAACATCAAGTGGACCTCCTGCCTCCCAAGTAGCTGGGACTACAGGCACCACCGAGCCCAAATAATTTTTTTTTTGAGACGGAGTTTTGCTCTGTCGCCCAGGTGGGAGTGCAATGATGCGATCTCGGCTCACTGCAACCTCCACCTCCAGGGTTCAAGCGATTCTCCTGCCTCAGCCTCCCAAGTAGCTGGGATTACAGGTGCCCACCACCATGCCTGGCTGATTTTTTGTACAAGAAGTTTATAGAACACCAAGCAGATTTAACCCAAAGAAGACGACCTCAAGGCATCTGATAATTAAACTCCGAAAGGTCAAGGATAAAGAAAGGATCCTAAAAGCAGCAAGAGAAAAGAAACAAATAACATGCAGTAGAGCTCCAATACATGACATGGGGCAGCCACCTTTCCAGTGGAAACCTTACAGGCCAGGGGGGAGTGGCATGACATATTTAAAGTGCTGAAGGAAAAAAAACTTTTAGCCTAGAATAACGTATCTGGCAAAAATATCCTTCCAACAGGAAGGAGAAATAAAGACCTTCCCAGACAAACAAAAGCTGCGAGATTTCATCAACACCAGACCTATATCCCACAAGAAATGCTAAAGGGAGTTTTTCAATCTGAAAAAAAAAAGGATATTAATGAGCAAGAAGAAATCATCTAAAGGTACAAAACTCACTGGTAATAGTAAGCACACAGAAAAACAGAGTATTATAATACTGTAATTGTGGTGTGTAAACTACTCTTATTTTAATTAGACTAAATGATGAACCAATCAAAAATAATAAGTACTTTTCAAGACAGACAGTACAGTAAGACATAAAGAGGCCGGACCCGGTGGCTCACGCAGGTAATCCCAGCACTTTGTAAGGCTGAGGTGGGTGGATCACCTGAGGGCAGGAGTTCGAGACAAGCCTGGCCAACATGGTGAAACCCCATCTCTACTAAAAATACAAAAAATTTAGCTGGGCATGGTGGTGGGCGCCTGCTACCCAGGAGGCTGAGGCAGGAGAATCGGTTGAACCTGGGAAGTGGAGGTTACAGTGAGCTGAGATCGTGCCACTGCACTCTAGCCTGGGCAACAGAGCAAGACTTTATCTCAAAAACAAAAAAAGAGAAACAACAAAAAGTTAAAAAGCACTAAGATGAACTTAAAGTGTAGAGTTTTTATTAGTCTTCCTTTTGCTTTATGTTTGTTTACGCAATCAGTGTTGTCATCCGTTTAAAATAATGAGTTATAAGATAATATTTGCAAGCCTCACGGCAACCTCAAATCAAAAAGCACACAATAAGTGAGACTGTGTCTCAAAAAGAAAAGAAGAAAAAACACACAATGGATACACACACAAAAAAAAGCAAGAAATTAAATCATACCACCAGAGAAAATCACCTTCATTAAAAGGAAGACAAGGAAAAAAAAAAAAAAGAGAAGACCACAAAACAGTGAGAAAAGAAATAACAAAATAGCAGGAGTAAGTCCCTGCTTAGCAATAATAACATTGAATGTAAATGGACTAAACTCTCCAATACAAAGACACAGAGTGGCTGAATGGATGAAAAAGCAAAGCTCAATGCTCTTTTGTCTAGAAGAAACACACTTCACCTGTAAAGATACACATAGACTGAAAATAAAGGGATGGAAAAAGATACTCCATGCCAATGGAAAACAAAAAAGAGCAGGAGTAGCAATACTTAGACAGAACAGATTTTAAAACAAAAACTGTAAGAGGAGGCCGGGTGTGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCTGAGGCGGGCGGATCACGAGGTCAGGAGATTGAGACTATCCTGGCTAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAAATTAGCCAGGCGTGGTGGCGGGCGCCTGTAGTCCCAGCTACTCAGGAGGCTGAGGCAGGAGAATGGCGTCAACCTGGGAGGCGAAGCTTGCAGTGAGCCAAGATCGCGCCACTGCACTCCAGCCTGGGTGACAGAGCGAGACTCCGTCTCCAAAACAAAACAAACAAACAACAACAACCAAAAAAACTGTAAGAGGAGACAAAGAAGGTCATCCAGCAACAGAATATAACAATTGTAAATACATATGCACACAACACTGGAGCACGTAAAGCAAATGTTATTGGAGCCCAAGAGAGACGTTAACGCAATAACAGCTAAAGACGTCAACACCCCACATTCAGCATTGGACGGGTGTCCCAGATGGAAACCCAATAAGAAAACATTAGACTTAATCTGCACTACAAAAGAAATGGACCTACTAGATACTTACAGAACACTTCGTCTAAAGTCTGCAGAATACACATTCTTCTCCTCAGCACATGGATCATTCTCAAGGATACACCATATGTTAGGTCACAAGGCAAGTCTTAAAACATTACAAATGTTAAAATAATATCAAGCATCTTCTCTGACCACAACAGAATAAAAGTGGAAATCAACAACAAGAGGAATTCTGGAAACTATACATACACGTGAAAATTAAACAATATGGTCCGGAATGGCCAGTGGTTCAATGAAGAAATTAGGAAGGAAATTTGGCTGGGCACAGTAGCTTACACCTGTAATCCCAGCACTCTGGGGGGCTGAGGCAGTCAGATGACCTGAGATAGGGAGTTCGAAAGCAGCCTGGCCAACATGGTGAAACTCCGTCTCTACAAAAAATACAAAAATTAGCAAAGCATGGTGGCATGTGCCTGCAGTCCCAGCTACTAGGGAGGCTGAGATGGGAGGATTGCTTGAACCCAGGAAGTCAAGGCTGCAGTGAGCCCTGATGGCATCACTGCACTCCAGCCTCGGTGACAGAGCAAGACCCTGTCTCAAGAAAACACACACACACACACACACACACACACACACACACAGATGCTCAAACTAATATCATTTTGCTGTTAGAGCCAAGAGGGGTGGCCTGTGTAGTAAAAAGTGGGGAAGTCATTCCTTGCACAATGCAAGCCACTGGACCAAGAGTCCAAACTGACTCTTGACAGGAGGCTGGGAGATATCTGCTAAGGCCTTGGAATGTCCTGCCTGAAATAGTGTCTTTGTACATAGCTAGGGCCTTGGACCGTACAACACAGTTTATGCCAACAATGTGATCGAGGGTGGGGCCGTCAGGCCTGTATCCATCTGACTTCAGGAGGGGCTGGAGACTGAGTAACTGAGGTCAGCCATGCTGCGGGGGCTCAAGCCTAGGATGACCAACTCCCAACAAAAACCATGGACACCAAGGCCCAGGTGAGCTTCCGTGGCTGGCAGGGCTCTCTGCTGCCTCACTTACTGTTGGGGGAGAATTAAGCACTGCCTGTAGGAGTCCACCAGAAAAGAGAGCTGCAGCCTTGGCCTGGTCATTCTGGACTCTGGTCCCTGTGCCTTTCATCTTTGCTGACTTTAATCTGTACCCTTCTCTGTAATAAACTGTTAACAGGGAGAATAACAGCTTTTCTAGGGCTGTGAGACCTTCTAGAAATCACTGAACCTGAGGGTGGTCTGGGGGAGCACAACACAGTCTCCCACCCTAGCCAGGGAATGGGTTGATTCTTGGCATATGCCTATTCATATCCACCCCAGCCAAGACTTACGCATGGACTTTGTCACCAAGCCAGGCAGCCAGTGATGGGTCTCTGGGCGTGACGTGGGGGCAGGCTGTTTCCTGCTGAGAATCACTATGCCTGTATCTCAAGTAAAGTCAGGCGTCCAGGTAAGAGTGAATGAGGTGAGGCTGGTCTCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCTGAGGCTGGTGGTCACGTGAAGTCAGGAGTTTGAAACCAGACTGGCCAACATGGCGAAACCCATCACTACTAAAAAGACAAAAATGAGCCGGGGGTGGTACCCGGTGCCTGTAATCCCAGCTACTCAGGAAGCTGAGGCACGAGAATCGCTTGAACTCTGGAGGCGGAGGTTGCAGTGAGCTGAGATTGCACCACTGCACTCCAGCCTGGGTGACAGAGTAGGCTCCATCTCAAAAAAAAAAAAAAAAAAATGAATGAATGAGGTGAGGGGTGAGGGGTGAGGGGTGAGCACTGACATCAGGCAGGTGACTGACGACCCAACACAACCAGGACCTTGGCAGGGGCCCAGACTGGATACAGAAACCAAGTGGGAGCCACTAGACTAATTTATTGTACAACAGGGTCCCAGCTGAGGAGCAACTCTAGCGGGGCACAGCACAAAGCTCATAGGGGGATGGCGTCACCAGAAAGCCGACGACACGAGAGTGGCTGGGCCGGGGCTGTCCGGTGGGCACCGAGAAGCTGAAGTGCTGCAGCAGGGAGGTGAA"
+}
