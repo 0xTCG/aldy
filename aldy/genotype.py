@@ -13,15 +13,15 @@ import traceback
 import logbook
 import logbook.more
 
-import cn
-import filtering
-import protein
-import refiner
-import sam
-import diplotype
+from . import cn
+from . import filtering
+from . import protein
+from . import refiner
+from . import sam
+from . import diplotype
 
-from common import *
-from gene import Gene
+from .common import *
+from .gene import Gene
 
 
 @timing

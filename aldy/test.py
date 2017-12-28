@@ -16,11 +16,11 @@ import pandas as pd
 import logbook
 import logbook.more
 
-import genotype
-import solver
+from . import genotype
+from . import solver
 
-from gene import SAM
-from common import log, LOG_FORMAT, colorize, allele_key
+from .gene import SAM
+from .common import log, LOG_FORMAT, colorize, allele_key
 
 
 def sortkey(x):

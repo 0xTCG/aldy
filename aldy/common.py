@@ -7,8 +7,8 @@
 
 
 from builtins import range
-import pkg_resources 
 
+import pkg_resources 
 import os
 import re
 import time

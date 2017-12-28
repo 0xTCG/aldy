@@ -9,7 +9,7 @@ from builtins import object
 
 import importlib
 
-from common import log
+from .common import log
 
 
 def model(name, solver):
@@ -17,7 +17,7 @@ def model(name, solver):
 		try:
 			model = Gurobi(name)
 			log.debug('Using Gurobi')
-		except ImportError, e:
+		except ImportError as e:
 			log.warn('Gurobi not found. Please install Gurobi and gurobipy Python package.')
 			log.error('{}', e)
 			model = None
@@ -37,7 +37,7 @@ def model(name, solver):
 		try:
 			model = SCIP(name)
 			log.debug('Using SCIP')
-		except ImportError, e:
+		except ImportError as e:
 			log.warn('SCIP not found. Please install SCIP and pyscipopt Python package.')
 			log.error('{}', e)
 			model = None

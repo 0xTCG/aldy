@@ -9,16 +9,17 @@ from __future__ import division
 from builtins import map
 from builtins import str
 from builtins import range
+from pprint import pprint
 
 import collections
 import functools
 import multiprocessing
-import lpinterface
 
-from common import *
-from gene import Mutation
-from filtering import cnv_filter
-from pprint import pprint
+from . import lpinterface
+
+from .common import *
+from .gene import Mutation
+from .filtering import cnv_filter
 
 
 def get_refined_solution(gene, sam, initial_solutions, solver):

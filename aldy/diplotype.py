@@ -7,11 +7,11 @@ from __future__ import print_function
 
 
 from builtins import map
-from common import *
 from collections import defaultdict, Counter
 
-
 import sys
+
+from .common import *
 
 
 def write_decomposition(sol_id, decomposition, genotype, f):

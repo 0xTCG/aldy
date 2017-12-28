@@ -12,10 +12,10 @@ import logbook
 import argparse
 import os
 
-import genotype
-import protein
-import sam
-import lpinterface
+from . import genotype
+from . import protein
+from . import sam
+from . import lpinterface
 
 from .common import *
 

@@ -14,14 +14,14 @@ from builtins import chr
 from builtins import map
 from builtins import range
 from builtins import object
+from collections import namedtuple as nt
+from pprint import pprint
 
 import os
 import yaml
 import collections
 
-from common import *
-from pprint import pprint
-from collections import namedtuple as nt
+from .common import *
 
 
 # disrupting_mutations, neutral_mutations

@@ -10,17 +10,18 @@ from builtins import map
 from builtins import chr
 from builtins import str
 from builtins import range
+from functools import reduce
 
 import collections
 import itertools
 import functools
 import multiprocessing
-import lpinterface
 
-from common import *
-from filtering import cnv_filter
-from gene import Allele, Mutation
-from functools import reduce
+from . import lpinterface
+
+from .common import *
+from .filtering import cnv_filter
+from .gene import Allele, Mutation
 
 
 SHOW_CN_INFO = True

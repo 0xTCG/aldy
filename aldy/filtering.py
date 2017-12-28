@@ -8,8 +8,8 @@ from __future__ import division
 
 import copy
 
-from common import *
-from gene import *
+from .common import *
+from .gene import *
 
 
 def basic_filter(sam):

@@ -13,6 +13,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import range # noqa
 from builtins import object # noqa
+from pprint import pprint # noqa
 
 import pysam # noqa
 import os # noqa
@@ -22,9 +23,8 @@ import tempfile # noqa
 import collections # noqa
 import pickle as pickle # noqa
 
-from common import * # noqa
-from pprint import pprint # noqa
-from gene import Mutation # noqa
+from .common import * # noqa
+from .gene import Mutation # noqa
 
 
 class SAM(object):

@@ -12,9 +12,10 @@ from builtins import range
 
 import collections
 import copy
-import lpinterface
 
-from common import *
+from . import lpinterface
+
+from .common import *
 
 
 def get_difference(coverage, unique_regions):
