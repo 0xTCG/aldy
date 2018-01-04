@@ -320,15 +320,13 @@ class SAM(object):
 			('CYP2C8', '10', 96796000, 96830000),
 			('CYP4F2', '19', 15619000, 16009500),
 			('CYP2A6', '19', 41347500, 41400000),
-			('CYP2B6', '19', 41428000, 41525000),
 			('CYP2D6', '22', 42518900, 42553000),
 			('TPMT', '6', 18126541, 18157374),
-			('SLCO1B1', '12', 21282127, 21394730),
-			('DPYD', '1', 97541298, 98388615),
-		]
-		R = [
-			('CYP21A', '6', 31970000, 32010000),
-			('CLN3', '16', 28488000, 28504000)
+			('DPYD', '1', 97541298, 98388615)
+		#	('CYP2B6', '19', 41428000, 41525000),
+		#	('SLCO1B1', '12', 21282127, 21394730),
+		# 	('CYP21A', '6', 31970000, 32010000),
+		# 	('CLN3', '16', 28488000, 28504000),
 		]
 		for r in R:
 			cov = collections.defaultdict(lambda: collections.defaultdict(int))
@@ -336,32 +334,39 @@ class SAM(object):
 
 			gene, r = r[0], (r[1], r[2], r[3])
 			with pysam.AlignmentFile(sam_path) as sam:
-				for read in sam.fetch(region='{}:{}-{}'.format(r[0], r[1], r[2])):
-					start, s_start = read.reference_start, 0
-					if not read.cigartuples:
-						continue
-					chr = read.reference_name
-					if chr.startswith('chr'):
-						chr = chr[3:]
-					
-					for op, size in read.cigartuples:
-						if op == 2:
-							for i in range(size):
-								cov[chr][start + i] += 1
-								if read.mapping_quality == 0:
-									rep_cov[chr][start + i] += 1
-							start += size
-						elif op == 1:
-							s_start += size
-						elif op == 4:
-							s_start += size
-						elif op in [0, 7, 8]:
-							for i in range(size):
-								cov[chr][start + i] += 1
-								if read.mapping_quality == 0:
-									rep_cov[chr][start + i] += 1
-							start += size
-							s_start += size
+				chrs = [x['SN'] for x in sam.header['SQ']]
+				if r[0] not in chrs and 'chr' + r[0] in chrs:
+					r = ('chr' + r[0], r[1], r[2])
+				log.info('Generating profile for {} ({}:{}-{})', gene, *r)
+				try:
+					for read in sam.fetch(region='{}:{}-{}'.format(r[0], r[1], r[2])):
+						start, s_start = read.reference_start, 0
+						if not read.cigartuples:
+							continue
+						chr = read.reference_name
+						if chr.startswith('chr'):
+							chr = chr[3:]
+						
+						for op, size in read.cigartuples:
+							if op == 2:
+								for i in range(size):
+									cov[chr][start + i] += 1
+									if read.mapping_quality == 0:
+										rep_cov[chr][start + i] += 1
+								start += size
+							elif op == 1:
+								s_start += size
+							elif op == 4:
+								s_start += size
+							elif op in [0, 7, 8]:
+								for i in range(size):
+									cov[chr][start + i] += 1
+									if read.mapping_quality == 0:
+										rep_cov[chr][start + i] += 1
+								start += size
+								s_start += size
+				except ValueError as e:
+					log.warn('Cannot fetch gene {} ({}:{}-{})', gene, *r)
 					
 			for c in sorted(cov.keys()):
 				for p in sorted(cov[c].keys()):
