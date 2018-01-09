@@ -265,4 +265,4 @@ Optional arguments:
 
 [Ibrahim Numanagić](mailto:inumanag.at.mit.dot.edu)
 
-If you have an urgent question, I suggest using e-mail: GitHub issues are checked not so frequently.
+If you have an urgent question, I suggest using e-mail: GitHub issues are not handled as fast as the email requests.
