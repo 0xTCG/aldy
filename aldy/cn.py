@@ -12,6 +12,7 @@ from builtins import range
 
 import collections
 import copy
+import os
 
 from . import lpinterface
 
@@ -41,7 +42,7 @@ def load_profile(profile_path):
 	return result
 
 
-def normalize_coverage(gene, sam, profile, coverage):
+def normalize_coverage(gene, sam, profile):
 	sam_ref = sum(sam.cnv_coverage[i] for i in range(gene.cnv_region[1], gene.cnv_region[2]))
 	cnv_ref = sum(profile[gene.cnv_region[0]][i] for i in range(gene.cnv_region[1], gene.cnv_region[2]))
 
@@ -60,13 +61,34 @@ def normalize_coverage(gene, sam, profile, coverage):
 		})
 		sam.region_coverage[k] = (cnv_ratio * float(s) / p) if p != 0 else 0.0
 
-
-def estimate_cn(gene, sam, profile, coverage, solver):
+def estimate_cn(gene, sam, profile, solution, solver):
 	log.debug('== Copy Number Estimator ==')
 
+	if solution is not None:
+		solution = solution.split(',')
+		solution = collections.Counter(solution)
+		result = []
+		res_cn = collections.defaultdict(int)
+		log.debug('  Solutions (user-provided):')
+		for sol in solution:
+			if sol not in gene.cnv_configurations:
+				raise Exception(
+					('Given copy number solution contains unknown copy number configuration {}. ' + 
+					 'Please run aldy --show-cn to list the valid configurations').format(sol)
+				)
+			for i in range(solution[sol]):
+				result.append((sol, i))
+				log.debug('    {}', (sol, i))
+				for r in gene.cnv_configurations[sol]:
+					res_cn[r] += gene.cnv_configurations[sol][r]
+		return [(tuple(result), res_cn)]
+
 	profile_path = script_path('aldy.resources.profiles', '{}.profile'.format(profile.lower()))
-	profile = load_profile(profile_path)
-	normalize_coverage(gene, sam, profile, coverage)
+	if os.path.exists(profile_path):
+		profile = load_profile(profile_path)
+	else:
+		profile = load_profile(profile)
+	normalize_coverage(gene, sam, profile)
 
 	coverage_diff = get_difference(sam.region_coverage, gene.unique_regions)
 

@@ -3,6 +3,8 @@
 
 from setuptools import setup, find_packages
 
+exec(open('aldy/version.py').read())
+
 setup(
     name='aldy',
     entry_points={
@@ -20,7 +22,7 @@ setup(
     	'aldy.resources.profiles': ['*.profile', 'aldy/resources/profiles/*.profile']
     },
     install_requires=['pyyaml', 'logbook', 'six', 'pysam', 'future'],
-    version='1.1',
+    version=__version__,
     description='A tool for allelic decomposition and exact genotyping of highly polymorphic and structurally variant genes',
     author='Ibrahim Numanagić',
     author_email='inumanag@mit.edu',

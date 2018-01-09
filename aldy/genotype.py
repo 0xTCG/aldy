@@ -12,6 +12,7 @@ import sys
 import traceback
 import logbook
 import logbook.more
+import platform
 
 from . import cn
 from . import filtering
@@ -22,10 +23,11 @@ from . import diplotype
 
 from .common import *
 from .gene import Gene
+from .version import __version__
 
 
 @timing
-def genotype(sample, output, log_output, gene, profile, threshold, solver, coverage=0):
+def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_solution):
 	try:
 		with open(sample): # Check does file exist
 			pass
@@ -38,7 +40,7 @@ def genotype(sample, output, log_output, gene, profile, threshold, solver, cover
 		fh = logbook.FileHandler(log_output, format_string=LOG_FORMAT, mode='w', bubble=True, level='TRACE')
 		fh.push_application()
 
-		log.info('*** Aldy v1.1 ***')
+		log.info('*** Aldy v{} (Python {}) ***', __version__, platform.python_version())
 		log.info('(c) 2017 SFU, MIT & IUB. All rights reserved.')
 		log.info('Arguments:')
 		log.info('  Gene:      {}', gene.upper())
@@ -54,7 +56,7 @@ def genotype(sample, output, log_output, gene, profile, threshold, solver, cover
 
 		sample = sam.SAM(sample, gene, threshold)
 		gene.alleles = filtering.initial_filter(gene, sample)
-		cn_sol = cn.estimate_cn(gene, sample, profile, coverage, solver)
+		cn_sol = cn.estimate_cn(gene, sample, profile, cn_solution, solver)
 		score, init_sol = protein.get_initial_solution(gene, sample, cn_sol, solver)
 		score, sol = refiner.get_refined_solution(gene, sample, init_sol, solver)
 
@@ -75,8 +77,12 @@ def genotype(sample, output, log_output, gene, profile, threshold, solver, cover
 	except SystemExit as ex:
 		log.debug(ex)
 		exit(ex.code)
+	except Exception as ex:
+		log.error(ex.message)
+		log.debug(traceback.format_exc())
+		exit(1)
 	except:
 		ex = sys.exc_info()[0]
 		log.critical('Unrecoverable error: {}', str(ex))
-		traceback.print_exc()
+		log.debug(traceback.format_exc())
 		exit(1)

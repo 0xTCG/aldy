@@ -8,6 +8,7 @@
 
 
 from __future__ import division
+from __future__ import print_function
 from builtins import next
 from builtins import filter
 from builtins import chr
@@ -149,6 +150,8 @@ class Gene(object):
 		alleles = {}
 		fusions_left = {}
 		fusions_right = {}
+		self.descriptions = collections.defaultdict(str)
+		self.descriptions['1'] = 'Normal allelic configuration: all regions present in both gene and pseudogene'
 		self.old_notation = collections.defaultdict(str)
 		self.deletion_allele = '0'
 		for allele_name, allele in j['alleles'].items():
@@ -156,6 +159,7 @@ class Gene(object):
 			mutations = []
 			if {'op': 'deletion'} in allele['mutations']:
 				self.deletion_allele = allele_name
+				self.descriptions[allele_name] = 'Gene deletion (only pseudogene is present)'
 				mutations = []
 			else:
 				for m in allele['mutations']:
@@ -164,10 +168,12 @@ class Gene(object):
 					if m['pos'] == 'pseudogene': # has only one mutation indicator
 						if '-' in m['op']:
 							fusions_left[allele_name] = m['op'][:-1][::-1] # eN -> Ne
+							self.descriptions[allele_name] = "Fusion: pseudogene until {} followed by the gene".format(m['op'][:-1][::-1])
 						else:
 							if m['op'][-1] == '+':
 								m['op'] = m['op'][:-1]
 							fusions_right[allele_name] = m['op'][::-1]
+							self.descriptions[allele_name] = "Conservation: Pseudogene retention after {} within the gene".format(m['op'][::-1])
 					else:
 						if 'old' in m:
 							self.old_notation[Mutation(**m)] = m['old']
@@ -207,6 +213,7 @@ class Gene(object):
 				[('7.' + regions[yi], y) for yi, y in enumerate(c[len(c) // 2:])]
 			), a) for c, a in self.cnv_configurations.items()
 		}
+		self.descriptions = {allele_key(a): d for a, d in self.descriptions.items()}
 		if self.name == 'CYP2D6': # This is necessary hack
 			self.cnv_configurations['1'][0]['6.pce'] = 0
 		self.fusions = { # TODO: check assumption that each fusion has unique allele_key
@@ -309,3 +316,35 @@ class Gene(object):
 			self.mutations.update({(m.pos, m.op): m for m in a.functional_mutations})
 			for _, sa in a.suballeles.items():
 				self.mutations.update({(m.pos, m.op): m for m in sa.neutral_mutations})
+
+	def print_configurations(self):
+		log.error('Gene {}\n', self.name)
+		for name, config in sorted(self.cnv_configurations.items()):
+			c6 = [c[2:] for c in config if c.startswith('6.')]
+			c7 = [c[2:] for c in config if c.startswith('7.')]
+			labels = sorted(list(set(c6) | set(c7)))
+			max_width = str(max(3, max(len(x) for x in labels)) + 1)
+
+			description = '{}\n'.format(self.descriptions[name]) if name in self.descriptions else ''
+			alleles = sorted(set('*' + a.split('/')[0] for a in self.alleles if self.alleles[a].cnv_configuration == name))
+			description += 'Alleles: ' 
+			for i in xrange(0, len(alleles), 12):
+				if i != 0: description += '\n         ';
+				description += ', '.join(alleles[i:i + 12]) 
+
+			log.warn('Name: {}\n{}'.format(name, description))
+			print('            ', end='')
+			for c in labels:
+				print(('{:>' + max_width + '}').format(c), end='')
+			print(' ')
+			print('Gene:       ', end='')
+			for c in labels:
+				if '6.' + c in config:
+					print(('{:' + max_width + '}').format(config['6.' + c]), end='')
+			print(' ')
+			print('Pseudogene: ', end='')
+			for c in labels:
+				if '7.' + c in config:
+					print(('{:' + max_width + '}').format(config['7.' + c]), end='')
+			print('\n')
+
