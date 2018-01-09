@@ -200,10 +200,12 @@ For non-legal folks, here is TL;DR version:
 
 ## Parameter documentation
 
-**NAME**
-aldy -- perform allelic decomposition and exact genotyping on next-generation sequencing data
+**NAME**  
 
-**SYNOPSIS**
+aldy — perform allelic decomposition and exact genotyping on next-generation sequencing data
+
+**SYNOPSIS**  
+
 ```
 aldy -h
 aldy --test
@@ -216,7 +218,7 @@ aldy [--threshold THRESHOLD] [--profile PROFILE]
      [file]
 ```
 
-**OPTIONS**:
+**OPTIONS**  
 
 Positional arguments:
 * `file`                  
