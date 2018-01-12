@@ -278,7 +278,7 @@ class SAM(object):
 				if SAM.PHASE:
 					paired_muts = sorted(paired_muts)
 					for pi, p in enumerate(paired_muts):
-						for pj in xrange(pi + 1, len(paired_muts)):
+						for pj in range(pi + 1, len(paired_muts)):
 							if p[1] == '_' and paired_muts[pj][1] == '_':
 								continue
 							self.links[(p, paired_muts[pj])] += 1

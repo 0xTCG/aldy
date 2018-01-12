@@ -328,7 +328,7 @@ class Gene(object):
 			description = '{}\n'.format(self.descriptions[name]) if name in self.descriptions else ''
 			alleles = sorted(set('*' + a.split('/')[0] for a in self.alleles if self.alleles[a].cnv_configuration == name))
 			description += 'Alleles: ' 
-			for i in xrange(0, len(alleles), 12):
+			for i in range(0, len(alleles), 12):
 				if i != 0: description += '\n         ';
 				description += ', '.join(alleles[i:i + 12]) 
 

@@ -32,7 +32,6 @@ def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_so
 		with open(sample): # Check does file exist
 			pass
 
-		profile = profile.lower()
 		if output is None:
 			output = '{}.{}.aldy'.format(os.path.splitext(sample)[0], gene.upper())
 		if log_output is None:
@@ -44,7 +43,7 @@ def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_so
 		log.info('(c) 2017 SFU, MIT & IUB. All rights reserved.')
 		log.info('Arguments:')
 		log.info('  Gene:      {}', gene.upper())
-		log.info('  Profile:   {}', profile.lower())
+		log.info('  Profile:   {}', profile)
 		log.info('  Threshold: {:.0f}%', threshold * 100)
 		log.info('  Input:     {}', sample)
 		log.info('  Output:    {}', output)
