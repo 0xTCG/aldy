@@ -3,7 +3,7 @@
 Aldy is a tool for allelic decomposition and exact genotyping of highly polymorphic and structurally variant genes.
 More simply, it is a tool which can detect the copy number of a target gene, and the structure and genotype of each gene copy present in the sample.
 
-Aldy has been published in Nature Communications (DOI to follow soon).
+Aldy has been published in Nature Communications (DOI to follow soon). Preprint is available [here](preprint.pdf).
 
 ## Installation
 
