@@ -1,3 +1,4 @@
+from __future__ import print_function
 # 786
 
 # Aldy source: lpinterface.py
@@ -69,9 +70,9 @@ def get_all_solutions(c, var, opt, candidates, iteration=0, mem=[]):
 		try:
 			status, obj = c.solve()
 			if status == 'optimal' and abs(obj - opt) < 1e-6:
-				new_solution = set(a for a, y in var.items() if round(c.getValue(y)) > 0)
+				new_solution = set([a for a, y in var.items() if round(c.getValue(y)) > 0])
 				new_candidates = (set(candidates) - set([a])) | new_solution
-				solutions.append(frozenset(new_solution))
+				solutions += [frozenset(new_solution)]
 				solutions += get_all_solutions(c, var, opt, new_candidates, iteration + 1, mem)
 		except NoSolutionsError:
 			pass
@@ -154,7 +155,7 @@ class Gurobi(object):
 			self, var, opt_value,
 			candidates=solutions[0], iteration=0, mem=list()
 		)
-		solutions = [tuple(sorted(y for y in x)) for x in solutions]
+		solutions = [tuple(sorted(list(x), key=str)) for x in solutions]
 
 		solutions = list(set(solutions))
 		return status, opt_value, solutions

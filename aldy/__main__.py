@@ -150,8 +150,11 @@ def main(args=None):
 
 	try:
 		m = lpinterface.model('init', args.solver)
-	except Exception as e:
-		log.critical('{}', e.message)
+	except Exception as ex:
+		if hasattr(ex, 'message'):
+			log.critical(ex.message)
+		else:
+			log.critical(ex)
 
 	if args.profile is None:
 		log.critical('No profile provided! Please run aldy --help for available profile choices.')
@@ -209,7 +212,10 @@ def main(args=None):
 		log.debug(ex)
 		exit(ex.code)
 	except Exception as ex:
-		log.error(ex.message)
+		if hasattr(ex, 'message'):
+			log.critical(ex.message)
+		else:
+			log.critical(ex)
 		log.debug(traceback.format_exc())
 		exit(1)
 	except:
