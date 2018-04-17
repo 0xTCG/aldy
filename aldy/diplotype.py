@@ -31,12 +31,7 @@ def write_decomposition(sol_id, decomposition, genotype, f):
 	print(file=f)
 
 
-def assign_diplotype(gene, solutions, output):
-	if output == '':
-		f = sys.stdout
-	else:
-		f = open(output, 'w')
-
+def assign_diplotype(gene, solutions, f):
 	print('# Aldy v1.0', file=f)
 	print('# Gene: {}'.format(gene.name), file=f)
 	print('# Number of solutions: {}'.format(len(solutions)), file=f)
@@ -87,6 +82,4 @@ def assign_diplotype(gene, solutions, output):
 		results.append((res, minor_sol))
 		write_decomposition(sol_id, decomposition, (res, minor_sol), f)
 
-	if output != '':
-		f.close()
 	return results

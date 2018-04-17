@@ -15,6 +15,7 @@ import copy
 import os
 
 from . import lpinterface
+from . import sam
 
 from .common import *
 
@@ -29,16 +30,19 @@ def get_difference(coverage, unique_regions):
 	return dict(list(zip(unique_regions, wo)))
 
 
-def load_profile(profile_path):
+def load_profile(profile_path, bam=False, region=None):
 	result = collections.defaultdict(lambda: collections.defaultdict(int))
-	with open(profile_path) as f:
-		for line in f:
-			if line[0] == '#':
-				continue
-			line = line.strip().split()[1:]
-			if not line[0].startswith('chr'):
-				line[0] = 'chr' + line[0]
-			result[line[0]][int(line[1])] = float(line[2])
+	if bam:
+		ptr = sam.SAM.load_profile(profile_path, 2, region)
+		for _, c, p, v in ptr:
+			result[c][p] = v
+	else:
+		with open(profile_path) as f:
+			for line in f:
+				if line[0] == '#':
+					continue
+				line = line.strip().split()[1:]
+				result[line[0]][int(line[1])] = float(line[2])
 	return result
 
 
@@ -60,6 +64,7 @@ def normalize_coverage(gene, sam, profile):
 			for i in range(r[0], r[1] + 1)
 		})
 		sam.region_coverage[k] = (cnv_ratio * float(s) / p) if p != 0 else 0.0
+
 
 def estimate_cn(gene, sam, profile, solution, solver):
 	log.debug('== Copy Number Estimator ==')
@@ -87,7 +92,10 @@ def estimate_cn(gene, sam, profile, solution, solver):
 	if os.path.exists(profile_path):
 		profile = load_profile(profile_path)
 	else:
-		profile = load_profile(profile)
+		profile = load_profile(profile, bam=True, region=[
+			(gene.name,) + gene.region,
+			('CN',) + gene.cnv_region
+			])
 	normalize_coverage(gene, sam, profile)
 
 	coverage_diff = get_difference(sam.region_coverage, gene.unique_regions)

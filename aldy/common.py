@@ -38,6 +38,10 @@ REV_COMPLEMENT = {
 }
 
 
+class AldyException(Exception):
+	pass
+
+
 def inspect():
 	import code
 	code.interact(local=locals())

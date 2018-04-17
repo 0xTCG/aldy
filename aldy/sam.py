@@ -27,23 +27,26 @@ from .common import * # noqa
 from .gene import Mutation # noqa
 
 
+def chr_prefix(ch, sqs): # assume ch is not prefixed
+	chrs = [x['SN'] for x in sqs]
+	if ch not in chrs and 'chr' + ch in chrs:
+		return 'chr'
+	return ''
+
+
 class SAM(object):
 	CACHE = False
 	PHASE = False
-	PROFILE = False
 
 	def get_cache(self, path, gene):
 		return path + '-{}.aldycache'.format(gene.name)
 
 	def __init__(self, sam_path, gene, threshold):
-		if SAM.PROFILE:
-			self.load_profile(sam_path, threshold)
-			exit(0)
-
 		self.coverage = dict()
 		self.cnv_coverage = collections.defaultdict(int)
 		self.region_coverage = dict()
 		self.sequence = ''
+		self.threshold = threshold
 		self.unfiltered_coverage = collections.defaultdict(int)
 		
 		if SAM.CACHE and os.path.exists(self.get_cache(sam_path, gene)):
@@ -55,9 +58,12 @@ class SAM(object):
 			if SAM.CACHE:
 				pickle.dump(self.__dict__, open(self.get_cache(sam_path, gene), 'wb'))
 
-		avg_coverage = sum(self.total(pos) for pos in self.coverage) / float(len(self.coverage))
-		log.debug('Coverage is {}', avg_coverage)
-		self.threshold = threshold
+		self.avg_coverage = sum(self.total(pos) for pos in self.coverage) / float(len(self.coverage) + 0.1)
+		log.debug('Coverage is {}', self.avg_coverage) 
+
+		cnv_avg_cov = float(sum(self.cnv_coverage.values())) / abs(gene.cnv_region[1] - gene.cnv_region[2])
+		if cnv_avg_cov < 2:
+			raise AldyException("The coverage of copy-number neutral region is too low (it is {}). Try specifying --cn-region parameter.".format(cnv_avg_cov))
 
 	def total(self, pos):
 		return float(sum(v for p, v in self[pos].items() if p[:3] != 'INS'))
@@ -173,22 +179,14 @@ class SAM(object):
 			region = ''
 			chromosome, chr_start, chr_end = gene.region
 			cnv_chromosome, cnv_start, cnv_end = gene.cnv_region
-			if not chromosome.startswith('chr'):
-				chromosome = 'chr' + chromosome
-				cnv_chromosome = 'chr' + cnv_chromosome
-
-			# TODO: saner way 
-			# if sum(x['SN'][:3] == 'chr' for x in sam.header['SQ']) < 2.0/3.0 * len(sam.header['SQ']):
-			chrs = [x['SN'] for x in sam.header['SQ']]
-			if 'chr1' not in chrs and '1'in chrs:
-				chromosome = chromosome[3:]
-				cnv_chromosome = cnv_chromosome[3:]
+			prefix = chr_prefix(chromosome, sam.header['SQ'])
+			assert(prefix == chr_prefix(cnv_chromosome, sam.header['SQ']))
 			
 			fetched_cnv = False
 			if sam.has_index():
 				log.debug('File {} has index', sam_path)
 				
-				region = '{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)
+				region = prefix + '{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)
 				for read in sam.fetch(region=region):
 					start = read.reference_start
 					if read.cigartuples is None or (read.flag & 0x40) == 0:
@@ -200,12 +198,13 @@ class SAM(object):
 							start += size
 				fetched_cnv = True
 
-				region = '{}:{}-{}'.format(chromosome, chr_start - 500, chr_end + 1)
+				region = prefix + '{}:{}-{}'.format(chromosome, chr_start - 500, chr_end + 1)
 
 			mutation_sites = set()
 			for read in sam.fetch(region=region):
 				start = read.reference_start
-				if not fetched_cnv and read.reference_id != -1 and read.reference_name == cnv_chromosome \
+				if not fetched_cnv and read.reference_id != -1 \
+					and read.reference_name == prefix + cnv_chromosome \
 					and cnv_start - 500 <= start <= cnv_end:
 					if read.cigartuples is None or (read.flag & 0x40) == 0:
 						pass
@@ -217,7 +216,8 @@ class SAM(object):
 								start += size
 
 				start, s_start = read.reference_start, 0
-				if not read.cigartuples or read.reference_name != chromosome or not (chr_start <= start < chr_end):
+				if not read.cigartuples or read.reference_name != prefix + chromosome \
+					or not (chr_start <= start < chr_end):
 					continue
 
 				if 'S' in read.cigarstring:
@@ -309,50 +309,48 @@ class SAM(object):
 	#    cypiripi.py --generate-profile bams/PGXT104.bam | grep -v CYP2B6 >> _ha
 	# PGRNseq-v2: NA19789 for all
 	# Illumina: all ones
-	def load_profile(self, sam_path, factor):
-		log.debug('SAM file: {}', sam_path)
-
-		R = [
-			('CYP3A5', '7', 99245000, 99278000),
-			('CYP3A4', '7', 99354000, 99465000),
-			('CYP2C19', '10', 96445000, 96615000),
-			('CYP2C9', '10', 96691000, 96754000),
-			('CYP2C8', '10', 96796000, 96830000),
-			('CYP4F2', '19', 15619000, 16009500),
-			('CYP2A6', '19', 41347500, 41400000),
-			('CYP2D6', '22', 42518900, 42553000),
-			('TPMT', '6', 18126541, 18157374),
-			('DPYD', '1', 97541298, 98388615)
-		#	('CYP2B6', '19', 41428000, 41525000),
-		#	('SLCO1B1', '12', 21282127, 21394730),
-		# 	('CYP21A', '6', 31970000, 32010000),
-		# 	('CLN3', '16', 28488000, 28504000),
-		]
-		for r in R:
+	# regions require non-chr'd names
+	@staticmethod
+	def load_profile(sam_path, factor, regions = None): 
+		# log.warn('SAM file profile: {} @ {}', sam_path, regions)
+		if regions is None:
+			regions = [
+				('CYP3A5', '7', 99245000, 99278000),
+				('CYP3A4', '7', 99354000, 99465000),
+				('CYP2C19', '10', 96445000, 96615000),
+				('CYP2C9', '10', 96691000, 96754000),
+				('CYP2C8', '10', 96796000, 96830000),
+				('CYP4F2', '19', 15619000, 16009500),
+				('CYP2A6', '19', 41347500, 41400000),
+				('CYP2D6', '22', 42518900, 42553000),
+				('TPMT', '6', 18126541, 18157374),
+				('DPYD', '1', 97541298, 98388615)
+			#	('CYP2B6', '19', 41428000, 41525000),
+			#	('SLCO1B1', '12', 21282127, 21394730),
+			# 	('CYP21A', '6', 31970000, 32010000),
+			# 	('CLN3', '16', 28488000, 28504000),
+			]
+		result = []
+		for r in regions:
 			cov = collections.defaultdict(lambda: collections.defaultdict(int))
 			rep_cov = collections.defaultdict(lambda: collections.defaultdict(int))
 
 			gene, r = r[0], (r[1], r[2], r[3])
 			with pysam.AlignmentFile(sam_path) as sam:
-				chrs = [x['SN'] for x in sam.header['SQ']]
-				if r[0] not in chrs and 'chr' + r[0] in chrs:
-					r = ('chr' + r[0], r[1], r[2])
-				log.info('Generating profile for {} ({}:{}-{})', gene, *r)
+				region = chr_prefix(r[0], sam.header['SQ']) + '{}:{}-{}'.format(r[0], r[1], r[2])
+				log.info('Generating profile for {} ({})', gene, region)
 				try:
-					for read in sam.fetch(region='{}:{}-{}'.format(r[0], r[1], r[2])):
+					for read in sam.fetch(region=region):
 						start, s_start = read.reference_start, 0
 						if not read.cigartuples:
 							continue
-						chr = read.reference_name
-						if chr.startswith('chr'):
-							chr = chr[3:]
 						
 						for op, size in read.cigartuples:
 							if op == 2:
 								for i in range(size):
-									cov[chr][start + i] += 1
+									cov[r[0]][start + i] += 1
 									if read.mapping_quality == 0:
-										rep_cov[chr][start + i] += 1
+										rep_cov[r[0]][start + i] += 1
 								start += size
 							elif op == 1:
 								s_start += size
@@ -360,16 +358,16 @@ class SAM(object):
 								s_start += size
 							elif op in [0, 7, 8]:
 								for i in range(size):
-									cov[chr][start + i] += 1
+									cov[r[0]][start + i] += 1
 									if read.mapping_quality == 0:
-										rep_cov[chr][start + i] += 1
+										rep_cov[r[0]][start + i] += 1
 								start += size
 								s_start += size
+					result += [
+						(gene, c, p, cov[c][p] * (factor / 2.0)) 
+						for c in sorted(cov.keys()) for p in sorted(cov[c].keys()) 
+						if r[1] - 500 <= p <= r[2] + 500
+					]
 				except ValueError as e:
-					log.warn('Cannot fetch gene {} ({}:{}-{})', gene, *r)
-					
-			for c in sorted(cov.keys()):
-				for p in sorted(cov[c].keys()):
-					if not r[1] - 500 <= p <= r[2] + 500:
-						continue
-					print(gene, c, p, cov[c][p] * (factor / 2.0))
+					log.warn('Cannot fetch gene {} ({})', gene, region)	
+		return result

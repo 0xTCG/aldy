@@ -115,6 +115,7 @@ class Gene(object):
 		self.seq = j['seq']
 		self.region = tuple(j['region'])
 		self.cnv_region = tuple(j['cnv_region'])
+		# TODO: check here for chr prefix!
 
 		## (2) Set up gene regions
 		# Convention: Main gene has prefix 6; pseudogenes are numbered 7, 8
