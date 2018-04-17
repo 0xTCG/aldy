@@ -190,7 +190,7 @@ def main(args=None):
 			output = '{}.aldy'.format(os.path.splitext(args.file)[0])
 			log.info('  Output:    {}', output)
 			output = open(output, 'w')
-		for gene in avail_genes[:3]:
+		for gene in avail_genes:
 			run(gene, args.file, output, log_output, args.profile, args.threshold, args.solver, args.cn_neutral, args.cn)
 		if output != sys.stdout:
 			output.close()
