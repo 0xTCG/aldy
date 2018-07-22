@@ -28,37 +28,39 @@ from .version import __version__
 
 @timing
 def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_region, cn_solution):
-	with open(sample): # Check does file exist
-		pass
+   with open(sample): # Check does file exist
+      pass
 
-	log.info('Gene: {}', gene.upper())
-	
-	database_file = script_path('aldy.resources.genes', '{}.yml'.format(gene.lower()))
-	gene = Gene(database_file)
+   log.info('Gene: {}', gene.upper())
+   
+   database_file = script_path('aldy.resources.genes', '{}.yml'.format(gene.lower()))
+   gene = Gene(database_file)
 
-	if cn_region is not None:
-		r = re.match(r'^(.+?):(\d+)-(\d+)$', cn_region) 
-		if not r:
-			raise AldyException('Parameter --cn-neutral={} is not in the format chr:start-end (where start and end are numbers)'.format(cn_region))
-		ch = r.group(1)
-		if ch.startswith('chr'): 
-			ch = ch[3:]
-		gene.cnv_region = (ch, r.group(2), r.group(3))
-		log.warn('Using {} as CN-neutral region', cn_region)
+   if cn_region is not None:
+      r = re.match(r'^(.+?):(\d+)-(\d+)$', cn_region) 
+      if not r:
+         raise AldyException('Parameter --cn-neutral={} is not in the format chr:start-end (where start and end are numbers)'.format(cn_region))
+      ch = r.group(1)
+      if ch.startswith('chr'): 
+         ch = ch[3:]
+      gene.cnv_region = (ch, r.group(2), r.group(3))
+      log.warn('Using {} as CN-neutral region', cn_region)
 
-	sample = sam.SAM(sample, gene, threshold)
+   sample_name = os.path.basename(sample)
+   sample_name = os.path.splitext(sample_name)[0]
+   sample = sam.SAM(sample, gene, threshold)
 
-	if sample.avg_coverage < 2:
-		raise AldyException("Average coverage of {0} for gene {1} is too low; skipping gene {1}. Please ensure that {1} is present in the input SAM/BAM.".format(sample.avg_coverage, gene.name))
-	elif sample.avg_coverage < 20:
-		log.warn("Average coverage is {}. We recommend at least 20x coverage for optimal results.", sample.avg_coverage)
-	
-	gene.alleles = filtering.initial_filter(gene, sample)
-	cn_sol = cn.estimate_cn(gene, sample, profile, cn_solution, solver)
-	score, init_sol = protein.get_initial_solution(gene, sample, cn_sol, solver)
-	score, sol = refiner.get_refined_solution(gene, sample, init_sol, solver)
+   if sample.avg_coverage < 2:
+      raise AldyException("Average coverage of {0} for gene {1} is too low; skipping gene {1}. Please ensure that {1} is present in the input SAM/BAM.".format(sample.avg_coverage, gene.name))
+   elif sample.avg_coverage < 20:
+      log.warn("Average coverage is {}. We recommend at least 20x coverage for optimal results.", sample.avg_coverage)
+   
+   gene.alleles = filtering.initial_filter(gene, sample)
+   cn_sol = cn.estimate_cn(gene, sample, profile, cn_solution, solver)
+   score, init_sol = protein.get_initial_solution(gene, sample, cn_sol, solver)
+   score, sol = refiner.get_refined_solution(gene, sample, init_sol, solver)
 
-	sol = diplotype.assign_diplotype(gene, sol, output)
+   sol = diplotype.assign_diplotype(sample_name, gene, sol, output)
 
-	return sol
+   return sol
 
