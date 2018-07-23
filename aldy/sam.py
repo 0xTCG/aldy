@@ -48,13 +48,24 @@ class SAM(object):
       return path + '-{}.aldycache'.format(gene.name)
 
    def __init__(self, sam_path, gene, threshold, reference=None):
+      # filtered coverage
       self.coverage = dict()
+      # unfiltered coverage at CN-neutral region (location -> coverage)
       self.cnv_coverage = collections.defaultdict(int)
+      # rescaled average coverage of the region (region -> average_coverage)
       self.region_coverage = dict()
+      # reference sequence
       self.sequence = ''
+      # threshold for liltering out mutations
       self.threshold = threshold
-      self.xas = dict()
+      # unfiltered coverage
       self.unfiltered_coverage = collections.defaultdict(int)
+      # phasing links 
+      self.links = collections.defaultdict(int)
+      # indel locations to be corrected
+      self.indel_sites = {}
+      # reads dictironary
+      self.reads = {}
       
       if SAM.CACHE and os.path.exists(self.get_cache(sam_path, gene)):
          log.debug('Loading cache')
@@ -65,6 +76,7 @@ class SAM(object):
          if SAM.CACHE:
             pickle.dump(self.__dict__, open(self.get_cache(sam_path, gene), 'wb'))
 
+      # average sample coverage
       self.avg_coverage = sum(self.total(pos) for pos in self.coverage) / float(len(self.coverage) + 0.1)
       log.debug('Coverage is {}', self.avg_coverage) 
 
@@ -118,13 +130,32 @@ class SAM(object):
                   cov, self.percentage(m)
                )
 
-   def load(self, sam_path, gene, reference=None):
+   def process(read_generator):
+      pass
+
+   def load(self, sam_path, gene, reference=None, do_cnv=True):
       log.debug('SAM file: {}', sam_path)
+
+      # filtered coverage
+      self.coverage = dict()
+      # unfiltered coverage at CN-neutral region (location -> coverage)
+      if do_cnv:
+         self.cnv_coverage = collections.defaultdict(int)
+      # rescaled average coverage of the region (region -> average_coverage)
+      self.region_coverage = dict()
+      # reference sequence
+      self.sequence = ''
+      # unfiltered coverage
+      self.unfiltered_coverage = collections.defaultdict(int)
+      # phasing links 
+      self.links = collections.defaultdict(int)
+      # indel locations to be corrected
+      self.indel_sites = {}
+      # reads dictironary
+      self.reads = {}
 
       muts = collections.defaultdict(int)
       norm = collections.defaultdict(int)
-
-      self.links = collections.defaultdict(int)
 
       is_deez_file = sam_path[-3:] == '.dz'
       pipe = ''
@@ -167,7 +198,6 @@ class SAM(object):
       ref = gene.seq
 
       # TODO: improve over non-functional mutations
-      self.indel_sites = {}
       for a in gene.alleles:
          for m in gene.alleles[a].functional_mutations:
             if m.op[:3] == 'INS':
@@ -190,8 +220,8 @@ class SAM(object):
          prefix = chr_prefix(chromosome, sam.header['SQ'])
          assert(prefix == chr_prefix(cnv_chromosome, sam.header['SQ']))
          
-         fetched_cnv = False
-         if sam.has_index():
+         fetched_cnv = not do_cnv # set it to fetched if we're not getting any CN information
+         if not fetched_cnv and sam.has_index():
             log.debug('File {} has index', sam_path)
             
             region = prefix + '{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)
@@ -242,31 +272,6 @@ class SAM(object):
             total_reads += 1
 
             seq = read.query_sequence
-
-            def allxas(r):
-               if r.has_tag('XA'):
-                   xas = r.get_tag('XA').split(';')[:-1]
-                   for xa in xas:
-                       xa = xa.split(',')
-                       xc = CIGAR_REGEX.findall(xa[2])
-                       xc = [(CIGAR2CODE[ord(y)], int(x)) for x, y in xc]
-                       yield XA(start=abs(int(xa[1])) - 1, cigar=xc, nm=int(xa[3]))
-            
-            if False: # TODO integrate
-               if read.query_name not in mate_cache:
-                  mate_cache[read.query_name] = Read(seq=seq, xas=[XA(
-                      start=read.reference_start,
-                      cigar=read.cigartuples,
-                      nm=read.get_tag('NM'))] + list(allxas(read)))
-               else: # match!
-                  if read.has_tag('XA') or len(mate_cache[read.query_name]) > 1:
-                      self.xas[read.query_name] = (
-                          mate_cache[read.query_name],
-                          Read(seq=seq, xas=[XA(start=read.reference_start,
-                              cigar=read.cigartuples,
-                              nm=read.get_tag('NM'))] + list(allxas(read)))
-                      )
-                  del mate_cache[read.query_name]
             
             has_indel = set()
             orig_start = start
@@ -335,6 +340,8 @@ class SAM(object):
 
       for pos in self.coverage:
          self.unfiltered_coverage[pos] = self.total(pos)
+
+      # no idea?!
       self.original_coverage = copy.deepcopy(self.coverage)
 
       if pipe != '' and os.path.exists(pipe):

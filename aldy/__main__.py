@@ -57,6 +57,8 @@ def get_args():
       help='Show the Aldy license')
    parser.add_argument('--test', default=0, action='store_true', 
       help='Sanity-check Aldy on NA10860 sample')
+   parser.add_argument('--remap', default=0, action='store_true', 
+      help='Run realignment via bowtie2')
    parser.add_argument('file', nargs='?', 
       help='SAM or BAM input file')
 
@@ -81,7 +83,7 @@ def print_licence():
       for l in f: print(l.strip())
 
 
-def run(gene, file, output, log_output, profile, threshold, solver, cn_region, cn):
+def run(gene, file, output, log_output, profile, threshold, solver, cn_region, cn, remap):
    try:
       result = genotype.genotype(
          file, output,
@@ -89,7 +91,8 @@ def run(gene, file, output, log_output, profile, threshold, solver, cn_region, c
          gene, profile,
          float(threshold) / 100.0,
          solver,
-         cn_region, cn
+         cn_region, cn,
+         remap
       )
       log.warn('Result{} for {}: ', '' if len(result) == 1 else 's', gene.upper())
       for rd, r in result:
@@ -194,7 +197,7 @@ def main(args=None):
          log.info('  Output:    {}', output)
          output = open(output, 'w')
       for gene in avail_genes:
-         run(gene, args.file, output, log_output, args.profile, args.threshold, args.solver, args.cn_neutral, args.cn)
+         run(gene, args.file, output, log_output, args.profile, args.threshold, args.solver, args.cn_neutral, args.cn, args.remap)
       if output != sys.stdout:
          output.close()
    except ValueError as ex:

@@ -119,14 +119,16 @@ class Gurobi(object):
 
    def abssum(self, vars, coeffs=None):
       total = 0
+      vv = []
       for v in vars:
          name = self.varName(v)
          coeff = 1 if coeffs is None or name not in coeffs else coeffs[name]
-         absvar = self.addVar()
-         total += absvar * coeff
+         absvar = self.model.addVar()
+         vv.append(absvar * coeff)
          self.addConstr(absvar + v >= 0)
          self.addConstr(absvar - v >= 0)
-      return total
+      self.model.update()
+      return self.quicksum(vv)
 
    def solve(self, objective=None, method='min', init=None): # ret obj val
       if objective is not None:

@@ -20,28 +20,21 @@ import multiprocessing
 from . import lpinterface
 
 from .common import *
+from .cn import CNSolution
 from .filtering import cnv_filter
 from .gene import Allele, Mutation
 
 
-SHOW_CN_INFO = True
+#class MajorSolution(CNSolution):
+#   def __init__(self, cn):
 
 
-def get_initial_solution(gene, sam, structure, solver):
-   # Make sure that the duplicates are gone
-   unique_structure = {}
-   for i, s in enumerate(structure):
-      s, cns = s
-      s = collections.Counter(y[0] for y in s if y != gene.deletion_allele)
-      key = tuple(sorted(s.elements()))
-      if key not in unique_structure:
-         unique_structure[key] = (s, cns)
-   structure = list(unique_structure.values())
 
+def get_initial_solution(gene, sam, cn_sols, solver):
    # pool = multiprocessing.Pool(1)
    results = list(map(
       functools.partial(solve_ilp, gene=gene, sam=sam, solver=solver),
-      structure
+      cn_sols.values()
    ))
    if len(results) > 0:
       score, solutions = min(results)[0], results[0][1]
@@ -50,25 +43,14 @@ def get_initial_solution(gene, sam, structure, solver):
    else:
       score, solutions = float('inf'), []
 
-   # if SHOW_CN_INFO:
-   #  log.info(colorize('Copy number best structures:', 'green'))
-   #  res = set()
-   #  for s in best_solutions:
-   #     y = ['1' if i not in gene.fusions else i for i in s[0]]
-   #     y = ['36' if i in ['66', '83', '36', '57'] else i for i in y]
-   #     y = collections.Counter(y)
-   #     y = ', '.join('{}x*{}-like'.format(b, a) for a, b in y.iteritems())
-   #     res.add(y)
-   #  for i, ii in enumerate(res):
-   #     log.info(colorize('  ({}) {}'.format(i + 1, ii), 'green'))
-
    return score, solutions
 
 
-def solve_ilp(structure, gene, sam, solver):
+def solve_ilp(cn_sol, gene, sam, solver):
    log.debug('== Initial Solver ==')
 
-   structure, region_cn = structure
+   structure, region_cn = cn_sol.cn_solution, cn_sol.region_cn
+   structure = collections.Counter([y[0] for y in structure])
    log.debug('Solving {}', structure)
    if len(structure) == 0: # only deletions
       return 0, [([gene.deletion_allele] * 2, region_cn)]

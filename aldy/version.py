@@ -5,4 +5,4 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-__version__ = 1.3
+__version__ = 1.9

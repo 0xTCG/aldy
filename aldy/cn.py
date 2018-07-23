@@ -20,12 +20,16 @@ from . import sam
 from .common import *
 
 
-class CN:
+class CNSolution:
    def __init__(self, gene, sam, sol):
-      self.sol = sol[0]
+      self.cn_solution = sol[0]
       self.gene = gene
       self.region_cn = dict(sol[1])
       self.baseline = sam.baseline
+      self.cn_score = 0
+      
+      self.key = collections.Counter(y[0] for y in self.cn_solution if y != gene.deletion_allele)
+      self.key = tuple(sorted(self.key.elements()))
 
    def __getitem__(self, region):
       if region in self.region_cn:
@@ -208,11 +212,14 @@ def estimate_cn(gene, sam, profile, solution, solver):
    log.debug('  Solutions:')
    for s in solutions:
       log.debug('    {}', s)
+   result = {}
    for si, s in enumerate(solutions):
       res = collections.defaultdict(int)
       for sx in s:
          for r in structures[sx]:
             res[r] += structures[sx][r]
-      solutions[si] = CN(gene, sam, (s, res))
+      cn = CNSolution(gene, sam, (s, res))
+      cn.cn_score = opt
+      result[cn.key] = cn
 
-   return solutions
+   return result
