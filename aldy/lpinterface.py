@@ -104,8 +104,13 @@ class Gurobi(object):
    def addVar(self, *args, **kwargs):
       if 'vtype' in kwargs and kwargs['vtype'] == 'B':
          kwargs['vtype'] = self.gurobipy.GRB.BINARY
+      update = True
+      if 'update' in kwargs:
+         update = kwargs['update']
+         del kwargs['update']
       v = self.model.addVar(*args, **kwargs)
-      self.model.update()
+      if update:
+         self.update()
       return v
 
    def quicksum(self, expr):
@@ -123,7 +128,7 @@ class Gurobi(object):
       for v in vars:
          name = self.varName(v)
          coeff = 1 if coeffs is None or name not in coeffs else coeffs[name]
-         absvar = self.model.addVar()
+         absvar = self.addVar(lb=0, update=False)
          vv.append(absvar * coeff)
          self.addConstr(absvar + v >= 0)
          self.addConstr(absvar - v >= 0)
