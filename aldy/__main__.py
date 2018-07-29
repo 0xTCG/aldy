@@ -29,7 +29,7 @@ from .version import __version__
 from .common import *
 
 
-def get_args():
+def _get_args():
    parser = argparse.ArgumentParser()
    parser.add_argument('--threshold', '-T', default=50, 
       help="Cut-off rate for variations (percent per copy). Default is 50%%.")
@@ -57,7 +57,7 @@ def get_args():
       help='Show the Aldy license')
    parser.add_argument('--test', default=0, action='store_true', 
       help='Sanity-check Aldy on NA10860 sample')
-   parser.add_argument('--remap', default=0, action='store_true', 
+   parser.add_argument('--remap', default=0, #action='store_true', 
       help='Run realignment via bowtie2')
    parser.add_argument('file', nargs='?', 
       help='SAM or BAM input file')
@@ -78,7 +78,7 @@ def get_args():
    return parser.parse_args()
 
 
-def print_licence():
+def _print_licence():
    with open(script_path('aldy.resources', 'LICENSE.md')) as f:
       for l in f: print(l.strip())
 
@@ -101,7 +101,7 @@ def run(gene, file, output, log_output, profile, threshold, solver, cn_region, c
       log.error(ex.message)
 
 
-def run_test():
+def _run_test():
    log.warn('Aldy Sanity-Check Test')
    log.warn('Expected result is: *1/*4+*4')
    run('cyp2d6', script_path('aldy.resources', 'NA10860.bam'),
@@ -126,10 +126,10 @@ def main(args=None):
    
 
    if args.license:
-      print_licence()
+      _print_licence()
       exit(0)
    elif args.test:
-      run_test()
+      _run_test()
       exit(0)
    elif args.show_cn:
       database_file = script_path('aldy.resources.genes', '{}.yml'.format(args.gene.lower()))

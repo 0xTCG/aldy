@@ -96,11 +96,11 @@ def static_vars(**kwargs):
 
 
 def timing(f):
-   def wrap(*args):
+   def wrap(*args, **kwargs):
       time1 = time.time()
-      ret = f(*args)
+      ret = f(*args, **kwargs)
       time2 = time.time()
-      log.debug('Time needed: ({:.1f})', time2 - time1)
+      log.warn('Time needed: ({:.1f})', time2 - time1)
       return ret
    return wrap
 

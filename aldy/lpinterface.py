@@ -104,6 +104,8 @@ class Gurobi(object):
    def addVar(self, *args, **kwargs):
       if 'vtype' in kwargs and kwargs['vtype'] == 'B':
          kwargs['vtype'] = self.gurobipy.GRB.BINARY
+      elif 'vtype' in kwargs and kwargs['vtype'] == 'I':
+         kwargs['vtype'] = self.gurobipy.GRB.INTEGER
       update = True
       if 'update' in kwargs:
          update = kwargs['update']

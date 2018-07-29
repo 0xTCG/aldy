@@ -29,7 +29,7 @@ from .version import __version__
 
 
 @timing
-def genotype(sample_path, output, log_output, gene, profile, threshold, solver, cn_region, cn_solution, do_remap=False):
+def genotype(sample_path, output, log_output, gene, profile, threshold, solver, cn_region, cn_solution, do_remap):
    with open(sample_path): # Check does file exist
       pass
 
@@ -61,11 +61,12 @@ def genotype(sample_path, output, log_output, gene, profile, threshold, solver, 
    gene.alleles = filtering.initial_filter(gene, sample)
    cn_sol = cn.estimate_cn(gene, sample, profile, cn_solution, solver)
 
-   if do_remap:
+   if do_remap != 0:
       log.critical('Remapping! Stay tuned...')
       cn_sol = list(cn_sol.values())[0] #!! TODO IMPORTANT just use furst CN for now
-      new_path = remap.remap(sample_path, gene, sample, cn_sol)
+      new_path = remap.remap(sample_path, gene, sample, cn_sol, remap_mode=do_remap)
       gene = gene_backup # refactor this somehow...
+      sam.SAM.CACHE = False
       sample = sam.SAM(new_path, gene, threshold)
       gene.alleles = filtering.initial_filter(gene, sample)
       cn_sol = cn.estimate_cn(gene, sample, profile, cn_solution, solver)
