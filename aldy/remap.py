@@ -105,7 +105,7 @@ def optimize(gene, reads, alleles, copy_number):
    result = {}
    deleted = 0
    for r, xa in x.items():
-      if model.getValue(d[-1]):
+      if model.getValue(d[r]):
          deleted += 1
          continue
       correct_allele = [a for a in xa if model.getValue(xa[a])]
@@ -219,9 +219,10 @@ def get_reads(alleles, tempdir, sam_path):
 def remap(sam_path, gene, sam, cn_sol, tempdir=None, force=True, cleanup=False, remap_mode=1):
    if tempdir is None:
       tempdir = tempfile.mkdtemp(suffix='_tmpaldy', dir='.')
+   log.critical('Temp is ' + tempdir)
 
    if str(remap_mode) == '2':
-      remap_farid.remap(sam_path, gene, sam, cn_sol, tempdir)
+      out = remap_farid.remap(sam_path, gene, sam, cn_sol, tempdir)
    else:
       log.critical("My remapper")
 
@@ -234,7 +235,7 @@ def remap(sam_path, gene, sam, cn_sol, tempdir=None, force=True, cleanup=False, 
       log.warn('Optimizing...')
       reads = optimize(gene, reads, alleles, cn_sol)
 
-      out = '{}.remap.bam'.format(os.path.basename(sam_path)) 
+      out = '{}.remap_ibrahim.bam'.format(os.path.basename(sam_path)) 
       if os.path.exists(out) and not force:
          raise AldyException('{} already exists--- make sure to use --force!'.format(out))
       write_reads(sam_path, gene, alleles, reads, out)

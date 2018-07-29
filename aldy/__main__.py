@@ -109,7 +109,7 @@ def _run_test():
 
 
 def main(args=None):
-   args = get_args()
+   args = _get_args()
 
    level = args.verbosity.lower()
    for k, v in logbook.base._reverse_level_names.items():

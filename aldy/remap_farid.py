@@ -34,7 +34,7 @@ from . import diplotype
 from .common import *
 
 
-def remap(sam_path, gene, sam, cn_sol, tempdir):
+def remap(sam_path, gene, sam, cn_sol, tempdir, hg19_path="genome.fa"):
    samtools_path = 'samtools'
    bowtie2_path = ''
 
@@ -71,7 +71,7 @@ def remap(sam_path, gene, sam, cn_sol, tempdir):
    os.system('{} faidx {} {}:{}-{} > {tmp}/seq.fa'.format(samtools_path, hg19_path,
                                                            'chr22',
                                                            int(gene.region[1])+1,
-                                                           int(gene.region[2])+2), tmp=tempdir)
+                                                           int(gene.region[2])+2, tmp=tempdir))
    os.system('sed -i.bak "1 s/^.*$/>{}/" {tmp}/seq.fa'.format(chromosome, tmp=tempdir))
    seq = read_genome('{tmp}/seq.fa'.format(tmp=tempdir))
 
@@ -155,7 +155,7 @@ def remap(sam_path, gene, sam, cn_sol, tempdir):
                      outfile.write(line)
 
       def merge_sam_bowtie2(keys, filename):
-         first = '@HD   VN:1.0   SO:unsorted\n'
+         first = "@HD\tVN:1.0\tSO:unsorted\n"
          with open('{tmp}/{}.sam'.format(filename, tmp=tempdir), 'w') as outfile:
             for fname in keys:
                with open('{tmp}/{}.sam'.format(fname, tmp=tempdir)) as infile:
