@@ -6,358 +6,334 @@
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
+from typing import Tuple, Dict, List, Optional
 
-from __future__ import print_function
-from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range # noqa
-from builtins import object # noqa
-from pprint import pprint # noqa
+import pysam
+import os
+import copy
+import subprocess
+import tempfile
+import collections
+import pickle as pickle
 
-import pysam # noqa
-import os # noqa
-import copy # noqa
-import subprocess # noqa
-import tempfile # noqa
-import collections # noqa
-import pickle as pickle # noqa
-
-from .common import * # noqa
-from .gene import Mutation # noqa
+from .common import *
+from .coverage import Coverage
+from .gene import Gene, Mutation
 
 
-Read = collections.namedtuple('Read', 'seq xas'.split())
-XA = collections.namedtuple('XA', 'start cigar nm'.split())
+# CIGAR parsing constants (borrowed from pysam)
 CIGAR2CODE = dict([ord(y), x] for x, y in enumerate("MIDNSHP=XB"))
 CIGAR_REGEX = re.compile(r"(\d+)([MIDNSHP=XB])")
 
 
-def chr_prefix(ch, sqs): # assume ch is not prefixed
-   chrs = [x['SN'] for x in sqs]
-   if ch not in chrs and 'chr' + ch in chrs:
-      return 'chr'
-   return ''
+class Sample:
+   """
+   Reads a SAM/BAM/CRAM/DeeZ file and parses the read alignments therein.
+   """
+
+   # Read bookkeeping classes (TODO: use later)
+   Read = nt('Read', 'seq xas'.split())
+   XATag = nt('XATag', 'start cigar nm'.split())
 
 
-class SAM(object):
-   CACHE = False
-   PHASE = False
-
-   def get_cache(self, path, gene):
-      return path + '-{}.aldycache'.format(gene.name)
-
-   def __init__(self, sam_path, gene, threshold, reference=None):
-      # filtered coverage
-      self.coverage = dict()
-      # unfiltered coverage at CN-neutral region (location -> coverage)
-      self.cnv_coverage = collections.defaultdict(int)
-      # rescaled average coverage of the region (region -> average_coverage)
-      self.region_coverage = dict()
-      # reference sequence
-      self.sequence = ''
-      # threshold for liltering out mutations
-      self.threshold = threshold
-      # unfiltered coverage
-      self.unfiltered_coverage = collections.defaultdict(int)
-      # phasing links 
-      self.links = collections.defaultdict(int)
-      # indel locations to be corrected
-      self.indel_sites = {}
-      # reads dictironary
-      self.reads = {}
+   def __init__(self, 
+                sam_path: str, gene: Gene, threshold: float, 
+                cache: bool = False, phase: bool = False, 
+                reference: Optional[str] = None, 
+                cn_region: Optional[GeneRegion] = None, 
+                profile: Optional[str] = None):
       
-      if SAM.CACHE and os.path.exists(self.get_cache(sam_path, gene)):
+      # Handle caching
+      def cache_fn(path, gene):
+         return path + '-{}.aldycache'.format(gene.name)
+      if cache and os.path.exists(cache_fn(sam_path, gene)):
          log.debug('Loading cache')
-         d = pickle.load(open(self.get_cache(sam_path, gene)))
+         d = pickle.load(open(cache_fn(sam_path, gene)))
          self.__dict__.update(d)
       else:
-         self.load(sam_path, gene, reference=reference)
-         if SAM.CACHE:
-            pickle.dump(self.__dict__, open(self.get_cache(sam_path, gene), 'wb'))
+         self.load_aligned(sam_path, gene, threshold, reference=reference, phase=phase, cn_region=cn_region)
+         self.detect_cn(gene, profile, cn_region)
+         if cache:
+            pickle.dump(self.__dict__, open(cache_fn(sam_path, gene), 'wb'))
 
-      # average sample coverage
-      self.avg_coverage = sum(self.total(pos) for pos in self.coverage) / float(len(self.coverage) + 0.1)
-      log.debug('Coverage is {}', self.avg_coverage) 
+      log.debug('Coverage is {}', self.coverage.average_coverage()) 
+      if self.coverage.diploid_avg_coverage() < 2:
+         raise AldyException(td("""
+            The coverage of copy-number neutral region is too low (it is {}). 
+            Try specifying --cn-region parameter.
+            """.format(self.coverage.diploid_avg_coverage())))
 
-      cnv_avg_cov = float(sum(self.cnv_coverage.values())) / abs(gene.cnv_region[1] - gene.cnv_region[2])
-      if cnv_avg_cov < 2:
-         raise AldyException("The coverage of copy-number neutral region is too low (it is {}). Try specifying --cn-region parameter.".format(cnv_avg_cov))
+   
+   def load_aligned(self, 
+                    sam_path: str, gene: Gene, threshold: float, 
+                    reference=None, cn_region=None, phase=False) -> None:
+      """
+      Load the read, mutation and coverage data from SAM/BAM/CRAM/DeeZ file.
+      Args:
+         sam_path: obvious
+         gene (aldy.gene.Gene): a gene instance that is to be extracted
+         reference: path to the reference genome that is needed to read CRAM or DeeZ file
+         cn_region: should we attempt to read CN-neutral region (turn off if you pass --cn manually)
+      """
 
-   def total(self, pos):
-      return float(sum(v for p, v in self[pos].items() if p[:3] != 'INS'))
-
-   def percentage(self, m):
-      total = self.total(m.pos)
-      if total == 0:
-         return 0
-      return 100.0 * float(self[m]) / total
-
-   def __getitem__(self, index):
-      if isinstance(index, Mutation):
-         if index.pos not in self.coverage:
-            self.coverage[index.pos] = {}
-         op = index.op
-         if op[:3] == 'REF':
-            op = '_'
-         if op not in self.coverage[index.pos]:
-            self.coverage[index.pos][op] = 0
-         return self.coverage[index.pos][op]
-      else:
-         if index not in self.coverage:
-            self.coverage[index] = {}
-         return self.coverage[index]
-
-   def __setitem__(self, index, value):
-      if isinstance(index, Mutation):
-         self.coverage[index.pos][index.op] = value
-      else:
-         self.coverage[index] = value
-
-   def dump(self, gene, limit=-1, full=False):
-      for pos in sorted(self.coverage):
-         if limit != -1 and pos > limit:
-            break
-         for op, cov in self.coverage[pos].items():
-            m = Mutation(pos=pos, op=op)
-            if self.percentage(m) < 5:
-               continue
-            if (full or op != '_') and gene.region_at[pos] != '':
-               log.debug(
-                  ' {:6} {:5}: {:10} {:10} {:5} ({:3.0f}%)',
-                  gene.region_at[pos], pos, op,
-                  gene.old_notation[m],
-                  cov, self.percentage(m)
-               )
-
-   def process(read_generator):
-      pass
-
-   def load(self, sam_path, gene, reference=None, do_cnv=True):
-      log.debug('SAM file: {}', sam_path)
-
-      # filtered coverage
-      self.coverage = dict()
-      # unfiltered coverage at CN-neutral region (location -> coverage)
-      if do_cnv:
-         self.cnv_coverage = collections.defaultdict(int)
-      # rescaled average coverage of the region (region -> average_coverage)
-      self.region_coverage = dict()
-      # reference sequence
-      self.sequence = ''
-      # unfiltered coverage
-      self.unfiltered_coverage = collections.defaultdict(int)
-      # phasing links 
-      self.links = collections.defaultdict(int)
-      # indel locations to be corrected
-      self.indel_sites = {}
-      # reads dictironary
+      #: dict of str: (pysam.AlignedSegment, pysam.AlignedSegment): stores the paired-end reads 
       self.reads = {}
 
-      muts = collections.defaultdict(int)
-      norm = collections.defaultdict(int)
-
-      is_deez_file = sam_path[-3:] == '.dz'
-      pipe = ''
-      if is_deez_file:
-         log.debug('Using DeeZ file {}', sam_path)
-
-         def is_exe(path): # http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python/377028#377028
-            return os.path.isfile(path) and os.access(path, os.X_OK)
-         if not is_exe('deez'):
-            found = False
-            for path in os.environ["PATH"].split(os.pathsep):
-               path = path.strip('"')
-               if is_exe(os.path.join(path, 'deez')):
-                  found = True
-                  break
-            if not found:
-               log.error('DeeZ not in PATH')
-               exit(1)
-
-         tmpdir = tempfile.mkdtemp()
-         pipe = os.path.join(tmpdir, 'dzpipe')
-         os.mkfifo(pipe)
-         chromosome, chr_start, chr_end = gene.region
-         cnv_chromosome, cnv_start, cnv_end = gene.cnv_region
-         cnv_region = '{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)[3:]
-         region = '{}:{}-{}'.format(chromosome, chr_start - 500, chr_end + 1)[3:]
-
-         command = "deez --stats {} 2>&1 | grep 'Block' | awk '{{print $3}}'".format(sam_path)
-         p = subprocess.check_output(command, shell=True)
-         if all(x[:3] == 'chr' or x[:2] == '*:' for x in p.split()):
-            cnv_region = 'chr' + cnv_region
-            region = 'chr' + region
-
-         command = 'deez {} -h -c -Q -r {} "{};{}" > {} 2>/dev/null'.format(
-            sam_path, reference, region, cnv_region, pipe)
-         log.debug(command)
-         p = subprocess.Popen(command, shell=True)
-         sam_path = pipe
-
-      ref = gene.seq
-
-      # TODO: improve over non-functional mutations
-      for a in gene.alleles:
-         for m in gene.alleles[a].functional_mutations:
-            if m.op[:3] == 'INS':
-               self.indel_sites[m] = [collections.defaultdict(int), 0]
-
-      total_reads = 0
-      filtered_reads = 0
-      mate_cache = dict()
+      log.debug('Alignment file: {}', sam_path)
+      
+      if sam_path[-3:] == '.dz': # Prepare DeeZ reading
+         sam_path, pipe = _load_deez(sam_path, reference, gene.region, cn_region)
       with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
+         # Check do we have proper index to speed up the queries
          try:
             sam.check_index()
          except AttributeError:
-            pass # SAM files do not have index
-         except ValueError as be:
-            raise be
+            pass # SAM files do not have index. BAMs can also lack it
+         except ValueError as ve: 
+            raise ve
 
-         region = ''
-         chromosome, chr_start, chr_end = gene.region
-         cnv_chromosome, cnv_start, cnv_end = gene.cnv_region
-         prefix = chr_prefix(chromosome, sam.header['SQ'])
-         assert(prefix == chr_prefix(cnv_chromosome, sam.header['SQ']))
+         # Check do we need to append 'chr' or not
+         self._prefix = _chr_prefix(gene.region.chr, [x['SN'] for x in sam.header['SQ']])
          
-         fetched_cnv = not do_cnv # set it to fetched if we're not getting any CN information
-         if not fetched_cnv and sam.has_index():
-            log.debug('File {} has index', sam_path)
-            
-            region = prefix + '{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)
-            for read in sam.fetch(region=region):
-               start = read.reference_start
-               if read.cigartuples is None or (read.flag & 0x40) == 0:
-                  continue
-               for op, size in read.cigartuples:
-                  if op in [0, 7, 8, 2]:
-                     for i in range(size):
-                        self.cnv_coverage[start + i] += 1
-                     start += size
-            fetched_cnv = True
-
-            region = prefix + '{}:{}-{}'.format(chromosome, chr_start - 500, chr_end + 1)
-
-         mutation_sites = set()
-         for read in sam.fetch(region=region):
+         # Attempt to read CN-neutral region if the file has index (fast)
+         # If not, the main loop below will catch it
+         # dict of int: int: the coverage at CN-neutral region
+         cnv_coverage = collections.defaultdict(int)
+         def read_cn_read(read):
+            """Check is pysam.AlignmentSegment valid CN-neutral read, and if so, parse it"""
             start = read.reference_start
-            if not fetched_cnv and read.reference_id != -1 \
-               and read.reference_name == prefix + cnv_chromosome \
-               and cnv_start - 500 <= start <= cnv_end:
-               if read.cigartuples is None or (read.flag & 0x40) == 0:
-                  pass
-               else:
-                  for op, size in read.cigartuples:
-                     if op in [0, 7, 8, 2]:
-                        for i in range(size):
-                           self.cnv_coverage[start + i] += 1
-                        start += size
-
-            start, s_start = read.reference_start, 0
-            if not read.cigartuples or read.reference_name != prefix + chromosome \
-               or not (chr_start <= start < chr_end):
-               continue
-
-            if read.flag & 0x800: # no supplemetary alignments
-               continue
-            if 'H' in read.cigarstring:
-               continue
-
-            if 'S' in read.cigarstring:
-               sk = 0
-               for op, size in read.cigartuples:
-                  if op == 4:
-                     sk += size
-               filtered_reads += 1
-            total_reads += 1
-
-            seq = read.query_sequence
-            
-            has_indel = set()
-            orig_start = start
-
-            paired_muts = []
+            if read.cigartuples is None or (read.flag & 0x40) == 0:
+               return
             for op, size in read.cigartuples:
-               if op == 2:
-                  mut = (start, 'DEL.{}'.format(ref[start - chr_start:start - chr_start + size]))
-                  muts[mut] += 1
-                  if SAM.PHASE: 
-                     mutation_sites.add(start)
-                     paired_muts.append(mut)
-                  start += size
-               elif op == 1:
-                  mut = (start, 'INS.{}'.format(seq[s_start:s_start + size].lower()))
-                  muts[mut] += 1
-                  if SAM.PHASE:
-                     mutation_sites.add(start)
-                     paired_muts.append(mut)
-                  has_indel.add((start, size))
-                  s_start += size
-               elif op == 4:
-                  s_start += size
-               elif op in [0, 7, 8]:
+               if op in [0, 7, 8, 2]:
                   for i in range(size):
-                     if 0 <= start + i - chr_start < len(ref) and ref[start + i - chr_start] != seq[s_start + i]:
-                        mut = (start + i, 'SNP.{}{}'.format(ref[start + i - chr_start], seq[s_start + i]))
-                        muts[mut] += 1
-                        if SAM.PHASE: 
-                           mutation_sites.add(start + i)
-                           paired_muts.append(mut)
-                     else:
-                        norm[start + i] += 1
-                        if SAM.PHASE and start + i in mutation_sites:
-                           paired_muts.append((start + i, '_'))
-                  start += size
-                  s_start += size
+                     cnv_coverage[start + i] += 1
+                  start += size         
+         # Set it to fetched if CN-neutral region is pre-set (e.g. --cn parameter is provided)
+         # Read sample's CN-neutral region
+         is_cn_region_fetched = cn_region is None
+         if not is_cn_region_fetched and sam.has_index():
+            log.debug('File {} has index', sam_path)
+            for read in sam.fetch(region=cn_region.samtools(prefix=self._prefix)):
+               read_cn_read(read)
+            is_cn_region_fetched = True
 
-            # TODO: check is real insertion? (does it match reference/read)
-            for ins in self.indel_sites:
-               ins_len = len(ins.op) - 4
-               if (ins.pos, ins_len) in has_indel:
-                  self.indel_sites[ins][1] += 1
+         # Get the list of indel sites that should be corrected
+         # TODO: currently checks only functional indels; other indels should be corrected as well
+         _indel_sites = {m: (collections.defaultdict(int), 0) 
+            for an, a in gene.alleles.items() 
+            for m in a.func_muts 
+            if m.op[:3] == 'INS'}
+
+         # Fetch the reads
+         total = 0
+         muts, norm = collections.defaultdict(int), collections.defaultdict(int)
+         for read in sam.fetch(region=gene.region.samtools(prefix=self._prefix)):
+            # If we haven't read CN-neutral region, do it now
+            if not is_cn_region_fetched and _in_region(cn_region, read, self._prefix):
+               read_cn_read(read)
+            if self._parse_read(read, gene, norm, muts, _indel_sites):
+               total += 1
+               if phase:
+                  if read.query_name in self.reads:
+                     assert self.reads[read.query_name][1] is None
+                     read1 = self.reads[read.query_name][0]
+                     if read.reference_start < read1.reference_start:
+                        read, read1 = read1, read
+                     self.reads[read.query_name] = (read1, read)
+                  else:
+                     self.reads[read.query_name] = (read, None)
+
+         # Establish coverage dictionary
+         #: dict of int: (dict of Mutation: int): coverage dictionary
+         #: keys are positions in the reference genome, while values are dictionaries
+         #: that describe the coverage of each mutation (_ stands for non-mutated nucleotide)
+         coverage = dict()
+         for pos, cov in norm.items():
+            if cov == 0: continue
+            if pos not in coverage:
+               coverage[pos] = {}
+            coverage[pos]['_'] = cov
+         for m, cov in muts.items():
+            pos, mut = m
+            if pos not in coverage:
+               coverage[pos] = {}
+            coverage[pos][mut] = cov
+         for mut, ins_cov in _indel_sites.items():
+            if mut.op in coverage[mut.pos]:
+               self._correct_ins_coverage(mut, ins_cov)
+         self.coverage = Coverage(coverage, threshold, cnv_coverage)
+      if sam_path[-3:] == '.dz': # Tear down DeeZ file
+         _teardown_deez(pipe)
+   
+
+   def _parse_read(self, 
+                   read: pysam.AlignedSegment, gene: Gene, 
+                   norm: dict, muts: dict, indel_sites=None) -> bool:
+      """
+      Parses pysam.AlignedSegment read.
+      Params:
+         read (pysam.AlignedSegment)
+         gene (gene.Gene)
+         norm (collections.defaultdict(int)) *CHANGED*: 
+            dict of positions within the read that have not been mutated
+         muts (collections.defaultdict(int)) *CHANGED*: 
+            dict of positions within the read that have been mutated
+      Return: 
+         True if successful, False otherwise.
+      """
+
+      if not _in_region(gene.region, read, self._prefix): # ensure that it is a proper gene read
+         return False
+      if not read.cigartuples: # only valid alignments
+         return False
+      if read.flag & 0x800: # no supplemetary alignments
+         return False
+      if 'H' in read.cigarstring: # avoid hard-clipped reads
+         return False
+      
+      insertions = set()
+      start, s_start = read.reference_start, 0
+      for op, size in read.cigartuples:
+         if op == 2: # Deletion
+            mut = (start, 'DEL.{}'.format(gene.seq[start - gene.region.start:start - gene.region.start + size]))
+            muts[mut] += 1
+            start += size
+         elif op == 1: # Insertion
+            mut = (start, 'INS.{}'.format(read.query_sequence[s_start:s_start + size].lower()))
+            muts[mut] += 1
+            insertions.add((start, size))
+            s_start += size
+         elif op == 4: # Soft-clip
+            s_start += size
+         elif op in [0, 7, 8]: # M, X and =
+            for i in range(size):
+               if not 0 <= start + i - gene.region.start < len(gene.seq):
+                  continue
+               if gene.seq[start + i - gene.region.start] != read.query_sequence[s_start + i]:
+                  mut = (start + i, 'SNP.{}{}'.format(gene.seq[start + i - gene.region.start], read.query_sequence[s_start + i]))
+                  muts[mut] += 1
                else:
-                  self.indel_sites[ins][0][(orig_start, start, len(read.query_sequence))] += 1
+                  norm[start + i] += 1
+            start += size
+            s_start += size
 
-            if SAM.PHASE:
-               paired_muts = sorted(paired_muts)
-               for pi, p in enumerate(paired_muts):
-                  for pj in range(pi + 1, len(paired_muts)):
-                     if p[1] == '_' and paired_muts[pj][1] == '_':
-                        continue
-                     self.links[(p, paired_muts[pj])] += 1
+      if indel_sites is not None: 
+         # TODO: check is real insertion? (does it match reference/read)
+         for ins in indel_sites:
+            ins_len = len(ins.op) - 4
+            if (ins.pos, ins_len) in insertions:
+               indel_sites[ins][1] += 1
+            else:
+               indel_sites[ins][0][(read.reference_start, start, len(read.query_sequence))] += 1
+      return True
 
-      for i, c in norm.items():
-         if c == 0:
+
+   def _correct_ins_coverage(self, mut: Mutation, j) -> None:
+      """
+      Attempts to fix low coverage of large tandem insertions.
+      In such cases, reference looks like ...X... and donor looks like ...XX...
+      (i.e. X is inserted). Then any read that looks covers insertion only (e.g. X...) 
+      will get mapped perfectly w/o any insertion tag, and the insertion count will be
+      too low. This function attempts to correct this.
+
+      Notes: this function modifies self.coverage.
+      """
+
+      MARGIN_RATIO = 0.20
+      INSERT_LEN_RESCALE = 10.0
+      INSERT_LEN_AMPLIFY = 3
+
+      total = self.coverage.total(mut.pos)
+      current_ratio = float(self.coverage[mut]) / total
+
+      # calculate j
+      j0 = 0
+      for orig_start, start, read_len in j[0]:
+         ins_len = len(mut.op) - 4
+         # This is rather hackish way of detecting *40
+         # min 20% on the sides, max ... how much?
+         min_margin = MARGIN_RATIO * max(1, ins_len / INSERT_LEN_RESCALE) * read_len
+         if start < mut.pos + max(INSERT_LEN_AMPLIFY * ins_len, min_margin) or \
+            orig_start > mut.pos - max((INSERT_LEN_AMPLIFY - 1) * ins_len, min_margin):
             continue
-         if i not in self.coverage:
-            self.coverage[i] = {}
-         self.coverage[i]['_'] = c
-      for k, c in muts.items():
-         p, o = k
-         if p not in self.coverage:
-            self.coverage[p] = {}
-         self.coverage[p][o] = c
+         j0 += j[0][(orig_start, start, read_len)]
 
-      for pos in self.coverage:
-         self.unfiltered_coverage[pos] = self.total(pos)
+      new_ratio = j[1] / float(j0 + j[1])
+      log.debug(
+         'Rescaling indel: {}:{} from {}/{} to {} (indel:total = {}:{})',
+         mut.pos, mut.op,
+         self.coverage[mut], total,
+         int(self.coverage[mut] * (new_ratio / current_ratio)),
+         j[1], j0 + j[1]
+      )
+      self.coverage._coverage[mut.pos][mut.op] = int(self.coverage[mut] * (new_ratio / current_ratio))
 
-      # no idea?!
-      self.original_coverage = copy.deepcopy(self.coverage)
 
-      if pipe != '' and os.path.exists(pipe):
-         os.unlink(pipe)
+   ########################################################################################
 
-      # pprint(self.links)
 
-   # PGRNseq-v1: PGXT104 for all except CYP2B4; PGXT147 with rescale 2.52444127771 for CYP2B6
-   #    cypiripi.py --generate-profile bams/PGXT149.bam --profile-factor 2.52444127771 | grep CYP2B6 > _ha &&
-   #    cypiripi.py --generate-profile bams/PGXT104.bam | grep -v CYP2B6 >> _ha
-   # PGRNseq-v2: NA19789 for all
-   # Illumina: all ones
-   # regions require non-chr'd names
+   def detect_cn(self, gene: Gene, profile: str, cn_region: GeneRegion) -> None:
+      """
+      Rescales the self.coverage to fit the sequencing profile coverage.
+      Params:
+         gene (aldy.Gene): gene object
+         profile (str): profile identifier
+         cn_region (GeneRegion): coordinates of CN-neutral region
+
+      Assumes that self.coverage is set. Modifies self.coverage.
+      """
+
+      profile_path = script_path('aldy.resources.profiles', '{}.profile'.format(profile.lower()))
+      if os.path.exists(profile_path):
+         profile = self._load_profile(profile_path)
+      else:
+         profile = self._load_profile(profile, is_bam=True, region=[
+            (gene.name,) + gene.region, ('CN',) + cn_region])      
+      self.coverage._normalize_coverage(profile, gene.regions.items(), cn_region)
+
+
+   def _load_profile(self, profile_path: str, 
+                     is_bam=False, region=None) -> Dict[str, Dict[int, float]]:
+      """
+      Load the coverage profile.
+      Args:
+         profile_path: path to the profile file. Profile can be in .profile or SAM/BAM format
+         is_bam (bool): is the file BAM
+         region: ??
+      Returns: 
+         profile dictionary, where keys are chromosome IDs and values are dicts of 
+         (position -> profile_coverage).
+      """
+
+      profile = collections.defaultdict(lambda: collections.defaultdict(int))
+      if is_bam:
+         ptr = Sample.load_sam_profile(profile_path, 2, region)
+         for _, c, p, v in ptr:
+            profile[c][p] = v
+      else:
+         with open(profile_path) as f:
+            for line in f:
+               if line[0] == '#': continue # skip comments
+               line = line.strip().split()[1:]
+               profile[line[0]][int(line[1])] = float(line[2])
+      return profile
+
+
+   ########################################################################################
+
+
    @staticmethod
-   def load_profile(sam_path, factor, regions = None): 
-      # log.warn('SAM file profile: {} @ {}', sam_path, regions)
+   def load_sam_profile(sam_path, factor, regions = None): 
+      """
+      Technology notes (profiles used in Aldy paper):
+      - PGRNseq-v1: PGXT104bam used for all genes 
+         (n.b. PGXT147 with rescale 2.52444127771 used for CYP2B6 beta)
+      - PGRNseq-v2: NA19789.bam used for all genes
+      - Illumina: by definition contain all ones
+      
+      TODO: code review this function
+      """
       if regions is None:
          regions = [
             ('CYP3A5', '7', 99245000, 99278000),
@@ -369,7 +345,7 @@ class SAM(object):
             ('CYP2A6', '19', 41347500, 41400000),
             ('CYP2D6', '22', 42518900, 42553000),
             ('TPMT', '6', 18126541, 18157374),
-            ('DPYD', '1', 97541298, 98388615)
+            ('DPYD', '1', 97541298, 98388615),
          #  ('CYP2B6', '19', 41428000, 41525000),
          #  ('SLCO1B1', '12', 21282127, 21394730),
          #  ('CYP21A', '6', 31970000, 32010000),
@@ -382,7 +358,7 @@ class SAM(object):
 
          gene, r = r[0], (r[1], r[2], r[3])
          with pysam.AlignmentFile(sam_path) as sam:
-            region = chr_prefix(r[0], sam.header['SQ']) + '{}:{}-{}'.format(r[0], r[1], r[2])
+            region = _chr_prefix(r[0], sam.header['SQ']) + '{}:{}-{}'.format(r[0], r[1], r[2])
             log.info('Generating profile for {} ({})', gene, region)
             try:
                for read in sam.fetch(region=region):
@@ -413,6 +389,73 @@ class SAM(object):
                   for c in sorted(cov.keys()) for p in sorted(cov[c].keys()) 
                   if r[1] - 500 <= p <= r[2] + 500
                ]
-            except ValueError as e:
+            except ValueError as _:
                log.warn('Cannot fetch gene {} ({})', gene, region)   
       return result
+
+
+
+def _chr_prefix(ch: str, chrs: List[str]) -> str: # assumes ch is not prefixed
+   """
+   Checks whether ch (*without any chr prefix*) should be prefixed with chr or not.
+   Params:
+      ch (str): chromosome name
+      chrs (list of str): list of chromosome names in the alignment file
+   """
+   if ch not in chrs and 'chr' + ch in chrs:
+      return 'chr'
+   return ''
+
+
+def _in_region(region: GeneRegion, read: pysam.AlignedSegment, prefix: str) -> bool:
+   """
+   Check whether a read is within a given region with some padding
+   """
+
+   return read.reference_id != -1 \
+      and read.reference_name == prefix + region.chr \
+      and region.start - 500 <= read.reference_start <= region.end
+
+
+def _load_deez(deez_path: str, reference: str, region: GeneRegion, cn_region: GeneRegion) -> str:
+   """
+   Loads DeeZ file instead of SAM/BAM by piping DeeZ to pysam. Requires 'deez' in PATH.
+   Returns:
+      the pipe file descriptor (e.g. '/dev/fd/12345')
+   """
+
+   log.debug('Using DeeZ file {}', deez_path)
+   
+   if reference is None:
+      raise AldyException("DeeZ files require reference")
+   if not check_path('deez'):
+      raise AldyException("'deez' not found (please double-check $PATH)")
+
+   tmpdir = tempfile.mkdtemp()
+   pipe = os.path.join(tmpdir, 'dzpipe')
+   os.mkfifo(pipe)
+   
+   # check the chr prefix
+   command = "deez --stats {} 2>&1 | grep 'Block' | awk '{{print $3}}'".format(deez_path)
+   p = subprocess.check_output(command, shell=True)
+   prefix = _chr_prefix(region.chr, p.split())
+      
+   # start the decompression process
+   command = 'deez {} -h -c -Q -r {} "{};{}" > {} 2>/dev/null'.format(
+      deez_path, reference, 
+      region.samtools(prefix), cn_region.samtools(prefix), 
+      pipe)
+   log.debug(command)
+   p = subprocess.Popen(command, shell=True)
+   return pipe
+
+
+def _teardown_deez(pipe: str) -> None:
+   """
+   Clean-up _load_deez handle
+   """
+
+   if os.path.exists(pipe):
+      os.unlink(pipe)
+
+

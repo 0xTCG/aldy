@@ -18,60 +18,84 @@ import functools
 import traceback
 
 
-from . import genotype
-from . import protein
-from . import gene
-from . import sam
-from . import lpinterface
+from .common import *
+from .gene import Gene
+from .sam import Sample
+from .genotype import genotype_init
+from .lpinterface import model as lp_model
 from .version import __version__
 
 
-from .common import *
-
-
 def _get_args():
+   """Prepares the command-line arguments"""
+
    parser = argparse.ArgumentParser()
+   parser.add_argument('file', nargs='?', 
+      help='Input sample in SAM, BAM, CRAM or DeeZ format.') 
    parser.add_argument('--threshold', '-T', default=50, 
-      help="Cut-off rate for variations (percent per copy). Default is 50%%.")
+      help="Cut-off rate for variations (percent per copy). Default is 50.")
    parser.add_argument('--profile', '-p', default=None, 
-      help='Sequencing profile. Currently, "illumina", "pgrnseq-v1", ' + 
-          '"pgrnseq-v2" and "wxs" are supported out of the box. You can also use SAM/BAM as a profile. Please check documentation for more information.')
+      help=td("""
+         Sequencing profile. Currently, the following profiles are supported out of the box:
+         - illumina
+         - pgrnseq-v1
+         - pgrnseq-v2 and
+         - wxs. 
+         You can also provide a SAM/BAM file as a profile. 
+         Please check documentation for more information."""))
    parser.add_argument('--gene', '-g', default='all', 
-      help='Gene profile. Default is "all" which calls all supported genes.')
+      help='Gene to be genotyped. Default is "all" which attempt to genotype all supported genes.')
+   parser.add_argument('--cn-neutral-region', '-n', default='22:42547463-42548249', 
+      help=td("""
+         Copy-number neutral region. Format of the region is chromosome:start-end 
+         (e.g. chr1:10000-20000). 
+         Default value is CYP2D8 within hg19 (22:42547463-42548249)."""))
    parser.add_argument('--verbosity', '-v', default='INFO', 
-      help='Logging verbosity. Acceptable values are ' + 
-          'T (trace), D (debug), I (info) and W (warn). Default is I (info).')
+      help=td("""
+         Logging verbosity. Acceptable values are:
+         - T (trace)
+         - D (debug)
+         - I (info) and
+         - W (warn). 
+         Default is "I" (info)."""))
    parser.add_argument('--log', '-l', default=None, 
-      help='Location of the output log file (default: [input].[gene].aldylog)')
+      help='Location of the output log file. Default is [input].[gene].aldylog')
    parser.add_argument('--output', '-o', default=None, 
       help='Location of the output file (default: [input].[gene].aldy)')
    parser.add_argument('--solver', '-s', default='any', 
-      help='IP Solver (default: any available)')
-   parser.add_argument('--cn-neutral', '-n', default=None, 
-      help='Manually specify copy number-neutral region in the sample to be used for calculating region copy numbers. '
-      + 'Format is chromosome:start-end (e.g. chr1:10000-20000). ' +
-       'Default is as specified in the gene YML file (typically CYP2D8 region).')
+      help=td("""
+         ILP Solver. Available solvers:
+         - gurobi (Gurobi)
+         - scip (SCIP)
+         - any (attempts to use gurobi, and if fails, uses scip).
+         Default is "any" """))
    parser.add_argument('--phase', '-P', default=0, action='store_true', 
-      help='Phase reads for better variant calling. May provide neglegible benefits at the cost of significant slowdown. Default is no.')
+      help=td("""
+      Phase aligned reads for better variant calling. 
+      May provide neglegible benefits at the cost of significant slowdown. 
+      Default is off."""))
    parser.add_argument('--license', default=0, action='store_true', 
-      help='Show the Aldy license')
+      help='Show Aldy license')
    parser.add_argument('--test', default=0, action='store_true', 
-      help='Sanity-check Aldy on NA10860 sample')
+      help='Sanity-check Aldy on NA10860 sample. Recommended prior to the first use.')
    parser.add_argument('--remap', default=0, #action='store_true', 
-      help='Run realignment via bowtie2')
-   parser.add_argument('file', nargs='?', 
-      help='SAM or BAM input file')
-
-   parser.add_argument('--show-cn', dest='show_cn', action='store_true',
-      help='Shows all copy number configurations supported by a gene (requires -g).')
+      help='Realign reads for better mutation calling. Requires samtools and bowtie2 in $PATH.')
    parser.add_argument('--cn', '-c', default=None,
-      help='Manually set copy number (input: a comma-separated list CN1,CN2,...). ' +
-          'For a list of supported configurations, please run --show-cn. For standard diploid case specify -c 1,1')
+      help=td("""
+         Manually set the copy number configuration.
+         Input format is a comma-separated list of configuration IDs: e.g. "CN1,CN2".
+         For a list of supported configuration IDs, please run aldy --show-cn. 
+         For a commonly used diploid case (e.g. 2 copies of the main gene) specify -c 1,1"""))
+   
+   parser.add_argument('--show-cn', dest='show_cn', action='store_true',
+      help='Show all available copy number configurations of a given gene. Requires --gene to be provided.')
    parser.add_argument('--generate-profile', dest='generate_profile', action='store_true', 
-      help='Generate a sequencing profile for a given SAM/BAM. Please check documentation for more information.')
+      help=td("""
+         Generate a sequencing profile for a given alignment file in SAM/BAM/CRAM format. 
+         Please check documentation for more information."""))
 
    # internal parameters for development purposes: please do not use unless instructed
-   parser.add_argument('--cache', '-C', dest='cache', action='store_true', help=argparse.SUPPRESS)
+   parser.add_argument('--cache', dest='cache', action='store_true', help=argparse.SUPPRESS)
    parser.add_argument('--profile-factor', dest='profile_factor', default=2.0, help=argparse.SUPPRESS)
 
    # WARNING: internally all chromosome names do not have chr prefix 
@@ -79,13 +103,15 @@ def _get_args():
 
 
 def _print_licence():
+   """Prints Aldy license"""
+
    with open(script_path('aldy.resources', 'LICENSE.md')) as f:
       for l in f: print(l.strip())
 
 
 def run(gene, file, output, log_output, profile, threshold, solver, cn_region, cn, remap):
    try:
-      result = genotype.genotype(
+      result = genotype_init(
          file, output,
          log_output,
          gene, profile,
@@ -98,33 +124,53 @@ def run(gene, file, output, log_output, profile, threshold, solver, cn_region, c
       for rd, r in result:
          log.warn('  {:30} ({})', rd, ', '.join(r))
    except AldyException as ex:
-      log.error(ex.message)
+      log.error(ex)
 
 
 def _run_test():
+   """
+   Runs the full pipeline as a sanity check on NA12878 sample (located within the package)
+   """
+
    log.warn('Aldy Sanity-Check Test')
    log.warn('Expected result is: *1/*4+*4')
-   run('cyp2d6', script_path('aldy.resources', 'NA10860.bam'),
-      '', os.devnull, 'illumina', 0.5, 'any', None)
+   run(
+      gene='cyp2d6', 
+      file=script_path('aldy.resources', 'NA10860.bam'),
+      output='', 
+      log_output=os.devnull, 
+      profile='illumina', 
+      threshold=0.5, 
+      solver='any', 
+      cn_region='22:42547463-42548249', 
+      cn=None, 
+      remap=False)
 
 
 def main(args=None):
    args = _get_args()
 
+   # Set the logging verbosity
    level = args.verbosity.lower()
-   for k, v in logbook.base._reverse_level_names.items():
-      if k.lower().startswith(level):
-         level = v
-         break
-
+   level = next(v for k, v in logbook.base._reverse_level_names.items() if k.lower().startswith(level))
+   
+   # Set the command-line logging
    sh = logbook.more.ColorizedStderrHandler(format_string=LOG_FORMAT, level=level)
    sh.push_application()
+   sh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
+      record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
 
    log.info('*** Aldy v{} (Python {}) ***', __version__, platform.python_version())
    log.info('(c) 2016-2018 SFU, MIT & IUB. All rights reserved.')
    log.info('Arguments: {}', ' '.join(k+'='+str(v) for k, v in vars(args).items() if k is not None))
-   
 
+   # Test for the ILP solver presence
+   try:
+      _ = lp_model('init', args.solver)
+   except Exception as ex:
+      log.critical(ex)
+      
+   # Parse the args
    if args.license:
       _print_licence()
       exit(0)
@@ -133,36 +179,21 @@ def main(args=None):
       exit(0)
    elif args.show_cn:
       database_file = script_path('aldy.resources.genes', '{}.yml'.format(args.gene.lower()))
-      g = gene.Gene(database_file)
-      g.print_configurations()
+      Gene(database_file).print_configurations()
       exit(0)
    elif args.file is None:
       log.critical('Input file must be specified!')
       exit(1)
-
    if args.generate_profile:
-      p = sam.SAM.load_profile(args.file, float(args.profile_factor))
+      p = Sample.load_sam_profile(args.file, float(args.profile_factor))
       for a, b, c, d in p:
          print(a, b, c, d)
       exit(0)
-
-   if args.cache:
-      sam.SAM.CACHE = True
-   if args.phase:
-      sam.SAM.PHASE = True
-
-   try:
-      m = lpinterface.model('init', args.solver)
-   except Exception as ex:
-      if hasattr(ex, 'message'):
-         log.critical(ex.message)
-      else:
-         log.critical(ex)
-
    if args.profile is None:
       log.critical('No profile provided! Please run aldy --help for available profile choices.')
       exit(1)
 
+   # Prepare the list of genes to be genotypes
    if args.gene.lower() == 'all':
       avail_genes = pkg_resources.resource_listdir('aldy.resources', 'genes')
       avail_genes = [i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == '.yml']
@@ -174,6 +205,7 @@ def main(args=None):
    log.info('  Threshold: {:.0f}%', float(args.threshold))
    log.info('  Input:     {}', args.file)
    
+   # Prepare the log files
    if args.log is None:
       log_output = '{}.aldylog'.format(os.path.splitext(args.file)[0])
    else:
@@ -181,10 +213,8 @@ def main(args=None):
    fh = logbook.FileHandler(log_output, format_string=LOG_FORMAT, mode='w', bubble=True, level='TRACE')
    fh.push_application()
    log.info('  Log:       {}', log_output)
-   log.info('  Phasing:   {}', sam.SAM.PHASE)
+   log.info('  Phasing:   {}', args.phase)
 
-   # pool = multiprocessing.Pool(4)
-   # pool.map(functools.partial(run, args=args, log_output=log_output), avail_genes)
    try:
       output = args.output
       if output == '-':
@@ -215,10 +245,7 @@ def main(args=None):
       log.debug(ex)
       exit(ex.code)
    except Exception as ex:
-      if hasattr(ex, 'message'):
-         log.critical(ex.message)
-      else:
-         log.critical(ex)
+      log.critical(ex)
       log.debug(traceback.format_exc())
       exit(1)
    except:

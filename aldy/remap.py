@@ -26,7 +26,7 @@ from . import gene
 from . import sam
 from . import lpinterface
 from . import diplotype
-from . import remap_farid
+# from . import remap_farid
 
 from .common import *
 

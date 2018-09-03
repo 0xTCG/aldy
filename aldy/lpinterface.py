@@ -1,12 +1,9 @@
-from __future__ import print_function
 # 786
 
 # Aldy source: lpinterface.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
-
-from builtins import object
 
 import importlib
 
