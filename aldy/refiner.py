@@ -73,10 +73,8 @@ def solve_minor_model(gene: Gene,
    ADD_PENALTY_FACTOR = 2
 
    log.debug('Refining {}', major_sol)
-
    model = lpinterface.model('aldy_refine', solver)
    
-
    # Establish minor allele binary variables
    alleles = {(ma, mi, 0): set(gene.alleles[ma].func_muts) | \
                            set(gene.alleles[ma].minors[mi].neutral_muts)
