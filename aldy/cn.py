@@ -40,7 +40,7 @@ Members:
    region_cn (dict of gene.GeneRegion: int):
       dictionary of region CNs in this solution
 """
-class CNSolution(nt('CNSolution', 'score solution region_cn gene'.split())):
+class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'region_cn', 'gene'])):
    def position_cn(self, pos: int) -> float:
       try:
          g, region = self.gene.region_at(pos)
@@ -53,9 +53,9 @@ class CNSolution(nt('CNSolution', 'score solution region_cn gene'.split())):
       return 'CNSol[{:.2f}; sol=({}); cn={}]'.format(
          self.score,
          ','.join('*{}x{}'.format(*kv) for kv in self.solution.items()),
-         '|'.join(
-            ''.join(str(self.region_cn[g][r]) if r in self.region_cn[g] else '_' for r in regions)
-            for g in sorted(self.region_cn)))
+         '|'.join(''.join(str(self.region_cn[g][r]) if r in self.region_cn[g] else '_' 
+                          for r in regions)
+                  for g in sorted(self.region_cn)))
 
 
 
@@ -80,10 +80,9 @@ def estimate_cn(gene: Gene, sam: Sample, solver: str,
 
       # TODO: filter CN configs with non-resent alleles
       # Calculate max. possible CN of the gene
-      max_observed_cn = 1 + max(
-         int(round(sam.coverage.region_coverage(g, r))) 
-         for g in gene.regions 
-         for r in gene.regions[g])
+      max_observed_cn = 1 + max(int(round(sam.coverage.region_coverage(g, r))) 
+                                for g in gene.regions 
+                                for r in gene.regions[g])
       log.debug('Maximum CN = {}', max_observed_cn)
 
       region_cov = _region_coverage(gene, sam)
@@ -112,6 +111,9 @@ def solve_cn_model(gene: Gene, cn_configs: Dict[str, CNConfig],
       CNSolutions describing the optimal solution
    """
 
+   print(">>>", region_coverage)
+   exit(0)
+
    # Model parameters
    LEFT_FUSION_PENALTY = 0.1
    PCE_PENALTY_COEFF = 1.5
@@ -133,15 +135,15 @@ def solve_cn_model(gene: Gene, cn_configs: Dict[str, CNConfig],
    structures = {(name, 0): structure for name, structure in cn_configs.items()}
    for a, ai in list(structures.keys()):
       # Add another complete haplotype (assuming diploid genomes)   
-      structures[(a, -1)] = structures[(a, 0)] 
+      structures[a, -1] = structures[a, 0] 
       if cn_configs[a].kind in [CNConfig.CNConfigType.DELETION, CNConfig.CNConfigType.LEFT_FUSION]:
          continue
       for i in range(1, max_cn):
-         structures[(a, i)] = copy.deepcopy(structures[(a, 0)])
-         for g in structures[(a, i)].cn:
+         structures[a, i] = copy.deepcopy(structures[a, 0])
+         for g in structures[a, i].cn:
             # if it is pseudog, remove one copy (i.e. create "weak configuration")
             if g != 0:
-               structures[(a, i)].cn[g] = {r: v - 1 for r, v in structures[(a, i)].cn[g].items()}
+               structures[a, i].cn[g] = {r: v - 1 for r, v in structures[a, i].cn[g].items()}
 
    # Add one binary variable to model for each structure copy.
    # Uppercase variables are LP variables
@@ -156,10 +158,10 @@ def solve_cn_model(gene: Gene, cn_configs: Dict[str, CNConfig],
    for a, ai in structures:
       if ai == -1:
          log.trace("LP constraint: A_-1 <= A_0 for {}", a)
-         model.addConstr(A[(a, ai)] <= A[(a, 0)]) # second haplotype is present only if the first one is there
+         model.addConstr(A[a, ai] <= A[a, 0]) # second haplotype is present only if the first one is there
       elif ai > 0:
          log.trace('LP constraint: A_{} <= A_{} for {}', ai, ai - 1, a)
-         model.addConstr(A[(a, ai)] <= A[(a, ai - 1)])
+         model.addConstr(A[a, ai] <= A[a, ai - 1])
       
    # Form the error variables
    E = {}
@@ -190,23 +192,22 @@ def solve_cn_model(gene: Gene, cn_configs: Dict[str, CNConfig],
       status, opt, solutions = model.solveAll(objective, A)
       log.debug('LP status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
-      return CNSolution(score=float('inf'), solution=[], region_cn={}, gene=gene)
+      return [CNSolution(score=float('inf'), solution=[], region_cn={}, gene=gene)]
    
    # Get final CN vector (i.e. total integer CN for each region)
    result = []
    for sol in solutions:
       log.debug('Solution: {}', ', '.join('*' + str(s) for s, _ in sol))
 
-      vec = collections.defaultdict(lambda: collections.defaultdict(int))
+      vec: Dict[int, Dict[GeneRegion, float]] = collections.defaultdict(lambda: collections.defaultdict(int))
       for conf in sol:
          for g in structures[conf].cn:
             for r in structures[conf].cn[g]:
                vec[g][r] += structures[conf].cn[g][r]
-      result.append(CNSolution(
-         score=opt, 
-         solution=collections.Counter(s for s, _ in sol), 
-         region_cn={a: dict(b) for a, b in vec.items()}, 
-         gene=gene))
+      result.append(CNSolution(score=opt, 
+                               solution=collections.Counter(s for s, _ in sol), 
+                               region_cn={a: dict(b) for a, b in vec.items()}, 
+                               gene=gene))
 
    return result
 
@@ -227,8 +228,8 @@ def _filter_configs(gene: Gene, sam: Sample) -> Dict[str, CNConfig]:
          continue # this is just a CN description w/o any mutations
       if any(cov[m] <= 0 for m in gene.alleles[an].func_muts):
          s = ('{} in {}'.format(m, gene.region_at(m.pos))
-            for m in gene.alleles[an].func_muts
-            if cov[m] <= 0)
+              for m in gene.alleles[an].func_muts
+              if cov[m] <= 0)
          log.trace('Removing {} because of {}', an, ' and '.join(s))
          del configs[an]
    return configs
@@ -274,9 +275,9 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
       gene (gene.Gene): a gene instance
       sols (list of str): list of CN configurations 
    """
-   result, vec = [], collections.defaultdict(int)
-   sols = collections.Counter(sols)
-   for sol, sol_cnt in sols.items():
+   result = [] 
+   vec: Dict[tuple, int] = collections.defaultdict(int)
+   for sol, sol_cnt in collections.Counter(sols).items():
       if sol not in gene.cn_configs:
          raise AldyException(
             'Given copy number solution contains unknown copy number configuration {}. '.format(sol) + 
@@ -284,7 +285,7 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
       for i in range(sol_cnt):
          result.append((sol, i))
          log.debug('Solution (user-provided): {}', result[-1])
-         for regions in gene.cn_configs[sol].values():
+         for regions in gene.cn_configs[sol].cn.values():
             for r, v in regions.items():
                vec[r] += v
    return CNSolution(score=0, solution=result, region_cn=dict(vec), gene=gene)

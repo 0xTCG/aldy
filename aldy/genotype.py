@@ -65,8 +65,15 @@ def genotype(gene_db: str, sam_path: str, profile: str,
 
    minor_sols = [refiner.estimate_minor(gene, sample, ma_sol, solver)
                  for ma_sol in major_sols]
-   min_score = min(major_sols, key=lambda m: m.score).score
-   minor_sols = [m for m in major_sols if abs(m.score - min_score) < 1e-6]
+   min_score = min(minor_sols, key=lambda m: m.score).score
+   minor_sols = [m for m in minor_sols if abs(m.score - min_score) < 1e-6]
+
+   sample_name = os.path.splitext(os.path.basename(sam_path))[0]
+   diplotype.write_header(sys.stdout)
+   for sol_id, sol in enumerate(minor_sols):
+      diplotype.estimate_diplotype(gene, sol)
+      log.warn('{}', sol.diplotype)
+      diplotype.write_decomposition(sample_name, gene, sol_id, sol, sys.stdout)
 
    # if do_remap != 0:
    #    log.critical('Remapping! Stay tuned...')
@@ -112,5 +119,5 @@ def genotype_init(sample_path, output, log_output, gene, profile, threshold, sol
    print(sol)
    
    exit(0)
-   return cn_sol
+   return sol
 

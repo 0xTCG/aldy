@@ -1,5 +1,4 @@
 {
-  "cnv_region": ["22", 42547463, 42548249], 
   "pseudogenes": {}, 
   "name": "CYP4F2", 
   "rev_comp": 1,
@@ -17,7 +16,6 @@
     "9": [15990573, 15990707], 
     "8": [15996733, 15996863]
   }, 
-  "max_cn": {}, 
   "alleles": {
     "CYP4F2*1": {
       "phenotype": {"invivo": "Normal", "invitro": "Normal"}, 

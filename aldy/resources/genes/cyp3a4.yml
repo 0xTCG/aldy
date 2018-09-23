@@ -1,5 +1,4 @@
 {
-  "cnv_region": ["22", 42547463, 42548249], 
   "pseudogenes": {}, 
   "name": "CYP3A4", 
   "rev_comp": 1,
@@ -18,7 +17,6 @@
     "9": [99363999, 99364066], 
     "8": [99364753, 99364881]
   }, 
-  "max_cn": {}, 
   "alleles": {
     "CYP3A4*1": {
       "phenotype": {"invivo": "Normal", "invitro": "Normal"}, 

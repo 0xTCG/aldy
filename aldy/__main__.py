@@ -38,8 +38,6 @@ def main():
    # Set the command-line logging
    sh = logbook.more.ColorizedStderrHandler(format_string=LOG_FORMAT, level=level)
    sh.push_application()
-   sh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
-      record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
 
    log.info('*** Aldy v{} (Python {}) ***', __version__, platform.python_version())
    log.info('(c) 2016-2018 SFU, MIT & IUB. All rights reserved.')
@@ -78,6 +76,8 @@ def main():
          else:
             log_output = args.log
          fh = logbook.FileHandler(log_output, format_string=LOG_FORMAT, mode='w', bubble=True, level='TRACE')
+         fh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
+            record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
          fh.push_application()
          log.info('  Log:       {}', log_output)
          log.info('  Phasing:   {}', args.phase)
@@ -97,7 +97,7 @@ def main():
          for gene in avail_genes:
             _genotype(gene, args.file, output, log_output, 
                       args.profile, args.threshold, args.solver, 
-                      args.cn_neutral, args.cn, args.remap)
+                      args.cn_neutral_region, args.cn, args.remap)
          if output != sys.stdout:
             output.close()
       else:
@@ -118,12 +118,12 @@ def main():
       exit(ex.code)
    except Exception as ex:
       log.critical(ex)
-      log.debug(traceback.format_exc())
+      log.warn(traceback.format_exc())
       exit(1)
    except:
-      ex = sys.exc_info()[0]
-      log.critical('Unrecoverable error: {}', str(ex))
-      log.debug(traceback.format_exc())
+      exc = sys.exc_info()[0]
+      log.critical('Unrecoverable error: {}', str(exc))
+      log.warn(traceback.format_exc())
       exit(1)
 
 

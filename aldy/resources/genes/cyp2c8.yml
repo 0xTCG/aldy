@@ -1,5 +1,4 @@
 {
-  "cnv_region": ["22", 42547463, 42548249], 
   "pseudogenes": {}, 
   "name": "CYP2C8", 
   "rev_comp": 1,
@@ -14,7 +13,6 @@
     "9": [96796884, 96797066], 
     "8": [96798653, 96798795]
   }, 
-  "max_cn": {}, 
   "alleles": {
     "CYP2C8*1": {
       "phenotype": {"invivo": "Normal", "invitro": "Normal"}, 

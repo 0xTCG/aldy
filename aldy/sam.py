@@ -22,7 +22,7 @@ from .gene import Gene, Mutation
 
 
 # CIGAR parsing constants (borrowed from pysam)
-CIGAR2CODE = dict([ord(y), x] for x, y in enumerate("MIDNSHP=XB"))
+CIGAR2CODE: Dict[int, int] = {ord(y): x for x, y in enumerate("MIDNSHP=XB")}
 CIGAR_REGEX = re.compile(r"(\d+)([MIDNSHP=XB])")
 
 
@@ -37,19 +37,23 @@ class Sample:
 
 
    def __init__(self, 
-                sam_path: str, gene: Gene, threshold: float, 
-                cache: bool = False, phase: bool = False, 
+                sam_path: str, 
+                gene: Gene, 
+                threshold: float, 
+                profile: str,
+                cache: bool = False, 
+                phase: bool = False, 
                 reference: Optional[str] = None, 
-                cn_region: Optional[GeneRegion] = None, 
-                profile: Optional[str] = None):
+                cn_region: Optional[GRange] = None) -> None:
       
       # Handle caching
       def cache_fn(path, gene):
          return path + '-{}.aldycache'.format(gene.name)
       if cache and os.path.exists(cache_fn(sam_path, gene)):
          log.debug('Loading cache')
-         d = pickle.load(open(cache_fn(sam_path, gene)))
-         self.__dict__.update(d)
+         with open(cache_fn(sam_path, gene)) as f:
+            d = pickle.load(f) # type: ignore       
+            self.__dict__.update(d)
       else:
          self.load_aligned(sam_path, gene, threshold, reference=reference, phase=phase, cn_region=cn_region)
          self.detect_cn(gene, profile, cn_region)
@@ -77,7 +81,7 @@ class Sample:
       """
 
       #: dict of str: (pysam.AlignedSegment, pysam.AlignedSegment): stores the paired-end reads 
-      self.reads = {}
+      self.reads: Dict[str, Tuple[pysam.AlignedSegment, pysam.AlignedSegment]] = {}
 
       log.debug('Alignment file: {}', sam_path)
       
@@ -98,7 +102,7 @@ class Sample:
          # Attempt to read CN-neutral region if the file has index (fast)
          # If not, the main loop below will catch it
          # dict of int: int: the coverage at CN-neutral region
-         cnv_coverage = collections.defaultdict(int)
+         cnv_coverage: Dict[int, int] = collections.defaultdict(int)
          def read_cn_read(read):
             """Check is pysam.AlignmentSegment valid CN-neutral read, and if so, parse it"""
             start = read.reference_start
@@ -120,14 +124,16 @@ class Sample:
 
          # Get the list of indel sites that should be corrected
          # TODO: currently checks only functional indels; other indels should be corrected as well
-         _indel_sites = {m: (collections.defaultdict(int), 0) 
+         _indel_sites: Dict[Mutation, tuple] = {
+            m: (collections.defaultdict(int), 0) 
             for an, a in gene.alleles.items() 
             for m in a.func_muts 
             if m.op[:3] == 'INS'}
 
          # Fetch the reads
          total = 0
-         muts, norm = collections.defaultdict(int), collections.defaultdict(int)
+         muts: dict = collections.defaultdict(int) 
+         norm: dict = collections.defaultdict(int)
          for read in sam.fetch(region=gene.region.samtools(prefix=self._prefix)):
             # If we haven't read CN-neutral region, do it now
             if not is_cn_region_fetched and _in_region(cn_region, read, self._prefix):
@@ -145,10 +151,10 @@ class Sample:
                      self.reads[read.query_name] = (read, None)
 
          # Establish coverage dictionary
-         #: dict of int: (dict of Mutation: int): coverage dictionary
+         #: dict of int: (dict of str: int): coverage dictionary
          #: keys are positions in the reference genome, while values are dictionaries
          #: that describe the coverage of each mutation (_ stands for non-mutated nucleotide)
-         coverage = dict()
+         coverage: Dict[int, Dict[str, int]] = dict()
          for pos, cov in norm.items():
             if cov == 0: continue
             if pos not in coverage:
@@ -223,7 +229,7 @@ class Sample:
          for ins in indel_sites:
             ins_len = len(ins.op) - 4
             if (ins.pos, ins_len) in insertions:
-               indel_sites[ins][1] += 1
+               indel_sites[ins] = (indel_sites[ins][0], indel_sites[ins][1] + 1)
             else:
                indel_sites[ins][0][(read.reference_start, start, len(read.query_sequence))] += 1
       return True
@@ -273,28 +279,31 @@ class Sample:
    ########################################################################################
 
 
-   def detect_cn(self, gene: Gene, profile: str, cn_region: GeneRegion) -> None:
+   def detect_cn(self, gene: Gene, profile: str, cn_region: Optional[GRange] = None) -> None:
       """
       Rescales the self.coverage to fit the sequencing profile coverage.
       Params:
          gene (aldy.Gene): gene object
          profile (str): profile identifier
-         cn_region (GeneRegion): coordinates of CN-neutral region
+         cn_region (GRange): coordinates of CN-neutral region
 
       Assumes that self.coverage is set. Modifies self.coverage.
       """
 
       profile_path = script_path('aldy.resources.profiles', '{}.profile'.format(profile.lower()))
       if os.path.exists(profile_path):
-         profile = self._load_profile(profile_path)
+         prof = self._load_profile(profile_path)
       else:
-         profile = self._load_profile(profile, is_bam=True, region=[
-            (gene.name,) + gene.region, ('CN',) + cn_region])      
-      self.coverage._normalize_coverage(profile, gene.regions.items(), cn_region)
+         prof = self._load_profile(profile, 
+                                   is_bam=True, 
+                                   region=[(gene.name,) + gene.region, ('CN',) + cn_region])      
+      self.coverage._normalize_coverage(prof, gene.regions, cn_region)
 
 
-   def _load_profile(self, profile_path: str, 
-                     is_bam=False, region=None) -> Dict[str, Dict[int, float]]:
+   def _load_profile(self, 
+                     profile_path: str, 
+                     is_bam=False, 
+                     region=None) -> Dict[str, Dict[int, float]]:
       """
       Load the coverage profile.
       Args:
@@ -306,7 +315,7 @@ class Sample:
          (position -> profile_coverage).
       """
 
-      profile = collections.defaultdict(lambda: collections.defaultdict(int))
+      profile: Dict[str, Dict[int, float]] = collections.defaultdict(lambda: collections.defaultdict(int))
       if is_bam:
          ptr = Sample.load_sam_profile(profile_path, 2, region)
          for _, c, p, v in ptr:
@@ -407,7 +416,7 @@ def _chr_prefix(ch: str, chrs: List[str]) -> str: # assumes ch is not prefixed
    return ''
 
 
-def _in_region(region: GeneRegion, read: pysam.AlignedSegment, prefix: str) -> bool:
+def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
    """
    Check whether a read is within a given region with some padding
    """
@@ -417,7 +426,7 @@ def _in_region(region: GeneRegion, read: pysam.AlignedSegment, prefix: str) -> b
       and region.start - 500 <= read.reference_start <= region.end
 
 
-def _load_deez(deez_path: str, reference: str, region: GeneRegion, cn_region: GeneRegion) -> str:
+def _load_deez(deez_path: str, reference: str, region: GRange, cn_region: GRange) -> str:
    """
    Loads DeeZ file instead of SAM/BAM by piping DeeZ to pysam. Requires 'deez' in PATH.
    Returns:

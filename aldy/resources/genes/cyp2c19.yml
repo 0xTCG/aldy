@@ -1,5 +1,4 @@
 {
-  "cnv_region": ["22", 42547463, 42548249], 
   "pseudogenes": {}, 
   "name": "CYP2C19", 
   "exons": {
@@ -14,7 +13,6 @@
     "8": [96609673, 96609815]
   }, 
   "rev_comp": 0,
-  "max_cn": {}, 
   "alleles": {
     "CYP2C19*1": {
       "phenotype": {"invivo": "Normal", "invitro": "Normal"}, 

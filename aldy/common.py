@@ -78,7 +78,7 @@ class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
 ### Aldy auxiliaries 
 
 
-def allele_number(x: str) -> int:
+def allele_number(x: str) -> str:
    """Returns a major allele number for an allele string (e.g. '12A' -> 12)"""
    p = re.split(r'(\d+)', x)
    return p[1]
@@ -87,7 +87,7 @@ def allele_number(x: str) -> int:
 def allele_sort_key(x: str) -> Tuple[int, str]:
    """Sort key for allele names (e.g. '13a' -> (13, 'a')). Useful for numeric sorting."""
    p = re.split(r'(\d+)', x)
-   return (int(p[1]),) + tuple(p[2:])
+   return (int(p[1]), ''.join(p[2:]))
 
 
 def rev_comp(seq: str) -> str:

@@ -32,7 +32,8 @@ Members:
       associated major star-allele solution used for calculating the minor 
       star-allele assignment
 """
-MinorSolution = nt('MinorSolution', 'score solution major_solution missing added'.split())
+class MinorSolution(collections.namedtuple('MinorSolution', ['score', 'solution', 'major_solution', 'missing', 'added'])):
+   diplotype = ''
 
 
 def estimate_minor(gene: Gene, sam: Sample, major_sol: MajorSolution, solver: str) -> MinorSolution:
@@ -40,8 +41,8 @@ def estimate_minor(gene: Gene, sam: Sample, major_sol: MajorSolution, solver: st
    """
 
    # Get list of alleles and mutations to consider   
-   alleles = list()
-   mutations = set()
+   alleles: List[Tuple[str, str]] = list()
+   mutations: Set[Mutation] = set()
    for ma in major_sol.solution:
       alleles += [(ma, mi) for mi in gene.alleles[ma].minors]
       mutations |= set(gene.alleles[ma].func_muts)
@@ -61,7 +62,7 @@ def estimate_minor(gene: Gene, sam: Sample, major_sol: MajorSolution, solver: st
 
 
 def solve_minor_model(gene: Gene,
-                      alleles: Set[Tuple[str, str]], 
+                      alleles_list: List[Tuple[str, str]], 
                       coverage: Coverage, 
                       major_sol: MajorSolution, 
                       mutations: Set[Mutation], 
@@ -78,7 +79,7 @@ def solve_minor_model(gene: Gene,
    # Establish minor allele binary variables
    alleles = {(ma, mi, 0): set(gene.alleles[ma].func_muts) | \
                            set(gene.alleles[ma].minors[mi].neutral_muts)
-              for ma, mi in alleles}
+              for ma, mi in alleles_list}
    for ma, mi, _ in list(alleles):
       for cnt in range(1, major_sol.solution[ma]):
          alleles[(ma, mi, cnt)] = alleles[(ma, mi, 0)]
@@ -128,7 +129,7 @@ def solve_minor_model(gene: Gene,
                constraints[m] += cov * MADD[a][m] * A[a]
 
       # Fill the constraints for non-variations (i.e. where nucleotide matches reference genome)
-      ref_m = Mutation(pos=m.pos, op='REF')
+      ref_m = Mutation(pos=m.pos, op='REF') # type: ignore
       if ref_m not in constraints:
          error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=str(ref_m))
          constraints[ref_m] = 0
@@ -173,15 +174,15 @@ def solve_minor_model(gene: Gene,
    # 3) Make sure that CN of each variation does not exceed total supporting allele CN
    for m in mutations:
       m_cn = major_sol.cn_solution.position_cn(m.pos)
-      expressed_cn = coverage.percentage(m) / 100.0
+      exp_cn = coverage.percentage(m) / 100.0
 
       # Get lower/upper CN bound: [floor(expressed_cn), ceil(expressed_cn)]
       if m_cn == 0:
          expressed_cn = (0, 0)
-      elif coverage[m] > 0 and int(expressed_cn * m_cn) == 0:
+      elif coverage[m] > 0 and int(exp_cn * m_cn) == 0:
          expressed_cn = (1, 1) # Force minimal CN to be 1
       else:
-         expressed_cn = (int(expressed_cn * m_cn), int(expressed_cn * m_cn) + 1)
+         expressed_cn = (int(exp_cn * m_cn), int(exp_cn * m_cn) + 1)
       
       expr = model.quicksum(MMISS[a][m] * A[a] for a in alleles if m in alleles[a])
       if not m.is_functional:
@@ -219,13 +220,12 @@ def solve_minor_model(gene: Gene,
       status, opt = model.solve(objective)
       log.debug('CN Solver status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
-      return MinorSolution(score=float('inf'), solution=[], major_sol=major_sol)
-
+      return MinorSolution(score=float('inf'), solution=[], major_solution=major_sol, missing={}, added={})
 
    # Get final minor solutions
    solution = []
-   added = collections.defaultdict(list)
-   missing = collections.defaultdict(list)
+   added: Dict[Tuple[str, int], List[Mutation]] = collections.defaultdict(list)
+   missing: Dict[Tuple[str, int], List[Mutation]] = collections.defaultdict(list)
    for allele, value in A.items():
       if model.getValue(value) <= 0:
          continue
@@ -243,6 +243,9 @@ def solve_minor_model(gene: Gene,
          if model.getValue(mv) > 0:
             added[a].append(m)
 
-   return MinorSolution(score=opt, solution=solution, major_solution=major_sol,
-                        added=dict(added), missing=dict(missing))
+   return MinorSolution(score=opt, 
+                        solution=solution, 
+                        major_solution=major_sol,
+                        added=dict(added), 
+                        missing=dict(missing))
 

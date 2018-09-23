@@ -25,9 +25,9 @@ class Coverage:
    """
 
    def __init__(self, 
-         coverage: Dict[int, Dict[str, float]], 
+         coverage: Dict[int, Dict[str, int]], 
          threshold: float, 
-         cnv_coverage: Dict[int, float]):
+         cnv_coverage: Dict[int, int]) -> None:
       self._coverage = coverage
       self.threshold = threshold
       self._cnv_coverage = cnv_coverage
@@ -65,7 +65,7 @@ class Coverage:
       return self.total(pos) * (1 / self._rescaled[pos])
 
 
-   def region_coverage(self, gene: str, region: GeneRegion) -> float:
+   def region_coverage(self, gene: int, region: GeneRegion) -> float:
       return self._region_coverage[gene, region]
 
 
@@ -80,12 +80,12 @@ class Coverage:
          pos: collections.defaultdict(int, {
             o: c
             for o, c in pos_mut.items()
-            if filter_fn(mut=Mutation(pos, o), cov=c, total=self.total(pos), thres=self.threshold)
+            if filter_fn(Mutation(pos, o), c, self.total(pos), self.threshold) # type: ignore
          })
          for pos, pos_mut in self._coverage.items()
       })
       
-      new_cov = Coverage(cov, self.threshold, self._cnv_coverage)
+      new_cov = Coverage(cov, self.threshold, self._cnv_coverage) # type: ignore
       new_cov._rescaled = self._rescaled
       new_cov._region_coverage = self._region_coverage
       return new_cov
@@ -97,22 +97,22 @@ class Coverage:
 
    def _normalize_coverage(self, 
       profile: Dict[str, Dict[int, float]], 
-      gene_regions: List[Tuple[int, GeneRegion]], 
-      cn_region: GeneRegion) -> None:
+      gene_regions: Dict[int, Dict[GeneRegion, GRange]], 
+      cn_region: GRange) -> None:
       """
       """
 
-      #: GeneRegion: store the CN-neutral region
-      self._cn_region = cn_region
+      #: GRange: store the CN-neutral region
+      self._cn_region: GRange = cn_region
       sam_ref = sum(self._cnv_coverage[i] for i in range(cn_region.start, cn_region.end))
       cnv_ref = sum(profile[cn_region.chr][i] for i in range(cn_region.start, cn_region.end))
 
       cn_ratio = float(cnv_ref) / sam_ref
       log.debug('CNV factor: {} ({})', cn_ratio, 1.0 / cn_ratio)
 
-      self._rescaled = {} 
-      self._region_coverage = {}
-      for gene, gr in gene_regions:
+      self._rescaled: Dict[int, float] = {} 
+      self._region_coverage: Dict[Tuple[int, GeneRegion], float] = {}
+      for gene, gr in gene_regions.items():
          for region, rng in gr.items():
             s = sum(self.total(i) for i in range(rng.start, rng.end)) #!IMPORTANT
             p = sum(profile[rng.chr][i] for i in range(rng.start, rng.end))
@@ -120,7 +120,7 @@ class Coverage:
                i: profile[rng.chr][i] / cn_ratio
                for i in range(rng.start, rng.end)
             })
-            self._region_coverage[(gene, region)] = (cn_ratio * float(s) / p) if p != 0 else 0.0
+            self._region_coverage[gene, region] = (cn_ratio * float(s) / p) if p != 0 else 0.0
 
 
    @staticmethod
