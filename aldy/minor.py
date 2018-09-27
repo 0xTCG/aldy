@@ -1,6 +1,6 @@
 # 786
 
-# Aldy source: refiner.py
+# Aldy source: minor.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
@@ -17,27 +17,54 @@ from .gene import Mutation, Gene, Allele, Suballele
 from .sam import Sample
 from .cn import MAX_CN
 from .coverage import Coverage
-from .protein import MajorSolution
+from .major import MajorSolution
 
-"""
-Describes a potential (possibly optimal) minor star-allele configuration.
-Members:
-   score (float):
-      ILP model error score (0 for user-provided solutions)
-   solution (dict of str: int):
-      dict of minor star-alleles where a value denotes the copy-number
-      of each star-allele (e.g. {1: 2} means that we have two copies
-      of *1).
-   major_solution (major.MajorSolution):
-      associated major star-allele solution used for calculating the minor 
-      star-allele assignment
-"""
+
 class MinorSolution(collections.namedtuple('MinorSolution', ['score', 'solution', 'major_solution', 'missing', 'added'])):
+   """
+   Describes a potential (possibly optimal) minor star-allele configuration.
+   Immutable class.
+
+   Attributes:
+      score (float):
+         ILP model error score (0 for user-provided solutions).
+      solution (dict[str, int]):
+         Dictionary of minor star-alleles describing the copy number
+         of each star-allele (e.g. `{1: 2}` means that we have two copies of \*1).
+      major_solution (:obj:`aldy.major.MajorSolution`):
+         Major star-allele solution used for calculating the minor star-allele assignment.
+      missing (dict[tuple[str, int], list[:obj:`aldy.gene.Mutation`]]):
+         List of missing mutations for each solved minor star-allele.
+         e.g. ``missing[('2A', 1)]`` contains the list of mutations that are present in the
+         definition of \*2A but that are omitted in the second copy (with ID 1) of \*2A in
+         the sample. 
+      added (dict[tuple[str, int], list[:obj:`aldy.gene.Mutation`]]):
+         List of added mutations for each solved minor star-allele.
+         e.g. ``added[('3A', 0)]`` contains the list of mutations that are not present in the
+         definition of \*3A but that are present in the first copy (with ID 1) of \*3A in
+         the sample. 
+      diplotype (str):
+         Assigned diplotype string (e.g. `*1/*2`).
+   """
    diplotype = ''
 
 
-def estimate_minor(gene: Gene, sam: Sample, major_sol: MajorSolution, solver: str) -> MinorSolution:
+def estimate_minor(gene: Gene, 
+                   sam: Sample, 
+                   major_sol: MajorSolution, 
+                   solver: str) -> MinorSolution:
    """
+   :obj:`MinorSolution`: Detect the minor star-allele in the sample.
+
+   Args:
+      gene (:obj:`aldy.gene.Gene`): 
+         A gene instance.
+      sam (:obj:`aldy.sam.Sample`): 
+         Read alignment data.
+      major_sol (:obj:`aldy.major.MajorSolution`): 
+         Copy-number solution to be used for major star-allele calling.
+      solver (str): 
+         ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
    """
 
    # Get list of alleles and mutations to consider   
@@ -68,10 +95,29 @@ def solve_minor_model(gene: Gene,
                       mutations: Set[Mutation], 
                       solver: str) -> MinorSolution:
    """
+   :obj:`MinorSolution`: Solves the minor star-allele detection problem via integer linear programming.
+
+   Args:
+      gene (:obj:`aldy.gene.Gene`):
+         Gene instance.
+      allele_dict (dict[str, :obj:`aldy.gene.Allele`]):
+         Dictionary of candidate major star-alleles. 
+      coverage (:obj:`aldy.coverage.Coverage`):
+         Sample coverage used to find out the coverage of each mutation.
+      major_sol (:obj:`aldy.major.MajorSolution`):
+         Major star-allele solution to be used for detecting minor star-alleles (check :obj:`aldy.major.MajorSolution`).
+      mutations (set[:obj:`aldy.gene.Mutation`]):
+         List of mutations to be considered during the solution build-up 
+         (all other mutations are ignored).
+      solver (str): 
+         ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+
+   Notes:
+      Please see Aldy paper (section Methods/Genotype refining) for the model explanation.
    """
 
    MISS_PENALTY_FACTOR = 2
-   ADD_PENALTY_FACTOR = 2
+   ADD_PENALTY_FACTOR = 1
 
    log.debug('Refining {}', major_sol)
    model = lpinterface.model('aldy_refine', solver)
@@ -243,9 +289,11 @@ def solve_minor_model(gene: Gene,
          if model.getValue(mv) > 0:
             added[a].append(m)
 
-   return MinorSolution(score=opt, 
-                        solution=solution, 
-                        major_solution=major_sol,
-                        added=dict(added), 
-                        missing=dict(missing))
+   sol = MinorSolution(score=opt, 
+                       solution=solution, 
+                       major_solution=major_sol,
+                       added=dict(added), 
+                       missing=dict(missing))
+   log.debug(f'Minor solution: {sol}')
+   return sol
 

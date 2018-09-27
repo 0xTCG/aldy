@@ -6,11 +6,14 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
+from typing import Optional
+
 import logbook
 import argparse
 import os
 import sys
 import platform
+import datetime
 import multiprocessing
 import functools
 import traceback
@@ -18,29 +21,27 @@ import traceback
 from .common import *
 from .gene import Gene
 from .sam import Sample
-from .genotype import genotype_init
-from .lpinterface import model as lp_model
+from .genotype import genotype
 from .version import __version__
 
 
 def main():
    """
-   Entry point
+   Entry point.
    """
 
    parser, args = _get_args()
-
 
    # Set the logging verbosity
    level = args.verbosity.lower()
    level = next(v for k, v in logbook.base._reverse_level_names.items() if k.lower().startswith(level))
    
    # Set the command-line logging
-   sh = logbook.more.ColorizedStderrHandler(format_string=LOG_FORMAT, level=level)
+   sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level=level)
    sh.push_application()
 
    log.info('*** Aldy v{} (Python {}) ***', __version__, platform.python_version())
-   log.info('(c) 2016-2018 SFU, MIT & IUB. All rights reserved.')
+   log.info('(c) 2016-{} Aldy Authors & Indiana University Bloomington. All rights reserved.', datetime.datetime.now().year)
    log.info('Arguments: {}', ' '.join(k+'='+str(v) for k, v in vars(args).items() if k is not None))
 
    try:
@@ -51,10 +52,10 @@ def main():
       elif args.subparser == 'test':
          _run_test()
       elif args.subparser == 'show':
-         database_file = script_path('aldy.resources.genes', '{}.yml'.format(args.gene.lower()))
+         database_file = script_path('aldy.resources.genes/{}.yml'.format(args.gene.lower()))
          Gene(database_file).print_configurations()
       elif args.subparser == 'profile':
-         p = Sample.load_sam_profile(args.file, float(args.profile_factor))
+         p = Sample.load_sam_profile(args.file)
          for i in p:
             print(*i)
       elif args.subparser == 'genotype':
@@ -66,38 +67,28 @@ def main():
          else:
             avail_genes = [args.gene.lower()]
 
-         log.info('  Profile:   {}', args.profile)
-         log.info('  Threshold: {:.0f}%', float(args.threshold))
-         log.info('  Input:     {}', args.file)
-      
          # Prepare the log files
          if args.log is None:
             log_output = '{}.aldylog'.format(os.path.splitext(args.file)[0])
          else:
             log_output = args.log
-         fh = logbook.FileHandler(log_output, format_string=LOG_FORMAT, mode='w', bubble=True, level='TRACE')
+         fh = logbook.FileHandler(log_output, mode='w', bubble=True, level='TRACE')
          fh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
             record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
          fh.push_application()
-         log.info('  Log:       {}', log_output)
-         log.info('  Phasing:   {}', args.phase)
 
          # Prepare output file
          output = args.output
          if output == '-':
             output = sys.stdout
          elif output:
-            log.info('  Output:    {}', output)
             output = open(output, 'w')
          else:
             output = '{}.aldy'.format(os.path.splitext(args.file)[0])
-            log.info('  Output:    {}', output)
             output = open(output, 'w')
          
          for gene in avail_genes:
-            _genotype(gene, args.file, output, log_output, 
-                      args.profile, args.threshold, args.solver, 
-                      args.cn_neutral_region, args.cn, args.remap)
+            _genotype(gene, output, args) 
          if output != sys.stdout:
             output.close()
       else:
@@ -129,7 +120,7 @@ def main():
 
 def _get_args():
    """
-   Prepares the command-line arguments
+   Prepares the command-line arguments.
    """
 
    parser = argparse.ArgumentParser(prog='aldy', 
@@ -161,7 +152,7 @@ def _get_args():
          - illumina
          - pgrnseq-v1
          - pgrnseq-v2 and
-         - wxs. 
+         - [wxs] (coming soon). 
          You can also provide a SAM/BAM file as a profile. 
          Please check documentation for more information."""))
    genotype_parser.add_argument('--threshold', '-T', default=50, 
@@ -178,7 +169,7 @@ def _get_args():
          ILP Solver. Available solvers:
          - gurobi (Gurobi)
          - scip (SCIP)
-         - any (attempts to use gurobi, and if fails, uses scip).
+         - any (attempts to use Gurobi, and if fails, uses SCIP).
          Default is "any" """))
    genotype_parser.add_argument('--phase', '-P', default=0, action='store_true', 
       help=td("""
@@ -195,7 +186,6 @@ def _get_args():
          For a commonly used diploid case (e.g. 2 copies of the main gene) specify -c 1,1"""))
    # HACK: Internal parameters for development purposes: please do not use unless instructed
    genotype_parser.add_argument('--cache', dest='cache', action='store_true', help=argparse.SUPPRESS)
-   genotype_parser.add_argument('--profile-factor', dest='profile_factor', default=2.0, help=argparse.SUPPRESS)
 
    _ = subparsers.add_parser('test',
       help='Sanity-check Aldy on NA10860 sample. Recommended prior to the first use')
@@ -221,55 +211,86 @@ def _get_args():
 
 
 def _print_licence():
-   """Prints Aldy license"""
-
-   with open(script_path('aldy.resources', 'LICENSE.md')) as f:
+   """
+   Prints Aldy license.
+   """
+   with open(script_path('aldy.resources/LICENSE.md')) as f:
       for l in f: print(l.strip())
 
 
-def _genotype(gene, file, output, log_output, profile, threshold, solver, cn_region, cn, remap):
-   """Attempts to genotype a file"""
+def _genotype(gene: str, output: Optional, args) -> None:
+   """
+   Attempts to genotype a file.
+
+   Args:
+      gene (str)
+      output (file, optional)
+      args: remaining arguments 
+   """
    
-   def test_lp_solver(solver):
-      _ = lp_model('init', solver)
+   cn_region = args.cn_region
+   if cn_region is not None:
+      r = re.match(r'^(.+?):(\d+)-(\d+)$', cn_region)
+      if not r:
+         raise AldyException(f'Parameter --cn-neutral={cn_region} is not in the format chr:start-end (where start and end are numbers)')
+      ch = r.group(1)
+      if ch.startswith('chr'):
+         ch = ch[3:]
+      cn_region = GRange(ch, int(r.group(2)), int(r.group(3)))
+      log.info('Using {} as copy-number neutral region', cn_region)
+   
+   cn_solution = args.cn_solution
+   if cn_solution:
+      cn_solution = cn_solution.split(',')
+
+   threshold = float(args.threshold) / 100
 
    try:
-      test_lp_solver(solver)
-      result = genotype_init(
-         file, output,
-         log_output,
-         gene, profile,
-         float(threshold) / 100.0,
-         solver,
-         cn_region, cn,
-         remap
-      )
+      result = genotype(gene_db=     gene, 
+                        sam_path=    args.file,
+                        cn_region=   cn_region,
+                        profile=     args.profile,
+                        output_file= output,
+                        cn_solution= cn_solution,
+                        threshold=   threshold,
+                        solver=      args.solver,
+                        cache=       False, 
+                        phase=       args.phase,
+                        reference=   args.reference)
       log.warn('Result{} for {}: ', '' if len(result) == 1 else 's', gene.upper())
-      for rd, r in result:
-         log.warn('  {:30} ({})', rd, ', '.join(r))
+      for r in result:
+         log.warn('  {:30} ({})', r.diplotype, ', '.join(f[1] for f in r.solution))
    except AldyException as ex:
       log.error(ex)
 
 
-def _run_test():
+def _run_test() -> None:
    """
-   Runs the full pipeline as a sanity check on NA12878 sample (located within the package)
+   Runs the full pipeline as a sanity check on NA12878 sample (located within the package).
    """
 
    log.warn('Aldy Sanity-Check Test')
    log.warn('Expected result is: *1/*4+*4')
-   _genotype(
-      gene='cyp2d6', 
-      file=script_path('aldy.resources', 'NA10860.bam'),
-      output='', 
-      log_output=os.devnull, 
-      profile='illumina', 
-      threshold=0.5, 
-      solver='any', 
-      cn_region='22:42547463-42548249', 
-      cn=None, 
-      remap=False)
+   
+   # Masquerade args via this helper class
+   class DictWrapper:
+      def __init__(self, d):
+         self.d = d
+      def __getattr__(self, key):
+         if key in self.d:
+            return self.d[key]
+         else:
+            return None
+   _genotype(gene='cyp2d6', 
+             output=None,
+             args=DictWrapper({'file': script_path('aldy.resources/NA10860.bam'),
+                               'profile': 'illumina',
+                               'threshold': 50,
+                               'solver': 'any',
+                               'phase': False}))
 
 
 if __name__ == "__main__":
    main()
+   #import cProfile
+   #cProfile.run('main()', filename='aldy.prof', sort='cumulative')

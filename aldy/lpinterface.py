@@ -14,7 +14,7 @@ def model(name, solver):
    def test_gurobi(name):
       try:
          model = Gurobi(name)
-         log.debug('Using Gurobi')
+         log.trace('Using Gurobi')
       except ImportError as e:
          log.warn('Gurobi not found. Please install Gurobi and gurobipy Python package.')
          log.error('{}', e)
@@ -34,7 +34,7 @@ def model(name, solver):
    def test_scip(name):
       try:
          model = SCIP(name)
-         log.debug('Using SCIP')
+         log.trace('Using SCIP')
       except ImportError as e:
          log.warn('SCIP not found. Please install SCIP and pyscipopt Python package.')
          log.error('{}', e)

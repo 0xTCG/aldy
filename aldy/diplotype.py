@@ -11,7 +11,12 @@ import sys
 
 from .common import *
 from .gene import Gene, CNConfig
-from .refiner import MinorSolution
+from .minor import MinorSolution
+
+
+OUTPUT_COLS = 'Sample Gene SolutionID Major Minor Copy Allele Location Type Coverage Effect dbSNP Code Status'.split()
+"""list[str]: Output file column descriptions"""
+
 
 def write_decomposition(sample: str, 
                         gene: Gene, 
@@ -19,6 +24,19 @@ def write_decomposition(sample: str,
                         minor: MinorSolution, 
                         f) -> None:
    """
+   Writes the allelic decomposition to the file `f`.
+
+   Args:
+      sample (str): 
+         Sample name.
+      gene (:obj:`aldy.gene.Gene`):
+         Gene instance.
+      sol_id (int):
+         ID of the solution (each solution should have different ID).
+      minor (:obj:`aldy.minor.MinorSolution`):
+         Final minor star-allele solution to be written.
+      f (file):
+         File to write a decomposition to.
    """
 
    for copy, a in enumerate(minor.solution):
@@ -61,8 +79,10 @@ def write_header(f) -> None:
    print('\t'.join('Sample Gene SolutionID Major Minor Copy Allele Location Type Coverage Effect dbSNP Code Status'.split()), file=f)
 
 
-def estimate_diplotype(gene: Gene, solution: MinorSolution) -> None:
+def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
    """
+   str: Fills the ``diplotype`` attribute of the :obj:`aldy.minor.MinorSolution`
+   via the diplotype assignment heuristics and returns the diplotype assignment.
    """
 
    del_allele = next(a for a, cn in gene.cn_configs.items() 
@@ -103,3 +123,4 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> None:
                      for x in diplotype)
 
    solution.diplotype = res
+   return res

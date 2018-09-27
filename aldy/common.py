@@ -18,7 +18,7 @@ import textwrap
 import collections
 
 
-PROTEINS = { # X is stop
+PROTEINS = {
    'TTT': 'F', 'CTT': 'L', 'ATT': 'I', 'GTT': 'V', 'TTC': 'F',
    'CTC': 'L', 'ATC': 'I', 'GTC': 'V', 'TTA': 'L', 'CTA': 'L',
    'ATA': 'I', 'GTA': 'V', 'TTG': 'L', 'CTG': 'L', 'ATG': 'M',
@@ -33,29 +33,45 @@ PROTEINS = { # X is stop
    'GGC': 'G', 'TGA': 'X', 'CGA': 'R', 'AGA': 'R', 'GGA': 'G',
    'TGG': 'W', 'CGG': 'R', 'AGG': 'R', 'GGG': 'G'
 }
+"""dict[str, str]: Codon table (stop codon is X)."""
+
 
 REV_COMPLEMENT = {
    'A': 'T', 'T': 'A',
    'C': 'G', 'G': 'C',
 }
-
-LOG_FORMAT = '{record.message}'
+"""dict[str, str]: Reverse-complement nucleotide table."""
 
 
 log = logbook.Logger('Aldy')
+"""Default console logger."""
 
 
 class AldyException(Exception):
+   """
+   Base Aldy exception class.
+   """
    pass
 
 
 class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
    """
-   Describes the range in the reference genome (e.g. chr22:10-20)
+   Describes the range in the reference genome (e.g. chr22:10-20).
+   Immutable class.
+
+   Attributes:
+      chr (str): Chromosome identifier.
+      start (int): Starting position of the interval.
+      end (int): Ending position of the interval.
+
+   Notes:
+      Has custom printer (``__str__``).
    """
    
    def samtools(self, pad_left=500, pad_right=1, prefix='') -> str:
-      """Samtools-compatible region string"""
+      """
+      str: Samtools-compatible region string (e.g. chr1-10-20)
+      """
       return '{}:{}-{}'.format(prefix + self.chr, self.start - 500, self.end + 1)
    
    def __str__(self):
@@ -64,13 +80,19 @@ class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
 
 class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
    """
-   Describes the region in the gene.
-   Members:
+   Describes the region of a gene.
+   
+   Attributes:
       number (int): 
-         region number (e.g. for exon 9 it is 9)
+         The region number (e.g. for exon 9, number is 9)
       kind (str): 
-         type of the region. Can be 'e' (EXON), 'i' (INTRON) or anything else.
+         Type of the region. Typically 'e' (for *e*xon), 'i' (for *i*intron) 
+         but can be anything else.
+
+   Notes:
+      Has custom printer (``__repr__``).
    """
+
    def __repr__(self):
       return 'GR({}.{})'.format(self.number, self.kind)
 
@@ -79,24 +101,35 @@ class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
 
 
 def allele_number(x: str) -> str:
-   """Returns a major allele number for an allele string (e.g. '12A' -> 12)"""
+   """
+   str: Returns a major allele number of the allele name string (e.g. '12A' -> 12).
+   """
    p = re.split(r'(\d+)', x)
    return p[1]
 
 
 def allele_sort_key(x: str) -> Tuple[int, str]:
-   """Sort key for allele names (e.g. '13a' -> (13, 'a')). Useful for numeric sorting."""
+   """
+   tuple[int, str]: Key for sorting allele names (e.g. '13a' -> (13, 'a')).
+   """
+
    p = re.split(r'(\d+)', x)
    return (int(p[1]), ''.join(p[2:]))
 
 
 def rev_comp(seq: str) -> str:
-   """Reverse-complement a DNA sequence"""
+   """
+   str: Reverse-complement a DNA sequence.
+   """
+
    return ''.join([REV_COMPLEMENT[x] for x in seq[::-1]])
 
 
 def seq_to_amino(seq: str) -> str:
-   """Converts DNA sequence to protein sequence"""
+   """
+   str: Makes a protein sequence from a DNA sequence.
+   """
+   
    return ''.join(PROTEINS[seq[i:i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3))
 
 
@@ -104,22 +137,25 @@ def seq_to_amino(seq: str) -> str:
 
 
 def sorted_tuple(x: tuple) -> tuple:
-   """Sorts a tuple"""
+   """
+   Sorts a tuple.
+   """
    return tuple(sorted(x))
 
 
 def td(s: str) -> str:
-   """Abbreviation for textwrap.dedent (useful for stripping indentation in multi-line strings)"""
+   """
+   str: Abbreviation for textwrap.dedent.
+        Useful for stripping indentation in multi-line docstrings.
+   """
    return textwrap.dedent(s)
 
 
-def nt(*args):
-   """Abbreviation for a collections.namedtuple"""
-   return collections.namedtuple(*args)
-
-
 def static_vars(**kwargs):
-   """Decorator that adds static variables to a function"""
+   """
+   Decorator that adds static variables to a function.
+   Usage: ``@static_vars(var=init_val)``.
+   """
    def decorate(func):
       for k in kwargs:
          setattr(func, k, kwargs[k])
@@ -128,7 +164,11 @@ def static_vars(**kwargs):
 
 
 def timing(f):
-   """Decorator for timing a function"""
+   """
+   Decorator for timing a function.
+   Prints the time spent in function after the function is completed.
+   Usage: ``@timing`` without any parameters
+   """
    def wrap(*args, **kwargs):
       time1 = time.time()
       ret = f(*args, **kwargs)
@@ -139,29 +179,47 @@ def timing(f):
 
 
 @static_vars(pp=pprint.PrettyPrinter(indent=4))
-def pp(x):
-   """Returns a pretty-printed variable string"""
+def pp(x) -> str:
+   """
+   str: Returns a pretty-printed variable string.
+   """
    return pp.pformat(x)
+
+
 def pr(x):
-   """Pretty-prints a variable to stdout"""
-   return pprint.pprint(x)
+   """
+   Pretty-prints a variable to stdout.
+   """
+   pprint.pprint(x)
 
 
-def script_path(path: str, file: str) -> str:
-   """Gives a full path of a package resource"""
-   return pkg_resources.resource_filename(path, file)
+def script_path(key: str) -> str:
+   """
+   str: Gives a full path of a package resource.
+
+   Args: 
+      key (str): a resource to be extracted. 
+      Specify with ``path/file`` (e.g. ``aldy.resources/test.txt``).
+   """
+   return pkg_resources.resource_filename(*key.split('/'))
 
 
 def colorize(text: str, color:str = 'green') -> str:
-   """Colorizes a string (for xterm) with a given color"""
+   """
+   str: Colorizes a string (on xterm-compatible terminals) with a given color.
+   """
    return logbook._termcolors.colorize(color, text)
 
 
 def check_path(cmd: str) -> bool:
-   """Checks whether `cmd` is in PATH or local directory"""
+   """
+   bool: Checks whether a command `cmd` is an executable in `PATH` or local directory.
+   """
 
    def is_exe(path): 
-      """Based on http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python/377028#377028"""
+      """
+      Based on http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python/377028#377028
+      """
       return os.path.isfile(path) and os.access(path, os.X_OK)
 
    if not is_exe(cmd):

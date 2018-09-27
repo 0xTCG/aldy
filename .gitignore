@@ -23,3 +23,12 @@ cypiripi-ismb
 README.html
 aldy.egg-info
 */.ipynb_checkpoints/*
+.mypy_cache
+.__pycache__
+.vscode
+.DS_Store
+temp
+.coverage
+.python-version
+*.aldy
+*.aldylog
