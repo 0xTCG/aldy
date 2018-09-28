@@ -95,8 +95,13 @@ class Gurobi(object):
       self.model = self.gurobipy.Model(name)
       self.model.reset()
 
+      self._constr = []
+      self._vars = []
+
    def addConstr(self, *args, **kwargs):
-      return self.model.addConstr(*args, **kwargs)
+      c = self.model.addConstr(*args, **kwargs)
+      self._constr.append(c)
+      return c
 
    def addVar(self, *args, **kwargs):
       if 'vtype' in kwargs and kwargs['vtype'] == 'B':
@@ -110,6 +115,7 @@ class Gurobi(object):
       v = self.model.addVar(*args, **kwargs)
       if update:
          self.update()
+      self._vars.append(v)
       return v
 
    def quicksum(self, expr):
@@ -139,8 +145,7 @@ class Gurobi(object):
          self.objective = objective
       self.model.setObjective(
          self.objective,
-         self.gurobipy.GRB.MINIMIZE if method == 'min' else self.gurobipy.GRB.MAXIMIZE
-      )
+         self.gurobipy.GRB.MINIMIZE if method == 'min' else self.gurobipy.GRB.MAXIMIZE)
       self.model.update()
 
       # self.model.params.timeLimit = 60

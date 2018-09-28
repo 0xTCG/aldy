@@ -40,7 +40,15 @@ class Allele(collections.namedtuple('Allele', ['name', 'cn_config', 'func_muts',
       minors (dict[str, :obj:`Suballele`]): 
          Dictionary of all minor alleles that are based upon this major allele.
    """
-   pass
+   
+   def minor_mutations(self, minor: str):
+      """
+      Generator that produces the mutations for a minor allele
+      """
+      for m in self.func_muts:
+         yield m
+      for m in self.minors[minor].neutral_muts:
+         yield m
 
 
 class Suballele(collections.namedtuple('Suballele', ['name', 'alt_names', 'neutral_muts'])):
@@ -400,7 +408,7 @@ class Gene:
             used_names[name] += 1
             name += '.' + chr(used_names[name] + ord('a'))
          else:
-            used_names[name] = 0
+            used_names[name] = -1
          self.alleles[name] = Allele(name=name, cn_config=a.cn_config, func_muts=set(a.func_muts),
             minors={sa: Suballele(name=sa, alt_names=[], 
                neutral_muts=set(alleles[sa].neutral_muts) - set(a.func_muts)) 

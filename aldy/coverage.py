@@ -44,6 +44,9 @@ class Coverage:
       self._coverage = coverage
       self._threshold = threshold
       self._cnv_coverage = cnv_coverage
+
+      self._rescaled: Dict[int, float] = {}
+      self._region_coverage: Dict[Tuple[int, GeneRegion], float] = {}
       
 
    def __getitem__(self, mut: Mutation) -> float:

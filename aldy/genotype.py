@@ -122,16 +122,16 @@ def genotype(gene_db: str,
                  for cn_sol in cn_sols
                  for sol in major.estimate_major(gene, sample, cn_sol, solver)]
    min_score = min(major_sols, key=lambda m: m.score).score
-   major_sols = [m for m in major_sols if abs(m.score - min_score) < 1e-3]
+   major_sols = sorted([m for m in major_sols if abs(m.score - min_score) < 1e-3], 
+                       key=lambda m: m.score)
 
-   minor_sols = [minor.estimate_minor(gene, sample, ma_sol, solver)
-                 for ma_sol in major_sols]
+   minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver)
    min_score = min(minor_sols, key=lambda m: m.score).score
    minor_sols = [m for m in minor_sols if abs(m.score - min_score) < 1e-3]
 
    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
    for sol_id, sol in enumerate(minor_sols):
-      dip = diplotype.estimate_diplotype(gene, sol)
+      _ = diplotype.estimate_diplotype(gene, sol)
       if output_file:
          diplotype.write_decomposition(sample_name, gene, sol_id, sol, output_file)
 

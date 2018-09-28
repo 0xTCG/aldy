@@ -96,6 +96,7 @@ def main():
    except ValueError as ex:
       log.critical('Input BAM has no index. Please create index by running samtools index.')
       log.debug(ex)
+      log.debug(traceback.format_exc())
       exit(1)
    except IOError as ex:
       if ex.filename is not None:
@@ -103,9 +104,11 @@ def main():
       else:
          log.critical('File cannot be accessed: {}', str(ex))
       log.debug(ex)
+      log.debug(traceback.format_exc())
       exit(1)
    except SystemExit as ex:
       log.debug(ex)
+      log.debug(traceback.format_exc())
       exit(ex.code)
    except Exception as ex:
       log.critical(ex)
@@ -147,6 +150,7 @@ def _get_args():
    genotype_parser.add_argument('--gene', '-g', default='all', 
       help='Gene to be genotyped. Default is "all" which attempt to genotype all supported genes.')
    genotype_parser.add_argument('--profile', '-p', 
+      required=True,
       help=td("""
          Sequencing profile. Currently, the following profiles are supported out of the box:
          - illumina
@@ -157,6 +161,8 @@ def _get_args():
          Please check documentation for more information."""))
    genotype_parser.add_argument('--threshold', '-T', default=50, 
       help="Cut-off rate for variations (percent per copy). Default is 50.")
+   genotype_parser.add_argument('--reference', '-r', default=None, 
+      help="CRAM or DeeZ FASTQ reference")
    genotype_parser.add_argument('--cn-neutral-region', '-n', default='22:42547463-42548249', 
       help=td("""
          Copy-number neutral region. Format of the region is chromosome:start-end 
@@ -228,7 +234,7 @@ def _genotype(gene: str, output: Optional, args) -> None:
       args: remaining arguments 
    """
    
-   cn_region = args.cn_region
+   cn_region = args.cn_neutral_region
    if cn_region is not None:
       r = re.match(r'^(.+?):(\d+)-(\d+)$', cn_region)
       if not r:
@@ -239,7 +245,7 @@ def _genotype(gene: str, output: Optional, args) -> None:
       cn_region = GRange(ch, int(r.group(2)), int(r.group(3)))
       log.info('Using {} as copy-number neutral region', cn_region)
    
-   cn_solution = args.cn_solution
+   cn_solution = args.cn
    if cn_solution:
       cn_solution = cn_solution.split(',')
 

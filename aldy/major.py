@@ -38,8 +38,18 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
       novel (dict[str, list[:obj:`aldy.gene.Mutation`]]):
          Dictionary that describes the list of novel functional
          mutations for each major star-allele.
+   
+   Notes:
+      Has custom printer (``__repr``).
    """
-   pass
+   
+   def __repr__(self):
+      return f'MajorSol[{self.score:.2f}; ' + \
+              'sol=({}); '.format(','.join('*{}x{}'.format(*kv) for kv in self.solution.items())) + \
+              'novel=({}); '.format(';'.join('{} -> {}'.format(a, ','.join(ms)) for a, ms in self.novel.items())) + \
+             f'cn={self.cn_solution}'
+      
+
 
 
 def estimate_major(gene: Gene, sam: Sample, cn_solution: CNSolution, 

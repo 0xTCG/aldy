@@ -13,12 +13,12 @@ from aldy.common import *
 
 
 def assert_cn_model(expected, cov):
-   cyp2d6 = Gene(script_path('aldy.resources.genes', 'cyp2d6.yml'))
+   cyp2d6 = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
    sols = aldy.cn.solve_cn_model(cyp2d6, 
-                         cn_configs=cyp2d6.cn_configs, 
-                         max_cn=20, 
-                         region_coverage=cov, 
-                         solver='gurobi')
+                                 cn_configs=cyp2d6.cn_configs, 
+                                 max_cn=20, 
+                                 region_coverage=cov, 
+                                 solver='gurobi')
    assert_equal(len(sols), len(expected))
    sols = sorted([sorted(s.solution.items()) for s in sols])
    expected = sorted([sorted(s.items()) for s in expected])

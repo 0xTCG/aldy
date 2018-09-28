@@ -42,10 +42,23 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'reg
          of each configuration (e.g. `{1: 2}` means that there are two copies of *1 configuration).
       region_cn (dict[:obj:`aldy.common.GeneRegion`, int]):
          Dictionary of region copy numbers in this solution.
+      gene (:obj:`aldy.gene.Gene`):
+         Gene instance.
 
    Notes:
       Has custom printer (``__repr``).
    """
+
+   def __new__(self, score: float, sol: List[str], gene: Gene):
+      vec: Dict[int, Dict[GeneRegion, float]] = collections.defaultdict(lambda: collections.defaultdict(int))
+      for conf in sol:
+         for g in gene.cn_configs[conf].cn:
+            for r in gene.cn_configs[conf].cn[g]:
+               vec[g][r] += gene.cn_configs[conf].cn[g][r]
+      solution = collections.Counter(sol)      
+      region_cn = {a: dict(b) for a, b in vec.items()}
+      return super(CNSolution, self).__new__(self, score, solution, region_cn, gene)
+
 
    def position_cn(self, pos: int) -> float:
       """
@@ -220,22 +233,13 @@ def solve_cn_model(gene: Gene,
       status, opt, solutions = model.solveAll(objective, A)
       log.debug('LP status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
-      return [CNSolution(score=float('inf'), solution=[], region_cn={}, gene=gene)]
+      return [CNSolution(float('inf'), sol=[], gene=gene)]
    
    # Get final CN vector (i.e. total integer CN for each region)
    result = []
    for sol in solutions:
       log.debug('Solution: {}', ', '.join('*' + str(s) for s, _ in sol))
-
-      vec: Dict[int, Dict[GeneRegion, float]] = collections.defaultdict(lambda: collections.defaultdict(int))
-      for conf in sol:
-         for g in structures[conf].cn:
-            for r in structures[conf].cn[g]:
-               vec[g][r] += structures[conf].cn[g][r]
-      result.append(CNSolution(score=opt, 
-                               solution=collections.Counter(s for s, _ in sol), 
-                               region_cn={a: dict(b) for a, b in vec.items()}, 
-                               gene=gene))
+      result.append(CNSolution(opt, sol=[conf for conf, _ in sol], gene=gene))
 
    return result
 
@@ -307,19 +311,15 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
          list of CN configurations 
    """
    result = [] 
-   vec: Dict[tuple, int] = collections.defaultdict(int)
-   for sol, sol_cnt in collections.Counter(sols).items():
+   for sol in sols:
       if sol not in gene.cn_configs:
          raise AldyException(
             'Given copy number solution contains unknown copy number configuration {}. '.format(sol) + 
             'Please run aldy --show-cn for the list the valid configurations')
-      for i in range(sol_cnt):
-         result.append((sol, i))
-         log.debug('Solution (user-provided): {}', result[-1])
-         for regions in gene.cn_configs[sol].cn.values():
-            for r, v in regions.items():
-               vec[r] += v
-   return CNSolution(score=0, solution=result, region_cn=dict(vec), gene=gene)
+   s = CNSolution(0, sol=sols, gene=gene)
+   log.debug('User-provided solution: {}', s)
+   return s
+
 
 
 
