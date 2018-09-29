@@ -45,14 +45,17 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
    
    def __repr__(self):
       return f'MajorSol[{self.score:.2f}; ' + \
-              'sol=({}); '.format(','.join('*{}x{}'.format(*kv) for kv in self.solution.items())) + \
-              'novel=({}); '.format(';'.join('{} -> {}'.format(a, ','.join(ms)) for a, ms in self.novel.items())) + \
+              'sol=({}); '.format(', '.join(
+                 '*{}{}'.format(
+                     sol, 
+                     ''.join(' +' + str(m) for m in self.novel.get(sol, [])))
+                 for sol in self.solution)) + \
              f'cn={self.cn_solution}'
       
 
-
-
-def estimate_major(gene: Gene, sam: Sample, cn_solution: CNSolution, 
+def estimate_major(gene: Gene, 
+                   sam: Sample, 
+                   cn_solution: CNSolution, 
                    solver: str) -> List[MajorSolution]:
    """
    list[:obj:`MajorSolution`]: Detect the major star-alleles in the sample.
@@ -86,11 +89,12 @@ def estimate_major(gene: Gene, sam: Sample, cn_solution: CNSolution,
    # TODO: Check for novel functional mutations and do something with them
    # novel_functional_mutations = _get_novel_mutations(gene, coverage, cn_solution)
 
-   results = solve_major_model(alleles, coverage, cn_solution, solver)
+   results = solve_major_model(gene, alleles, coverage, cn_solution, solver)
    return results
 
 
-def solve_major_model(allele_dict: Dict[str, Allele], 
+def solve_major_model(gene: Gene,
+                      allele_dict: Dict[str, Allele], 
                       coverage: Coverage, 
                       cn_solution: CNSolution, 
                       solver: str) -> List[MajorSolution]:
@@ -98,6 +102,8 @@ def solve_major_model(allele_dict: Dict[str, Allele],
    list[:obj:`MajorSolution`]: Solves the major star-allele detection problem via integer linear programming.
 
    Args:
+      gene (:obj:`aldy.gene.Gene`): 
+         A gene instance.
       allele_dict (dict[str, :obj:`aldy.gene.Allele`]):
          Dictionary of candidate major star-alleles. 
       coverage (:obj:`aldy.coverage.Coverage`):
@@ -160,7 +166,11 @@ def solve_major_model(allele_dict: Dict[str, Allele],
                  for m in alleles[a].func_muts}
    constraints = {e: 0 for e in error_vars}
    # Add a binary variable for any allele/novel mutation pair
+   # TODO: do not add novel variables in impossible CN regions
+   del_allele = gene.deletion_allele()
    M = {a: {m: model.addVar(vtype='B', name='EXTRA_{}_{}_{}'.format(m, *a))
+               if a[0] != del_allele
+               else 0 # deletion alleles should not be assigned any mutations
             for m in constraints
             if m not in alleles[a].func_muts} 
         for a in alleles}
@@ -196,31 +206,16 @@ def solve_major_model(allele_dict: Dict[str, Allele],
       for a in alleles:
          constraints[ref_m] += cov * A[a]
 
-
-   # Make sure that each constraint equals the observed coverage with some error
-
-   # Make sure that the CN for each CN config matches the CN solution
-
    # Each allele must express all of its functional mutations
    for m, expr in constraints.items():
       log.trace('LP contraint: {} == {} + err for {} with cn={}', coverage[m], expr, m, cn_solution.position_cn(m.pos))
       model.addConstr(expr + error_vars[m] == coverage[m])
-
-
-   # Make sure that each constraint equals the observed coverage with some error
-
-   # Make sure that the CN for each CN config matches the CN solution
 
    # Each allele must express all of its functional mutations
    for cnf, cnt in cn_solution.solution.items():
       expr = sum(A[a] for a in A if alleles[a].cn_config == cnf)
       log.trace('LP contraint: {} == {} for {}', cnt, expr, cnf)
       model.addConstr(expr == cnt)
-
-
-   # Make sure that each constraint equals the observed coverage with some error
-
-   # Make sure that the CN for each CN config matches the CN solution
 
    # Each allele must express all of its functional mutations
    func_muts = (m for a in alleles for m in alleles[a].func_muts if coverage[m] > 0)
@@ -239,31 +234,27 @@ def solve_major_model(allele_dict: Dict[str, Allele],
    # Solve the ILP
    try:
       status, opt, solutions = model.solveAll(objective, 
-         dict(list(A.items()) + [((a, m), M[a][m]) for a in M for m in M[a]]))
-      log.debug('CN Solver status: {}, opt: {}', status, opt)
+         {**{(k,  ): v for k, v in A.items()}, # wrap (k) to ensure that tuples can be compared
+          **{(a, m): M[a][m] for a in M for m in M[a] if a[0] != del_allele}})
+      log.debug('Major Solver status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
       return [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution, novel={})]
 
    result = []
    for sol in solutions:
-      sol_alleles = collections.Counter(ma for ma, _ in sol)
-      sol = MajorSolution(score=opt, solution=sol_alleles, cn_solution=cn_solution, novel={})
+      novel = collections.defaultdict(list)
+      alleles = []
+      for s in sol: # handle 2-tuples properly (2-tuples have novel alleles)
+         if len(s) == 2:
+            novel[s[0][0]].append(s[1])
+         else:
+            alleles.append(s[0][0])
+      sol = MajorSolution(score=opt, 
+                          solution=collections.Counter(alleles), 
+                          cn_solution=cn_solution, 
+                          novel=dict(novel))
       log.debug('Major solution: {}'.format(sol))
       result.append(sol)
-      # TODO: for (a, _), extra in sd.items():
-         # if len(extra) > 0:
-            # rai
-            # log.warn('Novel major star-allele (*{}-like) found!', a)
-            # extra = [Mutation(m.pos, m.op, m.functional, dict(list(m.aux.items()) + [('novel', True)])) for m in extra]
-            # an = Allele(
-            #    gene.alleles[a].name + '+{}'.format(unique_key[gene.alleles[a].name]),
-            #    gene.alleles[a].cnv_configuration,
-            #    gene.alleles[a].functional_mutations | set(extra),
-            #    gene.alleles[a].suballeles
-            # )
-            # unique_key[gene.alleles[a].name] = 'a' if unique_key[gene.alleles[a].name] == '' else chr(ord(unique_key[gene.alleles[a].name]) + 1)
-            # gene.alleles[an.name] = an
-            # solutions[si].append(an.name)
    
    return result
 

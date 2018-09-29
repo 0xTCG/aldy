@@ -44,7 +44,9 @@ def assert_minor(majors, mutations, solution):
 
    assert_equal(len(sol), 1)
    sol = sol[0]
-   assert_equal(sorted_tuple(s[1] for s in sol.solution), sorted_tuple(solution))
+   ref_solution = sorted(allele_number(s) for s in solution)
+   usr_solution = sorted(allele_number(s[1]) for s in sol.solution)
+   assert_equal(ref_solution, usr_solution)
    return sol
    
 

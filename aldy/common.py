@@ -6,7 +6,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Tuple
+from typing import Tuple, Iterable
 
 import pkg_resources 
 import os
@@ -136,7 +136,7 @@ def seq_to_amino(seq: str) -> str:
 ### Language auxiliaries
 
 
-def sorted_tuple(x: tuple) -> tuple:
+def sorted_tuple(x: Iterable) -> tuple:
    """
    Sorts a tuple.
    """
@@ -178,12 +178,11 @@ def timing(f):
    return wrap
 
 
-@static_vars(pp=pprint.PrettyPrinter(indent=4))
 def pp(x) -> str:
    """
    str: Returns a pretty-printed variable string.
    """
-   return pp.pformat(x)
+   return pprint.pformat(x)
 
 
 def pr(x):

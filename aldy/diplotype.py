@@ -47,7 +47,6 @@ def write_decomposition(sample: str,
       items = []
       if len(mutations) > 0:
          for m in sorted(mutations):
-            print (m.is_functional)
             items.append([sample, 
                           gene.name, 
                           sol_id, 
@@ -85,8 +84,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
    via the diplotype assignment heuristics and returns the diplotype assignment.
    """
 
-   del_allele = next(a for a, cn in gene.cn_configs.items() 
-                     if cn.kind == CNConfig.CNConfigType.DELETION)
+   del_allele = gene.deletion_allele()
 
    # solution is the array of (major, minor) tuples
    majors = [allele_sort_key(ma)[0] for ma, _, _ in solution.solution]

@@ -8,6 +8,7 @@
 from typing import List, Dict, Tuple, Set, Callable, Optional
 from functools import reduce, partial
 
+import math
 import collections
 import multiprocessing
 
@@ -56,8 +57,10 @@ class MinorSolution(collections.namedtuple('MinorSolution', ['score', 'solution'
    def __repr__(self):
       return f'MinorSol[{self.score:.2f}; ' + \
               'sol=({}); '.format(', '.join(
-                 '*{}{}{}'.format(
+                 '*{}{}{}{}'.format(
                      sol[1], 
+                     # TODO fix this if multiple same keys exist
+                     ''.join(' +' + str(m) for m in self.major_solution.novel.get(sol[0], [])),
                      ''.join(' +' + str(m) for m in self.added.get(sol, [])),
                      ''.join(' -' + str(m) for m in self.missing.get(sol, [])))
                  for sol in self.solution)) + \
@@ -154,15 +157,15 @@ def solve_minor_model(gene: Gene,
                            set(major_sol.novel.get(ma, [])) 
               for ma, mi in alleles_list}
 
-   # log.debug('Possible candidates:')
-   # for ma, mi, i in sorted(alleles, key=lambda x: allele_sort_key(x[1])):
-   #    log.debug('  *{} (cn=*{})', mi, gene.alleles[ma].cn_config)
-   #    for m in sorted(alleles[ma, mi, i], key=lambda m: m.pos):
-   #       log.debug('    {:26} {:4} ({:.1f} copies) {}',
-   #          str(m), 
-   #          coverage[m], 
-   #          coverage[m] / (coverage.total(m.pos) / major_sol.cn_solution.position_cn(m.pos)),
-   #          m.aux.get('old', ''))
+   log.debug('Possible candidates:')
+   for ma, mi, i in sorted(alleles, key=lambda x: allele_sort_key(x[1])):
+      log.debug('  *{} (cn=*{})', mi, gene.alleles[ma].cn_config)
+      for m in sorted(alleles[ma, mi, i], key=lambda m: m.pos):
+         log.debug('    {:26} {:4} ({:.1f} copies) {}',
+            str(m), 
+            coverage[m], 
+            coverage[m] / (coverage.total(m.pos) / major_sol.cn_solution.position_cn(m.pos)) if coverage.total(m.pos) > 0 else 0,
+            m.aux.get('old', ''))
    
    for ma, mi, _ in list(alleles):
       for cnt in range(1, major_sol.solution[ma]):
@@ -176,7 +179,7 @@ def solve_minor_model(gene: Gene,
       log.trace('LP constraint: A_{} <= A_{} for {}-{}', cnt, cnt - 1, ma, mi)
       model.addConstr(A[(ma, mi, cnt)] <= A[(ma, mi, cnt - 1)])
 
-   # Make sure that sum of all subaleles is exacly as the count of their major alleles
+   # Make sure that sum of all subaleles is exactly as the count of their major alleles
    for a, cnt in major_sol.solution.items():
       expr = model.quicksum(v for (ma, _, _), v in A.items() if ma == a)
       log.trace('LP constraint: {} == {} for {}', cnt, expr, a)
@@ -185,7 +188,7 @@ def solve_minor_model(gene: Gene,
    # Add a binary variable for each allele/mutation pair where mutation belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or will be missing
    MPRESENT = {a: {m: model.addVar(vtype='B', name='MISS-{}-{}-{}_{}'.format(m, *a)) 
-                for m in alleles[a]}
+                   for m in alleles[a]}
                for a in alleles}
    # Add a binary variable for each allele/mutation pair where mutation DOES NOT belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or not
@@ -275,8 +278,10 @@ def solve_minor_model(gene: Gene,
       expr = model.quicksum(exprs)
       total_cn = major_sol.cn_solution.position_cn(m.pos)
       log.trace(f'LP constraint 4: {total_cn} == {expr} for {m}')
-      model.addConstr(expr >= total_cn)
-      model.addConstr(expr <= total_cn)
+      # print(f'{m}:{m_gene}/{m_region} --> {total_cn} @ {list(exprs)}')
+      # floor/ceil because of total_cn potentially having 0.5 as a summand
+      #model.addConstr(expr >= math.floor(total_cn))
+      #model.addConstr(expr <= math.ceil(total_cn))
    # 5) Make sure that CN of each variation does not exceed total supporting allele CN
    for m in mutations: 
       m_cn = major_sol.cn_solution.position_cn(m.pos)
@@ -296,7 +301,7 @@ def solve_minor_model(gene: Gene,
       assert(lo >= 0)
       assert(hi <= m_cn)
       log.trace('LP constraint 5: {} <= {} <= {} for {}', m, lo, expr, hi, m)
-      model.addConstr(expr >= lo); model.addConstr(expr <= hi)
+      #model.addConstr(expr >= lo); model.addConstr(expr <= hi)
 
    # Objective: absolute sum of errors
    objective = model.abssum(error_vars.values())
@@ -324,60 +329,60 @@ def solve_minor_model(gene: Gene,
       status, opt = model.solve(objective)
       log.debug('CN Solver status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
+      log.debug(f'Minor solution: None')
       return MinorSolution(score=float('inf'), solution=[], major_solution=major_sol, missing={}, added={})
 
    # Get final minor solutions
    solution = []
-   added: Dict[Tuple[str, int], List[Mutation]] = collections.defaultdict(list)
-   missing: Dict[Tuple[str, int], List[Mutation]] = collections.defaultdict(list)
+   added: Dict[Tuple[str, str, int], List[Mutation]] = collections.defaultdict(list)
+   missing: Dict[Tuple[str, str, int], List[Mutation]] = collections.defaultdict(list)
    for allele, value in A.items():
       if model.getValue(value) <= 0:
          continue
 
       solution.append(allele)
       for m, mv in MPRESENT[allele].items():
-         if model.getValue(mv) == 0:
+         if not model.getValue(mv):
             missing[allele].append(m)
       for m, mv in MADD[allele].items():
-         if model.getValue(mv) > 0:
+         if model.getValue(mv):
             added[allele].append(m)
 
-
-   explan = {}
-   sm = 0
-   for m in error_vars:
-      explan[m] = []
-   for a in solution:
-      for m in mutations:
-         m_gene, m_region = gene.region_at(m.pos)
-         if gene.cn_configs[gene.alleles[a[0]].cn_config].cn[m_gene][m_region] == 0:
-            continue
-         if m in MPRESENT[a] and model.getValue(MPRESENT[a][m]):
-            explan[m].append(a[1])
-         elif m in MADD[a] and model.getValue(MADD[a][m]):
-            explan[m].append(a[1])
-         else:
-            explan[Mutation(m.pos,'REF')].append(a[1])
-   for pos in sorted(e.pos for e in explan):
-      ms = [m for m in explan if m.pos==pos]
-      m_cn = major_sol.cn_solution.position_cn(pos)
-      m_gene, m_region = gene.region_at(pos)
+   # explan = {}
+   # sm = 0
+   # for m in error_vars:
+   #    explan[m] = []
+   # for a in solution:
+   #    for m in mutations:
+   #       m_gene, m_region = gene.region_at(m.pos)
+   #       if gene.cn_configs[gene.alleles[a[0]].cn_config].cn[m_gene][m_region] == 0:
+   #          continue
+   #       if m in MPRESENT[a] and model.getValue(MPRESENT[a][m]):
+   #          explan[m].append(a[1])
+   #       elif m in MADD[a] and model.getValue(MADD[a][m]):
+   #          explan[m].append(a[1])
+   #       else:
+   #          explan[Mutation(m.pos,'REF')].append(a[1])
+   # for pos in sorted(e.pos for e in explan):
+   #    ms = [m for m in explan if m.pos==pos]
+   #    m_cn = major_sol.cn_solution.position_cn(pos)
+   #    m_gene, m_region = gene.region_at(pos)
       
-      cnt = 0
-      for m in sorted(ms):
-         cnt += len(explan[m])
-      if cnt != m_cn:
-         log.error(f'{pos} in {m_gene}/{m_region} with cn = {m_cn} BUT SOLVED WITH cn = {cnt}')
-         for m in sorted(ms):
-            log.debug('  {:6} {:3} (1 cp = {:4.1f}) <=> cn {}/{} with err = {:5.1f} <=> {}', 
-               str(m.op),  
-               coverage[m],
-               coverage.total(m.pos) / major_sol.cn_solution.position_cn(m.pos),
-               len(explan[m]),
-               m_cn,
-               model.getValue(error_vars[m]),
-               explan[m])
-            sm += abs(model.getValue(error_vars[m]))
+   #    cnt = 0
+   #    for m in sorted(ms):
+   #       cnt += len(explan[m])
+   #    if cnt != m_cn:
+   #       log.error(f'{pos} in {m_gene}/{m_region} with cn = {m_cn} BUT SOLVED WITH cn = {cnt}')
+   #       for m in sorted(ms):
+   #          log.debug('  {:6} {:3} (1 cp = {:4.1f}) <=> cn {}/{} with err = {:5.1f} <=> {}', 
+   #             str(m.op),  
+   #             coverage[m],
+   #             coverage.total(m.pos) / major_sol.cn_solution.position_cn(m.pos),
+   #             len(explan[m]),
+   #             m_cn,
+   #             model.getValue(error_vars[m]),
+   #             explan[m])
+   #          sm += abs(model.getValue(error_vars[m]))
       
    sol = MinorSolution(score=opt, 
                        solution=solution, 

@@ -5,84 +5,22 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
+from typing import Any, Optional, Dict, Tuple, List, Iterable, Callable, Set
+
 import importlib
 
-from .common import log
-
-
-def model(name, solver):
-   def test_gurobi(name):
-      try:
-         model = Gurobi(name)
-         log.trace('Using Gurobi')
-      except ImportError as e:
-         log.warn('Gurobi not found. Please install Gurobi and gurobipy Python package.')
-         log.error('{}', e)
-         model = None
-      return model
-
-   # CPLEX does not support our quadratic models
-   # def test_cplex(name):
-   #  try:
-   #     model = CPLEX(name)
-   #     log.warn('Using CPLEX')
-   #  except:
-   #     log.warn('CPLEX not found. Please install CPLEX and the following Python packages: cplex and docplex.')
-   #     model = None
-   #  return model
-
-   def test_scip(name):
-      try:
-         model = SCIP(name)
-         log.trace('Using SCIP')
-      except ImportError as e:
-         log.warn('SCIP not found. Please install SCIP and pyscipopt Python package.')
-         log.error('{}', e)
-         model = None
-      return model
-
-   if solver == 'any':
-      model = test_gurobi(name)
-      # if model is None:
-      #  model = test_cplex(name)
-      if model is None:
-         model = test_scip(name)
-      if model is None:
-         raise Exception('No IP solver found. Aldy cannot solve any problems without matching IP solver. Please try installing Gurobi or SCIP.')
-      return model
-   else:
-      fname = 'test_' + solver
-      if fname in locals():
-         return locals()[fname](name)
-      else:
-         raise Exception('IP solver {} is not supported'.format(solver))
-
-
-def get_all_solutions(c, var, opt, candidates, iteration=0, mem=[]):
-   if candidates in mem or iteration > 10:
-      return []
-   solutions = []
-   for a in candidates:
-      c.changeUb(var[a], 0)
-      try:
-         status, obj = c.solve()
-         if status == 'optimal' and abs(obj - opt) < 1e-6:
-            new_solution = set([a for a, y in var.items() if round(c.getValue(y)) > 0])
-            new_candidates = (set(candidates) - set([a])) | new_solution
-            solutions += [frozenset(new_solution)]
-            solutions += get_all_solutions(c, var, opt, new_candidates, iteration + 1, mem)
-      except NoSolutionsError:
-         pass
-      c.changeUb(var[a], 1)
-      mem.append(candidates)
-   return solutions
+from .common import log, sorted_tuple
 
 
 class NoSolutionsError(Exception):
    pass
 
 
-class Gurobi(object):
+class Gurobi:
+   """
+   An abstraction aroung Gurobi Python interface.
+   """
+
    def __init__(self, name):
       self.gurobipy = importlib.import_module('gurobipy')
 
@@ -95,15 +33,23 @@ class Gurobi(object):
       self.model = self.gurobipy.Model(name)
       self.model.reset()
 
-      self._constr = []
-      self._vars = []
 
    def addConstr(self, *args, **kwargs):
+      """
+      Add a constraint to the model.
+      """
       c = self.model.addConstr(*args, **kwargs)
-      self._constr.append(c)
       return c
 
+
    def addVar(self, *args, **kwargs):
+      """
+      Add a variable to the model.
+      `vtype` named argument stands for the variable type:
+         - `B` for binary variable
+         - `I` for integer variable
+         - `C` or nothing for continuous variable.
+      """
       if 'vtype' in kwargs and kwargs['vtype'] == 'B':
          kwargs['vtype'] = self.gurobipy.GRB.BINARY
       elif 'vtype' in kwargs and kwargs['vtype'] == 'I':
@@ -115,20 +61,40 @@ class Gurobi(object):
       v = self.model.addVar(*args, **kwargs)
       if update:
          self.update()
-      self._vars.append(v)
       return v
 
-   def quicksum(self, expr):
+
+   def quicksum(self, expr: Iterable):
+      """
+      Perform a quick summation of the iterable `expr`.
+      Much faster than Python's `sum` on large iterables.
+      """
       return self.gurobipy.quicksum(expr)
 
-   def update(self):
+
+   def update(self) -> None:
+      """
+      Update the model.
+      Avoid calling it too much as it slows down the model construction.
+      """
       self.model.update()
 
+
    def varName(self, var):
+      """
+      Getter for variable name.
+      """
       return var.varName
 
-   def abssum(self, vars, coeffs=None):
-      total = 0
+
+   def abssum(self, vars: Iterable, coeffs: Optional[Dict[str, float]] = None):
+      """
+      Returns absolute sum of the `vars`: e.g. 
+         :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
+      where :math:`c_i` is defined in the `coeffs` dictionary.
+      Key of the `coeffs` dictionary stands for the name of the variable 
+      accessible via ``varName`` call (1 if not defined).
+      """
       vv = []
       for v in vars:
          name = self.varName(v)
@@ -140,7 +106,17 @@ class Gurobi(object):
       self.model.update()
       return self.quicksum(vv)
 
-   def solve(self, objective=None, method='min', init=None): # ret obj val
+
+   def solve(self, objective=None, method: str = 'min', init: Optional[Callable] = None) -> Tuple[str, float]:
+      """
+      tuple[str, float]: Solves the model with objective `objective`.
+
+      Additional parameters of the solver can be set via `init` function that takes 
+      the model instance as a sole argument.
+
+      Returns the tuple describing the status of the solution and the objective value.
+      """
+
       if objective is not None:
          self.objective = objective
       self.model.setObjective(
@@ -148,8 +124,6 @@ class Gurobi(object):
          self.gurobipy.GRB.MINIMIZE if method == 'min' else self.gurobipy.GRB.MAXIMIZE)
       self.model.update()
 
-      # self.model.params.timeLimit = 60
-      # self.model.params.threads = 2
       self.model.params.outputFlag = 0
       self.model.params.logFile = ''
       if init is not None:
@@ -161,19 +135,34 @@ class Gurobi(object):
          raise NoSolutionsError(status)
       return status.lower(), self.model.objVal
 
-   def solveAll(self, objective, var, method='min'):
-      status, opt_value = self.solve(objective, method)
-      solutions = [frozenset(a for a, y in var.items() if round(self.getValue(y)) > 0)]
-      solutions += get_all_solutions(
-         self, var, opt_value,
-         candidates=solutions[0], iteration=0, mem=list()
-      )
-      solutions = [tuple(sorted(list(x), key=str)) for x in solutions]
 
-      solutions = list(set(solutions))
-      return status, opt_value, solutions
+   def solveAll(self, 
+                objective, 
+                var: dict, 
+                method: str = 'min', 
+                init: Optional[Callable] = None) -> Tuple[str, float, List[tuple]]:
+      """
+      tuple[str, float, list[tuple[any]]]: Solves the model with objective `objective`
+      and returns the list of all combinations of the variables `var` that minimize the objective.
+
+      Additional parameters of the solver can be set via `init` function that takes 
+      the model instance as a sole argument.
+
+      Returns the tuple describing the status of the solution and the objective value.
+      """
+      status, opt_value = self.solve(objective, method, init)
+
+      sol = sorted_tuple(set(a for a, v in var.items() if self.getValue(v))) 
+      solutions = set([sol]) | get_all_solutions(self, var, opt_value, sol) # type: ignore
+
+      return status, opt_value, list(solutions) # type: ignore
+
 
    def getValue(self, var):
+      """
+      Get the value of the solved variable.
+      Automatically adjusts the return type depending on the variable type.
+      """
       if var.vtype == self.gurobipy.GRB.BINARY:
          return round(var.x) > 0
       if var.vtype == self.gurobipy.GRB.INTEGER:
@@ -181,12 +170,20 @@ class Gurobi(object):
       else:
          return var.x
 
-   def changeUb(self, var, ub):
+
+   def changeUb(self, var, ub: float) -> None:
+      """
+      Change the upper-bound of the variable.
+      """
       var.ub = ub
       self.model.update()
 
 
 class SCIP(Gurobi):
+   """
+   An abstraction aroung SCIP `pysciopt` Python interface.
+   """
+
    def __init__(self, name):
       self.pyscipopt = importlib.import_module('pyscipopt')
       self.INF = 1e20
@@ -204,14 +201,13 @@ class SCIP(Gurobi):
    def quicksum(self, expr):
       return self.pyscipopt.quicksum(expr)
 
-   def solve(self, objective=None, method='min', init=None):
+   def solve(self, objective=None, method: str = 'min', init: Optional[Callable] = None) -> Tuple[str, float]:
       if objective is not None:
          self.objective = objective
       self.model.setObjective(
          self.objective,
          'minimize' if method == 'min' else 'maximize'
       )
-      # self.model.params.timeLimit = 60
       self.model.setRealParam('limits/time', 120)
       self.model.hideOutput()
       if init is not None:
@@ -234,80 +230,105 @@ class SCIP(Gurobi):
       self.model.chgVarUb(var, ub)
 
 
-# CPLEX does not support our quadratic models.
+def model(name: str, solver: str):
+   """
+   Create the ILP solver instance for a model named `name`.
+   If `solver` is ``any``, this function will attempt to use
+   Gurobi, and will fall back on SCIP if Gurobi fails.
+   """
 
-# class CPLEX:
-#  def __init__(self, name):
-#     self.docplex = importlib.import_module('docplex.mp.model')
-#     self.model = self.docplex.Model(name=name)
-#     self.INF = self.model.infinity
-#     print self.INF
+   def test_gurobi(name):
+      """
+      Tests if Gurobi is present. Requires Gurobi 7+.
+      """
+      try:
+         model = Gurobi(name)
+         log.trace('Using Gurobi')
+      except ImportError as e:
+         log.warn('Gurobi not found. Please install Gurobi and gurobipy Python package.')
+         log.error('{}', e)
+         model = None
+      return model
 
-#  def addConstr(self, *args, **kwargs):
-#     return self.model.add_constraint(*args, **kwargs)
+   def test_scip(name):
+      """
+      Tests if SCIP is present. Requires `pyscipopt`.
+      """
+      try:
+         model = SCIP(name)
+         log.trace('Using SCIP')
+      except ImportError as e:
+         log.warn('SCIP not found. Please install SCIP and pyscipopt Python package.')
+         log.error('{}', e)
+         model = None
+      return model
 
-#  def addVar(self, *args, **kwargs):
-#     vtype = 'c'
-#     if 'vtype' in kwargs:
-#        vtype = 'b' if kwargs['vtype'] == 'B' else 'c'
-#        del kwargs['vtype']
-#     if vtype == 'b':
-#        v = self.model.binary_var(*args, **kwargs)
-#     else:
-#        v = self.model.continuous_var(*args, **kwargs)
-#     return v
+   if solver == 'any':
+      model = test_gurobi(name)
+      if model is None:
+         model = test_scip(name)
+      if model is None:
+         raise Exception('No IP solver found. Aldy cannot solve any problems without matching IP solver. Please try installing Gurobi or SCIP.')
+      return model
+   else:
+      fname = 'test_' + solver
+      if fname in locals():
+         return locals()[fname](name)
+      else:
+         raise Exception('IP solver {} is not supported'.format(solver))
 
-#  def quicksum(self, expr):
-#     return self.model.sum(expr)
 
-#  def update(self):
-#     pass
+def get_all_solutions(model: Gurobi, 
+                      var: dict, 
+                      opt: float, 
+                      current_sol: tuple, 
+                      iteration: int = 0, 
+                      mem: Optional[Set[tuple]] = None) -> Set[tuple]:
+   """
+   list[tuple[str]]: Enumerate all possible solutions that yield `opt` value for the ILP defined in `model`.
 
-#  def varName(self, var):
-#     return var.varName
+   Args:
+      model (:obj:`Gurobi`): 
+         ILP model instance.
+      var (dict[any, :obj:`Variable`]):
+         Dictionary of the variables that can form the optimal solution `current_sol`.
+         Key is the variable identifier that forms the solution tuple.
+      opt (float):
+         The optimal solution of the model.
+      current_sol (tuple[any]):
+         The current solution in the pool. Used to build next solution.
+         Tuple members are keys in `var` dictionary.
+      iteration (int):
+         Recursion level depth. Used to terminate the functions early.
+         Max allowed depth: 10.
+      mem (list[tuple[any]]):
+         Memoization table to avoid recomputation of the already seen solutions.
 
-#  def abssum(self, vars, coeffs=None):
-#     return self.quicksum([self.model.abs(v) for v in vars])
-      
-#  def solve(self, objective=None, method='min'): # ret obj val
-#     if objective is not None:
-#        self.objective = objective
-#     if method == 'min':
-#        self.model.minimize(self.objective)
-#     else:
-#        self.model.maximize(self.objective)
-      
-#     # self.model.params.timeLimit = 60
-#     # self.model.params.threads = 2
-#     # self.model.params.outputFlag = 0
-#     # self.model.params.logFile = ''
-      
-#     self.model.export_as_lp(path='./MODEL_DBG.LP')
-#     params = {}
-#     try:
-#        self.solution = self.model.solve(cplex_parameters=params, agent='local', log_output=False)
-#     except:
-#        self.model.export_as_lp(path='./MODEL_DBG.LP')
-#        self.solution = None
-#        exit(1)
-#     if not self.solution:
-#        raise NoSolutionsError(self.solution)
-#     return 'optimal', self.solution.get_objective_value()
+   Note:
+      Variables in `var` **MUST BE** binary variables in order for this to work properly!
+   """
 
-#  def solveAll(self, objective, var, method='min'):
-#     status, opt_value = self.solve(objective, method)
-#     solutions = [frozenset(a for a, y in var.iteritems() if round(self.getValue(y)) > 0)]
-#     solutions += get_all_solutions(
-#        self, var, opt_value,
-#        candidates=solutions[0], iteration=0, mem=list()
-#     )
-#     solutions = map(lambda x: tuple(sorted(y for y in x)), solutions)
-
-#     solutions = list(set(solutions))
-#     return status, opt_value, solutions
-
-#  def getValue(self, var):
-#     return self.solution.get_value(var)
-
-#  def changeUb(self, var, ub):
-#     var.ub = ub
+   if mem is None:
+      mem = set()
+   if current_sol in mem or iteration > 10:
+      return set()
+   
+   solutions = set()
+   mem.add(current_sol)
+   for a in current_sol:
+      # Disable a variable
+      model.changeUb(var[a], 0)
+      try:
+         status, obj = model.solve()
+         if status == 'optimal' and abs(obj - opt) < 1e-6:
+            # new_solution = 
+            # new_solution |= set(current_sol) - set([a])
+            # assert(set(current_sol) - set([a]) <= new_solution)
+            new_solution = sorted_tuple(set(vn for vn, v in var.items() if model.getValue(v)))
+            solutions.add(new_solution)
+            solutions |= get_all_solutions(model, var, opt, new_solution, iteration + 1, mem) # type: ignore
+      except NoSolutionsError:
+         pass
+      # Re-enable variable
+      model.changeUb(var[a], 1)
+   return solutions # type: ignore

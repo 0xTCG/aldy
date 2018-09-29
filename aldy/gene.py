@@ -554,6 +554,14 @@ class Gene:
       return amino != self.coding_region.aminoacid
 
 
+   def deletion_allele(self) -> str:
+      """
+      Return the deletion allele ID.
+      """
+      return next(a for a, cn in self.cn_configs.items() 
+                  if cn.kind == CNConfig.CNConfigType.DELETION)
+
+
    def print_configurations(self):
       raise NotImplementedError
 
