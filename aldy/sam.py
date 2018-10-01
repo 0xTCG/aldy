@@ -373,14 +373,18 @@ class Sample:
          It modifies ``self.coverage``.
       """
 
-      profile_path = script_path('aldy.resources.profiles/{}.profile'.format(profile.lower()))
-      if os.path.exists(profile_path):
-         prof = self._load_profile(profile_path)
+      if os.path.exists(profile):
+         ext = os.path.splitext(profile)
+         if ext in ['bam', 'sam']:
+            prof = self._load_profile(profile, 
+                                      is_bam=True, 
+                                      gene_region=gene.region, 
+                                      cn_region=cn_region)      
+         else:
+            prof = self._load_profile(profile)
       else:
-         prof = self._load_profile(profile, 
-                                   is_bam=True, 
-                                   gene_region=gene.region, 
-                                   cn_region=cn_region)      
+         profile_path = script_path('aldy.resources.profiles/{}.profile'.format(profile.lower()))
+         prof = self._load_profile(profile_path)
       self.coverage._normalize_coverage(prof, gene.regions, cn_region)
 
 

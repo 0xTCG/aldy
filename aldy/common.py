@@ -199,8 +199,14 @@ def script_path(key: str) -> str:
    Args: 
       key (str): a resource to be extracted. 
       Specify with ``path/file`` (e.g. ``aldy.resources/test.txt``).
+
+   Raises:
+      :obj:`aldy.common.AldyException`.
    """
-   return pkg_resources.resource_filename(*key.split('/'))
+   components = key.split('/')
+   if len(components) < 2:
+      raise AldyException(f'"{key}"" is not valid resource name')
+   return pkg_resources.resource_filename(components[0], '/'.join(components[1:]))
 
 
 def colorize(text: str, color:str = 'green') -> str:

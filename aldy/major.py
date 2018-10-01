@@ -20,7 +20,42 @@ from .gene import Allele, Mutation, Gene, CNConfig
 from .sam import Sample, Coverage
 
 
-class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution', 'cn_solution', 'novel'])):
+class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'added', 'missing'])):
+   """
+   Describes a candidate star-allele configuration.
+   Immutable class.
+
+   Attributes:
+      major (str):
+         Major star-allele identifier.
+      minor (str, optional):
+         Minor star-allele identifier. Can be None.
+      added (list[:obj:`aldy.gene.Mutation`]):
+         List of mutations that are added to this copy of a major/minor star-allele
+         (e.g. these mutations are not present in the database defition of allele).
+      missing (list[:obj:`aldy.gene.Mutation`]):
+         List of mutations that are ommited from this copy of a major/minor star-allele
+         (e.g. these mutations are present in the database defition of allele but not in the sample).
+   
+   Notes:
+      Has custom printer (``__repr``).
+   """
+
+
+   def major_repr(self):
+      return '*{}{}'.format(self.major,
+         ''.join(' +' + str(m) for m in sorted(m for m in self.added if m.is_functional)))
+
+
+   def __repr__(self):
+      return '*{}{}{}'.format(
+         self.minor if self.minor else self.major,
+         ''.join(' +' + str(m) for m in sorted(self.added, 
+                                               key=lambda m: (-m.is_functional, m.pos, m.op))),
+         ''.join(' -' + str(m) for m in sorted(self.missing)))
+
+
+class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution', 'cn_solution'])):
    """
    Describes a potential (possibly optimal) major star-allele configuration.
    Immutable class.
@@ -28,16 +63,13 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
    Attributes:
       score (float):
          ILP model error score (0 for user-provided solutions).
-      solution (dict[str, int]):
+      solution (dict[:obj:`SolvedAllele`, int]):
          Dictionary of major star-alleles where each major star-allele is 
          associated with its copy number 
-         (e.g. `{1: 2}` means that we have two copies of \*1).
+         (e.g. `{1: 2}` means that we have two copies of *1).
       cn_solution (:obj:`aldy.cn.CNSolution`):
          Associated copy-number solution used for calculating the major 
          star-alleles.
-      novel (dict[str, list[:obj:`aldy.gene.Mutation`]]):
-         Dictionary that describes the list of novel functional
-         mutations for each major star-allele.
    
    Notes:
       Has custom printer (``__repr``).
@@ -45,11 +77,7 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
    
    def __repr__(self):
       return f'MajorSol[{self.score:.2f}; ' + \
-              'sol=({}); '.format(', '.join(
-                 '*{}{}'.format(
-                     sol, 
-                     ''.join(' +' + str(m) for m in self.novel.get(sol, [])))
-                 for sol in self.solution)) + \
+              'sol=({}); '.format(', '.join(f'{v}x{s}' for s, v in self.solution.items())) + \
              f'cn={self.cn_solution}'
       
 
@@ -242,17 +270,20 @@ def solve_major_model(gene: Gene,
 
    result = []
    for sol in solutions:
-      novel = collections.defaultdict(list)
-      alleles = []
+      alleles = {} # dict of allele IDs -> novel mutations
       for s in sol: # handle 2-tuples properly (2-tuples have novel alleles)
          if len(s) == 2:
-            novel[s[0][0]].append(s[1])
+            alleles[s[0]].append(s[1])
          else:
-            alleles.append(s[0][0])
+            alleles[s[0]] = [] # li
+      solution = collections.Counter(SolvedAllele(major=a, 
+                                                  minor=None, 
+                                                  added=tuple(mut), 
+                                                  missing=tuple()) 
+                                     for (a, _), mut in alleles.items())
       sol = MajorSolution(score=opt, 
-                          solution=collections.Counter(alleles), 
-                          cn_solution=cn_solution, 
-                          novel=dict(novel))
+                          solution=solution, 
+                          cn_solution=cn_solution)
       log.debug('Major solution: {}'.format(sol))
       result.append(sol)
    
@@ -278,8 +309,8 @@ def _filter_alleles(gene: Gene,
          del alleles[an]
       elif any(cov[m] <= 0 for m in a.func_muts):
          s = ('{} in {}'.format(m, gene.region_at(m.pos))
-            for m in a.func_muts
-            if cov[m] <= 0)
+              for m in a.func_muts
+              if cov[m] <= 0)
          log.trace('Removing {} because of {}', an, ' and '.join(s))
          del alleles[an]
    

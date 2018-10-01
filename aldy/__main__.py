@@ -265,7 +265,7 @@ def _genotype(gene: str, output: Optional, args) -> None:
                         reference=   args.reference)
       log.warn('Result{} for {}: ', '' if len(result) == 1 else 's', gene.upper())
       for r in result:
-         log.warn('  {:30} ({})', r.diplotype, ', '.join(f[1] for f in r.solution))
+         log.warn('  {:30} ({})', r.diplotype, ', '.join(f.major_repr() for f in r.solution))
    except AldyException as ex:
       log.error(ex)
 

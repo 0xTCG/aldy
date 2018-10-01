@@ -40,10 +40,9 @@ def write_decomposition(sample: str,
    """
 
    for copy, a in enumerate(minor.solution):
-      ma, mi, _ = a
-      mutations = set(gene.alleles[ma].func_muts) | \
-                  set(gene.alleles[ma].minors[mi].neutral_muts) | \
-                  set(minor.added[a] if a in minor.added else []) 
+      mutations = set(gene.alleles[a.major].func_muts) | set(gene.alleles[a.major].minors[a.minor].neutral_muts) 
+      mutations |= set(a.added) 
+      mutations -= set(a.missing)
       items = []
       if len(mutations) > 0:
          for m in sorted(mutations):
@@ -51,9 +50,9 @@ def write_decomposition(sample: str,
                           gene.name, 
                           sol_id, 
                           minor.diplotype, 
-                          ';'.join(mi for _, mi, _ in minor.solution),
+                          ';'.join(ay.minor for ay in minor.solution),
                           copy, 
-                          mi,
+                          a.minor,
                           m.pos, m.op, 
                           -1,
                           ['NEUTRAL', 'DISRUPTING'][bool(m.is_functional)],
@@ -65,9 +64,9 @@ def write_decomposition(sample: str,
                        gene.name, 
                        sol_id, 
                        minor.diplotype, 
-                       ';'.join(mi for _, mi, _ in minor.solution),
+                       ';'.join(ay.minor for ay in minor.solution),
                        copy, 
-                       mi,
+                       a.minor,
                        '', '', '', '', '', '', ''])
       for it in items:
          print('\t'.join(map(str, it)), file=f)
@@ -87,7 +86,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
    del_allele = gene.deletion_allele()
 
    # solution is the array of (major, minor) tuples
-   majors = [allele_sort_key(ma)[0] for ma, _, _ in solution.solution]
+   majors = [allele_sort_key(a.major)[0] for a in solution.solution]
    if len(majors) == 1:
       res = '*{}/*{}'.format(del_allele, *majors)
    elif len(majors) == 2:

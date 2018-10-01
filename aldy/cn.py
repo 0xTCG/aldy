@@ -29,7 +29,7 @@ MAX_CN = 20.0
 """Maximum supported copy-number"""
 
 
-class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'region_cn', 'gene'])):
+class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gene'])):
    """
    Describes a potential (possibly optimal) copy-number configuration.
    Immutable class.
@@ -49,15 +49,14 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'reg
       Has custom printer (``__repr``).
    """
 
-   def __new__(self, score: float, sol: List[str], gene: Gene):
+   def __new__(self, score: float, solution: List[str], gene: Gene):
       vec: Dict[int, Dict[GeneRegion, float]] = collections.defaultdict(lambda: collections.defaultdict(int))
-      for conf in sol:
+      for conf in solution:
          for g in gene.cn_configs[conf].cn:
             for r in gene.cn_configs[conf].cn[g]:
                vec[g][r] += gene.cn_configs[conf].cn[g][r]
-      solution = collections.Counter(sol)      
-      region_cn = {a: dict(b) for a, b in vec.items()}
-      return super(CNSolution, self).__new__(self, score, solution, region_cn, gene)
+      self.region_cn = {a: dict(b) for a, b in vec.items()}
+      return super(CNSolution, self).__new__(self, score, collections.Counter(solution), gene)
 
 
    def position_cn(self, pos: int) -> float:
@@ -74,7 +73,7 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'reg
       regions = sorted(set(r for g in self.region_cn for r in self.region_cn[g]))
       return 'CNSol[{:.2f}; sol=({}); cn={}]'.format(
          self.score,
-         ','.join('*{}x{}'.format(*kv) for kv in self.solution.items()),
+         ','.join(f'{v}x*{k}' for k, v in self.solution.items()),
          '|'.join(''.join('{:.0f}'.format(self.region_cn[g][r]) 
                           if r in self.region_cn[g] else '_' 
                           for r in regions)
@@ -233,13 +232,13 @@ def solve_cn_model(gene: Gene,
       status, opt, solutions = model.solveAll(objective, A)
       log.debug('LP status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
-      return [CNSolution(float('inf'), sol=[], gene=gene)]
+      return [CNSolution(float('inf'), solution=[], gene=gene)]
    
    # Get final CN vector (i.e. total integer CN for each region)
    result = []
    for sol in solutions:
       log.debug('Solution: {}', ', '.join('*' + str(s) for s, _ in sol))
-      result.append(CNSolution(opt, sol=[conf for conf, _ in sol], gene=gene))
+      result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
 
    return result
 
@@ -316,7 +315,7 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
          raise AldyException(
             'Given copy number solution contains unknown copy number configuration {}. '.format(sol) + 
             'Please run aldy --show-cn for the list the valid configurations')
-   s = CNSolution(0, sol=sols, gene=gene)
+   s = CNSolution(0, solution=sols, gene=gene)
    log.debug('User-provided solution: {}', s)
    return s
 

@@ -99,10 +99,8 @@ class Mutation(collections.namedtuple('Mutation', ['pos', 'op', 'is_functional',
       Comparable and hashable via ``(pos, op)`` tuple.
       Implements ``total_ordering``.
    """
-   def __new__(self, pos: int, op: str, is_functional=0, functional=None, aux=dict(), **kwargs):
-      if functional is not None:
-         is_functional = functional
-      return super(Mutation, self).__new__(self, pos, op, is_functional, aux)
+   def __new__(self, pos: int, op: str, is_functional=0, aux=None):
+      return super(Mutation, self).__new__(self, pos, op, is_functional, aux if aux else dict())
 
    def __repr__(self): return '{}:{}{}'.format(self.pos, self.op, '*' if self.is_functional else '')
    def __str__(self): return self.__repr__()
@@ -330,10 +328,11 @@ class Gene:
                      fusions_right[allele_name] = (int(m['op'][1:]), (EXON if m['op'][0] == 'e' else INTRON))
                      descriptions[allele_name] = "Conservation: Pseudogene retention after {} within the gene".format(m['op'][::-1])
                else:
-                  if 'old' in m:
-                     self._old_notation[Mutation(**m)] = m['old']
                   m['aux'] = {'dbsnp': ' or '.join(m['dbsnp']), 'old': m['old']}
-                  mutations.append(Mutation(**m))
+                  mut = Mutation(m['pos'], m['op'], m['functional'], m['aux'])
+                  if 'old' in m:
+                     self._old_notation[mut] = m['old']
+                  mutations.append(mut)
          alleles[allele_name] = Suballele(allele_name, [], mutations)
 
       self.common_tandems: List[tuple] = []
@@ -394,7 +393,6 @@ class Gene:
          cn_config = next(cn for cn, conf in self.cn_configs.items() if a in conf.alleles)
          fn_muts = sorted(m for m in alleles[a].neutral_muts if m.is_functional)
          alleles_inverse[(cn_config, tuple(fn_muts))].add(a)
-
       
       self.alleles: Dict[str, Allele] = dict()
       # Karolinska DB has a lot of ambiguities, and two alleles with same 'number' can correspond to two different major alleles
