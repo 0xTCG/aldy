@@ -56,8 +56,8 @@ def write_decomposition(sample: str,
                           m.pos, m.op, 
                           -1,
                           ['NEUTRAL', 'DISRUPTING'][bool(m.is_functional)],
-                          m.aux['dbsnp'], 
-                          m.aux['old'],
+                          m.aux.get('dbsnp', ''), 
+                          m.aux.get('old', ''),
                           ''])
       else:
          items.append([sample, 
@@ -87,7 +87,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
 
    # solution is the array of (major, minor) tuples
    majors = [allele_sort_key(a.major)[0] for a in solution.solution]
-   if len(majors) == 1:
+   if len(majors) == 1 and del_allele:
       res = '*{}/*{}'.format(del_allele, *majors)
    elif len(majors) == 2:
       res = '*{}/*{}'.format(*majors)

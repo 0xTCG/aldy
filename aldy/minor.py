@@ -38,11 +38,11 @@ class MinorSolution(collections.namedtuple('MinorSolution', ['score', 'solution'
          Assigned diplotype string (e.g. `*1/*2`).
 
    Notes:
-      Has custom printer (``__repr``).
+      Has custom printer (``__str__``).
    """
    diplotype = ''
    
-   def __repr__(self):
+   def __str__(self):
       return f'MinorSol[{self.score:.2f}; ' + \
               'sol=({}); '.format(', '.join(str(s) for s in self.solution)) + \
              f'major={self.major_solution}'
@@ -95,6 +95,7 @@ def estimate_minor(gene: Gene,
    minor_sols = []
    for major_sol in major_sols:
       minor_sols.append(solve_minor_model(gene, alleles, cov, major_sol, mutations, solver))
+   log.debug(f'>> minor_sols = {minor_sols.__repr__()}')
    return minor_sols
 
 

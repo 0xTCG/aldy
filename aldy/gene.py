@@ -7,7 +7,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict, List, Optional
 
 import os
 import enum
@@ -51,6 +51,14 @@ class Allele(collections.namedtuple('Allele', ['name', 'cn_config', 'func_muts',
          yield m
 
 
+   # def __eq__(self, other):
+   #    return isinstance(other, Allele) and \
+   #           self.name == other.name and \
+   #           self.cn_config == other.cn_config and \
+   #           self.func_muts == other.func_muts and \
+   #           self.minors == other.minors
+
+
 class Suballele(collections.namedtuple('Suballele', ['name', 'alt_names', 'neutral_muts'])):
    """
    Class describing minor allele configuration. 
@@ -67,11 +75,8 @@ class Suballele(collections.namedtuple('Suballele', ['name', 'alt_names', 'neutr
    Notes:
       Has custom printer (``__repr__``).
    """
-   def __repr__(self):
-      return 'Sub({}; [{}])'.format('|'.join([self.name] + self.alt_names), ', '.join(map(str, self.neutral_muts)))
-
    def __str__(self):
-      return self.__repr__()
+      return 'Sub({}; [{}])'.format('|'.join([self.name] + self.alt_names), ', '.join(map(str, self.neutral_muts)))
 
 
 @functools.total_ordering
@@ -95,15 +100,14 @@ class Mutation(collections.namedtuple('Mutation', ['pos', 'op', 'is_functional',
          and Karolinska-style mutation notation (key: ``old``).
 
    Notes:
-      Has custom printer (``__repr__``).
+      Has custom printer (``__str__``).
       Comparable and hashable via ``(pos, op)`` tuple.
       Implements ``total_ordering``.
    """
    def __new__(self, pos: int, op: str, is_functional=0, aux=None):
       return super(Mutation, self).__new__(self, pos, op, is_functional, aux if aux else dict())
 
-   def __repr__(self): return '{}:{}{}'.format(self.pos, self.op, '*' if self.is_functional else '')
-   def __str__(self): return self.__repr__()
+   def __str__(self): return '{}:{}{}'.format(self.pos, self.op, '*' if self.is_functional else '')
    def __eq__(self, other): return (self.pos, self.op) == (other.pos, other.op)
    def __lt__(self, other): return (self.pos, self.op) < (other.pos, other.op)
    def __hash__(self): return (self.pos, self.op).__hash__()
@@ -127,7 +131,7 @@ class CNConfig(collections.namedtuple('CNConfig', ['cn', 'kind', 'alleles', 'des
          Human-readable description of the configuration (e.g. "deletion").
 
    Notes:
-      Has custom printer (``__repr__``).
+      Has custom printer (``__str__``).
    """
 
    CNConfigType = enum.Enum('CNConfigType', 'DEFAULT_CN LEFT_FUSION RIGHT_FUSION DELETION')
@@ -139,7 +143,7 @@ class CNConfig(collections.namedtuple('CNConfig', ['cn', 'kind', 'alleles', 'des
       - ``DEFAULT_CN``
    """
 
-   def __repr__(self):
+   def __str__(self):
       regions = sorted(set(r for g in self.cn for r in self.cn[g]))
       return 'CNConfig({}; vector={}; alleles=[{}])'.format(
          str(self.kind)[13:],
@@ -197,18 +201,25 @@ class Gene:
    """
 
 
-   def __init__(self, path: str) -> None:
+   def __init__(self, path: Optional[str], name: Optional[str] = None, yml: Optional[str] = None) -> None:
       """
       Initializes the Gene class with the database description in `path` YML file.
       Args:
-         path (str): Location of YML file.
+         path (str, optional): Location of YML file.
+         name (str, optional): Gene name.
       """
       
-      with open(path) as file:
-         yml = file.read()
-         yml = yaml.safe_load(yml)
-         gene_name = os.path.split(path)[-1].split('.')[0].upper()
-         self.__parse_yml(gene_name, yml)
+      if path and os.path.exists(path):
+         with open(path) as file:
+            yml = file.read()
+         if not name:
+            name = os.path.split(path)[-1].split('.')[0].upper()
+      
+      if not yml or not name:
+         raise AldyException('Either path should be set, or name and yml')
+      
+      yml = yaml.safe_load(yml)
+      self.__parse_yml(name, yml)
 
 
    def __parse_yml(self, gene_name: str, yml) -> None:
@@ -310,6 +321,8 @@ class Gene:
       deletion_allele = None
 
       for allele_name, allele in yml['alleles'].items():
+         if not re.match(r'^[A-Z0-9]+\*[0-9]+[A-Z0-9]*$', allele_name):
+            raise AldyException('Allele names must be in format (alphanum?)*(number)(alphanum?) (e.g. CYP21*2A, *3)')
          allele_name = allele_name.split('*')[1]
          mutations: List[Mutation] = []
          if {'op': 'deletion'} in allele['mutations']:
@@ -328,7 +341,11 @@ class Gene:
                      fusions_right[allele_name] = (int(m['op'][1:]), (EXON if m['op'][0] == 'e' else INTRON))
                      descriptions[allele_name] = "Conservation: Pseudogene retention after {} within the gene".format(m['op'][::-1])
                else:
-                  m['aux'] = {'dbsnp': ' or '.join(m['dbsnp']), 'old': m['old']}
+                  m['aux'] = {}
+                  if 'dbsnp' in m:
+                     m['aux']['dbsnp'] = ' or '.join(m.get('dbsnp', []))
+                  if 'old' in m:
+                     m['aux']['old'] = m.get('old', '')
                   mut = Mutation(m['pos'], m['op'], m['functional'], m['aux'])
                   if 'old' in m:
                      self._old_notation[mut] = m['old']
@@ -381,7 +398,8 @@ class Gene:
       
       # Normal CN case
       used_alleles = {a for _, (_, _, alleles, _) in self.cn_configs.items() for a in alleles}
-      default_cn = {g: {r: 1 for r in self.regions[g]} for g in range(2)}
+      has_pseudogenes = len(self.pseudogenes) > 0
+      default_cn = {g: {r: 1 for r in self.regions[g]} for g in range(1 + has_pseudogenes)}
 
       self.cn_configs = {allele_number(min(v.alleles)): v for k, v in self.cn_configs.items()}
       self.cn_configs['1'] = CNConfig(default_cn, CNConfig.CNConfigType.DEFAULT_CN, 
@@ -471,11 +489,16 @@ class Gene:
             self.alleles[an].cn_config, 
             self.alleles[an].func_muts,
             {min(sa): Suballele(min(sa), 
-                                alt_names=list(set(sa) - {min(sa)}), 
-                                neutral_muts=nm) 
+                                alt_names=sorted(list(set(sa) - {min(sa)})), 
+                                neutral_muts=set(nm)) 
              for nm, sa in minors.items()})
 
       # TODO: prune identical post-fusion alleles (e.g. *2 after *13A and *13B is the same--no need to have 2 items)
+
+      for _, v in self.cn_configs.items():
+         v.alleles.clear()
+      for a in self.alleles.values():
+         self.cn_configs[a.cn_config].alleles.add(a.name)
       
 
    def __init_structure(self, yml) -> None:
@@ -552,12 +575,15 @@ class Gene:
       return amino != self.coding_region.aminoacid
 
 
-   def deletion_allele(self) -> str:
+   def deletion_allele(self) -> Optional[str]:
       """
       Return the deletion allele ID.
       """
-      return next(a for a, cn in self.cn_configs.items() 
-                  if cn.kind == CNConfig.CNConfigType.DELETION)
+      try:
+         return next(a for a, cn in self.cn_configs.items() 
+                     if cn.kind == CNConfig.CNConfigType.DELETION)
+      except StopIteration:
+         return None
 
 
    def print_configurations(self):

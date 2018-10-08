@@ -67,6 +67,10 @@ class Coverage:
          return 0
 
 
+   def _dump(self):
+      return {x: {a: b for a, b in c.items()} for x, c in self._coverage.items() if '_' in c and len(c)>1}
+
+
    def total(self, pos: int) -> float:
       """
       float: Returns the total coverage at locus `pos`.

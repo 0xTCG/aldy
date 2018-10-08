@@ -38,7 +38,7 @@ class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'ad
          (e.g. these mutations are present in the database defition of allele but not in the sample).
    
    Notes:
-      Has custom printer (``__repr``).
+      Has custom printer (``__str__``).
    """
 
 
@@ -47,7 +47,7 @@ class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'ad
          ''.join(' +' + str(m) for m in sorted(m for m in self.added if m.is_functional)))
 
 
-   def __repr__(self):
+   def __str__(self):
       return '*{}{}{}'.format(
          self.minor if self.minor else self.major,
          ''.join(' +' + str(m) for m in sorted(self.added, 
@@ -72,10 +72,10 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
          star-alleles.
    
    Notes:
-      Has custom printer (``__repr``).
+      Has custom printer (``__str__``).
    """
    
-   def __repr__(self):
+   def __str__(self):
       return f'MajorSol[{self.score:.2f}; ' + \
               'sol=({}); '.format(', '.join(f'{v}x{s}' for s, v in self.solution.items())) + \
              f'cn={self.cn_solution}'
@@ -99,6 +99,8 @@ def estimate_major(gene: Gene,
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
    """
 
+   log.debug(f'>> sample = {sam.coverage._dump()}')
+
    log.debug('Solving major alleles for cn={}', cn_solution)
    
    # Case of two deletions
@@ -111,13 +113,14 @@ def estimate_major(gene: Gene,
    alleles, coverage = _filter_alleles(gene, sam, cn_solution)
    # Check if some CN solution has no matching allele
    if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):
-      return [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution, novel={})]
-
+      results = [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution, novel={})]
+   else:
+      results = solve_major_model(gene, alleles, coverage, cn_solution, solver)
    # TODO: re-implement phasing step from Aldy 1.4   
    # TODO: Check for novel functional mutations and do something with them
    # novel_functional_mutations = _get_novel_mutations(gene, coverage, cn_solution)
 
-   results = solve_major_model(gene, alleles, coverage, cn_solution, solver)
+   log.debug(f'>> major_sol = {results.__repr__()}')
    return results
 
 

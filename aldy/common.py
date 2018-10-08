@@ -93,7 +93,7 @@ class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
       Has custom printer (``__repr__``).
    """
 
-   def __repr__(self):
+   def __str__(self):
       return 'GR({}.{})'.format(self.number, self.kind)
 
 

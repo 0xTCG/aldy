@@ -46,7 +46,7 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
          Gene instance.
 
    Notes:
-      Has custom printer (``__repr``).
+      Has custom printer (``__str__``).
    """
 
    def __new__(self, score: float, solution: List[str], gene: Gene):
@@ -69,7 +69,8 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
       except KeyError:
          return 0
 
-   def __repr__(self):
+
+   def __str__(self):
       regions = sorted(set(r for g in self.region_cn for r in self.region_cn[g]))
       return 'CNSol[{:.2f}; sol=({}); cn={}]'.format(
          self.score,
@@ -78,7 +79,6 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
                           if r in self.region_cn[g] else '_' 
                           for r in regions)
                   for g in sorted(self.region_cn)))
-
 
 
 def estimate_cn(gene: Gene, 
@@ -116,6 +116,7 @@ def estimate_cn(gene: Gene,
       configs = _filter_configs(gene, sam)
       sol = solve_cn_model(gene, configs, max_observed_cn, region_cov, solver)
 
+      log.debug(f'>> cn_sol = {sol.__repr__()}')
       return sol
 
 
@@ -152,6 +153,9 @@ def solve_cn_model(gene: Gene,
       - :math:`P` is the parsimony penalty, and 
       - :math:`L` is the penalty for left fusions.
    """
+
+   log.debug(f'>> cn_configs = {list(cn_configs.keys())}')
+   log.debug(f'>> region_coverage = {region_coverage.__repr__()}')
 
    # Model parameters
    LEFT_FUSION_PENALTY = 0.1
@@ -209,7 +213,7 @@ def solve_cn_model(gene: Gene,
       for s, structure in structures.items():
          if r in structure.cn[0]:
             expr += A[s] * structure.cn[0][r]
-         if r in structure.cn[1]:
+         if len(structure.cn) > 1 and r in structure.cn[1]:
             expr -= A[s] * structure.cn[1][r]
       E[r] = model.addVar(name='E_{}{}'.format(*r), lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
 
@@ -288,15 +292,17 @@ def _print_coverage(gene: Gene, sam: Sample) -> None:
    """
    regions = set(r for g in gene.regions for r in gene.regions[g])
    for r in sorted(regions):
-      log.debug(
-         'Region {:>5} {:2}: {:5.2f} {:5.2f} {}', 
-         r.kind, r.number,
-         sam.coverage.region_coverage(0, r) if r in gene.regions[0] else .0,
-         sam.coverage.region_coverage(1, r) if r in gene.regions[1] else .0,
-         '* with diff = {:5.2f}'.format(
-            (sam.coverage.region_coverage(0, r) if r in gene.regions[0] else .0) - 
-            (sam.coverage.region_coverage(1, r) if r in gene.regions[1] else .0))
-         if r in gene.unique_regions else '')
+      gc = sam.coverage.region_coverage(0, r) if r in gene.regions[0] else .0
+      if 1 in gene.regions:
+         pc = sam.coverage.region_coverage(1, r) if r in gene.regions[1] else .0
+      else: 
+         pc = -1
+      log.debug('Region {:>5} {:2}: {:5.2f} {} {}', 
+                r.kind, r.number,
+                gc, '' if pc == -1 else f'{pc:5.2f}',
+                f'* with diff = {gc - pc:5.2f}'
+                  if pc != -1 and r in gene.unique_regions 
+                  else '')
       
 
 def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution: 
