@@ -10,6 +10,8 @@ Aldy has been published in `Nature Communications <https://www.nature.com/articl
 Preprint `is available here <https://github.com/inumanag/aldy/blob/master/docs/preprint.pdf>`_. 
 Full experimental pipeline `is available here <https://github.com/inumanag/aldy-paper-resources>`_.
 
+Documentation is available `at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
+
 
 Installation
 ============

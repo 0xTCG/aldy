@@ -41,8 +41,9 @@ def main():
    sh.push_application()
 
    log.info('*** Aldy v{} (Python {}) ***', __version__, platform.python_version())
-   log.info('(c) 2016-{} Aldy Authors & Indiana University Bloomington. All rights reserved.', datetime.datetime.now().year)
-   log.info('Arguments: {}', ' '.join(k+'='+str(v) for k, v in vars(args).items() if k is not None))
+   log.info('*** (c) 2016-{} Aldy Authors & Indiana University Bloomington. All rights reserved.', datetime.datetime.now().year)
+   log.info('*** Free for non-commercial/academic use only.')
+   log.debug('Arguments: {}', ' '.join(k+'='+str(v) for k, v in vars(args).items() if k is not None))
 
    try:
       if args.subparser == 'help':

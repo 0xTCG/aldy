@@ -98,10 +98,11 @@ class GeneTest(unittest.TestCase):
       assert_equal(self.gene.region_at(55), (1, GeneRegion(3, "e")))
       assert_raises(KeyError, lambda: self.gene.region_at(80))
 
-      assert_equal(self.gene.unique_regions, [GeneRegion(0, 'tmp'), 
-                                    GeneRegion(1, 'e'),
-                                    GeneRegion(1, 'i'),
-                                    GeneRegion(3, 'e')])
+      assert_equal(self.gene.unique_regions, [GeneRegion(1, 'e'),
+                                              GeneRegion(1, 'i'),
+                                              GeneRegion(2, 'e'),
+                                              GeneRegion(2, 'i'),
+                                              GeneRegion(3, 'e')])
 
 
    def test_gene_alleles(self):

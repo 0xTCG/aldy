@@ -75,9 +75,16 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
       Has custom printer (``__str__``).
    """
    
+
+   def _solution_nice(self):
+      return ', '.join(f'{v}x{s}' 
+                       for s, v in sorted(self.solution.items(), 
+                                          key=lambda x: allele_sort_key(x[0].major)))
+
+
    def __str__(self):
       return f'MajorSol[{self.score:.2f}; ' + \
-              'sol=({}); '.format(', '.join(f'{v}x{s}' for s, v in self.solution.items())) + \
+             f'sol=({self._solution_nice()}); ' + \
              f'cn={self.cn_solution}'
       
 

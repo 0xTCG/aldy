@@ -118,44 +118,56 @@ def genotype(gene_db: str,
       log.warn("Average coverage is {}. We recommend at least 20x coverage for optimal results.", avg_cov)
    
    # Get copy-number solutions
-   print(f'>>NAME>> {os.path.basename(sam_path)}')
+   # print(f'>>NAME>> {os.path.basename(sam_path)}')
    cn_sols = cn.estimate_cn(gene, sample.coverage, solver=solver, user_solution=cn_solution)
 
    # Get major solutions and pick the best one
-   dmp = sample.coverage._dump()
-   print('>>COV>> {}'.format(' '.join(
-      '{}={}'.format(
-         p,  
-         ','.join("{}:{:.0f}".format(m,dmp[p][m]) for m in sorted(dmp[p]))
-      )
-      for p in sorted(dmp)
-   )))
+   # dmp = sample.coverage._dump()
+   # print('>>COV>> {}'.format(' '.join(
+   #    '{}={}'.format(
+   #       p,  
+   #       ','.join("{}:{:.0f}".format(m,dmp[p][m]) for m in sorted(dmp[p]))
+   #    )
+   #    for p in sorted(dmp)
+   # )))
+   
+   log.info(f'Potential copy number configurations for {gene.name}:')
    major_sols = []
-   for cn_sol in cn_sols:
+   for i, cn_sol in enumerate(cn_sols):
       sols = major.estimate_major(gene, sample.coverage, cn_sol, solver)
-      print('>>MAJOR>> {} {}'.format(
-         ','.join(','.join([s] * v) for s, v in cn_sol.solution.items()),
-         ';'.join(
-            ','.join(','.join([s.major_repr()] * v) for s, v in m.solution.items())
-            for m in sols)
-      ))
+      # print('>>MAJOR>> {} {}'.format(
+      #    ','.join(','.join([s] * v) for s, v in cn_sol.solution.items()),
+      #    ';'.join(
+      #       ','.join(','.join([s.major_repr()] * v) for s, v in m.solution.items())
+      #       for m in sols)
+      # ))
+      log.info('  {:2}: {}', i + 1, cn_sol._solution_nice())
       major_sols += sols
 
    min_score = min(major_sols, key=lambda m: m.score).score
-   major_sols = sorted([m for m in major_sols if abs(m.score - min_score) < SOLUTION_PRECISION], 
+   major_sols = sorted([m for m in major_sols 
+                        if abs(m.score - min_score) < SOLUTION_PRECISION], 
                        key=lambda m: m.score)
+
+   log.info(f'Potential major star-alleles for {gene.name}:')
+   for i, major_sol in enumerate(major_sols):
+      log.info('  {:2}: {}', i + 1, major_sol._solution_nice())
 
    minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver)
 
-   print('>>MINOR>> {}'.format(' '.join(
-      '{};{}'.format(round(sol.score, 2),
-                     ','.join(s.major_repr() for s in sol.solution))
-      for sol in sorted(minor_sols, key=lambda m: m.score)
-      )))
-   exit(0)
-
    min_score = min(minor_sols, key=lambda m: m.score).score
    minor_sols = [m for m in minor_sols if abs(m.score - min_score) < SOLUTION_PRECISION]
+
+   log.info(f'Best minor star-alleles for {gene.name}:')
+   for i, minor_sol in enumerate(minor_sols):
+      log.info('  {:2}: {}', i + 1, minor_sol._solution_nice())
+
+   # print('>>MINOR>> {}'.format(' '.join(
+   #    '{};{}'.format(round(sol.score, 2),
+   #                   ','.join(s.major_repr() for s in sol.solution))
+   #    for sol in sorted(minor_sols, key=lambda m: m.score)
+   #    )))
+   # exit(0)
 
    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
    for sol_id, sol in enumerate(minor_sols):

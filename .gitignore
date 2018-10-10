@@ -32,3 +32,6 @@ temp
 .python-version
 *.aldy
 *.aldylog
+docs/_*
+*.log
+Untitled*

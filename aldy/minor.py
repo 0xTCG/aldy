@@ -41,10 +41,17 @@ class MinorSolution(collections.namedtuple('MinorSolution', ['score', 'solution'
       Has custom printer (``__str__``).
    """
    diplotype = ''
+
+
+   def _solution_nice(self):
+      return ', '.join(str(s) 
+                       for s in sorted(self.solution, 
+                                       key=lambda x: allele_sort_key(x.minor)))
+
    
    def __str__(self):
       return f'MinorSol[{self.score:.2f}; ' + \
-              'sol=({}); '.format(', '.join(str(s) for s in self.solution)) + \
+             f'sol=({self._solution_nice()}); ' + \
              f'major={self.major_solution}'
 
 

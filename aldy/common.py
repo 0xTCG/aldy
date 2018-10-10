@@ -121,7 +121,6 @@ def allele_sort_key(x: str) -> Tuple[int, str]:
    Returns: 
       tuple[int, str]: Key for sorting allele names (e.g. ``'13a'`` -> ``(13, 'a')``).
    """
-
    p = re.split(r'(\d+)', x)
    return (int(p[1]), ''.join(p[2:]))
 

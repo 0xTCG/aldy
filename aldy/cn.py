@@ -74,11 +74,17 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
          return 0
 
 
+   def _solution_nice(self):
+      return ','.join(f'{v}x*{k}' 
+                      for k, v in sorted(self.solution.items(), 
+                                         key=lambda x: allele_sort_key(x[0])))
+
+
    def __str__(self):
       regions = sorted(set(r for g in self.region_cn for r in self.region_cn[g]))
       return 'CNSol[{:.2f}; sol=({}); cn={}]'.format(
          self.score,
-         ','.join(f'{v}x*{k}' for k, v in self.solution.items()),
+         self._solution_nice(),
          '|'.join(''.join('{:.0f}'.format(self.region_cn[g][r]) 
                           if r in self.region_cn[g] else '_' 
                           for r in regions)
@@ -123,7 +129,6 @@ def estimate_cn(gene: Gene,
       configs = _filter_configs(gene, coverage)
       sol = solve_cn_model(gene, configs, max_observed_cn, region_cov, solver)
 
-      log.debug(f'>> cn_sol = {sol.__repr__()}')
       return sol
 
 
@@ -244,12 +249,12 @@ def solve_cn_model(gene: Gene,
          mem.append(sol_tuple) 
          result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
 
-   print('>>CN>> {} {} {} {}'.format(
-      max_cn,
-      ','.join(cn_configs.keys()),
-      ';'.join(f'{a}.{b}:{x},{y}' for (a, b), (x, y) in region_coverage.items()),
-      ';'.join(','.join(str(s) for s, _ in sol) for sol in solutions)
-   ))
+   # print('>>CN>> {} {} {} {}'.format(
+   #    max_cn,
+   #    ','.join(cn_configs.keys()),
+   #    ';'.join(f'{a}.{b}:{x},{y}' for (a, b), (x, y) in region_coverage.items()),
+   #    ';'.join(','.join(str(s) for s, _ in sol) for sol in solutions)
+   # ))
 
    return result
 
@@ -339,7 +344,7 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
       if sol not in gene.cn_configs:
          raise AldyException(
             'Given copy number solution contains unknown copy number configuration {}. '.format(sol) + 
-            'Please run aldy --show-cn for the list the valid configurations')
+            f'Please run "aldy show --gene {gene.name}" for the list the valid configurations')
    s = CNSolution(0, solution=sols, gene=gene)
    log.debug('User-provided solution: {}', s)
    return s
