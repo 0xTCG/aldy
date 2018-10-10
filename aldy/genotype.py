@@ -115,19 +115,44 @@ def genotype(gene_db: str,
       log.warn("Average coverage is {}. We recommend at least 20x coverage for optimal results.", avg_cov)
    
    # Get copy-number solutions
-   cn_sols = cn.estimate_cn(gene, sam=sample, solver=solver, user_solution=cn_solution)
+   print(f'>>NAME>> {os.path.basename(sam_path)}')
+   cn_sols = cn.estimate_cn(gene, sample.coverage, solver=solver, user_solution=cn_solution)
 
    # Get major solutions and pick the best one
-   major_sols = [sol 
-                 for cn_sol in cn_sols
-                 for sol in major.estimate_major(gene, sample, cn_sol, solver)]
+   dmp = sample.coverage._dump()
+   print('>>COV>> {}'.format(' '.join(
+      '{}={}'.format(
+         p,  
+         ','.join("{}:{:.0f}".format(m,dmp[p][m]) for m in sorted(dmp[p]))
+      )
+      for p in sorted(dmp)
+   )))
+   major_sols = []
+   for cn_sol in cn_sols:
+      sols = major.estimate_major(gene, sample.coverage, cn_sol, solver)
+      print('>>MAJOR>> {} {}'.format(
+         ','.join(','.join([s] * v) for s, v in cn_sol.solution.items()),
+         ';'.join(
+            ','.join(','.join([s.major_repr()] * v) for s, v in m.solution.items())
+            for m in sols)
+      ))
+      major_sols += sols
+
    min_score = min(major_sols, key=lambda m: m.score).score
-   major_sols = sorted([m for m in major_sols if abs(m.score - min_score) < 1e-3], 
+   major_sols = sorted([m for m in major_sols if abs(m.score - min_score) < SOLUTION_PRECISION], 
                        key=lambda m: m.score)
 
    minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver)
+
+   print('>>MINOR>> {}'.format(' '.join(
+      '{};{}'.format(round(sol.score, 2),
+                     ','.join(s.major_repr() for s in sol.solution))
+      for sol in sorted(minor_sols, key=lambda m: m.score)
+      )))
+   exit(0)
+
    min_score = min(minor_sols, key=lambda m: m.score).score
-   minor_sols = [m for m in minor_sols if abs(m.score - min_score) < 1e-3]
+   minor_sols = [m for m in minor_sols if abs(m.score - min_score) < SOLUTION_PRECISION]
 
    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
    for sol_id, sol in enumerate(minor_sols):

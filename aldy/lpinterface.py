@@ -9,7 +9,7 @@ from typing import Any, Optional, Dict, Tuple, List, Iterable, Callable, Set
 
 import importlib
 
-from .common import log, sorted_tuple
+from .common import log, sorted_tuple, SOLUTION_PRECISION
 
 
 class NoSolutionsError(Exception):
@@ -320,7 +320,7 @@ def get_all_solutions(model: Gurobi,
       model.changeUb(var[a], 0)
       try:
          status, obj = model.solve()
-         if status == 'optimal' and abs(obj - opt) < 1e-6:
+         if status == 'optimal' and abs(obj - opt) < SOLUTION_PRECISION:
             # new_solution = 
             # new_solution |= set(current_sol) - set([a])
             # assert(set(current_sol) - set([a]) <= new_solution)

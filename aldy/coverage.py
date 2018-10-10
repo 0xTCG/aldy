@@ -67,8 +67,19 @@ class Coverage:
          return 0
 
 
-   def _dump(self):
-      return {x: {a: b for a, b in c.items()} for x, c in self._coverage.items() if '_' in c and len(c)>1}
+   def _dump(self, threshold=0):
+      c = {x: {a: b for a, b in c.items()} 
+           for x, c in self._coverage.items()}
+      for pos, mc in c.items():
+         for m in list(mc.keys()):
+            if mc[m] < threshold:
+               del mc[m] 
+      for pos in list(c.keys()):
+         if '_' in c[pos] and len(c[pos]) == 1:
+            del c[pos]
+         elif len(c[pos]) == 0:
+            del c[pos]
+      return c
 
 
    def total(self, pos: int) -> float:

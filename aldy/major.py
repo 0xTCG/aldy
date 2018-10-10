@@ -17,7 +17,7 @@ from . import lpinterface
 from .common import *
 from .cn import CNSolution, MAX_CN
 from .gene import Allele, Mutation, Gene, CNConfig
-from .sam import Sample, Coverage
+from .coverage import Coverage
 
 
 class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'added', 'missing'])):
@@ -82,7 +82,7 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
       
 
 def estimate_major(gene: Gene, 
-                   sam: Sample, 
+                   coverage: Coverage, 
                    cn_solution: CNSolution, 
                    solver: str) -> List[MajorSolution]:
    """
@@ -91,15 +91,13 @@ def estimate_major(gene: Gene,
    Args:
       gene (:obj:`aldy.gene.Gene`): 
          A gene instance.
-      sam (:obj:`aldy.sam.Sample`): 
-         Read alignment data.
+      coverage (:obj:`aldy.coverage.Coverage`): 
+         Read alignment coverage data.
       cn_solution (:obj:`aldy.cn.CNSolution`): 
          Copy-number solution to be used for major star-allele calling.
       solver (str): 
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
    """
-
-   log.debug(f'>> sample = {sam.coverage._dump()}')
 
    log.debug('Solving major alleles for cn={}', cn_solution)
    
@@ -107,13 +105,16 @@ def estimate_major(gene: Gene,
    if len(cn_solution.solution) == 0: 
       del_allele = next(a for a, cn in gene.cn_configs.items() 
                         if cn.kind == CNConfig.CNConfigType.DELETION)
-      sol = MajorSolution(score=0, solution={del_allele: 2}, cn_solution=cn_solution, novel={})
+      sol = MajorSolution(score=0, 
+                          solution={SolvedAllele(major=deletion_allele, 
+                                                 minor=None, added=[], missing=[]): 2}, 
+                          cn_solution=cn_solution)
       return [sol]
    
-   alleles, coverage = _filter_alleles(gene, sam, cn_solution)
+   alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
    # Check if some CN solution has no matching allele
    if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):
-      results = [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution, novel={})]
+      results = [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution)]
    else:
       results = solve_major_model(gene, alleles, coverage, cn_solution, solver)
    # TODO: re-implement phasing step from Aldy 1.4   
@@ -146,23 +147,6 @@ def solve_major_model(gene: Gene,
 
    Notes:
       Please see Aldy paper (section Methods/Major star-allele identification) for the model explanation.
-      Given:
-      - a list of major alleles :math:`P` with
-         - a binary variable :math:`p_i` indicating whether this major allele is the part of the solution
-      - a vector of observed coverage :math:`\mathbf{sam}` for each mutation,
-      - function :math:`\mathrm{cn}` that returns the copy number of the location that harbors some mutation,
-      - variables :math:`M_{i,m}` that indicate will the mutation :math:`m` belong to the major allele :math:`p_i`
-        (to account for the novel major alleles)
-      solve:
-      - :math:$$\min \sum_{m} 
-         \left| \mathbf{sam}[m] - \sum_{i \in P} \frac{\mathbf{sam}[m]}{\mathrm{cn}(m)} p_i M_{i,m} \right| + 
-         P \sum_{m \text{ not in the definition of } p_i} M_{i, m}$$,
-      where:
-      - :math:`P` is the novel mutation penalty
-      subject to:
-      - :math:`M_{i,m}` is always 1 if :math:`m` is in the definition of :math:`p_i`, 
-      - copy numbers of selected major alleles match the provided copy-number solution, and
-      - :math:`\sum_{i} M{i,m} \geq 1` for each expressed functional mutation :math:`m`.
    """
 
    # Model parameters
@@ -269,7 +253,7 @@ def solve_major_model(gene: Gene,
           **{(a, m): M[a][m] for a in M for m in M[a] if a[0] != del_allele}})
       log.debug('Major Solver status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
-      return [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution, novel={})]
+      return [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution)]
 
    result = []
    for sol in solutions:
@@ -294,7 +278,7 @@ def solve_major_model(gene: Gene,
 
 
 def _filter_alleles(gene: Gene, 
-                    sam: Sample, 
+                    coverage: Coverage, 
                     cn_solution: CNSolution) -> Tuple[Dict[str, Allele], Coverage]:
    """
    tuple[dict[str, :obj:`aldy.gene.Allele`], :obj:`aldy.coverage.Coverage`]: Filters out 
@@ -305,7 +289,7 @@ def _filter_alleles(gene: Gene,
    def filter_fns(mut, cov, total, thres):
       return Coverage.basic_filter(mut, cov, total, thres / MAX_CN) and \
              Coverage.cn_filter(mut, cov, total, thres, cn_solution)
-   cov = sam.coverage.filtered(filter_fns)
+   cov = coverage.filtered(filter_fns)
    alleles = copy.deepcopy(gene.alleles)
    for an, a in sorted(gene.alleles.items()):
       if a.cn_config not in cn_solution.solution:
@@ -318,40 +302,6 @@ def _filter_alleles(gene: Gene,
          del alleles[an]
    
    return alleles, cov
-
-
-def _get_novel_mutations(gene: Gene, 
-                         coverage: Coverage, 
-                         cn_solution: CNSolution) -> Set[Mutation]:
-   """
-   set[:obj:`aldy.gene.Mutation`]: Calculates the set of expressed major functional 
-   mutations that are not present in the database.
-
-   TODO: integrate this into the model.
-   """
-
-   # Require AT LEAST 80% coverage per copy for a nover mutation
-   MIN_COVERAGE_PER_COPY = 80.0
-
-   result = set()
-   for pos, muts in coverage._coverage.items():
-      for op, cov in muts.items():
-         if op == '_' or (pos, op) in gene.mutations:
-            continue
-         try:
-            _, region = gene.region_at(pos)
-         except KeyError:
-            continue
-         # TODO: handle non-unique regions as well (remapping)
-         if region not in gene.unique_regions:
-            continue
-         cn = cn_solution.position_cn(pos)
-         if cn == 0 or coverage.percentage(Mutation(pos, op)) < MIN_COVERAGE_PER_COPY / cn: # type: ignore
-            continue
-         if gene.check_functional(Mutation(pos, op)): # type: ignore
-            log.debug('Novel mutation: {} {} {} ({} or {}%)', gene.region_at(pos), pos, op, cov, coverage.percentage(Mutation(pos, op))) # type: ignore
-            result.add(Mutation(pos, op, is_functional=True)) # type: ignore
-   return result
 
 
 def _print_candidates(alleles: Dict[str, Allele], 

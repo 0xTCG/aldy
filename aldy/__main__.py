@@ -20,7 +20,7 @@ import traceback
 
 from .common import *
 from .gene import Gene
-from .sam import Sample
+from .sam import Sample, DEFAULT_CN_NEUTRAL_REGION
 from .genotype import genotype
 from .version import __version__
 
@@ -263,9 +263,9 @@ def _genotype(gene: str, output: Optional, args) -> None:
                         cache=       False, 
                         phase=       args.phase,
                         reference=   args.reference)
-      log.warn('Result{} for {}: ', '' if len(result) == 1 else 's', gene.upper())
+      log.info(colorize('Result{} for {}: '.format('' if len(result) == 1 else 's', gene.upper())))
       for r in result:
-         log.warn('  {:30} ({})', r.diplotype, ', '.join(f.major_repr() for f in r.solution))
+         log.info(colorize('  {:30} ({})'.format(r.diplotype, ', '.join(f.major_repr() for f in r.solution))))
    except AldyException as ex:
       log.error(ex)
 
@@ -294,6 +294,25 @@ def _run_test() -> None:
                                'threshold': 50,
                                'solver': 'any',
                                'phase': False}))
+
+
+def solve_(sample):
+   sample_dir = os.getenv('ALDY_TEST_SAMPLE_DIR', '.')
+   ref_path = os.getenv('ALDY_TEST_REF', '.')
+
+   result = genotype(gene_db=     'cyp2d6', 
+                     sam_path=    f'{sample_dir}/{sample}.cram',
+                     cn_region=   DEFAULT_CN_NEUTRAL_REGION,
+                     profile=     'pgrnseq-v1',
+                     output_file= None,
+                     cn_solution= None,
+                     threshold=   0.5,
+                     solver=      'gurobi',
+                     cache=       False, 
+                     phase=       None,
+                     reference=   ref_path)
+   return [sorted([m.major_repr()[1:] for m in r.solution]) 
+             for r in result]
 
 
 if __name__ == "__main__":

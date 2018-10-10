@@ -93,7 +93,7 @@ def estimate_minor(gene: Gene,
       cov = coverage.filtered(default_filter_fn)
    
    minor_sols = []
-   for major_sol in major_sols:
+   for major_sol in sorted(major_sols, key=lambda s: list(s.solution.items())):
       minor_sols.append(solve_minor_model(gene, alleles, cov, major_sol, mutations, solver))
    log.debug(f'>> minor_sols = {minor_sols.__repr__()}')
    return minor_sols
@@ -144,10 +144,14 @@ def solve_minor_model(gene: Gene,
       (ma, mi, _, _), _ = a
       log.debug('  *{} (cn=*{})', mi, gene.alleles[ma].cn_config)
       for m in sorted(alleles[a], key=lambda m: m.pos):
-         log.debug('    {:26} {:4} ({:.1f} copies) {}',
+         m_gene, m_region = gene.region_at(m.pos)
+         log.debug('    {:26} {:4}/{:4} ({} ~ {:.1f} copies) {}|{} {}',
             str(m), 
             coverage[m], 
+            coverage.total(m.pos),
+            major_sol.cn_solution.position_cn(m.pos),
             coverage[m] / (coverage.total(m.pos) / major_sol.cn_solution.position_cn(m.pos)) if coverage.total(m.pos) > 0 else 0,
+            m_gene, m_region,
             m.aux.get('old', ''))
    
    for a, _ in list(alleles):
@@ -340,6 +344,15 @@ def solve_minor_model(gene: Gene,
                        solution=solution, 
                        major_solution=major_sol)
    log.debug(f'Minor solution: {sol}')
+
+   # terr=0
+   # log.info(f'>>>> {sol}')
+   # for m in sorted(error_vars.keys()):
+   #    if m.pos not in [42522964, 42523210, 42523408]:
+   #       continue
+   #    print('>>', m, round(model.getValue(error_vars[m]), 1))
+   #    terr+=abs(round(model.getValue(error_vars[m]), 1))
+   # print('>>>', round(terr, 2))
 
    return sol
 

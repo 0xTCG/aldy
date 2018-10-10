@@ -18,7 +18,6 @@ from . import gene
 
 from .common import *
 from .gene import GeneRegion, CNConfig, Gene
-from .sam import Sample
 from .coverage import Coverage
 
 
@@ -29,7 +28,7 @@ MAX_CN = 20.0
 """Maximum supported copy-number"""
 
 
-class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gene'])):
+class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gene', 'region_cn'])):
    """
    Describes a potential (possibly optimal) copy-number configuration.
    Immutable class.
@@ -55,8 +54,11 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
          for g in gene.cn_configs[conf].cn:
             for r in gene.cn_configs[conf].cn[g]:
                vec[g][r] += gene.cn_configs[conf].cn[g][r]
-      self.region_cn = {a: dict(b) for a, b in vec.items()}
-      return super(CNSolution, self).__new__(self, score, collections.Counter(solution), gene)
+      return super(CNSolution, self).__new__(self, 
+                                             score, 
+                                             collections.Counter(solution), 
+                                             gene, 
+                                             {a: dict(b) for a, b in vec.items()})
 
 
    def position_cn(self, pos: int) -> float:
@@ -82,7 +84,7 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
 
 
 def estimate_cn(gene: Gene, 
-                sam: Sample, 
+                coverage: Coverage, 
                 solver: str, 
                 user_solution=None) -> List[CNSolution]:
    """
@@ -91,8 +93,8 @@ def estimate_cn(gene: Gene,
    Args:
       gene (:obj:`aldy.gene.Gene`): 
          Gene instance.
-      sam (:obj:`aldy.sam.Sample`): 
-         Read data instance.
+      coverage (:obj:`aldy.coverage.Coverage`): 
+         Read data coverage instance.
       solver (str): 
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
       user_solution (list[str], optional): 
@@ -103,17 +105,17 @@ def estimate_cn(gene: Gene,
    if user_solution is not None:
       return [_parse_user_solution(gene, user_solution)]
    else:
-      _print_coverage(gene, sam)
+      _print_coverage(gene, coverage)
 
       # TODO: filter CN configs with non-resent alleles
       # Calculate max. possible CN of the gene
-      max_observed_cn = 1 + max(int(round(sam.coverage.region_coverage(g, r))) 
+      max_observed_cn = 1 + max(int(round(coverage.region_coverage(g, r))) 
                                 for g in gene.regions 
                                 for r in gene.regions[g])
       log.debug('Maximum CN = {}', max_observed_cn)
 
-      region_cov = _region_coverage(gene, sam)
-      configs = _filter_configs(gene, sam)
+      region_cov = _region_coverage(gene, coverage)
+      configs = _filter_configs(gene, coverage)
       sol = solve_cn_model(gene, configs, max_observed_cn, region_cov, solver)
 
       log.debug(f'>> cn_sol = {sol.__repr__()}')
@@ -141,21 +143,7 @@ def solve_cn_model(gene: Gene,
 
    Notes:
       Please see Aldy paper (section Methods/Copy number and structural variation estimation) for the model explanation.
-      Given:
-      - a list of gene regions :math:`R`
-      - a list of the copy-number configurations :math:`A`, where :math:`i`-th config has a
-         - a binary variable :math:`a_i` indicating whether this config is the part of the solution
-         - a vector :math:`\mathbf{v}_i` describing the copy number of each region in the config, and
-      - a vector of observed coverage :math:`\mathbf{cn}` for each gene region,
-      solve:
-      - :math:$$\min \sum_{r\in R} \left| \mathbf{cn}[r] - \sum_{i \in A} a_i \mathbf{v}_i[r] \right| + P \sum_{i \in A} a_i + L \sum_{i \in A \text{ if left-fusion}} a_i$$,
-      where 
-      - :math:`P` is the parsimony penalty, and 
-      - :math:`L` is the penalty for left fusions.
    """
-
-   log.debug(f'>> cn_configs = {list(cn_configs.keys())}')
-   log.debug(f'>> region_coverage = {region_coverage.__repr__()}')
 
    # Model parameters
    LEFT_FUSION_PENALTY = 0.1
@@ -202,7 +190,7 @@ def solve_cn_model(gene: Gene,
       if ai == -1:
          log.trace("LP constraint: A_-1 <= A_0 for {}", a)
          model.addConstr(A[a, ai] <= A[a, 0]) # second haplotype is present only if the first one is there
-      elif ai > 0:
+      elif ai > 0: # TODO: and ai != 1 A[1] can be 1 while A[0] is 0 to support case *13/*13+*1
          log.trace('LP constraint: A_{} <= A_{} for {}', ai, ai - 1, a)
          model.addConstr(A[a, ai] <= A[a, ai - 1])
       
@@ -240,19 +228,30 @@ def solve_cn_model(gene: Gene,
    
    # Get final CN vector (i.e. total integer CN for each region)
    result = []
+   mem = []
    for sol in solutions:
       log.debug('Solution: {}', ', '.join('*' + str(s) for s, _ in sol))
-      result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
+      sol_tuple = sorted_tuple(tuple(conf for conf, _ in sol))
+      if sol_tuple not in mem: # Because A[1] can be 1 while A[0] is 0, we can have duplicates
+         mem.append(sol_tuple) 
+         result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
+
+   print('>>CN>> {} {} {} {}'.format(
+      max_cn,
+      ','.join(cn_configs.keys()),
+      ';'.join(f'{a}.{b}:{x},{y}' for (a, b), (x, y) in region_coverage.items()),
+      ';'.join(','.join(str(s) for s, _ in sol) for sol in solutions)
+   ))
 
    return result
 
 
-def _filter_configs(gene: Gene, sam: Sample) -> Dict[str, CNConfig]:
+def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
    """
    dict[str, :obj:`aldy.gene.CNConfig`]: Filters out all low-quality mutations and 
    CN configurations not supported by high-quality mutations.
    """
-   cov = sam.coverage.filtered(lambda mut, cov, total, thres: \
+   cov = coverage.filtered(lambda mut, cov, total, thres: \
       Coverage.basic_filter(mut, cov, total, thres / MAX_CN))
    configs = copy.deepcopy(gene.cn_configs)
    for an in sorted(gene.cn_configs):
@@ -267,7 +266,7 @@ def _filter_configs(gene: Gene, sam: Sample) -> Dict[str, CNConfig]:
    return configs
 
 
-def _region_coverage(gene: Gene, sam: Sample) -> Dict[GeneRegion, Tuple[float, float]]:
+def _region_coverage(gene: Gene, coverage: Coverage) -> Dict[GeneRegion, Tuple[float, float]]:
    """
    dict[:obj:`aldy.common.GeneRegion, tuple[float, float]]: Calculate the coverage 
    of the main gene and pseudogene for each region. Returns dictionary where the key 
@@ -276,25 +275,25 @@ def _region_coverage(gene: Gene, sam: Sample) -> Dict[GeneRegion, Tuple[float, f
    """
    
    if 1 in gene.regions: # do we have pseudogenes at all?
-      cov = {r: (sam.coverage.region_coverage(0, r), sam.coverage.region_coverage(1, r)) 
+      cov = {r: (coverage.region_coverage(0, r), coverage.region_coverage(1, r)) 
              for r in gene.unique_regions if r != PCE_REGION}
       # HACK: by default, CYP2D6 does not have PCE region, so insert dummy region to allow easy calculation below
       if PCE_REGION in gene.regions[1] and PCE_REGION not in gene.regions[0]:
-         cov[PCE_REGION] = (0, sam.coverage.region_coverage(1, PCE_REGION))
+         cov[PCE_REGION] = (0, coverage.region_coverage(1, PCE_REGION))
       return cov
    else:
-      return {r: (sam.coverage.region_coverage(0, r), 0) for r in gene.unique_regions}
+      return {r: (coverage.region_coverage(0, r), 0) for r in gene.unique_regions}
 
 
-def _print_coverage(gene: Gene, sam: Sample) -> None:
+def _print_coverage(gene: Gene, coverage: Coverage) -> None:
    """
    Pretty-prints region coverage vectors.
    """
    regions = set(r for g in gene.regions for r in gene.regions[g])
    for r in sorted(regions):
-      gc = sam.coverage.region_coverage(0, r) if r in gene.regions[0] else .0
+      gc = coverage.region_coverage(0, r) if r in gene.regions[0] else .0
       if 1 in gene.regions:
-         pc = sam.coverage.region_coverage(1, r) if r in gene.regions[1] else .0
+         pc = coverage.region_coverage(1, r) if r in gene.regions[1] else .0
       else: 
          pc = -1
       log.debug('Region {:>5} {:2}: {:5.2f} {} {}', 

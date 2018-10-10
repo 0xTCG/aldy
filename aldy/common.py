@@ -47,6 +47,10 @@ log = logbook.Logger('Aldy')
 """Default console logger."""
 
 
+SOLUTION_PRECISION = 1e-2
+"""float: Solution precision (all objectives that differ less than this are considered equal)"""
+
+
 class AldyException(Exception):
    """
    Base Aldy exception class.
