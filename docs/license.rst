@@ -1,3 +1,3 @@
 .. _aldy_license:
 
-.. include:: ../aldy/resources/license.rst
+.. include:: ../license.rst
