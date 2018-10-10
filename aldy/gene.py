@@ -88,9 +88,9 @@ class Mutation(collections.namedtuple('Mutation', ['pos', 'op', 'is_functional',
    Attributes:
       pos (int): Position in the reference genome.
       op (str): Mutation operation that can be one of the following:
-         - ``SNP.AB``:  SNP from A to B (A, B are in `[ACGT]`)
-         - ``INS.xx``:  Insertion of xx (xx is `[acgt]+`)
-         - ``DEL.xx``:  Deletion of xx (xx is `[ACGT]+`)
+         - ``SNP.AB``:  SNP from A to B (A, B are in ``[ACGT]``)
+         - ``INS.xx``:  Insertion of xx (xx is ``[acgt]+``)
+         - ``DEL.xx``:  Deletion of xx (xx is ``[ACGT]+``)
       is_functional (int): Functionality of the mutation, being:
          - 0 for non-functional (silent) mutations
          - 1 for functional (gene-disrupting) mutations
@@ -164,7 +164,7 @@ class Gene:
       name (str): 
          Name of the gene (e.g. CYP2D6).
       seq (str): 
-         The wild-type reference sequence that describes *1 allele.
+         The wild-type reference sequence that describes \*1 allele.
          Should be location-compatible with hg19 (contains no indels w.r.t. the reference genome).
       region (:obj:`aldy.common.GRange`): 
          Region of the ``seq`` within the reference genome.
@@ -178,15 +178,15 @@ class Gene:
       common_tandems (list[tuple[str, str]]):
          A list of allelic tandems that commonly occur in pairs.
          Useful for diplotype calling heuristics.
-         For example, the fact that *13 is always followed by *1 (encoded as `('13', '1')`)
-         will be used to group *13 and *1 to the same haplotype (e.g. *13+*1).
+         For example, the fact that \*13 is always followed by \*1 (encoded as ``('13', '1')``)
+         will be used to group \*13 and \*1 to the same haplotype (e.g. \*13+\*1).
       cn_configs (dict[str, :obj:`CNConfig`]): 
          Stores all copy-number configurations associated with the gene.
-         `1` (akin to *1) stands for default CN config 
+         `1` (akin to \*1) stands for default CN config 
          (a configuration where all genes are as in the reference genome).
       alleles (dict[str, :obj:`Allele`]): 
          A dictionary of major star-alleles associated with this gene.
-         Key is the major star-allele name (e.g. `'1'`).
+         Key is the major star-allele name (e.g. ``'1'``).
       coding_region (:obj:`CodingRegion`):
          Describes coding region of the gene with its aminoacid and the reverse complement status in the reference genome.
       mutations (dict[tuple[int, str], :obj:`Mutation`]): 
@@ -203,10 +203,16 @@ class Gene:
 
    def __init__(self, path: Optional[str], name: Optional[str] = None, yml: Optional[str] = None) -> None:
       """
-      Initializes the Gene class with the database description in `path` YML file.
+      Initializes the Gene class with the database description in YML file specified in ``path``.
+      
       Args:
-         path (str, optional): Location of YML file.
-         name (str, optional): Gene name.
+         path (str, optional): 
+            Location of YML file.
+         name (str, optional): 
+            Gene name.
+
+      Raises:
+         :obj:`aldy.common.AldyException` if a path is not set.
       """
       
       if path and os.path.exists(path):
@@ -236,7 +242,7 @@ class Gene:
 
    def __init_basic(self, gene: str, yml) -> None:
       """
-      Reads basic gene properties (`name`, `seq` and `region`).
+      Reads basic gene properties (``name``, ``seq`` and ``region``).
       """
       self.name = gene.upper() 
       self.seq = yml['seq']
@@ -245,7 +251,7 @@ class Gene:
 
    def __init_regions(self, yml) -> None:
       """
-      Calculates the genic regions and pseudogenes (`regions`, `unique_regions` and `pseudogenes`).
+      Calculates the genic regions and pseudogenes (``regions``, ``unique_regions`` and ``pseudogenes``).
       Also initializes ``region_at()`` call.
       """
       assert hasattr(self, 'region')
@@ -302,8 +308,11 @@ class Gene:
 
    def __init_alleles(self, yml) -> None:
       """
-      Initializes gene alleles (`alleles`, `common_tandems`) and copy number configurations (`cn_configs`).
-      Initializes old mutation lookup (`old_notation`).
+      Initializes gene alleles (``alleles``, ``common_tandems``) and copy number configurations (``cn_configs``).
+      Initializes old mutation lookup (``old_notation``).
+
+      Raises:
+         :obj:`aldy.common.AldyException` if allele name is not correctly specified.
       """
 
       alleles = {}
@@ -313,8 +322,8 @@ class Gene:
       # Human-readable CN descriptions
       descriptions = {'1': 'Normal allelic configuration: all regions present in both gene and pseudogene'}
       
-      #: dict(`Mutation`, str): 
-      #: old Karolinska notation (e.g. 32C>T) for a `Mutation` key.
+      #: dict(:obj:`Mutation`, str): 
+      #: old Karolinska notation (e.g. 32C>T) for a :obj:`Mutation` key.
       self._old_notation: Dict[Mutation, str] = collections.defaultdict(str)
       
       # allele ID of the deletion allele (i.e. whole gene is missing). By default it is 0.
@@ -479,7 +488,7 @@ class Gene:
       
       for an, a in self.alleles.items():
          # Clean up minor alleles (as many might be equivalent after fusions)
-         # Put references to the cleaned-up alleles in `alt_names` field
+         # Put references to the cleaned-up alleles in ``alt_names`` field
          minors: Dict[tuple, List[str]] = collections.defaultdict(list)
          for s in a.minors:
             key = sorted_tuple(a.minors[s].neutral_muts)
@@ -503,7 +512,7 @@ class Gene:
 
    def __init_structure(self, yml) -> None:
       """
-      Initialize `mutations` lookup and protein coding region structure `coding_region`.
+      Initialize ``mutations`` lookup and protein coding region structure ``coding_region``.
       """
 
       is_rev_comp = True if yml['rev_comp'] == 1 else False
@@ -530,7 +539,8 @@ class Gene:
 
    def region_at(self, pos: int) -> Tuple[int, GeneRegion]:
       """
-      (int, :obj:`aldy.common.GeneRegion`): Returns tuple consisting of a gene ID and a region of the given position in the gene. 
+      Returns:
+         (int, :obj:`aldy.common.GeneRegion`): Tuple consisting of a gene ID and a region of the given position in the gene. 
       
       Args:
          pos (int): Position in the reference genome.
@@ -540,7 +550,8 @@ class Gene:
 
    def old_notation(self, mut: Mutation) -> str:
       """
-      str: Returns old Karolinska-style notation (e.g. 32C>T) for a `Mutation` key. 
+      Returns:
+         str: Karolinska-style notation (e.g. ``32C>T``) for a :obj:`Mutation` key. 
       
       Args:
          mut (:obj:`Mutation`): Mutation whose notation is sought.
@@ -550,7 +561,8 @@ class Gene:
 
    def sequence(self, gene: int, pad=0) -> str:
       """
-      str: Returns the genomic sequence of a gene.
+      Returns:
+         str: Genomic sequence of a gene.
       
       Args:
          id (int): Gene ID (0 for the main gene, 1+ for pseudogenes).
@@ -564,7 +576,8 @@ class Gene:
 
    def check_functional(self, m: Mutation) -> bool:
       """
-      bool: Check is a mutation functional (i.e. does it affect the underlying aminoacid or not).
+      Returns:
+         bool: ``True`` if a mutation is functional (i.e. does it affect the underlying aminoacid or not).
       """
       if m.pos not in self.coding_region.lookup:
          return False
@@ -577,7 +590,8 @@ class Gene:
 
    def deletion_allele(self) -> Optional[str]:
       """
-      Return the deletion allele ID.
+      Returns:
+         str, optional: Deletion allele ID. Can be ``None`` if a gene has no deletion alleles.
       """
       try:
          return next(a for a, cn in self.cn_configs.items() 

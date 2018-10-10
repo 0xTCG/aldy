@@ -35,7 +35,7 @@ class MinorSolution(collections.namedtuple('MinorSolution', ['score', 'solution'
       major_solution (:obj:`aldy.major.MajorSolution`):
          Major star-allele solution used for calculating the minor star-allele assignment.
       diplotype (str):
-         Assigned diplotype string (e.g. `*1/*2`).
+         Assigned diplotype string (e.g. ``*1/*2``).
 
    Notes:
       Has custom printer (``__str__``).
@@ -54,7 +54,7 @@ def estimate_minor(gene: Gene,
                    solver: str,
                    filter_fn: Optional[Callable] = None) -> List[MinorSolution]:
    """
-   :obj:`MinorSolution`: Detect the minor star-allele in the sample.
+   Detect the minor star-allele in the sample.
 
    Args:
       gene (:obj:`aldy.gene.Gene`): 
@@ -67,6 +67,9 @@ def estimate_minor(gene: Gene,
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
       filter_fn (callable):
          Custom filtering function (used for testing only).
+
+   Returns:
+      :obj:`MinorSolution`
    """
 
    # Get list of alleles and mutations to consider   
@@ -106,7 +109,7 @@ def solve_minor_model(gene: Gene,
                       mutations: Set[Mutation], 
                       solver: str) -> MinorSolution:
    """
-   :obj:`MinorSolution`: Solves the minor star-allele detection problem via integer linear programming.
+   Solves the minor star-allele detection problem via integer linear programming.
 
    Args:
       gene (:obj:`aldy.gene.Gene`):
@@ -123,8 +126,11 @@ def solve_minor_model(gene: Gene,
       solver (str): 
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
 
+   Returns:
+      :obj:`MinorSolution`
+      
    Notes:
-      Please see Aldy paper (section Methods/Genotype refining) for the model explanation.
+      Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_ (section Methods/Genotype refining) for the model explanation.
    """
 
    MISS_PENALTY_FACTOR = 2

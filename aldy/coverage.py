@@ -33,9 +33,9 @@ class Coverage:
             For example, ``coverage[10]['SNP.AG'] = 2`` means that there are 2
             reads that have G (instead of A) at the genomic locus 10.
          threshold (float):
-            Threshold :math:`t` used for filtering out low quality mutations.
+            Threshold `t` used for filtering out low quality mutations.
             Ranging from 0 to 1 (normalized percentage).
-            Typically any mutation with the coverage :math:`<t\%` is filtered out.
+            Typically any mutation with the coverage less than `t`% is filtered out.
          cnv_coverage (dict[int, int]):
             Coverage of the copy-number neutral region in the sample used for
             coverage rescaling. Dictionary key is the locus, while the value stands
@@ -51,14 +51,16 @@ class Coverage:
 
    def __getitem__(self, mut: Mutation) -> float:
       """
-      float: Returns the coverage of the mutation `mut`.
+      Returns:
+         float: Coverage of the mutation ``mut``.
       """
       return self.coverage(mut)
    
 
    def coverage(self, mut: Mutation) -> float:
       """
-      float: Returns the coverage of the mutation `mut`.
+      Returns:
+         float: Coverage of the mutation ``mut``.
       """
       op = '_' if mut.op[:3] == 'REF' else mut.op
       if op in self._coverage[mut.pos]:
@@ -84,7 +86,8 @@ class Coverage:
 
    def total(self, pos: int) -> float:
       """
-      float: Returns the total coverage at locus `pos`.
+      Returns:
+         float: Total coverage at locus ``pos``.
       """
       if pos not in self._coverage: 
          return 0
@@ -95,7 +98,8 @@ class Coverage:
 
    def percentage(self, m: Mutation) -> float:
       """
-      float: Returns the coverage, expressed as the percentage in range 0-100, of the mutation `mut`.
+      Returns:
+         float: Coverage of the mutation ``mut``, expressed as the percentage in the range 0-100.
       """
       total = self.total(m.pos)
       if total == 0: return 0
@@ -104,7 +108,8 @@ class Coverage:
 
    def loci_cn(self, pos: int) -> float:
       """
-      float: Returns the copy number of the locus `pos`.
+      Returns:
+         float: Copy number of the locus ``pos``.
       """
       if self._rescaled[pos] == 0: 
          return 0
@@ -113,31 +118,35 @@ class Coverage:
 
    def region_coverage(self, gene: int, region: GeneRegion) -> float:
       """
-      float: Returns the average coverage of the region `region` in the gene `gene`.
+      Returns:
+         float: Average coverage of the region ``region`` in the gene ``gene``.
       """
       return self._region_coverage[gene, region]
 
 
    def average_coverage(self) -> float:
       """
-      float: Returns the average coverage of the sample.
+      Returns:
+         float: Average coverage of the sample.
       """
       return sum(self.total(pos) for pos in self._coverage) / float(len(self._coverage) + 0.1)
 
 
    def filtered(self, filter_fn: Callable[[Mutation, float, float, float], bool]): # -> Coverage
       """
-      :obj:`Coverage`: Returns the filtered coverage.
-
       Args:
          filter_fn (callable): 
-            Function that performs the filtering.
-            Its arguments are:
-               - mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
-               - cov (float): coverage of the mutation
-               - total (float): total locus coverage
-               - thres (float): threshold value to be used for filtering
-            Returns false if a mutation is to be filtered out.
+            Function that performs the filtering. Its arguments are:
+
+            1. mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
+            2. cov (float): coverage of the mutation
+            3. total (float): total locus coverage
+            4. thres (float): threshold value to be used for filtering
+            
+            ``filter_fn`` returns ``False`` if a mutation is to be filtered out.
+
+      Returns:
+         :obj:`Coverage`: Filtered coverage.
       """
 
       cov = collections.defaultdict(lambda: collections.defaultdict(int), {
@@ -157,7 +166,8 @@ class Coverage:
 
    def diploid_avg_coverage(self) -> float:
       """
-      float: Returns the average coverage of the copy-number neutral region.
+      Returns:
+         float: Average coverage of the copy-number neutral region.
       """
       return float(sum(self._cnv_coverage.values())) / abs(self._cn_region.end - self._cn_region.start)
       
@@ -171,7 +181,7 @@ class Coverage:
 
       Args:
          profile (dict[str, dict[int, float]]):
-            Profile coverage in the form `chromosome -> (position -> coverage)`.
+            Profile coverage in the form `chromosome: (position -> coverage)`.
          gene_regions (dict[int, dict[:obj:`aldy.common.GeneRegion`, :obj:`aldy.common.GRange`]]):
             List of gene regions for each gene ID.
          cn_region (:obj:`aldy.common.GRange`):

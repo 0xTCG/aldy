@@ -66,7 +66,7 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
       solution (dict[:obj:`SolvedAllele`, int]):
          Dictionary of major star-alleles where each major star-allele is 
          associated with its copy number 
-         (e.g. `{1: 2}` means that we have two copies of *1).
+         (e.g. ``{1: 2}`` means that we have two copies of \*1).
       cn_solution (:obj:`aldy.cn.CNSolution`):
          Associated copy-number solution used for calculating the major 
          star-alleles.
@@ -86,7 +86,7 @@ def estimate_major(gene: Gene,
                    cn_solution: CNSolution, 
                    solver: str) -> List[MajorSolution]:
    """
-   list[:obj:`MajorSolution`]: Detect the major star-alleles in the sample.
+   Detect the major star-alleles in the sample.
 
    Args:
       gene (:obj:`aldy.gene.Gene`): 
@@ -97,6 +97,9 @@ def estimate_major(gene: Gene,
          Copy-number solution to be used for major star-allele calling.
       solver (str): 
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+
+   Returns:
+      list[:obj:`MajorSolution`]
    """
 
    log.debug('Solving major alleles for cn={}', cn_solution)
@@ -131,7 +134,7 @@ def solve_major_model(gene: Gene,
                       cn_solution: CNSolution, 
                       solver: str) -> List[MajorSolution]:
    """
-   list[:obj:`MajorSolution`]: Solves the major star-allele detection problem via integer linear programming.
+   Solves the major star-allele detection problem via integer linear programming.
 
    Args:
       gene (:obj:`aldy.gene.Gene`): 
@@ -145,8 +148,11 @@ def solve_major_model(gene: Gene,
       solver (str): 
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
 
+   Returns:
+      list[:obj:`MajorSolution`]
+
    Notes:
-      Please see Aldy paper (section Methods/Major star-allele identification) for the model explanation.
+      Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_ (section Methods/Major star-allele identification) for the model explanation.
    """
 
    # Model parameters
@@ -281,9 +287,11 @@ def _filter_alleles(gene: Gene,
                     coverage: Coverage, 
                     cn_solution: CNSolution) -> Tuple[Dict[str, Allele], Coverage]:
    """
-   tuple[dict[str, :obj:`aldy.gene.Allele`], :obj:`aldy.coverage.Coverage`]: Filters out 
-   all low-quality mutations and impossible alleles. Returns an allele dictionary describing 
-   feasible alleles and high-confidence variants.
+   Filters out all low-quality mutations and impossible alleles. 
+
+   Returns:
+      tuple[dict[str, :obj:`aldy.gene.Allele`], :obj:`aldy.coverage.Coverage`]: Allele 
+      dictionary describing feasible alleles and high-confidence variants.
    """
    
    def filter_fns(mut, cov, total, thres):

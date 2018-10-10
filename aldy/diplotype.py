@@ -72,15 +72,13 @@ def write_decomposition(sample: str,
          print('\t'.join(map(str, it)), file=f)
 
 
-def write_header(f) -> None:
-   print('# Aldy v1.3', file=f)
-   print('\t'.join('Sample Gene SolutionID Major Minor Copy Allele Location Type Coverage Effect dbSNP Code Status'.split()), file=f)
-
-
 def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
    """
-   str: Fills the ``diplotype`` attribute of the :obj:`aldy.minor.MinorSolution`
+   Fills the ``diplotype`` attribute of the :obj:`aldy.minor.MinorSolution`
    via the diplotype assignment heuristics and returns the diplotype assignment.
+
+   Returns:
+      str: Diplotype string.
    """
 
    del_allele = gene.deletion_allele()

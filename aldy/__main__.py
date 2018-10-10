@@ -93,11 +93,6 @@ def main():
             output.close()
       else:
          raise AldyException('Invalid sub-command ' + args.subparser)
-   except ValueError as ex:
-      log.critical('Input BAM has no index. Please create index by running samtools index.')
-      log.debug(ex)
-      log.debug(traceback.format_exc())
-      exit(1)
    except IOError as ex:
       if ex.filename is not None:
          log.critical('File cannot be accessed: {}', ex.filename)
@@ -232,6 +227,9 @@ def _genotype(gene: str, output: Optional, args) -> None:
       gene (str)
       output (file, optional)
       args: remaining arguments 
+
+   Raises:
+      :obj:`aldy.common.AldyException` if ``cn_region`` is invalid.
    """
    
    cn_region = args.cn_neutral_region
@@ -254,9 +252,9 @@ def _genotype(gene: str, output: Optional, args) -> None:
    try:
       result = genotype(gene_db=     gene, 
                         sam_path=    args.file,
-                        cn_region=   cn_region,
                         profile=     args.profile,
                         output_file= output,
+                        cn_region=   cn_region,
                         cn_solution= cn_solution,
                         threshold=   threshold,
                         solver=      args.solver,
@@ -294,25 +292,6 @@ def _run_test() -> None:
                                'threshold': 50,
                                'solver': 'any',
                                'phase': False}))
-
-
-def solve_(sample):
-   sample_dir = os.getenv('ALDY_TEST_SAMPLE_DIR', '.')
-   ref_path = os.getenv('ALDY_TEST_REF', '.')
-
-   result = genotype(gene_db=     'cyp2d6', 
-                     sam_path=    f'{sample_dir}/{sample}.cram',
-                     cn_region=   DEFAULT_CN_NEUTRAL_REGION,
-                     profile=     'pgrnseq-v1',
-                     output_file= None,
-                     cn_solution= None,
-                     threshold=   0.5,
-                     solver=      'gurobi',
-                     cache=       False, 
-                     phase=       None,
-                     reference=   ref_path)
-   return [sorted([m.major_repr()[1:] for m in r.solution]) 
-             for r in result]
 
 
 if __name__ == "__main__":

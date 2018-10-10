@@ -27,12 +27,12 @@ from .lpinterface import model as lp_model
 from .version import __version__
 
 
-@timing
+#@timing
 def genotype(gene_db: str, 
              sam_path: str,
-             cn_region: Optional[GRange],
              profile: Optional[str],
              output_file: Optional = sys.stdout, 
+             cn_region: Optional[GRange] = None,
              cn_solution: Optional[List[str]] = None,
              threshold: float = 0.5, 
              solver: str = 'any',
@@ -40,7 +40,10 @@ def genotype(gene_db: str,
              phase: bool = False,
              reference: Optional[str] = None) -> List[minor.MinorSolution]:
    """
-   list[:obj:`aldy.minor.MinorSolution`]: Genotype a sample and return a list of solutions.
+   Genotype a sample.
+
+   Returns:
+      list[:obj:`aldy.minor.MinorSolution`]: List of solutions.
 
    Args:
       gene_db (str): 
@@ -50,34 +53,34 @@ def genotype(gene_db: str,
          Location of SAM/BAM/CRAM/DeeZ file to be genotyped.
       profile (str, optional):
          Coverage profile (e.g. 'illumina'). 
-         Can be None if `cn_solution` is provided.
+         Can be ``None`` if ``cn_solution`` is provided.
       cn_region (:obj:`aldy.common.GRange`, optional):
          Copy-number neutral region.
-         Can be None (will use default CYP2D8 region or None if `cn_solution` is provided).
+         Can be ``None`` (will use default CYP2D8 region or ``None`` if ``cn_solution`` is provided).
       output_file (file, optional):
          Location of the output decomposition file. 
-         Provide None for no output.
-         Default is stdout.
+         Provide ``None`` for no output.
+         Default is ``sys.stdout``.
       cn_solution (list[str], optional):
          User-specified list of copy number configurations.
          Copy-number detection ILP will not run is this parameter is provided.
-         Default is None.
+         Default is ``None``.
       threshold (float):
          Filtering threshold.
          Default is 0.5 (for 50%).
       solver (str):
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
-         Default is any.
+         Default is ``'any'``.
       cache (bool):
          Use Aldy caching for faster loading. Internal-use only. 
-         Default is False.
+         Default is ``False``.
       phase (bool):
          Construct basic rudimentary phasing of the reads to aid the genotyping.
          Not recommended (slows down the pipeline with no tangible benefits).
-         Default is False.
+         Default is ``False``.
       reference (str, optional):
          A path to the reference genome that was used to encode DeeZ or CRAM files.
-         Default is None.
+         Default is ``None``.
 
    Raises:
       :obj:`aldy.common.AldyException` if the average coverage is too low (less than 2).

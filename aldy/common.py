@@ -74,7 +74,10 @@ class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
    
    def samtools(self, pad_left=500, pad_right=1, prefix='') -> str:
       """
-      str: Samtools-compatible region string (e.g. chr1-10-20)
+      Samtools-compatible region string (e.g. chr1-10-20).
+
+      Returns:
+         str
       """
       return '{}:{}-{}'.format(prefix + self.chr, self.start - 500, self.end + 1)
    
@@ -88,13 +91,13 @@ class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
    
    Attributes:
       number (int): 
-         The region number (e.g. for exon 9, number is 9)
+         The region number (e.g. for exon 9, number is 9).
       kind (str): 
-         Type of the region. Typically 'e' (for *e*xon), 'i' (for *i*intron) 
+         Type of the region. Typically 'e' (for **e**\ xon), 'i' (for **i**\ ntron) 
          but can be anything else.
 
    Notes:
-      Has custom printer (``__repr__``).
+      Has custom printer (``__str__``).
    """
 
    def __str__(self):
@@ -106,7 +109,8 @@ class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
 
 def allele_number(x: str) -> str:
    """
-   str: Returns a major allele number of the allele name string (e.g. '12A' -> 12).
+   Returns:
+      str: Major allele number of the allele name string (e.g. ``'12A'`` -> ``12``).
    """
    p = re.split(r'(\d+)', x)
    return p[1]
@@ -114,7 +118,8 @@ def allele_number(x: str) -> str:
 
 def allele_sort_key(x: str) -> Tuple[int, str]:
    """
-   tuple[int, str]: Key for sorting allele names (e.g. '13a' -> (13, 'a')).
+   Returns: 
+      tuple[int, str]: Key for sorting allele names (e.g. ``'13a'`` -> ``(13, 'a')``).
    """
 
    p = re.split(r'(\d+)', x)
@@ -123,7 +128,8 @@ def allele_sort_key(x: str) -> Tuple[int, str]:
 
 def rev_comp(seq: str) -> str:
    """
-   str: Reverse-complement a DNA sequence.
+   Returns:
+      str: Reverse-complemented DNA sequence.
    """
 
    return ''.join([REV_COMPLEMENT[x] for x in seq[::-1]])
@@ -131,7 +137,8 @@ def rev_comp(seq: str) -> str:
 
 def seq_to_amino(seq: str) -> str:
    """
-   str: Makes a protein sequence from a DNA sequence.
+   Returns:
+      str: Protein sequence formed from a DNA sequence.
    """
    
    return ''.join(PROTEINS[seq[i:i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3))
@@ -149,8 +156,8 @@ def sorted_tuple(x: Iterable) -> tuple:
 
 def td(s: str) -> str:
    """
-   str: Abbreviation for textwrap.dedent.
-        Useful for stripping indentation in multi-line docstrings.
+   Abbreviation for textwrap.dedent. Useful for stripping indentation 
+   in multi-line docstrings.
    """
    return textwrap.dedent(s)
 
@@ -158,7 +165,10 @@ def td(s: str) -> str:
 def static_vars(**kwargs):
    """
    Decorator that adds static variables to a function.
-   Usage: ``@static_vars(var=init_val)``.
+   
+   Usage::
+      
+      @static_vars(var=init_val)
    """
    def decorate(func):
       for k in kwargs:
@@ -171,7 +181,12 @@ def timing(f):
    """
    Decorator for timing a function.
    Prints the time spent in function after the function is completed.
-   Usage: ``@timing`` without any parameters
+   
+   Usage:: 
+
+      @timing 
+
+   (without any parameters).
    """
    def wrap(*args, **kwargs):
       time1 = time.time()
@@ -184,7 +199,8 @@ def timing(f):
 
 def pp(x) -> str:
    """
-   str: Returns a pretty-printed variable string.
+   Returns:
+      str: Pretty-printed variable string.
    """
    return pprint.pformat(x)
 
@@ -198,11 +214,12 @@ def pr(x):
 
 def script_path(key: str) -> str:
    """
-   str: Gives a full path of a package resource.
-
    Args: 
       key (str): a resource to be extracted. 
       Specify with ``path/file`` (e.g. ``aldy.resources/test.txt``).
+
+   Returns:
+      str: Full path of a package resource.
 
    Raises:
       :obj:`aldy.common.AldyException`.
@@ -215,14 +232,16 @@ def script_path(key: str) -> str:
 
 def colorize(text: str, color:str = 'green') -> str:
    """
-   str: Colorizes a string (on xterm-compatible terminals) with a given color.
+   Returns:
+      str: Colorized string (on xterm-compatible terminals) with a given color.
    """
    return logbook._termcolors.colorize(color, text)
 
 
 def check_path(cmd: str) -> bool:
    """
-   bool: Checks whether a command `cmd` is an executable in `PATH` or local directory.
+   Returns:
+      bool: ``True`` if a command ``cmd`` is an executable in ``PATH`` or local directory.
    """
 
    def is_exe(path): 

@@ -22,10 +22,10 @@ from .coverage import Coverage
 
 
 PCE_REGION = GeneRegion(11, 'pce') 
-""":obj:`aldy.common.GeneRegion`: CYP2D6 PCE region that requires special handling (as CYP2D7 does not have matching region)"""
+""":obj:`aldy.common.GeneRegion`: *CYP2D6* PCE region that requires special handling (as *CYP2D7* does not have matching PCE region)."""
 
 MAX_CN = 20.0
-"""Maximum supported copy-number"""
+"""float: Maximum supported number of copies for a gene."""
 
 
 class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gene', 'region_cn'])):
@@ -38,7 +38,8 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
          ILP model error score (0 for user-provided solutions).
       solution (dict[str, int]):
          Dictionary of copy-number configurations where a value denotes the copy-number
-         of each configuration (e.g. `{1: 2}` means that there are two copies of *1 configuration).
+         of each configuration (e.g. ``{1: 2}`` means that there are two copies of \*1 
+         configuration).
       region_cn (dict[:obj:`aldy.common.GeneRegion`, int]):
          Dictionary of region copy numbers in this solution.
       gene (:obj:`aldy.gene.Gene`):
@@ -63,7 +64,8 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
 
    def position_cn(self, pos: int) -> float:
       """
-      float: Returns the copy number at the loci ``pos``.
+      Returns:
+         float: Copy number of the loci ``pos``.
       """
       try:
          g, region = self.gene.region_at(pos)
@@ -88,7 +90,7 @@ def estimate_cn(gene: Gene,
                 solver: str, 
                 user_solution=None) -> List[CNSolution]:
    """
-   :obj:`CNSolution`: Estimate optimal copy number configuration given the gene and read data.
+   Estimate optimal copy number configuration given the gene and read data.
 
    Args:
       gene (:obj:`aldy.gene.Gene`): 
@@ -100,7 +102,10 @@ def estimate_cn(gene: Gene,
       user_solution (list[str], optional): 
          User-specified list of copy number configurations.
          ILP will not run is this parameter is provided.
-         Default is None.
+         Default is ``None``.
+
+   Returns: 
+      list[:obj:`CNSolution`]: List of copy number solutions.
    """
    if user_solution is not None:
       return [_parse_user_solution(gene, user_solution)]
@@ -128,7 +133,7 @@ def solve_cn_model(gene: Gene,
                    region_coverage: Dict[GeneRegion, Tuple[float, float]], 
                    solver: str) -> List[CNSolution]:
    """
-   list[:obj:`CNSolution`]: Solves the copy number estimation problem (similar to the closest vector problem).
+   Solves the copy number estimation problem (similar to the closest vector problem).
 
    Args:
       cn_configs (dict[str, :obj:`aldy.gene.CNConfig`]):
@@ -141,8 +146,11 @@ def solve_cn_model(gene: Gene,
       solver (str):
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
 
+   Returns:
+      list[:obj:`CNSolution`]: List of copy-number solutions.
+
    Notes:
-      Please see Aldy paper (section Methods/Copy number and structural variation estimation) for the model explanation.
+      Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_ (section Methods/Copy number and structural variation estimation) for the model explanation.
    """
 
    # Model parameters
@@ -248,8 +256,11 @@ def solve_cn_model(gene: Gene,
 
 def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
    """
-   dict[str, :obj:`aldy.gene.CNConfig`]: Filters out all low-quality mutations and 
-   CN configurations not supported by high-quality mutations.
+   Filters out all low-quality mutations and 
+   copy number configurations that are not supported by high-quality mutations.
+
+   Returns: 
+      dict[str, :obj:`aldy.gene.CNConfig`]
    """
    cov = coverage.filtered(lambda mut, cov, total, thres: \
       Coverage.basic_filter(mut, cov, total, thres / MAX_CN))
@@ -268,10 +279,13 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
 
 def _region_coverage(gene: Gene, coverage: Coverage) -> Dict[GeneRegion, Tuple[float, float]]:
    """
-   dict[:obj:`aldy.common.GeneRegion, tuple[float, float]]: Calculate the coverage 
+   Calculate the coverage 
    of the main gene and pseudogene for each region. Returns dictionary where the key 
    is the region (e.g. exon 1) and the value is the coverage of the main gene (0) 
    and the pseudogene (1).
+
+   Returns:
+      dict[:obj:`aldy.common.GeneRegion, tuple[float, float]]
    """
    
    if 1 in gene.regions: # do we have pseudogenes at all?
@@ -306,13 +320,19 @@ def _print_coverage(gene: Gene, coverage: Coverage) -> None:
 
 def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution: 
    """
-   :obj:`CNSolution`: Parses the list of user-provided solutions.
+   Parses the list of user-provided solutions.
    
    Args:
       gene (:obj:`aldy.gene.Gene`): 
-         a gene instance
+         Gene instance.
       sols (list[str]): 
-         list of CN configurations 
+         List of copy number configurations.
+
+   Returns:
+      :obj:`CNSolution`: User-provided solution.
+
+   Raises:
+      :obj:`aldy.common.AldyException` if a user-provided solution does not match the gene database.
    """
    result = [] 
    for sol in sols:

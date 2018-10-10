@@ -30,7 +30,7 @@ CIGAR_REGEX = re.compile(r"(\d+)([MIDNSHP=XB])")
 
 
 DEFAULT_CN_NEUTRAL_REGION = GRange('22', 42547463, 42548249)
-"""A default copy-number neutral region that Aldy uses (exon 4-6 of the CYP2D8 gene)"""
+"""obj:`aldy.common.GRange` A default copy-number neutral region that Aldy uses (exon 4-6 of the CYP2D8 gene)"""
 
 
 class Sample:
@@ -47,7 +47,7 @@ class Sample:
          Key is the read name. Used only if ``phase`` is True.
 
    Static methods:
-      load_sam_profile (documentation below).
+      ``load_sam_profile`` (documentation below).
    """
 
 
@@ -86,7 +86,7 @@ class Sample:
          cn_region (:obj:`aldy.common.GRange`, optional):
             A location of copy-number neutral region to be used for coverage rescaling.
             If none, profile loading and rescaling will not be done (in that case, Aldy will requires 
-            `--cn` parameter to be provided by the user).
+            ``--cn`` parameter to be provided by the user).
             Default is ``DEFAULT_CN_NEUTRAL_REGION``.
       
       Raises:
@@ -142,7 +142,10 @@ class Sample:
             By default, Aldy uses CYP2D8 (``DEFAULT_CN_NEUTRAL_REGION``) as a copy-number neutral region.
             If this parameter is not None, Aldy will use this parameter to override the default copy-number
             neutral region.
-            Default is None.
+            Default is ``None``.
+
+      Raises:
+         :obj:`aldy.common.AldyException` if BAM does not have index.
       """
 
       # store paired-end reads (only if phasing is on)
@@ -159,7 +162,7 @@ class Sample:
          except AttributeError:
             pass # SAM files do not have index. BAMs can also lack it
          except ValueError as ve: 
-            raise ve
+            raise AldyException(f'File {sam_path} has no index (it must be indexed)')
 
          #: str: Check do we need to append 'chr' or not
          self._prefix = _chr_prefix(gene.region.chr, [x['SN'] for x in sam.header['SQ']])
@@ -247,11 +250,14 @@ class Sample:
                    muts: dict, 
                    indel_sites=None) -> bool:
       """
-      bool: Parses a pysam.AlignedSegment read and returns whether the parse was successful.
+      Parses a pysam.AlignedSegment read.
 
       Params:
          read (:obj:`pysam.AlignedSegment`)
          gene (:obj:`aldy.gene.Gene`)
+
+      Returns:
+         bool: Whether the parse was successful.
 
       Params that are mutated:
          norm (:obj:`collections.defaultdict(int)`): 
@@ -362,11 +368,12 @@ class Sample:
       Rescales the ``self.coverage`` to fit the sequencing profile.
 
       Params:
-         gene (:obj:`aldy.gene.Gene`)
+         gene (:obj:`aldy.gene.Gene`):
+            Gene object.
          profile (str): 
-            profile identifier (e.g. 'pgrnseq-v1'). Can be SAM/BAM file as well.
+            Profile identifier (e.g. 'pgrnseq-v1'). Can be SAM/BAM file as well.
          cn_region (:obj:`aldy.common.GRange`): 
-            coordinates of the copy-number neutral region
+            Coordinates of the copy-number neutral region.
 
       Notes:
          This function assumes that ``self.coverage`` is set. 
@@ -394,10 +401,14 @@ class Sample:
                      gene_region: Optional[GRange] = None,
                      cn_region: Optional[GRange] = None) -> Dict[str, Dict[int, float]]:
       """
-      defaultdict[str, dict[int, float]]: Loads the coverage profile.
-      Returns the profile dictionary in which keys are chromosome IDs (e.g. '7' for chr7) 
-      and values are hashtables that map the genomic position to the profile coverage at that loci.
-      This is defaultdict that yields 0 for the missing loci.
+      Loads the coverage profile.
+      
+      Returns:
+         defaultdict[str, dict[int, float]]: The profile dictionary in which 
+         keys are chromosome IDs (e.g. '7' for chr7) 
+         and values are hashtables that map the genomic position to the 
+         profile coverage at that loci.
+         This is defaultdict that yields 0 for the missing loci.
 
       Args:
          profile_path: 
@@ -440,21 +451,23 @@ class Sample:
                         factor: float = 2.0, 
                         regions: Optional[List[GRange]] = None) -> List[Tuple[str, str, int, float]]: 
       """
-      list[str, str, int, float]: Loads the profile information from SAM/BAM file.
-      Returns list of tuples `(gene_name, chromosome, loci, coverage)`.
+      Loads the profile information from SAM/BAM file.
+      
+      Returns:
+         list[str, str, int, float]: list of tuples ``(gene_name, chromosome, loci, coverage)``.
 
       Params:
          factor (float): 
-            Scaling factor. 
-            Default is 2.0 (diplotype?).
+            Scaling factor. Default is 2.0 (for two copies).
          regions (list[:obj:`GRange`], optional): 
             List of regions to be extracted.
 
-      Technology notes (profiles used in Aldy paper):
-         - PGRNseq-v1: PGXT104 was used for all genes 
-           (n.b. PGXT147 with rescale 2.52444127771 used for CYP2B6 beta).
-         - PGRNseq-v2: NA19789.bam was used for all genes.
-         - Illumina: by definition contains all ones (uniform profile).
+      Notes:
+         Profiles that were used in Aldy paper:
+
+         1. PGRNseq-v1: PGXT104 was used for all genes (n.b. PGXT147 with rescale 2.52444127771 used for CYP2B6 beta).
+         2. PGRNseq-v2: NA19789.bam was used for all genes.
+         3. Illumina: by definition contains all ones (uniform profile).
       """
       if regions is None:
          gene_regions = sorted([ # paper gene coordinates in hg19
@@ -510,8 +523,10 @@ class Sample:
 
 def _chr_prefix(ch: str, chrs: List[str]) -> str: # assumes ch is not prefixed
    """
-   str: Checks whether ch (*without any chr prefix*) should be prefixed with chr or not,
-   and returns such prefix if it should.
+   Checks whether ch (*without any chr prefix*) should be prefixed with chr or not.
+
+   Returns:
+      str: A prefix to be prepended to chromosome (empty if needed).
 
    Params:
       ch (str): chromosome name
@@ -524,7 +539,10 @@ def _chr_prefix(ch: str, chrs: List[str]) -> str: # assumes ch is not prefixed
 
 def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
    """
-   bool: Check whether a read is located within a given region.
+   Check whether a read is located within a given region.
+
+   Returns:
+      bool
 
    Notes:
       The region is padded with 500bp on the left side.
@@ -537,9 +555,14 @@ def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
 
 def _load_deez(deez_path: str, reference: Optional[str], region: GRange, cn_region: Optional[GRange]) -> str:
    """
-   str: Loads a DeeZ file instead of SAM/BAM by piping DeeZ to pysam. 
-   Requires 'deez' in `PATH`.
-   Returns the pipe file descriptor (e.g. '/dev/fd/12345').
+   Loads a DeeZ file instead of SAM/BAM by piping DeeZ to pysam. 
+   Requires 'deez' executable in ``PATH``.
+   
+   Returns:
+      str: Pipe file descriptor (e.g. '/dev/fd/12345').
+
+   Raises:  
+      :obj:`aldy.common.AldyException` if reference is not set or if DeeZ is not found in the ``PATH``.
    """
 
    log.debug('Using DeeZ file {}', deez_path)
@@ -571,7 +594,7 @@ def _load_deez(deez_path: str, reference: Optional[str], region: GRange, cn_regi
 
 def _teardown_deez(pipe: str) -> None:
    """
-   Cleans-up the `_load_deez` handle
+   Cleans-up the ``_load_deez`` handle
    """
    if os.path.exists(pipe):
       os.unlink(pipe)

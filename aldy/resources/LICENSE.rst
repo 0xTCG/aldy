@@ -1,4 +1,5 @@
-# Aldy Software License Agreement
+Aldy Software License Agreement
+*******************************
 
 Indiana University Research and Technology Corporation (IURTC) provides the recipient with the software subject to the following terms and conditions.
 

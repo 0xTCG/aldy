@@ -45,10 +45,12 @@ class Gurobi:
    def addVar(self, *args, **kwargs):
       """
       Add a variable to the model.
-      `vtype` named argument stands for the variable type:
-         - `B` for binary variable
-         - `I` for integer variable
-         - `C` or nothing for continuous variable.
+      
+      ``vtype`` named argument stands for the variable type:
+      
+      - ``B`` for binary variable
+      - ``I`` for integer variable
+      - ``C`` or nothing for continuous variable.
       """
       if 'vtype' in kwargs and kwargs['vtype'] == 'B':
          kwargs['vtype'] = self.gurobipy.GRB.BINARY
@@ -66,8 +68,8 @@ class Gurobi:
 
    def quicksum(self, expr: Iterable):
       """
-      Perform a quick summation of the iterable `expr`.
-      Much faster than Python's `sum` on large iterables.
+      Perform a quick summation of the iterable ``expr``.
+      Much faster than Python's ``sum`` on large iterables.
       """
       return self.gurobipy.quicksum(expr)
 
@@ -89,10 +91,10 @@ class Gurobi:
 
    def abssum(self, vars: Iterable, coeffs: Optional[Dict[str, float]] = None):
       """
-      Returns absolute sum of the `vars`: e.g. 
+      Returns absolute sum of the ``vars``: e.g. 
          :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
-      where :math:`c_i` is defined in the `coeffs` dictionary.
-      Key of the `coeffs` dictionary stands for the name of the variable 
+      where :math:`c_i` is defined in the ``coeffs`` dictionary.
+      Key of the ``coeffs`` dictionary stands for the name of the variable 
       accessible via ``varName`` call (1 if not defined).
       """
       vv = []
@@ -109,12 +111,16 @@ class Gurobi:
 
    def solve(self, objective=None, method: str = 'min', init: Optional[Callable] = None) -> Tuple[str, float]:
       """
-      tuple[str, float]: Solves the model with objective `objective`.
+      Solves the model with objective ``objective``.
 
-      Additional parameters of the solver can be set via `init` function that takes 
+      Additional parameters of the solver can be set via ``init`` function that takes 
       the model instance as a sole argument.
 
-      Returns the tuple describing the status of the solution and the objective value.
+      Returns:
+         tuple[str, float]: Tuple describing the status of the solution and the objective value.
+
+      Raises:
+         :obj:`NoSolutionsError` if the model is infeasible.
       """
 
       if objective is not None:
@@ -142,13 +148,14 @@ class Gurobi:
                 method: str = 'min', 
                 init: Optional[Callable] = None) -> Tuple[str, float, List[tuple]]:
       """
-      tuple[str, float, list[tuple[any]]]: Solves the model with objective `objective`
-      and returns the list of all combinations of the variables `var` that minimize the objective.
+      Solves the model with objective ``objective``
+      and returns the list of all combinations of the variables ``var`` that minimize the objective.
 
-      Additional parameters of the solver can be set via `init` function that takes 
+      Additional parameters of the solver can be set via ``init`` function that takes 
       the model instance as a sole argument.
 
-      Returns the tuple describing the status of the solution and the objective value.
+      Returns:
+         tuple[str, float, list[tuple[any]]]: Tuple describing the status of the solution and the objective value.
       """
       status, opt_value = self.solve(objective, method, init)
 
@@ -181,7 +188,7 @@ class Gurobi:
 
 class SCIP(Gurobi):
    """
-   An abstraction aroung SCIP `pysciopt` Python interface.
+   An abstraction aroung SCIP `PySCIPopt` Python interface.
    """
 
    def __init__(self, name):
@@ -232,9 +239,12 @@ class SCIP(Gurobi):
 
 def model(name: str, solver: str):
    """
-   Create the ILP solver instance for a model named `name`.
-   If `solver` is ``any``, this function will attempt to use
+   Create the ILP solver instance for a model named ``name``.
+   If ``solver`` is ``'any'``, this function will attempt to use
    Gurobi, and will fall back on SCIP if Gurobi fails.
+
+   Raises:
+      :obj:`Exception` if no solver is found.
    """
 
    def test_gurobi(name):
@@ -252,7 +262,7 @@ def model(name: str, solver: str):
 
    def test_scip(name):
       """
-      Tests if SCIP is present. Requires `pyscipopt`.
+      Tests if SCIP is present. Requires `PySCIPopt`.
       """
       try:
          model = SCIP(name)
@@ -285,7 +295,7 @@ def get_all_solutions(model: Gurobi,
                       iteration: int = 0, 
                       mem: Optional[Set[tuple]] = None) -> Set[tuple]:
    """
-   list[tuple[str]]: Enumerate all possible solutions that yield `opt` value for the ILP defined in `model`.
+   Enumerate all possible solutions that yield ``opt`` value for the ILP defined in ``model``.
 
    Args:
       model (:obj:`Gurobi`): 
@@ -297,7 +307,7 @@ def get_all_solutions(model: Gurobi,
          The optimal solution of the model.
       current_sol (tuple[any]):
          The current solution in the pool. Used to build next solution.
-         Tuple members are keys in `var` dictionary.
+         Tuple members are keys in ``var`` dictionary.
       iteration (int):
          Recursion level depth. Used to terminate the functions early.
          Max allowed depth: 10.
@@ -305,7 +315,10 @@ def get_all_solutions(model: Gurobi,
          Memoization table to avoid recomputation of the already seen solutions.
 
    Note:
-      Variables in `var` **MUST BE** binary variables in order for this to work properly!
+      Variables in ``var`` **MUST BE** binary variables in order for this to work properly!
+
+   Returns:
+      list[tuple[str]]
    """
 
    if mem is None:
