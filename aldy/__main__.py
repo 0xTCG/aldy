@@ -126,7 +126,9 @@ def _get_args():
       description=td("""
          Allelic decomposition and exact genotyping of highly polymorphic 
          and structurally variant genes"""))
-   parser.add_argument('--verbosity', '-v', default='INFO', 
+
+   base = argparse.ArgumentParser(add_help=False)
+   base.add_argument('--verbosity', '-v', default='INFO', 
       help=td("""
          Logging verbosity. Acceptable values are:
          - T (trace)
@@ -134,13 +136,13 @@ def _get_args():
          - I (info) and
          - W (warn). 
          Default is "I" (info)."""))
-   parser.add_argument('--log', '-l', default=None, 
+   base.add_argument('--log', '-l', default=None, 
       help='Location of the output log file. Default is [input].[gene].aldylog')
-
+   
    subparsers = parser.add_subparsers(dest="subparser")
    
    genotype_parser = subparsers.add_parser('genotype', 
-      help='Genotype a SAM/BAM/CRAM/DeeZ file')
+      help='Genotype a SAM/BAM/CRAM/DeeZ file', parents=[base])
    genotype_parser.add_argument('file', nargs='?', 
       help='Input sample in SAM, BAM, CRAM or DeeZ format.') 
    genotype_parser.add_argument('--gene', '-g', default='all', 
@@ -189,25 +191,26 @@ def _get_args():
    # HACK: Internal parameters for development purposes: please do not use unless instructed
    genotype_parser.add_argument('--cache', dest='cache', action='store_true', help=argparse.SUPPRESS)
 
-   _ = subparsers.add_parser('test',
+   _ = subparsers.add_parser('test', parents=[base],
       help='Sanity-check Aldy on NA10860 sample. Recommended prior to the first use')
    
-   _ = subparsers.add_parser('license', 
+   _ = subparsers.add_parser('license', parents=[base], 
       help='Show Aldy license')
    
-   show_parser = subparsers.add_parser('show',
+   show_parser = subparsers.add_parser('show', parents=[base],
       help='Show all available copy number configurations of a given gene.')
    show_parser.add_argument('--gene', '-g', default='all', 
       help='Gene to be shown.')
 
-   profile_parser = subparsers.add_parser('profile',
+   profile_parser = subparsers.add_parser('profile', parents=[base],
       help=td("""
          Generate a sequencing profile for a given alignment file in SAM/BAM/CRAM format. 
          Please check documentation for more information."""))
    profile_parser.add_argument('file', nargs='?', 
       help='Input sample in SAM, BAM, CRAM or DeeZ format.') 
 
-   _ = subparsers.add_parser('help', help='Show a help message and exit.')
+   _ = subparsers.add_parser('help', parents=[base], 
+      help='Show a help message and exit.')
 
    return parser, parser.parse_args()
 
