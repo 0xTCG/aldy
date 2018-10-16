@@ -105,7 +105,7 @@ class Gurobi:
          vv.append(absvar * coeff)
          self.addConstr(absvar + v >= 0)
          self.addConstr(absvar - v >= 0)
-      self.model.update()
+      self.update()
       return self.quicksum(vv)
 
 
@@ -128,7 +128,7 @@ class Gurobi:
       self.model.setObjective(
          self.objective,
          self.gurobipy.GRB.MINIMIZE if method == 'min' else self.gurobipy.GRB.MAXIMIZE)
-      self.model.update()
+      self.update()
 
       self.model.params.outputFlag = 0
       self.model.params.logFile = ''
@@ -183,7 +183,7 @@ class Gurobi:
       Change the upper-bound of the variable.
       """
       var.ub = ub
-      self.model.update()
+      self.update()
 
 
 class SCIP(Gurobi):
@@ -203,6 +203,8 @@ class SCIP(Gurobi):
       return self.model.addCons(*args, **kwargs)
 
    def addVar(self, *args, **kwargs):
+      if 'update' in kwargs:
+         del kwargs['update']
       return self.model.addVar(*args, **kwargs)
 
    def quicksum(self, expr):
