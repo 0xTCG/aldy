@@ -255,6 +255,8 @@ class SAM(object):
 					elif op in [0, 7, 8]:
 						for i in range(size):
 							if 0 <= start + i - chr_start < len(ref) and ref[start + i - chr_start] != seq[s_start + i]:
+								if seq[s_start + i] == 'N':
+									continue  # ignore read bases with N in it
 								mut = (start + i, 'SNP.{}{}'.format(ref[start + i - chr_start], seq[s_start + i]))
 								muts[mut] += 1
 								if SAM.PHASE: 
