@@ -232,14 +232,19 @@ def solve_ilp(structure, gene, sam, solver):
 
 	# solve ILP
 	try:
-		status, opt, solutions = c.solveAll(objective, dict(list(A.items()) + [((a, m), M[a][m]) for a in M for m in M[a]]))
+		status, opt, solutions = c.solveAll(objective, 
+			dict(
+				[((k,), v) for k, v in A.items()] + 
+				[((a, m), M[a][m]) for a in M for m in M[a]]
+			))
 		log.debug('CN Solver status: {}, opt: {}', status, opt)
 	except lpinterface.NoSolutionsError:
 		return float('inf'), []
 
 	unique_key = collections.defaultdict(str)
 	for si, s in enumerate(solutions):
-		sd = {x: [y[1] for y in s if isinstance(y[0], tuple) and y[0][0] == x[0]] for x in s if not isinstance(x[0], tuple)}
+		sd = {x[0]: [y[1] for y in s if len(y) == 2 and y[0] == x[0]] 
+				for x in s if len(x) == 1}
 		solutions[si] = []
 		for (a, _), extra in sd.items():
 			if len(extra) > 0:

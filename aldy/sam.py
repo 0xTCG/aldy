@@ -162,7 +162,7 @@ class SAM(object):
 
 		total_reads = 0
 		filtered_reads = 0
-		with pysam.AlignmentFile(sam_path) as sam:
+		with pysam.AlignmentFile(sam_path, reference_filename='/Volumes/Data/inumanag/cram-genome.fa') as sam:
 			try:
 				sam.check_index()
 			except AttributeError:
