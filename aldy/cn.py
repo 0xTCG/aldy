@@ -46,6 +46,10 @@ def normalize_coverage(gene, sam, profile):
 	sam_ref = sum(sam.cnv_coverage[i] for i in range(gene.cnv_region[1], gene.cnv_region[2]))
 	cnv_ref = sum(profile[gene.cnv_region[0]][i] for i in range(gene.cnv_region[1], gene.cnv_region[2]))
 
+	if round(sam_ref, 2) < 1e-2:
+		raise Exception('CN-neutral region ({}) coverage is too low ({:.1f})'.format(gene.cnv_region, sam_ref))
+	if round(cnv_ref, 2) < 1e-2:
+		raise Exception('CN-neutral region ({}) profile coverage is too low ({:.1f})'.format(gene.cnv_region, cnv_ref))
 	cnv_ratio = float(cnv_ref) / sam_ref
 	log.debug('CNV factor: {} ({})', cnv_ratio, 1.0 / cnv_ratio)
 

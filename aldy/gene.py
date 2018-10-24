@@ -19,6 +19,7 @@ from collections import namedtuple as nt
 from pprint import pprint
 
 import os
+import re
 import yaml
 import collections
 
@@ -102,10 +103,10 @@ class Gene(object):
 			this represents the canonical mutation code
 			for the gene (e.g. -77:G>A)
 	"""
-	def __init__(self, path):
-		self.load(path)
+	def __init__(self, path, cnv_region=None):
+		self.load(path, cnv_region)
 
-	def load(self, path):
+	def load(self, path, cnv_region):
 		with open(path) as file:
 			j = file.read()
 			j = yaml.safe_load(j)
@@ -115,6 +116,15 @@ class Gene(object):
 		self.seq = j['seq']
 		self.region = tuple(j['region'])
 		self.cnv_region = tuple(j['cnv_region'])
+		if cnv_region:
+			r = re.match(r'^(.+?):(\d+)-(\d+)$', cnv_region)
+			if not r:
+				raise Exception('Parameter --cn-neutral-region={} is not in the format chr:start-end (where start and end are numbers)', cnv_region)
+			ch = r.group(1)
+			if not ch.startswith('chr'):
+				ch = 'chr' + ch
+			self.cnv_region = [ch, int(r.group(2)), int(r.group(3))]
+			log.info('Using {} as copy-number neutral region', cnv_region)
 
 		## (2) Set up gene regions
 		# Convention: Main gene has prefix 6; pseudogenes are numbered 7, 8

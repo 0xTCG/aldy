@@ -27,7 +27,7 @@ from .version import __version__
 
 
 @timing
-def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_solution):
+def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_solution, reference, cn_neutral_region):
 	try:
 		with open(sample): # Check does file exist
 			pass
@@ -51,7 +51,7 @@ def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_so
 		log.info('  Phasing:   {}', sam.SAM.PHASE)
 
 		database_file = script_path('aldy.resources.genes', '{}.yml'.format(gene.lower()))
-		gene = Gene(database_file)
+		gene = Gene(database_file, cn_neutral_region)
 
 		sample = sam.SAM(sample, gene, threshold)
 		gene.alleles = filtering.initial_filter(gene, sample)
@@ -77,7 +77,7 @@ def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_so
 		log.debug(ex)
 		exit(ex.code)
 	except Exception as ex:
-		log.error(ex.message)
+		log.error(str(ex))
 		log.debug(traceback.format_exc())
 		exit(1)
 	except:

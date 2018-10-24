@@ -38,6 +38,10 @@ def get_args():
 		help='Location of the output log file (default: [input].[gene].aldylog)')
 	parser.add_argument('--output', '-o', default=None, 
 		help='Location of the output file (default: [input].[gene].aldy)')
+	parser.add_argument('--reference', '-r', default=None, 
+		help='Location of the FASTA reference file for CRAM files')
+	parser.add_argument('--cn-neutral-region', '-n', default=None, 
+		help='Copy-number neutral region')
 	parser.add_argument('--solver', '-s', default='any', 
 		help='IP Solver (default: any available)')
 	parser.add_argument('--phase', '-P', default=0, action='store_true', 
@@ -77,7 +81,7 @@ def run_test():
 	result = genotype.genotype(
 		script_path('aldy.resources', 'NA10860.bam'), 
 		'', os.devnull, 'CYP2D6', 'illumina',
-		0.5, 'any', None
+		0.5, 'any', None, None, None
 	)
 	log.warn('Result{}: ', '' if len(result) == 1 else 's')
 	for rd, r in result:
@@ -136,7 +140,9 @@ def main(args=None):
 		args.gene, args.profile,
 		float(args.threshold) / 100.0,
 		args.solver,
-		args.cn
+		args.cn,
+		args.reference,
+		args.cn_neutral_region
 	)
 	log.warn('Result{}: ', '' if len(result) == 1 else 's')
 	for rd, r in result:

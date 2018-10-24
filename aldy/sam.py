@@ -35,7 +35,7 @@ class SAM(object):
 	def get_cache(self, path, gene):
 		return path + '-{}.aldycache'.format(gene.name)
 
-	def __init__(self, sam_path, gene, threshold):
+	def __init__(self, sam_path, gene, threshold, reference_path=None):
 		if SAM.PROFILE:
 			self.load_profile(sam_path, threshold)
 			exit(0)
@@ -51,7 +51,7 @@ class SAM(object):
 			d = pickle.load(open(self.get_cache(sam_path, gene)))
 			self.__dict__.update(d)
 		else:
-			self.load(sam_path, gene)
+			self.load(sam_path, gene, reference_path)
 			if SAM.CACHE:
 				pickle.dump(self.__dict__, open(self.get_cache(sam_path, gene), 'wb'))
 
@@ -105,7 +105,7 @@ class SAM(object):
 						cov, self.percentage(m)
 					)
 
-	def load(self, sam_path, gene):
+	def load(self, sam_path, gene, reference_path=None):
 		log.debug('SAM file: {}', sam_path)
 
 		muts = collections.defaultdict(int)
@@ -145,8 +145,8 @@ class SAM(object):
 				cnv_region = 'chr' + cnv_region
 				region = 'chr' + region
 
-			command = 'deez {} -h -c -Q -r /cs/compbio3/ibrahim/mpeg/ref/hs37d5.fa "{};{}" > {} 2>/dev/null'.format(
-				sam_path, region, cnv_region, pipe)
+			command = 'deez {} -h -c -Q -r {} "{};{}" > {} 2>/dev/null'.format(
+				sam_path, reference_path, region, cnv_region, pipe)
 			log.debug(command)
 			p = subprocess.Popen(command, shell=True)
 			sam_path = pipe
@@ -162,7 +162,7 @@ class SAM(object):
 
 		total_reads = 0
 		filtered_reads = 0
-		with pysam.AlignmentFile(sam_path, reference_filename='/Volumes/Data/inumanag/cram-genome.fa') as sam:
+		with pysam.AlignmentFile(sam_path, reference_filename=reference_path) as sam:
 			try:
 				sam.check_index()
 			except AttributeError:
