@@ -311,7 +311,7 @@ class SAM(object):
 	#    cypiripi.py --generate-profile bams/PGXT104.bam | grep -v CYP2B6 >> _ha
 	# PGRNseq-v2: NA19789 for all
 	# Illumina: all ones
-	def load_profile(self, sam_path, factor):
+	def load_profile(self, sam_path, factor, cnv_region=None):
 		log.debug('SAM file: {}', sam_path)
 
 		R = [
@@ -330,6 +330,15 @@ class SAM(object):
 		# 	('CYP21A', '6', 31970000, 32010000),
 		# 	('CLN3', '16', 28488000, 28504000),
 		]
+		if cnv_region:
+			r = re.match(r'^(.+?):(\d+)-(\d+)$', cnv_region)
+			if not r:
+				raise Exception('Parameter --cn-neutral-region={} is not in the format chr:start-end (where start and end are numbers)', cnv_region)
+			ch = r.group(1)
+			if ch.startswith('chr'):
+				ch = ch[3:]
+			R.append( ('CN_NEUTRAL', ch, int(r.group(2)), int(r.group(3))) )
+			log.info('Using {} as copy-number neutral region', R[-1])
 		for r in R:
 			cov = collections.defaultdict(lambda: collections.defaultdict(int))
 			rep_cov = collections.defaultdict(lambda: collections.defaultdict(int))
