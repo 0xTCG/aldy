@@ -117,7 +117,7 @@ def main(args=None):
 
 	if args.generate_profile:
 		sam.SAM.PROFILE = True
-		sam.SAM(args.file, None, float(args.profile_factor), args.cn_neutral_region)
+		sam.SAM(args.file, None, float(args.profile_factor), cn_neutral=args.cn_neutral_region)
 
 	if args.cache:
 		sam.SAM.CACHE = True

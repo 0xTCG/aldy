@@ -35,9 +35,9 @@ class SAM(object):
 	def get_cache(self, path, gene):
 		return path + '-{}.aldycache'.format(gene.name)
 
-	def __init__(self, sam_path, gene, threshold, reference_path=None):
+	def __init__(self, sam_path, gene, threshold, reference_path=None, cn_neutral=None):
 		if SAM.PROFILE:
-			self.load_profile(sam_path, threshold)
+			self.load_profile(sam_path, threshold, cnv_region=cn_neutral)
 			exit(0)
 
 		self.coverage = dict()
