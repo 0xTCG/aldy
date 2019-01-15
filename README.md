@@ -9,6 +9,7 @@ Aldy has been published in [Nature Communications](https://www.nature.com/articl
 
 Aldy is written in Python, and supports both Python 2.7 and 3. It is intended to be run on POSIX-based systems (only Linux and macOS have been tested).
 
+## Due to a bug, Aldy sometimes reports suboptimal solution as optimal with Python 3. Please use Python 2.7 until we fix the bug.
 
 The easiest way to install Aldy is to use `pip`:
 
