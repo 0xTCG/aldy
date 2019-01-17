@@ -1906,7 +1906,7 @@
       "mutations": [
         {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
         {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
-        {"pos": 42527470, "op": "SNP.TC", "old": "-678:A>G", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:A>G", "functional": 0, "dbsnp": ["rs28633410"]}, 
         {"pos": 42526775, "op": "SNP.CT", "old": "18:G>A", "functional": 0, "dbsnp": ["rs148382141"]}, 
         {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
         {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
