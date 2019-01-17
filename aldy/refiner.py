@@ -44,7 +44,7 @@ def get_refined_solution(gene, sam, initial_solutions, solver):
    ))
    if len(results) > 0:
       score = min(results)[0]
-      solutions = [(r[1], r[2]) for r in results if abs(r[0] - score) < 1e-6]
+      solutions = [(r[1], r[2]) for r in results if abs(r[0] - score) < 1e-3]
    else:
       score, solutions = float('inf'), []
    return score, solutions
@@ -287,6 +287,7 @@ def refine_ilp(solution, gene, sam, mutations, solver):
       decomposition.append((allele, mutations))
 
    
+   opt = round(opt, 2)
    print('>>> {} -> {} @ {}'.format(solution
       ,opt,dict(decomposition)))
 

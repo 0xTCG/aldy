@@ -46,7 +46,8 @@ def get_initial_solution(gene, sam, structure, solver):
    if len(results) > 0:
       score, solutions = min(results)[0], results[0][1]
       if len(results) > 1:
-         solutions = reduce(lambda x, y: x + y, (r[1] for r in results if abs(r[0] - score) < 1e-6))
+         solutions = reduce(lambda x, y: x + y, 
+            (r[1] for r in results if abs(r[0] - score) < 1e-3))
    else:
       score, solutions = float('inf'), []
 
@@ -272,5 +273,6 @@ def solve_ilp(structure, gene, sam, solver):
    for s in solutions:
       log.debug('    {}', s)
 
+   opt = round(opt, 2)
    print ('>> {} -> {} @ {}'.format(dict(structure),opt,solutions))
    return opt, [(s, region_cn) for s in solutions]

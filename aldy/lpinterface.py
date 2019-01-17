@@ -186,20 +186,25 @@ class SCIP(Gurobi):
       return self.pyscipopt.quicksum(expr)
 
    def solve(self, objective=None, method='min'):
+      import sys
+
       if objective is not None:
          self.objective = objective
       self.model.setObjective(
          self.objective,
          'minimize' if method == 'min' else 'maximize'
       )
-      # self.model.params.timeLimit = 60
-      self.model.setRealParam('limits/time', 120)
+      # self.model.params.timeLimit = 1800
+      self.model.setRealParam('limits/time', 60 * 60) # 1 hr
       self.model.hideOutput()
       self.model.optimize()
 
       status = self.model.getStatus()
+      if status == 'timelimit':
+         log.critical('SCIP time limit exceeded: the reported solution might **not be optimal**!')
       if status == 'infeasible':
          raise NoSolutionsError(status)
+
       return status, self.model.getObjVal()
 
    def varName(self, var):

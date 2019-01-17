@@ -26,7 +26,6 @@ from .gene import Gene
 from .version import __version__
 
 
-@timing
 def genotype(sample, output, log_output, gene, profile, threshold, solver, cn_solution, reference, cn_neutral_region):
    try:
       with open(sample): # Check does file exist
