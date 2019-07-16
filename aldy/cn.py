@@ -96,7 +96,61 @@ def normalize_coverage(gene, sam, profile):
 def estimate_cn(gene, sam, profile, solution, solver):
    log.debug('== Copy Number Estimator ==')
 
-   if solution is not None:
+   if solution is not None and profile != 'illumina':
+       raise Exception('You must pass -pillumina with -c parameter')
+   profile_path = script_path('aldy.resources.profiles', '{}.profile'.format(profile.lower()))
+   if os.path.exists(profile_path):
+      profile = load_profile(profile_path)
+   else:
+      profile = load_profile(profile)
+   normalize_coverage(gene, sam, profile)
+
+   if solution is not None and solution.lower() == 'estimate':
+      normalize_coverage(gene, sam, profile)
+
+      potentials = []
+      for s, v in sam.coverage.iteritems():
+         if '_' in v and len(v) > 1:
+            for vx, vy in v.iteritems():
+               if gene.region_at[s] == '': continue
+               if 'SNP' not in vx: continue
+               if not vy > 0: continue
+               if (s, vx) not in gene.mutations: continue
+               potentials.append((gene.mutations[s, vx], vy))
+      
+      arr = []
+      for cp in range(2, 5):
+         cn = 100.0 / cp
+         err = 0
+         for mut, val in potentials:
+            p = sam.percentage(mut)
+            opt = min(abs(cn * c - int(p)) for c in range(cp + 1))
+            err += opt
+         arr.append((err, cp))
+      arr = [(k[1], round(k[0], 1)) for k in sorted(arr)]
+
+      log.info('Most likely CNs based on SNP estimation (lower the score, the better):')
+      p = arr[0][1]
+      likely=[]
+      for cn, v in arr:
+         if abs(v - p) < 1e-3: 
+            likely.append(cn)
+         log.info('  CN = {} (score = {:.2f})', cn, v)
+      sols = {}   
+      log.info('Choosing CNs = {}', likely)
+      for cn in likely:
+         cn = arr[0][0]
+         result, res_cn = [], collections.defaultdict(int)
+         sol = '1'
+         for i in range(cn):
+            result.append((sol, i))
+            log.debug('    {}', (sol, i))
+            for r in gene.cnv_configurations[sol]:
+               res_cn[r] += gene.cnv_configurations[sol][r]
+         cn = CNSolution(gene, sam, (tuple(result), res_cn))
+         sols[cn.key] = cn
+      return sols
+   elif solution is not None:
       solution = solution.split(',')
       solution = collections.Counter(solution)
       result = []
@@ -113,18 +167,8 @@ def estimate_cn(gene, sam, profile, solution, solver):
             log.debug('    {}', (sol, i))
             for r in gene.cnv_configurations[sol]:
                res_cn[r] += gene.cnv_configurations[sol][r]
-      return [(tuple(result), res_cn)]
-
-   profile_path = script_path('aldy.resources.profiles', '{}.profile'.format(profile.lower()))
-   if os.path.exists(profile_path):
-      profile = load_profile(profile_path)
-   else:
-      profile = load_profile(profile)
-      # profile = load_profile(profile, bam=True, region=[
-      #    (gene.name,) + gene.region,
-      #    ('CN',) + gene.cnv_region
-      #    ])
-   normalize_coverage(gene, sam, profile)
+      cn = CNSolution(gene, sam, (tuple(result), res_cn))
+      return {cn.key: cn}
 
    coverage_diff = get_difference(sam.region_coverage, gene.unique_regions)
 
