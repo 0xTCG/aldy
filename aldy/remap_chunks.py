@@ -252,7 +252,7 @@ def remap(sam_path, gene, sam, cn_sol, tempdir=None, force=True, cleanup=True, r
       final_reads = {}
       counter = 0
       for r1,r2 in zip(chunks['6'], chunks['7']):
-      	 counter += 1
+         counter += 1
          temp_reads = collections.defaultdict(dict)
          for i, j in zip(r1, r2):
             if which_read_at.has_key(('6',i)):
