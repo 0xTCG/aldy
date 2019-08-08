@@ -24,9 +24,13 @@ def assert_cn(gene, expected, cov, max_cn=20):
                                  solver='gurobi')
    sols = sorted([sorted(s.solution.items()) for s in sols])
    expected = sorted([sorted(s.items()) for s in expected])
-   # print(sols); print(expected)
+   print(sols); print(expected)
    assert_equal(len(sols), len(expected))
    assert_equal(sols, expected)
+
+
+#sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='DEBUG')
+#sh.push_application()
 
 
 class CNSyntheticTest(unittest.TestCase):
@@ -34,8 +38,6 @@ class CNSyntheticTest(unittest.TestCase):
 
    def setUp(self):
       self.gene = Gene(None, 'GENE', TOY_GENE)
-      # sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level=9)
-      # sh.push_application()
 
 
    def make_coverage(self, lst):
@@ -47,41 +49,54 @@ class CNSyntheticTest(unittest.TestCase):
 
 
    def test_basic(self):
+      # Test two copies of *1
       assert_cn(self.gene, 
                 [{'1': 2}],
                 self.make_coverage(zip([2,2, 2,2, 2], [2,2, 2,2, 2])))
 
 
    def test_deletion(self):
+      # Test a single copy of *1 (*6 is deletion allele)
       assert_cn(self.gene, 
                 [{'1': 1, '6': 1}],
                 self.make_coverage(zip([1,1, 1,1, 1], [2,2, 2,2, 2])))
 
+      # Test whole gene deletion
+      assert_cn(self.gene, 
+                [{'6': 2}],
+                self.make_coverage(zip([0,0, 0,0, 0], [2,2, 2,2, 2])))
 
    def test_left_fusion(self):
-      # 4 is 00001|11100 
+      # Test two fused copies (*4 is defined as 00001|11100)
       assert_cn(self.gene, 
                 [{'4': 2}], 
                 self.make_coverage(zip([0,0, 0,1, 2], [2,2, 2,1, 0])))
       
-      # TODO: handle this case
-      # assert_cn(self.gene, 
-      #           [{'4': 2, '1': 1}], 
-      #           self.make_coverage(zip([1,1, 1,2, 3], [2,2, 2,1, 0])))
+      # Test one fused and one normal (*1) allele 
+      # Note: each left fusion operates on the whole genic region; 
+      #       thus, the maximum number of left fusions is 2
+      assert_cn(self.gene, 
+                 [{'4': 2, '1': 1}], 
+                 self.make_coverage(zip([1,1, 1,2, 3], [2,2, 2,1, 0])))
 
 
    def test_right_fusion(self):
-      # 5 is 11000|11222
+      # Test one fused and one normal (*1) allele (*5 is defined as 11000|11222)
       assert_cn(self.gene, 
                 [{'1': 1, '5': 1}],
                 self.make_coverage(zip([2,2, 1,1, 1], [2,2, 3,3, 3])))
 
 
    def test_multiplication(self):
+      # Test twelve copies of *1
+      assert_cn(self.gene, 
+                [{'1': 12}],
+                self.make_coverage(zip([12,12, 12,12, 12], [2,2, 2,2, 2])))
+
+      # Test seven copies of *1 and one fused *5 copy
       assert_cn(self.gene, 
                 [{'1': 7, '5': 1}],
                 self.make_coverage(zip([8,8, 7,7, 7], [2,2, 3,3, 3])))
-
 
 
 class CNRealTest(unittest.TestCase):
@@ -96,7 +111,10 @@ class CNRealTest(unittest.TestCase):
       assert_cn(self.gene,
                 [{'1': 2, '36': 2},
                  {'1': 2, '61': 2},
-                 {'1': 2, '63': 2}],
+                 {'1': 2, '63': 2},
+                 {'1': 2, '36': 1, '61': 1},
+                 {'1': 2, '36': 1, '63': 1},
+                 {'1': 2, '61': 1, '63': 1}],
                 {GeneRegion(1, 'e'): (3.8496, 2.1395), GeneRegion(1, 'i'): (3.3383, 2.5479),
                  GeneRegion(2, 'e'): (3.7298, 2.1429), GeneRegion(2, 'i'): (4.0521, 1.9735),
                  GeneRegion(3, 'e'): (4.5473, 1.8748), 

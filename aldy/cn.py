@@ -179,14 +179,13 @@ def solve_cn_model(gene: Gene,
    structures = {(name, 0): structure for name, structure in cn_configs.items()}
    for a, ai in list(structures.keys()):
       # Add another complete haplotype (assuming diploid genomes)   
-      structures[a, -1] = structures[a, 0] 
-      if cn_configs[a].kind in [CNConfig.CNConfigType.DELETION, CNConfig.CNConfigType.LEFT_FUSION]:
+      structures[a, -1] = copy.deepcopy(structures[a, 0])
+      if cn_configs[a].kind != CNConfig.CNConfigType.DEFAULT_CN:
          continue
       for i in range(1, max_cn):
          structures[a, i] = copy.deepcopy(structures[a, 0])
          for g in structures[a, i].cn:
-            # if it is pseudogene, remove one copy (i.e. create "weak configuration")
-            if g != 0:
+            if g != 0: # if it is pseudogene, remove one copy (i.e. create a "weak configuration")
                structures[a, i].cn[g] = {r: v - 1 for r, v in structures[a, i].cn[g].items()}
 
    # Add one binary variable to model for each structure copy.
@@ -202,8 +201,8 @@ def solve_cn_model(gene: Gene,
    for a, ai in structures:
       if ai == -1:
          log.trace("LP constraint: A_-1 <= A_0 for {}", a)
-         model.addConstr(A[a, ai] <= A[a, 0]) # second haplotype is present only if the first one is there
-      elif ai > 0: # TODO: and ai != 1 A[1] can be 1 while A[0] is 0 to support case *13/*13+*1
+         model.addConstr(A[a, ai] <= A[a, 0]) # second haplotype (-1) is present only if the first one (0) is there
+      elif ai > 1: # ignore 1, as A[1] can be 1 while A[0] is 0 to support cases such as *13/*13+*1
          log.trace('LP constraint: A_{} <= A_{} for {}', ai, ai - 1, a)
          model.addConstr(A[a, ai] <= A[a, ai - 1])
       
@@ -238,23 +237,42 @@ def solve_cn_model(gene: Gene,
       log.debug('LP status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
       return [CNSolution(float('inf'), solution=[], gene=gene)]
-   
+
+   def _explain_solution(sol):
+      """Print the step-by-step explanation of each constraint for easier debugging"""
+      
+      log.debug("** Carriers: {}", ', '.join('*' + str(a) for a, ai in sol if ai <= 0))
+      total = 0
+      for r, (exp_cov0, exp_cov1) in region_coverage.items():
+         expr = 0
+         covs = []
+         for a, ai in sol:
+            if r in structures[a, ai].cn[0]:
+               expr += structures[a, ai].cn[0][r]
+            if len(structures[a, ai].cn) > 1 and r in structures[a, ai].cn[1]:
+               expr -= structures[a, ai].cn[1][r]
+         E = abs(expr-(exp_cov0-exp_cov1))
+         if r == PCE_REGION: E *= PCE_PENALTY_COEFF
+         total += E
+         g = [a for a, ai in sol if r in structures[a, ai].cn[0] and structures[a, ai].cn[0][r] > 0]
+         p = [a for a, ai in sol if r in structures[a, ai].cn[1] and structures[a, ai].cn[1][r] > 0]
+         log.debug(f'** {r}: E = {E:.2f} ({expr} vs {exp_cov0-exp_cov1:.2f}) ::: {",".join(g)} / {",".join(p)}')
+      pc = PARSIMONY_PENALTY * len(sol)
+      log.debug(f'** Parsimony cost: {pc:.2f}')
+      fc = LEFT_FUSION_PENALTY * sum(1 for s, _ in sol if cn_configs[s].kind == CNConfig.CNConfigType.LEFT_FUSION)
+      log.debug(f'** Fusion cost: {fc:.2f}')
+      log.debug(f'== Error: {total + pc + fc:.2f} vs {opt:.2f}\n')
+
    # Get final CN vector (i.e. total integer CN for each region)
    result = []
    mem = []
    for sol in solutions:
       log.debug('Solution: {}', ', '.join('*' + str(s) for s, _ in sol))
+      _explain_solution(sol)
       sol_tuple = sorted_tuple(tuple(conf for conf, _ in sol))
       if sol_tuple not in mem: # Because A[1] can be 1 while A[0] is 0, we can have duplicates
          mem.append(sol_tuple) 
          result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
-
-   # print('>>CN>> {} {} {} {}'.format(
-   #    max_cn,
-   #    ','.join(cn_configs.keys()),
-   #    ';'.join(f'{a}.{b}:{x},{y}' for (a, b), (x, y) in region_coverage.items()),
-   #    ';'.join(','.join(str(s) for s, _ in sol) for sol in solutions)
-   # ))
 
    return result
 

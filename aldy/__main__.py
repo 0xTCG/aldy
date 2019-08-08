@@ -70,7 +70,7 @@ def main():
 
          # Prepare the log files
          if args.log is None:
-            log_output = '{}.aldylog'.format(os.path.splitext(args.file)[0])
+            log_output = '{}.aldy.log'.format(os.path.splitext(args.file)[0])
          else:
             log_output = args.log
          fh = logbook.FileHandler(log_output, mode='w', bubble=True, level='TRACE')
@@ -182,6 +182,8 @@ def _get_args():
       Default is off."""))
    genotype_parser.add_argument('--remap', default=0, #action='store_true', 
       help='Realign reads for better mutation calling. Requires samtools and bowtie2 in $PATH.')
+   genotype_parser.add_argument('--dump', action='store_true', 
+      help='Dump the anonymozed input file contents into <filename>.aldy.dump for debug purposes.')
    genotype_parser.add_argument('--cn', '-c', default=None,
       help=td("""
          Manually set the copy number configuration.
@@ -264,7 +266,8 @@ def _genotype(gene: str, output: Optional, args) -> None:
                         solver=      args.solver,
                         cache=       False, 
                         phase=       args.phase,
-                        reference=   args.reference)
+                        reference=   args.reference,
+                        dump=        args.dump)
       log.info(colorize('Result{} for {}: '.format('' if len(result) == 1 else 's', gene.upper())))
       for r in result:
          log.info(colorize('  {:30} ({})'.format(r.diplotype, ', '.join(f.major_repr() for f in r.solution))))

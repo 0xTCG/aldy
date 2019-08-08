@@ -73,6 +73,7 @@ class GeneTest(unittest.TestCase):
 
 
    def test_gene_regions(self):
+      # Test gene regions
       assert_dict_equal(self.gene.regions, {
          0: { GeneRegion(0, "tmp"): GRange('1', 100, 110),
               GeneRegion(1, "e"):   GRange('1', 110, 120),
@@ -89,6 +90,7 @@ class GeneTest(unittest.TestCase):
       })
       assert_equal(self.gene.pseudogenes, ['PSEUDO'])
 
+      # Test gene auxiliary functions
       assert_equal(self.gene.region_at(105), (0, GeneRegion(0, "tmp")))
       assert_equal(self.gene.region_at(127), (0, GeneRegion(1, "i")))
       assert_equal(self.gene.region_at(155), (0, GeneRegion(3, "e")))
@@ -106,8 +108,8 @@ class GeneTest(unittest.TestCase):
 
 
    def test_gene_alleles(self):
+      # Test metadata loading
       assert_equal(self.gene.common_tandems, [('1', '4')])
-
       assert_equal(self.gene.old_notation(Mutation(115, 'SNP.TA')), '3828:T>A')
       assert_equal(self.gene.old_notation(Mutation(119, 'INS.TT')), '')
 
@@ -123,6 +125,7 @@ class GeneTest(unittest.TestCase):
                i += 1
          return cn
 
+      # Test copy number configurations
       assert_dict_equal(self.gene.cn_configs, {
          '1': CNConfig(cnify('1,  1,1,  1,1,  1, | 1,  1,1,  1,1,  1'), 
             kind=CNConfig.CNConfigType.DEFAULT_CN, 
@@ -141,6 +144,7 @@ class GeneTest(unittest.TestCase):
             alleles=set(['6']), 
             description='Gene deletion')})
 
+      # Test allele configurations
       assert_equal(sorted(self.gene.alleles.keys()), ['1', '1.a', '2', '3', '4/1', '4/3', '5', '6'])
       assert_equal(self.gene.alleles['1'], 
                    Allele('1', cn_config='1', 
@@ -178,6 +182,7 @@ class GeneTest(unittest.TestCase):
 
 
    def test_structure(self):
+      # Test the inferred gene structure
       assert_dict_equal(self.gene.mutations, {
          (105, 'SNP.TA'): Mutation(105, 'SNP.TA', 1),
          (111, 'DEL.AC'): Mutation(111, 'DEL.AC', 3),

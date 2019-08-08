@@ -74,7 +74,7 @@ class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
    
    def samtools(self, pad_left=500, pad_right=1, prefix='') -> str:
       """
-      Samtools-compatible region string (e.g. chr1-10-20).
+      Samtools-compatible region string (e.g. chr1:10-20).
 
       Returns:
          str

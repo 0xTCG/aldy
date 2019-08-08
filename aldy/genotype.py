@@ -38,7 +38,8 @@ def genotype(gene_db: str,
              solver: str = 'any',
              cache: bool = False,
              phase: bool = False,
-             reference: Optional[str] = None) -> List[minor.MinorSolution]:
+             reference: Optional[str] = None,
+             dump: bool = False) -> List[minor.MinorSolution]:
    """
    Genotype a sample.
 
@@ -81,6 +82,9 @@ def genotype(gene_db: str,
       reference (str, optional):
          A path to the reference genome that was used to encode DeeZ or CRAM files.
          Default is ``None``.
+      dump (bool):
+         If true, Aldy will create "<filename>.aldy.dump" file for debug purposes.
+         Default is ``False``.
 
    Raises:
       :obj:`aldy.common.AldyException` if the average coverage is too low (less than 2).
@@ -89,6 +93,7 @@ def genotype(gene_db: str,
    # Test the existence of LP solver
    _ = lp_model('init', solver)
 
+   # Load the gene specification
    db_file = script_path('aldy.resources.genes/{}.yml'.format(gene_db.lower()))
    if os.path.exists(db_file):
       gene_db = db_file
@@ -107,7 +112,8 @@ def genotype(gene_db: str,
                        cache=False,
                        phase=False,
                        reference=reference,
-                       cn_region=cn_region)
+                       cn_region=cn_region, 
+                       dump=dump)
 
    avg_cov = sample.coverage.average_coverage()
    if avg_cov < 2:
