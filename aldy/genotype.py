@@ -128,27 +128,17 @@ def genotype(gene_db: str,
    cn_sols = cn.estimate_cn(gene, sample.coverage, solver=solver, user_solution=cn_solution)
 
    # Get major solutions and pick the best one
-   # dmp = sample.coverage._dump()
-   # print('>>COV>> {}'.format(' '.join(
-   #    '{}={}'.format(
-   #       p,  
-   #       ','.join("{}:{:.0f}".format(m,dmp[p][m]) for m in sorted(dmp[p]))
-   #    )
-   #    for p in sorted(dmp)
-   # )))
-   
    log.info(f'Potential copy number configurations for {gene.name}:')
    major_sols = []
+   print(os.path.basename(sam_path)+"\tcn", end='')
    for i, cn_sol in enumerate(cn_sols):
       sols = major.estimate_major(gene, sample.coverage, cn_sol, solver)
-      # print('>>MAJOR>> {} {}'.format(
-      #    ','.join(','.join([s] * v) for s, v in cn_sol.solution.items()),
-      #    ';'.join(
-      #       ','.join(','.join([s.major_repr()] * v) for s, v in m.solution.items())
-      #       for m in sols)
-      # ))
       log.info('  {:2}: {}', i + 1, cn_sol._solution_nice())
+
+      print(';' + ','.join(sorted([j for k, v in cn_sol.solution.items() for j in [k] * v])), end='')
+
       major_sols += sols
+   print('\t', end='')
 
    min_score = min(major_sols, key=lambda m: m.score).score
    major_sols = sorted([m for m in major_sols 
@@ -156,8 +146,12 @@ def genotype(gene_db: str,
                        key=lambda m: m.score)
 
    log.info(f'Potential major star-alleles for {gene.name}:')
+   print("ma", end='')
    for i, major_sol in enumerate(major_sols):
+      print(';' + ','.join(str(j) for s, v in sorted(major_sol.solution.items(), 
+         key=lambda x: allele_sort_key(x[0].major)) for j in [s] * v).replace('*', ''), end='')
       log.info('  {:2}: {}', i + 1, major_sol._solution_nice())
+   print('\t', end='')
 
    minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver)
 
@@ -165,8 +159,11 @@ def genotype(gene_db: str,
    minor_sols = [m for m in minor_sols if abs(m.score - min_score) < SOLUTION_PRECISION]
 
    log.info(f'Best minor star-alleles for {gene.name}:')
+   print("mi", end='')
    for i, minor_sol in enumerate(minor_sols):
       log.info('  {:2}: {}', i + 1, minor_sol._solution_nice())
+      print(';' + ','.join(str(s) for s in sorted(minor_sol.solution, key=lambda x: allele_sort_key(x.minor))).replace('*', ''), end='')
+   print('\t', end='')
 
    # print('>>MINOR>> {}'.format(' '.join(
    #    '{};{}'.format(round(sol.score, 2),
@@ -176,11 +173,13 @@ def genotype(gene_db: str,
    # exit(0)
 
    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
+   print("di", end='')
    for sol_id, sol in enumerate(minor_sols):
-      _ = diplotype.estimate_diplotype(gene, sol)
+      s = diplotype.estimate_diplotype(gene, sol)
+      print(';' + s, end='')
       if output_file:
          diplotype.write_decomposition(sample_name, gene, sol_id, sol, output_file)
-
+   print()
    # if do_remap != 0:
    #    log.critical('Remapping! Stay tuned...')
    #    cn_sol = list(cn_sol.values())[0] #!! TODO IMPORTANT just use furst CN for now

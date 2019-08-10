@@ -196,11 +196,9 @@ def solve_major_model(gene: Gene,
    # Add a binary variable for any allele/novel mutation pair
    # TODO: do not add novel variables in impossible CN regions
    del_allele = gene.deletion_allele()
-   M = {a: {m: model.addVar(vtype='B', name='EXTRA_{}_{}_{}'.format(m, *a))
-               if a[0] != del_allele
-               else 0 # deletion alleles should not be assigned any mutations
-            for m in constraints
-            if m not in alleles[a].func_muts} 
+   N = {a: {m: model.addVar(vtype='B', name='N_{}_{}_{}'.format(m, *a))
+               if a[0] != del_allele else 0 # deletion alleles should not be assigned any mutations
+            for m in constraints if m not in alleles[a].func_muts} 
         for a in alleles}
    # Populate constraints
    for a in alleles:
@@ -209,13 +207,12 @@ def solve_major_model(gene: Gene,
             if cn_solution.position_cn(m.pos) > 0 else 0
          constraints[m] += cov * A[a]
    # Add novel mutation constraints
-   for a in M:
-      for m in M[a]:
+   for a in N:
+      for m in N[a]:
          if cn_solution.position_cn(m.pos) == 0:
             continue
-         cov = max(1, coverage.total(m.pos)) / cn_solution.position_cn(m.pos) \
-            if cn_solution.position_cn(m.pos) > 0 else 0
-         constraints[m] += cov * A[a] * M[a][m]
+         cov = max(1, coverage.total(m.pos)) / cn_solution.position_cn(m.pos)
+         constraints[m] += cov * A[a] * N[a][m]
    
    # Populate constraints of non-variations (i.e. matches with the reference genome)
    for m in list(constraints):
@@ -232,14 +229,15 @@ def solve_major_model(gene: Gene,
       cov = max(1, coverage.total(m.pos)) / cn_solution.position_cn(m.pos) \
          if cn_solution.position_cn(m.pos) > 0 else 0
       for a in alleles:
-         constraints[ref_m] += cov * A[a]
+         #if m not in alleles[a].func_muts:
+         constraints[ref_m] += cov * A[a] #* (1 - N[a][m])
 
    # Each allele must express all of its functional mutations
    for m, expr in constraints.items():
       log.trace('LP contraint: {} == {} + err for {} with cn={}', coverage[m], expr, m, cn_solution.position_cn(m.pos))
       model.addConstr(expr + error_vars[m] == coverage[m])
 
-   # Each allele must express all of its functional mutations
+   # Each CN config must be satisfied by matching alleles
    for cnf, cnt in cn_solution.solution.items():
       expr = sum(A[a] for a in A if alleles[a].cn_config == cnf)
       log.trace('LP contraint: {} == {} for {}', cnt, expr, cnf)
@@ -249,21 +247,21 @@ def solve_major_model(gene: Gene,
    func_muts = (m for a in alleles for m in alleles[a].func_muts if coverage[m] > 0)
    for m in func_muts:
       expr = model.quicksum(A[a] for a in alleles if m in alleles[a].func_muts)
-      expr += model.quicksum(A[a] * M[a][m] for a in alleles if m not in alleles[a].func_muts)
+      expr += model.quicksum(A[a] * N[a][m] for a in alleles if m not in alleles[a].func_muts)
       log.trace('LP contraint: {} >= 1 for {}', expr, m)
       model.addConstr(expr >= 1)
 
    # Set objective: minimize the absolute sum of errors   
    objective = \
       model.abssum(e for e in error_vars.values()) + \
-      NOVEL_MUTATION_PENAL * model.quicksum(M[a][m] for a in M for m in M[a])
+      NOVEL_MUTATION_PENAL * model.quicksum(N[a][m] for a in N for m in N[a])
    log.trace('LP objective: {}', objective)
 
    # Solve the ILP
    try:
       status, opt, solutions = model.solveAll(objective, 
          {**{(k,  ): v for k, v in A.items()}, # wrap (k) to ensure that tuples can be compared
-          **{(a, m): M[a][m] for a in M for m in M[a] if a[0] != del_allele}})
+          **{(a, m): N[a][m] for a in N for m in N[a] if a[0] != del_allele}})
       log.debug('Major Solver status: {}, opt: {}', status, opt)
    except lpinterface.NoSolutionsError:
       return [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution)]

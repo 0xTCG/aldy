@@ -188,12 +188,12 @@ def solve_minor_model(gene: Gene,
 
    # Add a binary variable for each allele/mutation pair where mutation belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or will be missing
-   MPRESENT = {a: {m: model.addVar(vtype='B', name='MISS-{}-{}'.format(m, a)) 
+   MPRESENT = {a: {m: model.addVar(vtype='B', name='MISS-{}-{}'.format(m, a)[:250]) 
                    for m in alleles[a]}
                for a in alleles}
    # Add a binary variable for each allele/mutation pair where mutation DOES NOT belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or not
-   MADD = {a: {m: model.addVar(vtype='B', name='ADD-{}-{}'.format(m, a)) 
+   MADD = {a: {m: model.addVar(vtype='B', name='ADD-{}-{}'.format(m, a)[:250]) 
                for m in mutations 
                if m not in alleles[a]}
            for a in alleles}

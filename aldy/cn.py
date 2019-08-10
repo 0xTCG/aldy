@@ -240,7 +240,7 @@ def solve_cn_model(gene: Gene,
 
    def _explain_solution(sol):
       """Print the step-by-step explanation of each constraint for easier debugging"""
-      
+
       log.debug("** Carriers: {}", ', '.join('*' + str(a) for a, ai in sol if ai <= 0))
       total = 0
       for r, (exp_cov0, exp_cov1) in region_coverage.items():

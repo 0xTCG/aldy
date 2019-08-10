@@ -47,7 +47,75 @@ def assert_minor(gene, majors, mutations, solution):
    usr_solution = sorted(allele_number(s[1]) for s in sol.solution)
    assert_equal(ref_solution, usr_solution)
    return sol
-   
+
+
+class MajorSyntheticTest(unittest.TestCase):
+   _multiprocess_can_split_ = True
+
+   def setUp(self):
+      self.gene = Gene(None, 'GENE', TOY_GENE)
+
+
+   def make_coverage(self, lst):
+      cov = {}
+      i = 0
+      for r in sorted(self.gene.unique_regions):
+         cov[r] = next(lst)
+      return cov
+
+
+   def test_basic(self):
+      # Test two copies of *1
+      assert_cn(self.gene, 
+                [{'1': 2}],
+                self.make_coverage(zip([2,2, 2,2, 2], [2,2, 2,2, 2])))
+
+
+   def test_deletion(self):
+      # Test a single copy of *1 (*6 is deletion allele)
+      assert_cn(self.gene, 
+                [{'1': 1, '6': 1}],
+                self.make_coverage(zip([1,1, 1,1, 1], [2,2, 2,2, 2])))
+
+      # Test whole gene deletion
+      assert_cn(self.gene, 
+                [{'6': 2}],
+                self.make_coverage(zip([0,0, 0,0, 0], [2,2, 2,2, 2])))
+
+   def test_left_fusion(self):
+      # Test two fused copies (*4 is defined as 00001|11100)
+      assert_cn(self.gene, 
+                [{'4': 2}], 
+                self.make_coverage(zip([0,0, 0,1, 2], [2,2, 2,1, 0])))
+      
+      # Test one fused and one normal (*1) allele 
+      # Note: each left fusion operates on the whole genic region; 
+      #       thus, the maximum number of left fusions is 2
+      assert_cn(self.gene, 
+                 [{'4': 2, '1': 1}], 
+                 self.make_coverage(zip([1,1, 1,2, 3], [2,2, 2,1, 0])))
+
+
+   def test_right_fusion(self):
+      # Test one fused and one normal (*1) allele (*5 is defined as 11000|11222)
+      assert_cn(self.gene, 
+                [{'1': 1, '5': 1}],
+                self.make_coverage(zip([2,2, 1,1, 1], [2,2, 3,3, 3])))
+
+
+   def test_multiplication(self):
+      # Test twelve copies of *1
+      assert_cn(self.gene, 
+                [{'1': 12}],
+                self.make_coverage(zip([12,12, 12,12, 12], [2,2, 2,2, 2])))
+
+      # Test seven copies of *1 and one fused *5 copy
+      assert_cn(self.gene, 
+                [{'1': 7, '5': 1}],
+                self.make_coverage(zip([8,8, 7,7, 7], [2,2, 3,3, 3])))
+
+
+
 class MajorFullTest(unittest.TestCase):
    _multiprocess_can_split_ = True
 

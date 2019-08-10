@@ -183,24 +183,24 @@ class Sample:
             for j in range(m, M + 1):
                cnv_coverage[j], = struct.unpack('<i', fd.read(i))
             ld, = struct.unpack('<l', fd.read(l))
-            insertions = set()
             for _ in range(ld):
                ref_start, ref_end, read_len, num_mutations = struct.unpack('<llhh', fd.read(l + l + h + h))
                ref_end += ref_start
                for j in range(ref_start, ref_end):
                   norm[j] += 1
+               insertions = set()
                for __ in range(num_mutations):
                   mut_start, op_len = struct.unpack('<hh', fd.read(h + h))
                   mut_start += ref_start
                   op = fd.read(op_len).decode('ascii')
                   muts[mut_start, op] += 1
-                  norm[mut_start] -= 1
                   if op[:3] == 'DEL':
-                     for j in range(1, len(op) - 4):
+                     for j in range(0, len(op) - 4):
                         norm[mut_start + j] -= 1
                   elif op[:3] == 'INS':
-                     norm[mut_start] += 1
                      insertions.add((mut_start, len(op) - 4))
+                  else:
+                     norm[mut_start] -= 1
                for ins in _indel_sites:
                   ins_len = len(ins.op) - 4
                   if (ins.pos, ins_len) in insertions:

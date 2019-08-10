@@ -106,6 +106,14 @@ class CNRealTest(unittest.TestCase):
       self.gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
 
 
+   def make_coverage(self, d):
+      cov = {}
+      for k, v in d.items():
+         k = re.split(r'(\d+)', k)
+         cov[GeneRegion(int(k[1]), k[2])] = v
+      return cov
+
+
    def test_many_copies_multiple_solutions(self):
       # HG00465
       assert_cn(self.gene,
@@ -115,88 +123,74 @@ class CNRealTest(unittest.TestCase):
                  {'1': 2, '36': 1, '61': 1},
                  {'1': 2, '36': 1, '63': 1},
                  {'1': 2, '61': 1, '63': 1}],
-                {GeneRegion(1, 'e'): (3.8496, 2.1395), GeneRegion(1, 'i'): (3.3383, 2.5479),
-                 GeneRegion(2, 'e'): (3.7298, 2.1429), GeneRegion(2, 'i'): (4.0521, 1.9735),
-                 GeneRegion(3, 'e'): (4.5473, 1.8748), 
-                 GeneRegion(5, 'e'): (3.9511, 2.0961), GeneRegion(5, 'i'): (4.1373, 2.0973),
-                 GeneRegion(6, 'e'): (4.0175, 2.0495), GeneRegion(6, 'i'): (3.9902, 1.8785),
-                 GeneRegion(9, 'e'): (2.5436, 3.6071), 
-                 GeneRegion(1, 'pce'): (0, 4.1413)})
+                self.make_coverage({
+                   '1e': (3.8, 2.1), '1i': (3.3, 2.5), '2e': (3.7, 2.1), '2i': (4.0, 1.9),
+                   '5e': (3.9, 2.0), '5i': (4.1, 2.0), '6e': (4.0, 2.0), '6i': (3.9, 1.8),
+                   '3e': (4.5, 1.8), '9e': (2.5, 3.6), '1pce': (0, 4.1)
+                }))
 
 
    def test_right_fusion(self):
       # HG01190
       assert_cn(self.gene,
                 [{'1': 1, '68': 1}],
-                {GeneRegion(1, 'e'): (1.8930, 2.0846), GeneRegion(1, 'i'): (1.9497, 2.0202),
-                 GeneRegion(2, 'e'): (0.9163, 2.8526), GeneRegion(2, 'i'): (1.0604, 3.0672),
-                 GeneRegion(3, 'e'): (1.1844, 2.7596), 
-                 GeneRegion(5, 'e'): (1.0381, 3.3204), GeneRegion(5, 'i'): (1.1508, 3.2331),
-                 GeneRegion(6, 'e'): (1.0662, 3.1833), GeneRegion(6, 'i'): (1.1335, 2.9531),
-                 GeneRegion(9, 'e'): (1.3104, 2.7224), 
-                 GeneRegion(1, 'pce'): (0, 3.1630)})
+                self.make_coverage({
+                   '1e': (1.8, 2.0), '1i': (1.9, 2.0), '2e': (0.9, 2.8), '2i': (1.0, 3.0),
+                   '5e': (1.0, 3.3), '5i': (1.1, 3.2), '6e': (1.0, 3.1), '6i': (1.1, 2.9),
+                   '3e': (1.1, 2.7), '9e': (1.3, 2.7), '1pce': (0, 3.1)
+                }))
 
 
    def test_normal(self):
       # HG02260
       assert_cn(self.gene,
                 [{'1': 2}],
-                {GeneRegion(1, 'e'): (1.8404, 2.0857), GeneRegion(1, 'i'): (1.9031, 2.0085),
-                 GeneRegion(2, 'e'): (2.0439, 1.9288), GeneRegion(2, 'i'): (1.9131, 1.8656),
-                 GeneRegion(3, 'e'): (2.0366, 1.8861), 
-                 GeneRegion(5, 'e'): (1.8515, 2.1882), GeneRegion(5, 'i'): (1.9531, 2.0443),
-                 GeneRegion(6, 'e'): (2.0923, 2.1187), GeneRegion(6, 'i'): (2.0568, 1.9060),
-                 GeneRegion(9, 'e'): (2.1798, 1.8956), 
-                 GeneRegion(1, 'pce'): (0, 2.0132)})
+                self.make_coverage({
+                   '1e': (1.8, 2.0), '1i': (1.9, 2.0), '2e': (2.0, 1.9), '2i': (1.9, 1.8),
+                   '5e': (1.8, 2.1), '5i': (1.9, 2.0), '6e': (2.0, 2.1), '6i': (2.0, 1.9),
+                   '3e': (2.0, 1.8), '9e': (2.1, 1.8), '1pce': (0, 2.0)
+                }))
 
 
    def test_deletion(self):
       # NA12336
       assert_cn(self.gene,
                 [{'1': 1, '5': 1}],
-                {GeneRegion(1, 'e'): (1.0308, 1.9988), GeneRegion(1, 'i'): (1.3748, 1.6491),
-                 GeneRegion(2, 'e'): (0.9924, 1.6342), GeneRegion(2, 'i'): (1.0290, 1.9198),
-                 GeneRegion(3, 'e'): (1.1670, 1.7540), 
-                 GeneRegion(5, 'e'): (0.9421, 2.2108), GeneRegion(5, 'i'): (0.9298, 2.0529),
-                 GeneRegion(6, 'e'): (0.9427, 1.9694), GeneRegion(6, 'i'): (0.9973, 1.8855),
-                 GeneRegion(9, 'e'): (1.0982, 1.8465), 
-                 GeneRegion(1, 'pce'): (0, 1.9869)})
+                self.make_coverage({
+                   '1e': (1.0, 1.9), '1i': (1.3, 1.6), '2e': (0.9, 1.6), '2i': (1.0, 1.9),
+                   '5e': (0.9, 2.2), '5i': (0.9, 2.0), '6e': (0.9, 1.9), '6i': (0.9, 1.8),
+                   '3e': (1.1, 1.7), '9e': (1.0, 1.8), '1pce': (0, 1.9)
+                }))
 
 
    def test_right_fusion_with_copy(self):
       # NA12878
       assert_cn(self.gene,
                 [{'1': 2, '68': 1}],
-                {GeneRegion(1, 'e'): (2.6537, 2.0015), GeneRegion(1, 'i'): (2.4258, 2.3148),
-                 GeneRegion(2, 'e'): (1.8623, 2.9641), GeneRegion(2, 'i'): (2.0050, 2.9440),
-                 GeneRegion(3, 'e'): (2.2375, 2.5721), 
-                 GeneRegion(5, 'e'): (1.9376, 3.0845), GeneRegion(5, 'i'): (1.9339, 3.0267),
-                 GeneRegion(6, 'e'): (1.8525, 2.9231), GeneRegion(6, 'i'): (1.9799, 2.9167),
-                 GeneRegion(9, 'e'): (2.1669, 2.6403), 
-                 GeneRegion(1, 'pce'): (0, 3.0387)})
+                self.make_coverage({
+                   '1e': (2.6, 2.0), '1i': (2.4, 2.3), '2e': (1.8, 2.9), '2i': (2.0, 2.9),
+                   '5e': (1.9, 3.0), '5i': (1.9, 3.0), '6e': (1.8, 2.9), '6i': (1.9, 2.9),
+                   '3e': (2.2, 2.5), '9e': (2.1, 2.6), '1pce': (0, 3.0)
+                }))
 
 
    def test_normal2(self):
       # NA19239
       assert_cn(self.gene,
                 [{'1': 2}],
-                {GeneRegion(1, 'e'): (1.6961, 2.2349), GeneRegion(1, 'i'): (2.0603, 2.0186),
-                 GeneRegion(2, 'e'): (2.0000, 1.9220), GeneRegion(2, 'i'): (2.0129, 2.1490),
-                 GeneRegion(3, 'e'): (2.1748, 1.9104), 
-                 GeneRegion(5, 'e'): (1.9325, 2.2576), GeneRegion(5, 'i'): (2.0313, 2.0658),
-                 GeneRegion(6, 'e'): (1.9981, 2.0114), GeneRegion(6, 'i'): (1.9534, 2.0146),
-                 GeneRegion(9, 'e'): (2.1122, 2.0378), 
-                 GeneRegion(1, 'pce'): (0, 2.1584)})
+                self.make_coverage({
+                   '1e': (1.6, 2.2), '1i': (2.0, 2.0), '2e': (2.0, 1.9), '2i': (2.0, 2.1),
+                   '5e': (1.9, 2.2), '5i': (2.0, 2.0), '6e': (1.9, 2.0), '6i': (1.9, 2.0),
+                   '3e': (2.1, 1.9), '9e': (2.1, 2.0), '1pce': (0, 2.1)
+                }))
 
 
    def test_left_fusion(self):
       # NA19790
       assert_cn(self.gene,
                 [{'1': 2, '78': 1}],
-                {GeneRegion(1, 'e'): (1.9410, 2.0690), GeneRegion(1, 'i'): (2.0166, 1.9104),
-                 GeneRegion(2, 'e'): (2.0613, 2.0358), GeneRegion(2, 'i'): (2.0889, 2.0979),
-                 GeneRegion(3, 'e'): (2.1226, 1.9755), 
-                 GeneRegion(5, 'e'): (2.8184, 1.2211), GeneRegion(5, 'i'): (2.9438, 1.0068),
-                 GeneRegion(6, 'e'): (2.7618, 0.9867), GeneRegion(6, 'i'): (2.8389, 0.9691),
-                 GeneRegion(9, 'e'): (3.1541, 1.0116), 
-                 GeneRegion(1, 'pce'): (0, 1.0484)})
+                self.make_coverage({
+                   '1e': (1.9, 2.0), '1i': (2.0, 1.9), '2e': (2.0, 2.0), '2i': (2.0, 2.0),
+                   '5e': (2.8, 1.2), '5i': (2.9, 1.0), '6e': (2.7, 0.9), '6i': (2.8, 0.9),
+                   '3e': (2.1, 1.9), '9e': (3.1, 1.0), '1pce': (0, 1.0)
+                }))
