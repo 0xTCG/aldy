@@ -9,6 +9,7 @@
 from nose.tools import *
 import unittest
 import logbook.more
+import pandas
 
 import aldy.cn
 from aldy.gene import Gene
@@ -194,3 +195,31 @@ class CNRealTest(unittest.TestCase):
                    '5e': (2.8, 1.2), '5i': (2.9, 1.0), '6e': (2.7, 0.9), '6i': (2.8, 0.9),
                    '3e': (2.1, 1.9), '9e': (3.1, 1.0), '1pce': (0, 1.0)
                 }))
+
+
+class CNFullTest:
+   #_multiprocess_can_split_ = True
+
+   def execute(gene, path, validation):
+      sample = aldy.sam.Sample(sam_path=path, gene=gene, threshold=0.5, profile='pgrnseq-v1')
+      solver = 'gurobi'
+      cn_sols = aldy.cn.estimate_cn(gene, sample.coverage, solver)
+
+      result = [[j for k, v in cn_sol.solution.items() for j in [k] * v] for cn_sol in cn_sols]
+      validation = [v.split(',') for v in validation.split(';')]
+      assert_equal(sorted(result), sorted(validation))
+
+   def test_pgx1(self):
+      gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
+      truth = pandas.read_csv(script_path('aldy.tests.paper/pgx1.tsv'), sep="\t")
+      for _, i in truth.iterrows():
+         p = script_path(f'aldy.tests.paper/pgx1/{i["sample"]}.pgx1.aldy.dump')
+         yield CNFullTest.execute, gene, p, i['cn']
+
+   def test_pgx2(self):
+      gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
+      truth = pandas.read_csv(script_path('aldy.tests.paper/pgx2.tsv'), sep="\t")
+      for _, i in truth.iterrows():
+         p = script_path(f'aldy.tests.paper/pgx2/{i["sample"]}.pgx2.aldy.dump')
+         yield CNFullTest.execute, gene, p, i['cn']
+

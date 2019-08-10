@@ -131,7 +131,6 @@ def estimate_major(gene: Gene,
    # TODO: Check for novel functional mutations and do something with them
    # novel_functional_mutations = _get_novel_mutations(gene, coverage, cn_solution)
 
-   log.debug(f'>> major_sol = {results.__repr__()}')
    return results
 
 
@@ -233,9 +232,13 @@ def solve_major_model(gene: Gene,
          constraints[ref_m] += cov * A[a] #* (1 - N[a][m])
 
    # Each allele must express all of its functional mutations
-   for m, expr in constraints.items():
+   print('<major_cn>: ' + str(dict(cn_solution.solution)))
+   print('<major_data>: {', end='')
+   for m, expr in sorted(constraints.items()):
       log.trace('LP contraint: {} == {} + err for {} with cn={}', coverage[m], expr, m, cn_solution.position_cn(m.pos))
       model.addConstr(expr + error_vars[m] == coverage[m])
+      print(f"({m[0]}, '{m[1]}'): {coverage[m]}, ", end='')
+   print('}')
 
    # Each CN config must be satisfied by matching alleles
    for cnf, cnt in cn_solution.solution.items():
@@ -267,6 +270,7 @@ def solve_major_model(gene: Gene,
       return [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution)]
 
    result = []
+   print('<major_sol>: [', end='')
    for sol in solutions:
       alleles = {} # dict of allele IDs -> novel mutations
       for s in sol: # handle 2-tuples properly (2-tuples have novel alleles)
@@ -279,11 +283,15 @@ def solve_major_model(gene: Gene,
                                                   added=tuple(mut), 
                                                   missing=tuple()) 
                                      for (a, _), mut in alleles.items())
+      print(str(dict(collections.Counter(
+         tuple([a] + [(m[0], m[1]) for m in mut]) if len(mut) > 0 else a
+         for (a, _), mut in alleles.items()))) + ', ', end='')
       sol = MajorSolution(score=opt, 
                           solution=solution, 
                           cn_solution=cn_solution)
       log.debug('Major solution: {}'.format(sol))
       result.append(sol)
+   print(']')
    
    return result
 

@@ -105,7 +105,6 @@ def estimate_minor(gene: Gene,
    minor_sols = []
    for major_sol in sorted(major_sols, key=lambda s: list(s.solution.items())):
       minor_sols.append(solve_minor_model(gene, alleles, cov, major_sol, mutations, solver))
-   log.debug(f'>> minor_sols = {minor_sols.__repr__()}')
    return minor_sols
 
 
@@ -236,9 +235,17 @@ def solve_minor_model(gene: Gene,
             constraints[ref_m] += cov * (1 - MADD[a][m]) * A[a]
 
    # Ensure that each constraint matches the observed coverage
-   for m, expr in constraints.items():
+   print('<minor_cn>: ' + str(dict(major_sol.cn_solution.solution)))
+   print('<minor_major>: ' + str({
+         tuple([s.major] + [(m[0], m[1]) for m in s.added]) if len(s.added) > 0 else s.major: v
+         for s, v in major_sol.solution.items()}))
+   print('<minor_data>: {', end='')
+   for m, expr in sorted(constraints.items()):
       log.trace('LP constraint: {} == {} + err for {}', coverage[m], expr, m)
       model.addConstr(expr + error_vars[m] == coverage[m])
+      print(f"({m[0]}, '{m[1]}'): {coverage[m]}, ", end='')
+   print('}')
+
    # Ensure that a mutation is not assigned to allele that does not exist 
    for a, mv in MPRESENT.items():
       for m, v in mv.items():
@@ -347,11 +354,15 @@ def solve_minor_model(gene: Gene,
       for m, mv in MADD[allele].items():
          if model.getValue(mv):
             added.append(m)
-
       solution.append(SolvedAllele(allele[0].major, 
                                    allele[0].minor, 
                                    allele[0].added + tuple(added), 
                                    tuple(missing)))
+
+   print('<minor_sol>: ' + str([
+      (s.minor, [(m[0], m[1]) for m in s.added], [(m[0], m[1]) for m in s.missing])
+      for s in solution    
+   ]))
 
    sol = MinorSolution(score=opt, 
                        solution=solution, 

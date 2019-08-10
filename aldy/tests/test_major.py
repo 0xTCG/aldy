@@ -9,6 +9,7 @@
 from nose.tools import *
 import unittest
 import collections
+import pandas as pd
 
 import aldy.cn
 import aldy.major
@@ -116,10 +117,30 @@ class MajorSyntheticTest(unittest.TestCase):
 
 
 
-class MajorFullTest(unittest.TestCase):
+class MajorRealPGX1Test(unittest.TestCase):
    _multiprocess_can_split_ = True
 
    def setUp(self):
       self.gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
+      self.results = pd.read_csv(script_path('aldy.tests.paper/pgx1.tsv'), sep="\t")
+      self.results = self.results[~self.results['sample'].str.startswith('>')]
+
+
+   def load(self, sample):
+      path = script_path(f'aldy.tests.paper/pgx1/{}.pgx1.aldy.dump')
+      sample = aldy.sam.Sample(sam_path=path, gene=self.gene, threshold=0.5, profile='pgrnseq-v1')
+
+      solver = 'gurobi'
+      cn_sols = aldy.cn.estimate_cn(self.gene, sample.coverage, solver)
+      major_sols = []
+      for i, cn_sol in enumerate(cn_sols):
+         sols = aldy.major.estimate_major(self.gene, sample.coverage, cn_sol, solver)
+         log.info('  {:2}: {}', i + 1, cn_sol._solution_nice())
+         major_sols += sols
+      
+      min_score = min(major_sols, key=lambda m: m.score).score
+      major_sols = sorted([m for m in major_sols 
+                           if abs(m.score - min_score) < SOLUTION_PRECISION], 
+                        key=lambda m: m.score)
 
 

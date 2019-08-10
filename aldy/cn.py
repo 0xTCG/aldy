@@ -208,7 +208,9 @@ def solve_cn_model(gene: Gene,
       
    # Form the error variables
    E = {}
+   print('<cn_data>: {', end='')
    for r, (exp_cov0, exp_cov1) in region_coverage.items():
+      print(f"'{str(r)[3:-1]}': ({exp_cov0}, {exp_cov1}), ", end='')
       expr = 0
       for s, structure in structures.items():
          if r in structure.cn[0]:
@@ -219,7 +221,7 @@ def solve_cn_model(gene: Gene,
 
       log.trace('LP contraint: {} == E_{} + {}', exp_cov0 - exp_cov1, r, expr)
       model.addConstr(expr + E[r] == exp_cov0 - exp_cov1)
-
+   print('}')
    # Set objective: minimize absolute errors AND the number of alleles (max. parsimony)
    # PCE_REGION (in CYP2D6) is penalized with extra score
    objective = model.abssum(E.values(), 
@@ -273,7 +275,7 @@ def solve_cn_model(gene: Gene,
       if sol_tuple not in mem: # Because A[1] can be 1 while A[0] is 0, we can have duplicates
          mem.append(sol_tuple) 
          result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
-
+   print('<cn_sol>: ' + str([dict(r.solution) for r in result]))
    return result
 
 
