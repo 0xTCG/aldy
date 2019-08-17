@@ -109,7 +109,7 @@ class Gurobi:
       return self.quicksum(vv)
 
 
-   def solve(self, objective=None, method: str = 'min', init: Optional[Callable] = None) -> Tuple[str, float]:
+   def solve(self, objective=None, method: str = 'min', init: Optional[Callable] = None) -> Tuple[str, float, dict]:
       """
       Solves the model with objective ``objective``.
 
@@ -144,12 +144,12 @@ class Gurobi:
 
    def solveAll(self, 
                 objective, 
-                var: dict, 
+                keys: dict, 
                 method: str = 'min', 
                 init: Optional[Callable] = None) -> Tuple[str, float, List[tuple]]:
       """
       Solves the model with objective ``objective``
-      and returns the list of all combinations of the variables ``var`` that minimize the objective.
+      and returns the list of all combinations of the variables ``keys`` that minimize the objective.
 
       Additional parameters of the solver can be set via ``init`` function that takes 
       the model instance as a sole argument.
@@ -158,12 +158,9 @@ class Gurobi:
          tuple[str, float, list[tuple[any]]]: Tuple describing the status of the solution and the objective value.
       """
       status, opt_value = self.solve(objective, method, init)
-
-      sol = sorted_tuple(set(a for a, v in var.items() if self.getValue(v))) 
-      solutions = set([sol]) | get_all_solutions(self, var, opt_value, sol) # type: ignore
-
-      return status, opt_value, list(solutions) # type: ignore
-
+      sol = sorted_tuple(set(a for a, v in keys.items() if self.getValue(v))) 
+      yield status, opt_value, sol
+      yield from get_all_solutions(self, keys, opt_value, sol)
 
    def getValue(self, var):
       """
@@ -326,9 +323,7 @@ def get_all_solutions(model: Gurobi,
    if mem is None:
       mem = set()
    if current_sol in mem or iteration > 10:
-      return set()
-   
-   solutions = set()
+      return
    mem.add(current_sol)
    for a in current_sol:
       # Disable a variable
@@ -336,14 +331,10 @@ def get_all_solutions(model: Gurobi,
       try:
          status, obj = model.solve()
          if status == 'optimal' and abs(obj - opt) < SOLUTION_PRECISION:
-            # new_solution = 
-            # new_solution |= set(current_sol) - set([a])
-            # assert(set(current_sol) - set([a]) <= new_solution)
             new_solution = sorted_tuple(set(vn for vn, v in var.items() if model.getValue(v)))
-            solutions.add(new_solution)
-            solutions |= get_all_solutions(model, var, opt, new_solution, iteration + 1, mem) # type: ignore
+            yield status, obj, new_solution
+            yield from get_all_solutions(model, var, opt, new_solution, iteration + 1, mem)
       except NoSolutionsError:
          pass
       # Re-enable variable
       model.changeUb(var[a], 1)
-   return solutions # type: ignore

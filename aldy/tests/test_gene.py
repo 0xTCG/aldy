@@ -14,56 +14,9 @@ from aldy.gene import *
 from aldy.common import *
 
 
-TOY_GENE = """{
-"name": "GENE", 
-"pseudogenes": {
-   "PSEUDO": {
-      "special_regions": { 0: ["tmp", 0, 10] }, 
-      "exons": { 1: [10, 20], 2: [30, 40], 3: [50, 60] }
-   } }, 
-"region": ["1", 0, 200], 
-"rev_comp": 0,
-"seq": "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT",
-
-"special_regions": { 0: ["tmp", 100, 110] }, 
-"exons": { 1: [110, 120], 2: [130, 140], 3: [150, 160] },
-"common_tandems": [ ['1', '4'] ],
-"unique_regions": ["1e", "1i", "2e", "2i", "3e"], 
-
-"alleles": {
-   "GENE*1": { # Normal
-      "phenotype": {"invivo": "Normal", "invitro": "Normal"}, 
-      "mutations": []
-   }, 
-   "GENE*1B": { # 0-indexed! 
-      "mutations": [ {"pos": 115, "op": "SNP.TA", "old": "3828:T>A", "functional": 0, "dbsnp": ["rs28371732", "rs28371741"]} ]
-   }, 
-   "GENE*1C": { # 0-indexed! 
-      "mutations": [ {"pos": 105, "op": "SNP.TA", "functional": 1} ]
-   }, 
-   "GENE*2": {
-      "mutations": [ {"pos": 111, "op": "DEL.AC", "functional": 3},  
-                     {"pos": 119, "op": "INS.TT", "functional": 3} ]
-   }, 
-   "GENE*3": {
-      "mutations": [ {"pos": 151, "op": "SNP.CT", "functional": 1}, {"pos": 148, "op": "INS.A", "functional": 0} ]
-   }, 
-   "GENE*4": { # left fusion
-      "mutations": [ {"pos": "pseudogene", "op": "i2-" } ]
-   }, 
-   "GENE*5": { # right fusion
-      "mutations": [ {"pos": "pseudogene", "op": "e2+" },
-                     {"pos": 111, "op": "DEL.AC", "functional": 3} ]
-   }, 
-   "GENE*6DEL": { # deletion fusion
-      "mutations": [ {"op": "deletion" } ]
-   }, 
-}}"""
-
-
 class GeneTest(unittest.TestCase):
    def setUp(self):
-      self.gene = Gene(None, 'GENE', TOY_GENE)
+      self.gene = Gene(script_path('aldy.tests/toy.yml'))
 
 
    def test_gene_basic(self):

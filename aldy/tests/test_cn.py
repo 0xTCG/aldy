@@ -12,33 +12,32 @@ import logbook.more
 import pandas
 
 import aldy.cn
+from aldy.cn import PARSIMONY_PENALTY, LEFT_FUSION_PENALTY
 from aldy.gene import Gene
-from aldy.tests.test_gene import TOY_GENE
 from aldy.common import *
 
 
-def assert_cn(gene, expected, cov, max_cn=20):
+def assert_cn(gene, expected, cov, expected_obj=None):
    sols = aldy.cn.solve_cn_model(gene, 
                                  cn_configs=gene.cn_configs, 
-                                 max_cn=max_cn, 
+                                 max_cn=20, 
                                  region_coverage=cov, 
                                  solver='gurobi')
+   if expected_obj:
+      for s in sols:
+         assert_less(abs(s.score - expected_obj), SOLUTION_PRECISION)
    sols = sorted([sorted(s.solution.items()) for s in sols])
    expected = sorted([sorted(s.items()) for s in expected])
-   print(sols); print(expected)
    assert_equal(len(sols), len(expected))
    assert_equal(sols, expected)
-
-
-#sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='DEBUG')
-#sh.push_application()
 
 
 class CNSyntheticTest(unittest.TestCase):
    _multiprocess_can_split_ = True
 
+
    def setUp(self):
-      self.gene = Gene(None, 'GENE', TOY_GENE)
+      self.gene = Gene(script_path('aldy.tests/toy.yml'))
 
 
    def make_coverage(self, lst):
@@ -53,55 +52,67 @@ class CNSyntheticTest(unittest.TestCase):
       # Test two copies of *1
       assert_cn(self.gene, 
                 [{'1': 2}],
-                self.make_coverage(zip([2,2, 2,2, 2], [2,2, 2,2, 2])))
+                self.make_coverage(zip([2,2, 2,2, 2], [2,2, 2,2, 2])),
+                2 * PARSIMONY_PENALTY)
+      # Test two copies of *1 with slightly perturbed coverage
+      assert_cn(self.gene, 
+                [{'1': 2}],
+                self.make_coverage(zip([1.8,2.2, 2.1,1.9, 1.7], [2.05,1.95, 2,2, 2.7])),
+                2 * PARSIMONY_PENALTY + (0.2 * 2 + 0.1 * 2 + 0.3 + 0.05 * 2 + 0.7))
 
 
    def test_deletion(self):
       # Test a single copy of *1 (*6 is deletion allele)
       assert_cn(self.gene, 
                 [{'1': 1, '6': 1}],
-                self.make_coverage(zip([1,1, 1,1, 1], [2,2, 2,2, 2])))
-
+                self.make_coverage(zip([1,1, 1,1, 1], [2,2, 2,2, 2])),
+                2 * PARSIMONY_PENALTY)
       # Test whole gene deletion
       assert_cn(self.gene, 
                 [{'6': 2}],
-                self.make_coverage(zip([0,0, 0,0, 0], [2,2, 2,2, 2])))
+                self.make_coverage(zip([0,0, 0,0, 0], [2,2, 2,2, 2])),
+                2 * PARSIMONY_PENALTY)
+
 
    def test_left_fusion(self):
       # Test two fused copies (*4 is defined as 00001|11100)
       assert_cn(self.gene, 
                 [{'4': 2}], 
-                self.make_coverage(zip([0,0, 0,1, 2], [2,2, 2,1, 0])))
-      
+                self.make_coverage(zip([0,0, 0,1, 2], [2,2, 2,1, 0])),
+                2 * PARSIMONY_PENALTY + 2 * LEFT_FUSION_PENALTY)
       # Test one fused and one normal (*1) allele 
       # Note: each left fusion operates on the whole genic region; 
       #       thus, the maximum number of left fusions is 2
       assert_cn(self.gene, 
                  [{'4': 2, '1': 1}], 
-                 self.make_coverage(zip([1,1, 1,2, 3], [2,2, 2,1, 0])))
+                 self.make_coverage(zip([1,1, 1,2, 3], [2,2, 2,1, 0])),
+                 3 * PARSIMONY_PENALTY + 2 * LEFT_FUSION_PENALTY)
 
 
    def test_right_fusion(self):
       # Test one fused and one normal (*1) allele (*5 is defined as 11000|11222)
       assert_cn(self.gene, 
                 [{'1': 1, '5': 1}],
-                self.make_coverage(zip([2,2, 1,1, 1], [2,2, 3,3, 3])))
+                self.make_coverage(zip([2,2, 1,1, 1], [2,2, 3,3, 3])),
+                2 * PARSIMONY_PENALTY)
 
 
    def test_multiplication(self):
       # Test twelve copies of *1
       assert_cn(self.gene, 
                 [{'1': 12}],
-                self.make_coverage(zip([12,12, 12,12, 12], [2,2, 2,2, 2])))
-
+                self.make_coverage(zip([12,12, 12,12, 12], [2,2, 2,2, 2])),
+                12 * PARSIMONY_PENALTY)
       # Test seven copies of *1 and one fused *5 copy
       assert_cn(self.gene, 
                 [{'1': 7, '5': 1}],
-                self.make_coverage(zip([8,8, 7,7, 7], [2,2, 3,3, 3])))
+                self.make_coverage(zip([8,8, 7,7, 7], [2,2, 3,3, 3])),
+                8 * PARSIMONY_PENALTY)
 
 
 class CNRealTest(unittest.TestCase):
    _multiprocess_can_split_ = True
+
 
    def setUp(self):
       self.gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
@@ -197,29 +208,29 @@ class CNRealTest(unittest.TestCase):
                 }))
 
 
-class CNFullTest:
-   #_multiprocess_can_split_ = True
+# class CNFullTest:
+#    #_multiprocess_can_split_ = True
 
-   def execute(gene, path, validation):
-      sample = aldy.sam.Sample(sam_path=path, gene=gene, threshold=0.5, profile='pgrnseq-v1')
-      solver = 'gurobi'
-      cn_sols = aldy.cn.estimate_cn(gene, sample.coverage, solver)
+#    def execute(gene, path, validation):
+#       sample = aldy.sam.Sample(sam_path=path, gene=gene, threshold=0.5, profile='pgrnseq-v1')
+#       solver = 'gurobi'
+#       cn_sols = aldy.cn.estimate_cn(gene, sample.coverage, solver)
 
-      result = [[j for k, v in cn_sol.solution.items() for j in [k] * v] for cn_sol in cn_sols]
-      validation = [v.split(',') for v in validation.split(';')]
-      assert_equal(sorted(result), sorted(validation))
+#       result = [[j for k, v in cn_sol.solution.items() for j in [k] * v] for cn_sol in cn_sols]
+#       validation = [v.split(',') for v in validation.split(';')]
+#       assert_equal(sorted(result), sorted(validation))
 
-   def test_pgx1(self):
-      gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
-      truth = pandas.read_csv(script_path('aldy.tests.paper/pgx1.tsv'), sep="\t")
-      for _, i in truth.iterrows():
-         p = script_path(f'aldy.tests.paper/pgx1/{i["sample"]}.pgx1.aldy.dump')
-         yield CNFullTest.execute, gene, p, i['cn']
+#    def test_pgx1(self):
+#       gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
+#       truth = pandas.read_csv(script_path('aldy.tests.paper/pgx1.tsv'), sep="\t")
+#       for _, i in truth.iterrows():
+#          p = script_path(f'aldy.tests.paper/pgx1/{i["sample"]}.pgx1.aldy.dump')
+#          yield CNFullTest.execute, gene, p, i['cn']
 
-   def test_pgx2(self):
-      gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
-      truth = pandas.read_csv(script_path('aldy.tests.paper/pgx2.tsv'), sep="\t")
-      for _, i in truth.iterrows():
-         p = script_path(f'aldy.tests.paper/pgx2/{i["sample"]}.pgx2.aldy.dump')
-         yield CNFullTest.execute, gene, p, i['cn']
+#    def test_pgx2(self):
+#       gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
+#       truth = pandas.read_csv(script_path('aldy.tests.paper/pgx2.tsv'), sep="\t")
+#       for _, i in truth.iterrows():
+#          p = script_path(f'aldy.tests.paper/pgx2/{i["sample"]}.pgx2.aldy.dump')
+#          yield CNFullTest.execute, gene, p, i['cn']
 

@@ -87,7 +87,7 @@ class Coverage:
    def total(self, pos: int) -> float:
       """
       Returns:
-         float: Total coverage at locus ``pos``.
+         float: Total coverage at the locus ``pos``.
       """
       if pos not in self._coverage: 
          return 0
@@ -114,6 +114,19 @@ class Coverage:
       if self._rescaled[pos] == 0: 
          return 0
       return self.total(pos) * (1 / self._rescaled[pos])
+
+   
+   def single_copy(self, pos: int, cn_solution) -> float:
+      """
+      Args:
+         pos (int): genomic locus
+         cn_solution (:obj:`aldy.cn.CNSolution`): a copy-number solution
+      Returns:
+         float: Coverage of a single copy at the locus ``pos``.
+      """
+      if cn_solution.position_cn(pos) == 0:
+         return 0
+      return max(1, self.total(pos)) / cn_solution.position_cn(pos)
 
 
    def region_coverage(self, gene: int, region: GeneRegion) -> float:

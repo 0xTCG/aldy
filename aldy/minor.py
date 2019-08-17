@@ -162,7 +162,7 @@ def solve_minor_model(gene: Gene,
             coverage[m], 
             coverage.total(m.pos),
             major_sol.cn_solution.position_cn(m.pos),
-            coverage[m] / (coverage.total(m.pos) / major_sol.cn_solution.position_cn(m.pos)) if coverage.total(m.pos) > 0 else 0,
+            coverage[m] / coverage.single_copy(m.pos, major_sol.cn_solution),
             m_gene, m_region,
             m.aux.get('old', ''))
    
@@ -202,8 +202,7 @@ def solve_minor_model(gene: Gene,
    constraints = {m: 0 for m in mutations} 
    for m in mutations:
       m_gene, m_region = gene.region_at(m.pos)
-      m_cn = major_sol.cn_solution.position_cn(m.pos)
-      cov = coverage.total(m.pos) / m_cn if m_cn > 0 else 0
+      cov = coverage.single_copy(m.pos, major_sol.cn_solution)
       
       for a in alleles:
          if m in alleles[a]:

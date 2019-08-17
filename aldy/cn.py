@@ -27,6 +27,20 @@ PCE_REGION = GeneRegion(11, 'pce')
 MAX_CN = 20.0
 """float: Maximum supported number of copies for a gene."""
 
+# Model parameters
+
+LEFT_FUSION_PENALTY = 0.1
+"""float: Penalty applied to left fusions (0 for no penalty)."""
+
+PCE_PENALTY_COEFF = 1.5
+"""float: Error scaling applied to PCE regions (1 for no penalty)."""
+
+MAX_CN_ERROR = 10.0
+"""float: Absolute error upper bound."""
+
+PARSIMONY_PENALTY = 0.5
+"""float: Penalty applied to each gene copy (0 for no penalty)."""
+
 
 class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gene', 'region_cn'])):
    """
@@ -158,12 +172,6 @@ def solve_cn_model(gene: Gene,
       Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_ (section Methods/Copy number and structural variation estimation) for the model explanation.
    """
 
-   # Model parameters
-   LEFT_FUSION_PENALTY = 0.1
-   PCE_PENALTY_COEFF = 1.5
-   MAX_CN_ERROR = 10
-   PARSIMONY_PENALTY = 0.5
-
    log.debug('Detecting CN among: {}', ', '.join(sorted(cn_configs)))
 
    # Initialize the LP model
@@ -233,13 +241,6 @@ def solve_cn_model(gene: Gene,
    objective += LEFT_FUSION_PENALTY * fusion_cost
    log.trace('LP objective: {}', objective)
 
-   # Solve the model 
-   try:
-      status, opt, solutions = model.solveAll(objective, A)
-      log.debug('LP status: {}, opt: {}', status, opt)
-   except lpinterface.NoSolutionsError:
-      return [CNSolution(float('inf'), solution=[], gene=gene)]
-
    def _explain_solution(sol):
       """Print the step-by-step explanation of each constraint for easier debugging"""
 
@@ -265,18 +266,22 @@ def solve_cn_model(gene: Gene,
       log.debug(f'** Fusion cost: {fc:.2f}')
       log.debug(f'== Error: {total + pc + fc:.2f} vs {opt:.2f}\n')
 
-   # Get final CN vector (i.e. total integer CN for each region)
-   result = []
-   mem = []
-   for sol in solutions:
-      log.debug('Solution: {}', ', '.join('*' + str(s) for s, _ in sol))
-      _explain_solution(sol)
-      sol_tuple = sorted_tuple(tuple(conf for conf, _ in sol))
-      if sol_tuple not in mem: # Because A[1] can be 1 while A[0] is 0, we can have duplicates
-         mem.append(sol_tuple) 
-         result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
-   print('<cn_sol>: ' + str([dict(r.solution) for r in result]))
-   return result
+   # Solve the model 
+   result, mem = [], []
+   try:
+      for status, opt, sol in model.solveAll(objective, A):
+         log.debug(f'LP status: {status}, opt: {opt}, solution {{}}',
+                   ', '.join('*' + str(s) for s, _ in sol))
+         _explain_solution(sol)
+         sol_tuple = sorted_tuple(tuple(conf for conf, _ in sol))
+         if sol_tuple not in mem: # Because A[1] can be 1 while A[0] is 0, we can have duplicates
+            mem.append(sol_tuple) 
+            result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
+      print('<cn_sol>: ' + str([dict(r.solution) for r in result]))
+      return result
+   except lpinterface.NoSolutionsError:
+      return [CNSolution(float('inf'), solution=[], gene=gene)]
+
 
 
 def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
