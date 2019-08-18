@@ -45,12 +45,7 @@ def assert_major(gene, major):
 
 
 sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='DEBUG')
-sh.push_application()
-# test_left_fusion_1 (aldy.tests.test_major.MajorRealTest) ... ERROR
-# test_left_fusion_2 (aldy.tests.test_major.MajorRealTest) ... ERROR
-# test_multiple_solutions_2 (aldy.tests.test_major.MajorRealTest) ... ERROR
-# test_right_fusion_1 (aldy.tests.test_major.MajorRealTest) ... ERROR
-# test_left_fusion (aldy.tests.test_major.MajorSyntheticTest) ... ERROR
+#sh.push_application()
 
 class MajorSyntheticTest(unittest.TestCase):
    _multiprocess_can_split_ = True
@@ -182,24 +177,20 @@ class MajorSyntheticTest(unittest.TestCase):
 
 
    def test_novel_mutations(self):
-      pass
-      #sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='TRACE')
-      #sh.push_application()
-
-      # Test novel mutation
-      # TODO WHOOPS
-      # assert_major(self.gene, {
-      #    "cn": {'1': 2},
-      #    "data": {(111, '_'): 10, (111, 'DEL.AC'): 10},
-      #    "sol": [{'1': 2}]
-      # }) 
-      
-      # TODO
-      # assert_major(self.gene, {
-      #    "cn": {'1': 1, '5': 1},
-      #    "data": {(111, '_'): 0, (111, 'DEL.AC'): 20},
-      #    "sol": [{'1': 1, '5': 1}]
-      # })  
+      # Test novel mutations within a single gene (other is deleted)
+      assert_major(self.gene, {
+        "cn": {'1': 1, '6': 1},
+        "data": {(111, '_'): 0, (111, 'DEL.AC'): 20},
+        "sol": [{('1', (111, 'DEL.AC')): 1, '6': 1}],
+        "score": NOVEL_MUTATION_PENAL
+      })  
+      # Test novel mutations
+      assert_major(self.gene, {
+         "cn": {'1': 2},
+         "data": {(111, '_'): 10, (111, 'DEL.AC'): 10},
+         "sol": [{'1': 1, ('1', (111, 'DEL.AC')): 1}],
+         "score": NOVEL_MUTATION_PENAL
+      }) 
 
 
 class MajorRealTest(unittest.TestCase):

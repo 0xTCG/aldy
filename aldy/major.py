@@ -118,15 +118,8 @@ def estimate_major(gene: Gene,
 
    log.debug('Solving major alleles for cn={}', cn_solution)
    
-   # Case of two deletions
-   if len(cn_solution.solution) == 0: 
-      del_allele = next(a for a, cn in gene.cn_configs.items() 
-                        if cn.kind == CNConfig.CNConfigType.DELETION)
-      sol = MajorSolution(score=0, 
-                          solution={SolvedAllele(major=deletion_allele, 
-                                                 minor=None, added=[], missing=[]): 2}, 
-                          cn_solution=cn_solution)
-      return [sol]
+   if sum(cn_solution.solution.values()) < 2:
+      raise AldyException("estimate_major requires at least two valid gene configurations") 
    
    alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
    # Check if some CN solution has no matching allele
@@ -169,8 +162,12 @@ def solve_major_model(gene: Gene,
    """
 
    # Make sure that coverage defaults to 0 on empty values
+
    model = lpinterface.model('aldy_major_allele', solver)
-   _print_candidates(allele_dict, coverage, cn_solution)
+ 
+   func_muts = {M for m, M in gene.mutations.items() 
+                if M.is_functional and coverage[M] > 0}
+   _print_candidates(allele_dict, coverage, cn_solution, func_muts)
    
    # hack to silence type checker
    a: Any = 0
@@ -189,18 +186,17 @@ def solve_major_model(gene: Gene,
       if ai > 0:
          log.trace('LP contraint: A_{}_{} <= A_{}_{}', a, ai, a, ai - 1)
          model.addConstr(A[a, ai] <= A[a, ai - 1])
-   
+
    # Add an error variable to the ILP for any mutation
-   error_vars = {m: model.addVar(lb=-model.INF, ub=model.INF, name='E_{}_{}_{}'.format(m, *a))
-                 for a in alleles
-                 for m in alleles[a].func_muts}
+   error_vars = {m: model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{m}')
+                 for m in func_muts}
    constraints = {e: 0 for e in error_vars}
    # Add a binary variable for any allele/novel mutation pair
    # TODO: do not add novel variables in impossible CN regions
    del_allele = gene.deletion_allele()
    N = {a: {m: model.addVar(vtype='B', name='N_{}_{}_{}'.format(m, *a))
                if a[0] != del_allele else 0 # deletion alleles should not be assigned any mutations
-            for m in constraints if m not in alleles[a].func_muts} 
+            for m in constraints if m[0] not in set(mm[0] for mm in alleles[a].func_muts)} 
         for a in alleles}
    # Populate constraints
    for a in alleles:
@@ -224,8 +220,12 @@ def solve_major_model(gene: Gene,
             continue
          if not any(ma[0] == pos and not ma[1].startswith('INS') 
                     for ma in alleles[a].func_muts):
-            Ns = reduce(operator.mul, (N[a][m] for m in N[a] if m[0] == pos), 1)
-            constraints[ref_m] += cov * A[a] #* (1 - Ns)
+            Ns = [N[a][m] for m in N[a] if m[0] == pos]
+            if len(Ns) > 0:
+               Ns = 1 - reduce(operator.mul, Ns, 1)
+            else:
+               Ns = 1
+            constraints[ref_m] += cov * A[a] * Ns
 
    # Each allele must express all of its functional mutations
    print('<major_cn>: ' + str(dict(cn_solution.solution)))
@@ -243,9 +243,8 @@ def solve_major_model(gene: Gene,
       model.addConstr(expr == cnt)
 
    # Each allele must express all of its functional mutations
-   func_muts = (m for a in alleles for m in alleles[a].func_muts if coverage[m] > 0)
    for m in func_muts:
-      expr = model.quicksum(A[a] for a in alleles if m in alleles[a].func_muts)
+      expr  = model.quicksum(A[a] for a in alleles if m in alleles[a].func_muts)
       expr += model.quicksum(A[a] * N[a][m] for a in alleles if m not in alleles[a].func_muts)
       log.trace('LP contraint: {} >= 1 for {}', expr, m)
       model.addConstr(expr >= 1)
@@ -256,38 +255,6 @@ def solve_major_model(gene: Gene,
       NOVEL_MUTATION_PENAL * model.quicksum(N[a][m] for a in N for m in N[a])
    log.trace('LP objective: {}', objective)
 
-   def _explain_solution(sol):
-      """Print the step-by-step explanation of each constraint for easier debugging"""
-      solved_alleles = {} # dict of allele IDs -> novel mutations
-      for s in sol: # handle 2-tuples properly (2-tuples have novel alleles)
-         if len(s) == 2:
-            solved_alleles[s[0]].append(s[1])
-         elif len(s) == 1:
-            solved_alleles[s[0]] = [] # li
-      print (sol)
-      log.debug("** Solution: {}", solved_alleles)
-      total = 0
-      for m in constraints:
-         cov = coverage.single_copy(m.pos, cn_solution)
-         g, region = gene.region_at(m.pos)
-         score = []
-         for a in solved_alleles:
-            if m[1].startswith('_'):
-               if gene.cn_configs[alleles[a].cn_config].cn[g][region] == 0: 
-                  continue
-               if not any(ma[0] == m[0] and not ma[1].startswith('INS') 
-                          for ma in alleles[a].func_muts):
-                  score.append(a)
-            else:
-               if m in alleles[a].func_muts:
-                  score.append(a)
-               #elif a[0] != del_allele and m in solved_alleles[a]:
-               #   score.append(a)
-         e = abs(model.getValue(error_vars[m]))
-         log.debug(f'** {m[0]}:{m[1]}: {coverage[m]} vs {abs(e-coverage[m])} (error = {e}) ::: alleles = {score}')
-         total += e
-      log.debug(f'== Error: {total} vs opt={opt:.2f}\n')
-
    # Solve the ILP
    try:
       keys = {**{(k,  ): v for k, v in A.items()}, # wrap (k) to ensure that tuples can be compared
@@ -296,14 +263,18 @@ def solve_major_model(gene: Gene,
       print('<major_sol>: [', end='')
       for status, opt, sol in model.solveAll(objective, keys):
          log.debug('Major Solver status: {}, opt: {}', status, opt)
-         _explain_solution(sol)
          solved_alleles = {} # dict of allele IDs -> novel mutations
          for s in sol: # handle 2-tuples properly (2-tuples have novel alleles)
             if len(s) == 2:
                solved_alleles[s[0]].append(s[1])
             else:
                solved_alleles[s[0]] = []
-         sol_tuple = tuple(sorted(solved_alleles.items()))
+         exp_opt = _explain_solution(solved_alleles, 
+                                     gene, coverage, cn_solution, alleles, constraints, model, error_vars)
+         log.debug(f'== Error: {exp_opt} vs opt={opt:.2f}\n')
+         
+         sol_tuple = tuple(sorted((a, nm) for (a, _), nm in solved_alleles.items()))
+         print(f'\n>> {sol_tuple}' )
          if sol_tuple not in mem:
             mem.append(sol_tuple)
             solution = collections.Counter(SolvedAllele(major=a, 
@@ -356,16 +327,53 @@ def _filter_alleles(gene: Gene,
 
 def _print_candidates(alleles: Dict[str, Allele], 
                       coverage: Coverage, 
-                      cn_solution: CNSolution) -> None:
+                      cn_solution: CNSolution, 
+                      func_muts: set) -> None:
    """
    Pretty-prints the list of allele candidates and their functional mutations.
    """
    log.debug('Possible candidates:')
+   func_muts = func_muts.copy()
    for a in sorted(alleles, key=allele_sort_key):
       log.debug('  *{} (cn=*{})', a, alleles[a].cn_config)
       for m in sorted(alleles[a].func_muts, key=lambda m: m.pos):
+         if m in func_muts: func_muts.remove(m)
          log.debug('    {} {:4} ({:.1f} copies) {} {}',
             #coverage.region_at(m.pos),
             m, coverage[m], 
             coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos)),
             'F', m.aux.get('old', ''))
+   if len(func_muts) > 0:
+      log.debug('  Other mutations:')
+      for m in sorted(func_muts, key=lambda m: m.pos):
+         log.debug('    {} {:4} ({:.1f} copies) {} {}',
+            m, coverage[m], 
+            coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos)),
+            'F', m.aux.get('old', '')) 
+
+
+def _explain_solution(sol, gene, coverage, cn_solution, alleles, constraints, model, error_vars):
+   """Pretty-prints the step-by-step explanation of each constraint for easier debugging"""
+   print (sol)
+   log.debug("** Solution: {}", sol)
+   total = 0
+   for m in constraints:
+      cov = coverage.single_copy(m.pos, cn_solution)
+      g, region = gene.region_at(m.pos)
+      score = []
+      for a in sol:
+         if m[1].startswith('_'):
+            if gene.cn_configs[alleles[a].cn_config].cn[g][region] == 0: 
+               continue
+            if not any(ma[0] == m[0] and not ma[1].startswith('INS') 
+                        for ma in alleles[a].func_muts):
+               score.append(a)
+         else:
+            if m in alleles[a].func_muts:
+               score.append(a)
+            #elif a[0] != del_allele and m in sol[a]:
+            #   score.append(a)
+      e = abs(model.getValue(error_vars[m]))
+      log.debug(f'** {m[0]}:{m[1]}: {coverage[m]} vs {abs(e-coverage[m])} (error = {e}) ::: alleles = {score}')
+      total += e
+   return total

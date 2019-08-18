@@ -62,9 +62,8 @@ class Coverage:
       Returns:
          float: Coverage of the mutation ``mut``.
       """
-      op = '_' if mut.op[:3] == 'REF' else mut.op
-      if op in self._coverage[mut.pos]:
-         return self._coverage[mut.pos][op]
+      if mut.op in self._coverage[mut.pos]:
+         return self._coverage[mut.pos][mut.op]
       else:
          return 0
 

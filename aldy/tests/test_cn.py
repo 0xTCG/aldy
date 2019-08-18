@@ -72,6 +72,13 @@ class CNSyntheticTest(unittest.TestCase):
                 [{'6': 2}],
                 self.make_coverage(zip([0,0, 0,0, 0], [2,2, 2,2, 2])),
                 2 * PARSIMONY_PENALTY)
+      # TODO: test 2 deletions with no coverage
+      # sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='DEBUG')
+      # sh.push_application()
+      # assert_cn(self.gene, 
+      #           [{'6': 2}],
+      #           self.make_coverage(zip([0,0, 0,0, 0], [0,0, 0,0, 0])),
+      #           2 * PARSIMONY_PENALTY)
 
 
    def test_left_fusion(self):

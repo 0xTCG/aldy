@@ -215,7 +215,7 @@ def solve_minor_model(gene: Gene,
                constraints[m] += cov * MADD[a][m] * A[a]
 
       # Fill the constraints for non-variations (i.e. where nucleotide matches reference genome)
-      ref_m = Mutation(m.pos, 'REF') # type: ignore
+      ref_m = Mutation(m.pos, '_') # type: ignore
       if ref_m not in constraints:
          error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=str(ref_m))
          constraints[ref_m] = 0

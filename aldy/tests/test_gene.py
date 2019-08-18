@@ -20,7 +20,7 @@ class GeneTest(unittest.TestCase):
 
 
    def test_gene_basic(self):
-      assert_equal(self.gene.name, 'GENE')
+      assert_equal(self.gene.name, 'TOY')
       assert_equal(self.gene.seq, 'ACGT' * 50)
       assert_equal(self.gene.region, GRange('1', 0, 200))
 
