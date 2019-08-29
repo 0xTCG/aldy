@@ -166,7 +166,7 @@ def genotype(gene_db: str,
       if output_file:
          diplotype.write_decomposition(sample_name, gene, sol_id, sol, output_file)
    
-   print('}')
+   print('},')
 
    # if do_remap != 0:
    #    log.critical('Remapping! Stay tuned...')

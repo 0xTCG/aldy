@@ -203,7 +203,7 @@ def solve_major_model(gene: Gene,
          constraints[m] += coverage.single_copy(m.pos, cn_solution) * A[a]
    # Add novel mutation constraints
    for a in N:
-      for m in N[a].keys():
+      for m in list(N[a].keys()):
          g, region = gene.region_at(m.pos)
          if gene.cn_configs[alleles[a].cn_config].cn[g][region] == 0: 
             del N[a][m]
