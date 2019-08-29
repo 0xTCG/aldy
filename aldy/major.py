@@ -251,7 +251,7 @@ def solve_major_model(gene: Gene,
    # Each functional mutation must be chosen by some allele and expressed
    for m in func_muts:
       expr  = model.quicksum(A[a] for a in alleles if m in alleles[a].func_muts)
-      expr += model.quicksum(A[a] * N[a][m] for a in alleles if m not in alleles[a].func_muts)
+      expr += model.quicksum(A[a] * N[a][m] for a in alleles if m in N[a] and m not in alleles[a].func_muts)
       log.trace('LP contraint: {} >= 1 for {}', expr, m)
       model.addConstr(expr >= 1)
 
