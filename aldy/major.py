@@ -192,7 +192,6 @@ def solve_major_model(gene: Gene,
                  for m in func_muts}
    constraints = {e: 0 for e in error_vars}
    # Add a binary variable for any allele/novel mutation pair
-   # TODO: do not add novel variables in impossible CN regions
    del_allele = gene.deletion_allele()
    N = {a: {m: model.addVar(vtype='B', name='N_{}_{}_{}'.format(m, *a))
                if a[0] != del_allele else 0 # deletion alleles should not be assigned any mutations
@@ -204,37 +203,44 @@ def solve_major_model(gene: Gene,
          constraints[m] += coverage.single_copy(m.pos, cn_solution) * A[a]
    # Add novel mutation constraints
    for a in N:
-      for m in N[a]:
-         constraints[m] += coverage.single_copy(m.pos, cn_solution) * A[a] * N[a][m]
+      for m in N[a].keys():
+         g, region = gene.region_at(m.pos)
+         if gene.cn_configs[alleles[a].cn_config].cn[g][region] == 0: 
+            del N[a][m]
+         else:
+            constraints[m] += coverage.single_copy(m.pos, cn_solution) * A[a] * N[a][m]
    
    # Populate constraints of non-variations (i.e. matches with the reference genome)
-   for pos in [m.pos for m in constraints]:
+   for pos in set(m.pos for m in constraints):
       ref_m = Mutation(pos, '_') # type: ignore
-      if ref_m not in constraints:
-         constraints[ref_m] = 0
-         error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{ref_m}')
+      constraints[ref_m] = 0
+      error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{ref_m}')
+
       cov = coverage.single_copy(pos, cn_solution)
       g, region = gene.region_at(pos)
       for a in alleles:
          if gene.cn_configs[alleles[a].cn_config].cn[g][region] == 0: 
             continue
-         if not any(ma[0] == pos and not ma[1].startswith('INS') 
-                    for ma in alleles[a].func_muts):
-            Ns = [N[a][m] for m in N[a] if m[0] == pos]
-            if len(Ns) > 0:
-               Ns = 1 - reduce(operator.mul, Ns, 1)
-            else:
-               Ns = 1
-            constraints[ref_m] += cov * A[a] * Ns
+         # If allele has insertion at this loci, it will still contribute to the coverage at this loci
+         if any(ma[0] == pos and not ma[1][:3] == 'INS' for ma in alleles[a].func_muts):
+            continue
+         # Make sure that this allele has no novel alleles at this position
+         Ns = [N[a][m] for m in N[a] if m[0] == pos and m[1][:3] != 'INS']
+         if len(Ns) > 0:
+            Ns = 1 - reduce(operator.mul, Ns, 1)
+         else:
+            Ns = 1
+         constraints[ref_m] += cov * A[a] * Ns
 
    # Each allele must express all of its functional mutations
-   print('<major_cn>: ' + str(dict(cn_solution.solution)))
-   print('<major_data>: {', end='')
+   print('  {')
+   print(f'    "cn": {str(dict(cn_solution.solution))}, ')
+   print( '    "data": {', end='')
    for m, expr in sorted(constraints.items()):
       log.trace('LP contraint: {} == {} + err for {} with cn={}', coverage[m], expr, m, cn_solution.position_cn(m.pos))
       model.addConstr(expr + error_vars[m] == coverage[m])
       print(f"({m[0]}, '{m[1]}'): {coverage[m]}, ", end='')
-   print('}')
+   print('}, ')
 
    # Each CN config must be satisfied by matching alleles
    for cnf, cnt in cn_solution.solution.items():
@@ -242,7 +248,7 @@ def solve_major_model(gene: Gene,
       log.trace('LP contraint: {} == {} for {}', cnt, expr, cnf)
       model.addConstr(expr == cnt)
 
-   # Each allele must express all of its functional mutations
+   # Each functional mutation must be chosen by some allele and expressed
    for m in func_muts:
       expr  = model.quicksum(A[a] for a in alleles if m in alleles[a].func_muts)
       expr += model.quicksum(A[a] * N[a][m] for a in alleles if m not in alleles[a].func_muts)
@@ -260,7 +266,7 @@ def solve_major_model(gene: Gene,
       keys = {**{(k,  ): v for k, v in A.items()}, # wrap (k) to ensure that tuples can be compared
               **{(a, m): N[a][m] for a in N for m in N[a] if a[0] != del_allele}}
       result, mem = [], []
-      print('<major_sol>: [', end='')
+      print('    "sol": [', end='')
       for status, opt, sol in model.solveAll(objective, keys):
          log.debug('Major Solver status: {}, opt: {}', status, opt)
          solved_alleles = {} # dict of allele IDs -> novel mutations
@@ -274,13 +280,12 @@ def solve_major_model(gene: Gene,
          log.debug(f'== Error: {exp_opt} vs opt={opt:.2f}\n')
          
          sol_tuple = tuple(sorted((a, nm) for (a, _), nm in solved_alleles.items()))
-         print(f'\n>> {sol_tuple}' )
          if sol_tuple not in mem:
             mem.append(sol_tuple)
             solution = collections.Counter(SolvedAllele(major=a, 
-                                                      minor=None, 
-                                                      added=tuple(mut), 
-                                                      missing=tuple()) 
+                                                        minor=None, 
+                                                        added=tuple(mut), 
+                                                        missing=tuple()) 
                                           for (a, _), mut in solved_alleles.items())
             print(str(dict(collections.Counter(
                tuple([a] + [(m[0], m[1]) for m in mut]) if len(mut) > 0 else a
@@ -290,7 +295,7 @@ def solve_major_model(gene: Gene,
                               cn_solution=cn_solution)
             log.debug('Major solution: {}'.format(sol))
             result.append(sol)
-      print(']')
+      print(']\n  }, ', end='')
       return result
    except lpinterface.NoSolutionsError:
       return [MajorSolution(score=float('inf'), solution=[], cn_solution=cn_solution)]
@@ -354,7 +359,6 @@ def _print_candidates(alleles: Dict[str, Allele],
 
 def _explain_solution(sol, gene, coverage, cn_solution, alleles, constraints, model, error_vars):
    """Pretty-prints the step-by-step explanation of each constraint for easier debugging"""
-   print (sol)
    log.debug("** Solution: {}", sol)
    total = 0
    for m in constraints:

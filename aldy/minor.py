@@ -20,6 +20,13 @@ from .cn import MAX_CN
 from .coverage import Coverage
 from .major import MajorSolution, SolvedAllele
 
+# Model parameters
+MISS_PENALTY_FACTOR = 2.0
+"""float: Penalty for each missed minor mutation (0 for no penalty)"""
+
+ADD_PENALTY_FACTOR = 1.0
+"""float: Penalty for each novel minor mutation (0 for no penalty)"""
+
 
 class MinorSolution(collections.namedtuple('MinorSolution', ['score', 'solution', 'major_solution'])):
    """
@@ -79,8 +86,9 @@ def estimate_minor(gene: Gene,
       :obj:`MinorSolution`
    """
 
-   # Get list of alleles and mutations to consider   
+   # Get list of alleles and mutations to consider
    alleles: List[Tuple[str, str]] = list()
+   # Consider all major and minor mutations *from all available major solutions* together
    mutations: Set[Mutation] = set()
    for major_sol in major_sols:
       for (ma, _, added, _) in major_sol.solution:
@@ -139,9 +147,6 @@ def solve_minor_model(gene: Gene,
       Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_ (section Methods/Genotype refining) for the model explanation.
    """
 
-   MISS_PENALTY_FACTOR = 2
-   ADD_PENALTY_FACTOR = 1
-
    log.debug('\nRefining {}', major_sol)
    model = lpinterface.model('aldy_refine', solver)
    
@@ -187,12 +192,12 @@ def solve_minor_model(gene: Gene,
 
    # Add a binary variable for each allele/mutation pair where mutation belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or will be missing
-   MPRESENT = {a: {m: model.addVar(vtype='B', name='MISS-{}-{}'.format(m, a)[:250]) 
+   MPRESENT = {a: {m: model.addVar(vtype='B', name=f'MISS_{m}_{a}') 
                    for m in alleles[a]}
                for a in alleles}
    # Add a binary variable for each allele/mutation pair where mutation DOES NOT belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or not
-   MADD = {a: {m: model.addVar(vtype='B', name='ADD-{}-{}'.format(m, a)[:250]) 
+   MADD = {a: {m: model.addVar(vtype='B', name=f'ADD_{m}_{a}') 
                for m in mutations 
                if m not in alleles[a]}
            for a in alleles}
@@ -203,7 +208,6 @@ def solve_minor_model(gene: Gene,
    for m in mutations:
       m_gene, m_region = gene.region_at(m.pos)
       cov = coverage.single_copy(m.pos, major_sol.cn_solution)
-      
       for a in alleles:
          if m in alleles[a]:
             constraints[m] += cov * MPRESENT[a][m] * A[a]
@@ -214,36 +218,40 @@ def solve_minor_model(gene: Gene,
             if gene.cn_configs[gene.alleles[ma].cn_config].cn[m_gene][m_region] > 0:
                constraints[m] += cov * MADD[a][m] * A[a]
 
-      # Fill the constraints for non-variations (i.e. where nucleotide matches reference genome)
+   # Fill the constraints for non-variations (i.e. where nucleotide matches reference genome)
+   for pos in set(m.pos for m in constraints):
       ref_m = Mutation(m.pos, '_') # type: ignore
-      if ref_m not in constraints:
-         error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=str(ref_m))
-         constraints[ref_m] = 0
-
+      error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=str(ref_m))
+      constraints[ref_m] = 0
       for a in alleles:
          (ma, _, _, _), _ = a
          if gene.cn_configs[gene.alleles[ma].cn_config].cn[m_gene][m_region] == 0:
             continue
-         if m in alleles[a]:
-            # TODO: If a mutation is not present in allele, we assign it to REF mutation. 
-            #       This should be extended to other potential mutations at the same loci as well.
-            constraints[ref_m] += cov * (1 - MPRESENT[a][m]) * A[a]
-         elif not any(m.pos == fm.pos for fm in alleles[a]):
-            # ^ Make sure that reference position is not introduced 
-            #   if there is already some mutation at this locus
-            constraints[ref_m] += cov * (1 - MADD[a][m]) * A[a]
+         # Does this allele contain any mutation at the position `pos`? 
+         # Insertions are not counted as they always contribute to `_`.
+         present_muts = [m for m in alleles[a] if m.pos == pos and m[1][:3] != 'INS']
+         assert(len(present_muts) < 2)
+         if len(present_muts) == 1:
+            constraints[ref_m] += cov * (1 - MPRESENT[a][present_muts[0]]) * A[a]
+         else:
+            N = 1
+            for m in MADD[a]:
+               if m.pos == pos and m[1][:3] != 'INS':
+                  N *= 1 - MADD[a][m]
+            constraints[ref_m] += cov * N * A[a]
 
    # Ensure that each constraint matches the observed coverage
-   print('<minor_cn>: ' + str(dict(major_sol.cn_solution.solution)))
-   print('<minor_major>: ' + str({
+   print('  {')
+   print(f'    "cn": {str(dict(major_sol.cn_solution.solution))}, ')
+   print( '    "major": ' + str({
          tuple([s.major] + [(m[0], m[1]) for m in s.added]) if len(s.added) > 0 else s.major: v
-         for s, v in major_sol.solution.items()}))
-   print('<minor_data>: {', end='')
+         for s, v in major_sol.solution.items()}) + ", ")
+   print('    "data": {', end='')
    for m, expr in sorted(constraints.items()):
       log.trace('LP constraint: {} == {} + err for {}', coverage[m], expr, m)
       model.addConstr(expr + error_vars[m] == coverage[m])
       print(f"({m[0]}, '{m[1]}'): {coverage[m]}, ", end='')
-   print('}')
+   print('}, ')
 
    # Ensure that a mutation is not assigned to allele that does not exist 
    for a, mv in MPRESENT.items():
@@ -277,7 +285,8 @@ def solve_minor_model(gene: Gene,
          expr = model.quicksum(MADD[a][m] for a in alleles if m not in alleles[a])
          log.trace('LP constraint 3: 0 >= {} for {}', expr, m)
          model.addConstr(expr <= 0)
-   # 4) CNs at each loci must be respected
+   
+   # 4) TODO: CNs at each loci must be respected
    for m in mutations:
       m_gene, m_region = gene.region_at(m.pos) 
       exprs = (A[a] 
@@ -288,9 +297,9 @@ def solve_minor_model(gene: Gene,
       log.trace(f'LP constraint 4: {total_cn} == {expr} for {m}')
       # print(f'{m}:{m_gene}/{m_region} --> {total_cn} @ {list(exprs)}')
       # floor/ceil because of total_cn potentially having 0.5 as a summand
-      #model.addConstr(expr >= math.floor(total_cn))
-      #model.addConstr(expr <= math.ceil(total_cn))
-   # 5) Make sure that CN of each variation does not exceed total supporting allele CN
+      # model.addConstr(expr >= math.floor(total_cn))
+      # model.addConstr(expr <= math.ceil(total_cn))
+   # 5) TODO: Make sure that CN of each variation does not exceed total supporting allele CN
    for m in mutations: 
       m_cn = major_sol.cn_solution.position_cn(m.pos)
       exp_cn = coverage.percentage(m) / 100.0
@@ -358,24 +367,16 @@ def solve_minor_model(gene: Gene,
                                    allele[0].added + tuple(added), 
                                    tuple(missing)))
 
-   print('<minor_sol>: ' + str([
+   print('    "sol": ' + str([
       (s.minor, [(m[0], m[1]) for m in s.added], [(m[0], m[1]) for m in s.missing])
       for s in solution    
    ]))
+   print("  }, ", end='')
 
    sol = MinorSolution(score=opt, 
                        solution=solution, 
                        major_solution=major_sol)
    log.debug(f'Minor solution: {sol}')
-
-   # terr=0
-   # log.info(f'>>>> {sol}')
-   # for m in sorted(error_vars.keys()):
-   #    if m.pos not in [42522964, 42523210, 42523408]:
-   #       continue
-   #    print('>>', m, round(model.getValue(error_vars[m]), 1))
-   #    terr+=abs(round(model.getValue(error_vars[m]), 1))
-   # print('>>>', round(terr, 2))
 
    return sol
 
