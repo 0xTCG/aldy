@@ -231,10 +231,14 @@ def solve_major_model(gene: Gene,
    print('  {')
    print(f'    "cn": {str(dict(cn_solution.solution))}, ')
    print( '    "data": {', end='')
+   prev=0
    for m, expr in sorted(constraints.items()):
       cov = coverage[m] / coverage.single_copy(m.pos, cn_solution)
       model.addConstr(expr + VERR[m] == cov)
-      print(f"({m[0]}, '{m[1]}'): {cov}, ", end='')
+      if m.pos != prev and prev != 0:
+         print('\n             ', end='')
+      prev=m.pos
+      print(f"({m[0]}, '{m[1]}'): {cov:.4f}, ", end='')
    print('}, ')
 
    # Each CN config must be satisfied by matching alleles

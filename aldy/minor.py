@@ -245,10 +245,14 @@ def solve_minor_model(gene: Gene,
          tuple([s.major] + [(m[0], m[1]) for m in s.added]) if len(s.added) > 0 else s.major: v
          for s, v in major_sol.solution.items()}) + ", ")
    print('    "data": {', end='')
+   prev=0
    for m, expr in sorted(constraints.items()):
       cov = coverage[m] / coverage.single_copy(m.pos, major_sol.cn_solution) 
       model.addConstr(expr + error_vars[m] == cov)
-      print(f"({m[0]}, '{m[1]}'): {cov}, ", end='')
+      if m.pos != prev and prev != 0:
+         print('\n             ', end='')
+      prev=m.pos
+      print(f"({m.pos}, '{m.op}'): {cov:.4f}, ", end='')
    print('}, ')
 
    # Ensure the following rules for all mutations:
