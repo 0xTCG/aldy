@@ -339,7 +339,7 @@ def solve_minor_model(gene: Gene,
    # Solve the model
    try:
       status, opt = model.solve(objective)
-      model.model.write('minor.lp')
+      # model.model.write('minor.lp')
       solution = []
       for allele, value in A.items():
          if model.getValue(value) <= 0:
@@ -366,7 +366,8 @@ def solve_minor_model(gene: Gene,
       return [sol]
    except lpinterface.NoSolutionsError:
       log.debug('No minor solutions')
-      #model.model.computeIIS()
-      #model.model.write("minor.ilp")
+      # Enable to debug infeasible models
+      # model.model.computeIIS()
+      # model.model.write("minor.ilp")
       return []
 
