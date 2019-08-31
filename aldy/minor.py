@@ -163,12 +163,12 @@ def solve_minor_model(gene: Gene,
       log.debug('  *{} (cn=*{})', mi, gene.alleles[ma].cn_config)
       for m in sorted(alleles[a], key=lambda m: m.pos):
          m_gene, m_region = gene.region_at(m.pos)
-         log.debug('    {:26} {:4}/{:4} ({} ~ {:.1f} copies) {}|{} {}',
+         log.debug('    {:26}  {:.2f} ({:4} / {} * {:4}) {}:{} {}',
             str(m), 
-            coverage[m], 
-            coverage.total(m.pos),
-            major_sol.cn_solution.position_cn(m.pos),
             coverage[m] / coverage.single_copy(m.pos, major_sol.cn_solution),
+            coverage[m], 
+            major_sol.cn_solution.position_cn(m.pos),
+            coverage.single_copy(m.pos, major_sol.cn_solution),
             m_gene, m_region,
             m.aux.get('old', ''))
    
@@ -177,11 +177,10 @@ def solve_minor_model(gene: Gene,
       for cnt in range(1, max_cn):
          alleles[a, cnt] = alleles[a, 0]
       
-   A = {a: model.addVar(vtype='B', name=a[0].minor) for a in sorted(alleles)}
-   for a, cnt in sorted(alleles):
+   A = {a: model.addVar(vtype='B', name=a[0].minor) for a in alleles}
+   for a, cnt in alleles:
       if cnt == 0:
          continue
-      log.trace('LP constraint: A_{} <= A_{} for {}', cnt, cnt - 1, a)
       model.addConstr(A[a, cnt] <= A[a, cnt - 1])
 
    # Make sure that sum of all subaleles is exactly as the count of their major alleles
