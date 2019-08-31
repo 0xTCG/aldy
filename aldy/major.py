@@ -23,7 +23,7 @@ from .coverage import Coverage
 
 
 # Model parameters
-NOVEL_MUTATION_PENAL = 100000.0
+NOVEL_MUTATION_PENAL = MAX_CN + 1
 """float: Penalty for each novel mutation (0 for no penalty)"""
 
 
@@ -176,46 +176,43 @@ def solve_major_model(gene: Gene,
    alleles = {(a, 0): allele_dict[a] for a in allele_dict} 
    for (an, _), a in list(alleles.items()):
       max_cn = cn_solution.solution[a.cn_config]
-      log.trace('Maximum CN for {}: {}', an, max_cn)
       for i in range(1, max_cn):
          alleles[an, i] = alleles[an, 0]
-   A = {a: model.addVar(vtype='B', name='A_{}_{}'.format(*a)) for a in alleles}
+   VA = {a: model.addVar(vtype='B', name=f'A_{a[0]}_{a[1]}') for a in alleles}
 
-   # Make sure that A[i+1] <= A[i] (to avoid equivalent solutions)
+   # Make sure that VA[i+1] <= VA[i] (to avoid equivalent solutions)
    for a, ai in alleles.keys(): 
       if ai > 0:
-         log.trace('LP contraint: A_{}_{} <= A_{}_{}', a, ai, a, ai - 1)
-         model.addConstr(A[a, ai] <= A[a, ai - 1])
+         model.addConstr(VA[a, ai] <= VA[a, ai - 1])
 
    # Add an error variable to the ILP for any mutation
-   error_vars = {m: model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{m}')
-                 for m in func_muts}
-   constraints = {e: 0 for e in error_vars}
+   VERR = {m: model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{m.pos}_{m.op.replace(".", "")}')
+              for m in func_muts}
+   constraints = {e: 0 for e in VERR}
    # Add a binary variable for any allele/novel mutation pair
    del_allele = gene.deletion_allele()
-   N = {a: {m: model.addVar(vtype='B', name='N_{}_{}_{}'.format(m, *a))
+   VNEW = {a: {m: model.addVar(vtype='B', name=f'N_{m.pos}_{m.op.replace(".", "")}_{a[0]}')
                if a[0] != del_allele else 0 # deletion alleles should not be assigned any mutations
-            for m in constraints if m[0] not in set(mm[0] for mm in alleles[a].func_muts)} 
-        for a in alleles}
+               for m in constraints if m[0] not in set(mm[0] for mm in alleles[a].func_muts)} 
+           for a in alleles}
    # Populate constraints
    for a in alleles:
       for m in alleles[a].func_muts:
-         constraints[m] += coverage.single_copy(m.pos, cn_solution) * A[a]
+         constraints[m] += VA[a]
    # Add novel mutation constraints
-   for a in N:
-      for m in list(N[a].keys()):
+   for a in VNEW:
+      for m in list(VNEW[a].keys()):
          if gene.has_coverage(a[0], m.pos):
-            constraints[m] += coverage.single_copy(m.pos, cn_solution) * A[a] * N[a][m]
+            constraints[m] += VA[a] * VNEW[a][m]
          else: 
-            del N[a][m]
+            del VNEW[a][m]
    
    # Populate constraints of non-variations (i.e. matches with the reference genome)
    for pos in set(m.pos for m in constraints):
       ref_m = Mutation(pos, '_') # type: ignore
       constraints[ref_m] = 0
-      error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{ref_m}')
+      VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{pos}_REF')
 
-      cov = coverage.single_copy(pos, cn_solution)
       for a in alleles:
          if not gene.has_coverage(a[0], pos): 
             continue
@@ -223,46 +220,44 @@ def solve_major_model(gene: Gene,
          if any(ma[0] == pos and not ma[1][:3] == 'INS' for ma in alleles[a].func_muts):
             continue
          # Make sure that this allele has no novel alleles at this position
-         Ns = [N[a][m] for m in N[a] if m[0] == pos and m[1][:3] != 'INS']
+         Ns = [VNEW[a][m] for m in VNEW[a] if m[0] == pos and m[1][:3] != 'INS']
          if len(Ns) > 0:
             Ns = 1 - reduce(operator.mul, Ns, 1)
          else:
             Ns = 1
-         constraints[ref_m] += cov * A[a] * Ns
+         constraints[ref_m] += VA[a] * Ns
 
    # Each allele must express all of its functional mutations
    print('  {')
    print(f'    "cn": {str(dict(cn_solution.solution))}, ')
    print( '    "data": {', end='')
    for m, expr in sorted(constraints.items()):
-      log.trace('LP contraint: {} == {} + err for {} with cn={}', coverage[m], expr, m, cn_solution.position_cn(m.pos))
-      model.addConstr(expr + error_vars[m] == coverage[m])
-      print(f"({m[0]}, '{m[1]}'): {coverage[m]}, ", end='')
+      cov = coverage[m] / coverage.single_copy(m.pos, cn_solution)
+      model.addConstr(expr + VERR[m] == cov)
+      print(f"({m[0]}, '{m[1]}'): {cov}, ", end='')
    print('}, ')
 
    # Each CN config must be satisfied by matching alleles
    for cnf, cnt in cn_solution.solution.items():
-      expr = sum(A[a] for a in A if alleles[a].cn_config == cnf)
-      log.trace('LP contraint: {} == {} for {}', cnt, expr, cnf)
+      expr = sum(VA[a] for a in VA if alleles[a].cn_config == cnf)
       model.addConstr(expr == cnt)
 
    # Each functional mutation must be chosen by some allele and expressed
    for m in func_muts:
-      expr  = model.quicksum(A[a] for a in alleles if m in alleles[a].func_muts)
-      expr += model.quicksum(A[a] * N[a][m] for a in alleles if m in N[a] and m not in alleles[a].func_muts)
-      log.trace('LP contraint: {} >= 1 for {}', expr, m)
+      expr  = model.quicksum(VA[a] for a in alleles if m in alleles[a].func_muts)
+      expr += model.quicksum(VA[a] * VNEW[a][m] for a in alleles if m in VNEW[a] and m not in alleles[a].func_muts)
       model.addConstr(expr >= 1)
 
    # Set objective: minimize the absolute sum of errors   
    objective = \
-      model.abssum(e for e in error_vars.values()) + \
-      NOVEL_MUTATION_PENAL * model.quicksum(N[a][m] for a in N for m in N[a])
+      model.abssum(e for e in VERR.values()) + \
+      NOVEL_MUTATION_PENAL * model.quicksum(VNEW[a][m] for a in VNEW for m in VNEW[a])
    log.trace('LP objective: {}', objective)
 
    # Solve the ILP
    try:
-      keys = {**{(k,  ): v for k, v in A.items()}, # wrap (k) to ensure that tuples can be compared
-              **{(a, m): N[a][m] for a in N for m in N[a] if a[0] != del_allele}}
+      keys = {**{(k,  ): v for k, v in VA.items()}, # wrap (k) to ensure that tuples can be compared
+              **{(a, m): VNEW[a][m] for a in VNEW for m in VNEW[a] if a[0] != del_allele}}
       result, mem = [], []
       print('    "sol": [', end='')
       for status, opt, sol in model.solveAll(objective, keys):
@@ -274,7 +269,7 @@ def solve_major_model(gene: Gene,
             elif s[0] not in solved_alleles:
                solved_alleles[s[0]] = []
          exp_opt = _explain_solution(solved_alleles, 
-                                     gene, coverage, cn_solution, alleles, constraints, model, error_vars)
+                                     gene, coverage, cn_solution, alleles, constraints, model, VERR)
          log.debug(f'== Error: {exp_opt} vs opt={opt:.2f}\n')
          
          sol_tuple = tuple(sorted((a, nm) for (a, _), nm in solved_alleles.items()))
@@ -356,12 +351,11 @@ def _print_candidates(alleles: Dict[str, Allele],
 
 def _explain_solution(sol, gene, coverage, cn_solution, alleles, constraints, model, error_vars):
    """Pretty-prints the step-by-step explanation of each constraint for easier debugging"""
-   log.debug("** Solution: {}", sol)
+   log.debug(f"** Solution: {dict(sol)}")
    total = 0
-   for m in constraints:
-      cov = coverage.single_copy(m.pos, cn_solution)
+   for m in sorted(constraints):
       score = []
-      for a in sol:
+      for a in sorted(sol):
          if m[1].startswith('_'):
             if not gene.has_coverage(a[0], m.pos): 
                continue
@@ -371,9 +365,7 @@ def _explain_solution(sol, gene, coverage, cn_solution, alleles, constraints, mo
          else:
             if m in alleles[a].func_muts:
                score.append(a)
-            #elif a[0] != del_allele and m in sol[a]:
-            #   score.append(a)
       e = abs(model.getValue(error_vars[m]))
-      log.debug(f'** {m[0]}:{m[1]}: {coverage[m]} vs {abs(e-coverage[m])} (error = {e}) ::: alleles = {score}')
+      log.debug(f'** {m[0]}:{m[1]}: {coverage[m]:.2f} vs {abs(e-coverage[m]):.2f} (error = {e:.2f}) @@ alleles = {score}')
       total += e
    return total

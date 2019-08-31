@@ -100,7 +100,7 @@ class MinorSyntheticTest(unittest.TestCase):
          "data": {(115, '_'): 9, (115, 'SNP.TA'): 11},
          "major": {'1': 2},
          "sol": [('1', [], []), ('1B', [], [])],
-         "score": 2
+         "score": 0.2
       })
 
 
@@ -136,7 +136,7 @@ class MinorRealTest(unittest.TestCase):
       self.gene = Gene(script_path('aldy.resources.genes/cyp2d6.yml'))
       
    
-   def test_normal(self): # HG00436/v1 ~ 7254.33 / 7248.33 / 8284.33 ???
+   def test_normal(self): # HG00436/v1 
       assert_minor(self.gene, {
          "cn": {'1': 3}, 
          "major": {'2': 1, '2.a': 1, '71': 1}, 

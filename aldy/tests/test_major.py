@@ -45,7 +45,7 @@ def assert_major(gene, major):
 
 
 sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='DEBUG')
-#sh.push_application()
+# sh.push_application()
 
 class MajorSyntheticTest(unittest.TestCase):
    _multiprocess_can_split_ = True
@@ -100,7 +100,7 @@ class MajorSyntheticTest(unittest.TestCase):
                   (119, '_'): 22, (119, 'INS.TT'): 8,
                   (151, '_'): 10.5, (151, 'SNP.CT'): 9.5},
          "sol": [{'2': 1, '3': 1}],
-         "score": 6
+         "score": 2/10 + 3/11 + 1/10 
       }) 
 
 
