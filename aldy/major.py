@@ -37,11 +37,11 @@ class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'ad
          Major star-allele identifier.
       minor (str, optional):
          Minor star-allele identifier. Can be None.
-      added (list[:obj:`aldy.gene.Mutation`]):
-         List of mutations that are added to this copy of a major/minor star-allele
+      added (tuple[:obj:`aldy.gene.Mutation`]):
+         Tuple of mutations that are added to this copy of a major/minor star-allele
          (e.g. these mutations are not present in the database defition of allele).
-      missing (list[:obj:`aldy.gene.Mutation`]):
-         List of mutations that are ommited from this copy of a major/minor star-allele
+      missing (tuple[:obj:`aldy.gene.Mutation`]):
+         Tuple of mutations that are ommited from this copy of a major/minor star-allele
          (e.g. these mutations are present in the database defition of allele but not in the sample).
    
    Notes:
@@ -204,11 +204,10 @@ def solve_major_model(gene: Gene,
    # Add novel mutation constraints
    for a in N:
       for m in list(N[a].keys()):
-         g, region = gene.region_at(m.pos)
-         if gene.cn_configs[alleles[a].cn_config].cn[g][region] == 0: 
-            del N[a][m]
-         else:
+         if gene.has_coverage(a[0], m.pos):
             constraints[m] += coverage.single_copy(m.pos, cn_solution) * A[a] * N[a][m]
+         else: 
+            del N[a][m]
    
    # Populate constraints of non-variations (i.e. matches with the reference genome)
    for pos in set(m.pos for m in constraints):
@@ -217,9 +216,8 @@ def solve_major_model(gene: Gene,
       error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{ref_m}')
 
       cov = coverage.single_copy(pos, cn_solution)
-      g, region = gene.region_at(pos)
       for a in alleles:
-         if gene.cn_configs[alleles[a].cn_config].cn[g][region] == 0: 
+         if not gene.has_coverage(a[0], pos): 
             continue
          # If allele has insertion at this loci, it will still contribute to the coverage at this loci
          if any(ma[0] == pos and not ma[1][:3] == 'INS' for ma in alleles[a].func_muts):
@@ -269,11 +267,11 @@ def solve_major_model(gene: Gene,
       print('    "sol": [', end='')
       for status, opt, sol in model.solveAll(objective, keys):
          log.debug('Major Solver status: {}, opt: {}', status, opt)
-         solved_alleles = {} # dict of allele IDs -> novel mutations
+         solved_alleles = collections.defaultdict(lambda: []) # dict of allele IDs -> novel mutations
          for s in sol: # handle 2-tuples properly (2-tuples have novel alleles)
             if len(s) == 2:
                solved_alleles[s[0]].append(s[1])
-            else:
+            elif s[0] not in solved_alleles:
                solved_alleles[s[0]] = []
          exp_opt = _explain_solution(solved_alleles, 
                                      gene, coverage, cn_solution, alleles, constraints, model, error_vars)
@@ -322,8 +320,7 @@ def _filter_alleles(gene: Gene,
          del alleles[an]
       elif any(cov[m] <= 0 for m in a.func_muts):
          s = ('{} in {}'.format(m, gene.region_at(m.pos))
-              for m in a.func_muts
-              if cov[m] <= 0)
+              for m in a.func_muts if cov[m] <= 0)
          log.trace('Removing {} because of {}', an, ' and '.join(s))
          del alleles[an]
    
@@ -363,11 +360,10 @@ def _explain_solution(sol, gene, coverage, cn_solution, alleles, constraints, mo
    total = 0
    for m in constraints:
       cov = coverage.single_copy(m.pos, cn_solution)
-      g, region = gene.region_at(m.pos)
       score = []
       for a in sol:
          if m[1].startswith('_'):
-            if gene.cn_configs[alleles[a].cn_config].cn[g][region] == 0: 
+            if not gene.has_coverage(a[0], m.pos): 
                continue
             if not any(ma[0] == m[0] and not ma[1].startswith('INS') 
                         for ma in alleles[a].func_muts):

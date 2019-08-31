@@ -273,7 +273,7 @@ class MajorRealTest(unittest.TestCase):
       })
 
    
-   def test_novel_allele_1(self):
+   def test_novel_allele_1(self): # NA17012/v1
       assert_major(self.gene, {
          "cn": {'1': 1, '5': 1},
          "data": {(42522612, '_'): 0,  (42522612, 'SNP.CG'): 288, 

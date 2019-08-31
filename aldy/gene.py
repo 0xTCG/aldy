@@ -600,6 +600,15 @@ class Gene:
          return None
 
 
+   def has_coverage(self, a: str, pos: int):
+      """
+      Returns True if a major allele `a` covers the mutation `m`.
+      """
+      m_gene, m_region = self.region_at(pos)
+      return self.cn_configs[self.alleles[a].cn_config].cn[m_gene][m_region] > 0
+
+
+
    def print_configurations(self):
       raise NotImplementedError
 
