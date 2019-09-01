@@ -68,14 +68,6 @@ def main():
          else:
             avail_genes = [args.gene.lower()]
 
-         # Prepare the log files
-         if args.debug is not None:
-            log_output = f'{args.debug}/{os.path.splitext(args.file)[0]}.log'
-            fh = logbook.FileHandler(log_output, mode='w', bubble=True, level='TRACE')
-            fh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
-               record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
-            fh.push_application()
-
          # Prepare output file
          output = args.output
          if output == '-':
@@ -243,7 +235,6 @@ def _genotype(gene: str, output: Optional, args) -> None:
       if ch.startswith('chr'):
          ch = ch[3:]
       cn_region = GRange(ch, int(r.group(2)), int(r.group(3)))
-      log.info('Using {} as copy-number neutral region', cn_region)
    
    cn_solution = args.cn
    if cn_solution:
@@ -251,10 +242,17 @@ def _genotype(gene: str, output: Optional, args) -> None:
 
    threshold = float(args.threshold) / 100
    
+   debug = args.debug
    if debug:
       os.makedirs(debug, exist_ok=True)
-      debug = f'{debug}/{os.path.splitext(args.file)[0]}'
+      debug = f'{debug}/{os.path.splitext(os.path.basename(args.file))[0]}'
+      log_output = f'{debug}.log'
+      fh = logbook.FileHandler(log_output, mode='w', bubble=True, level='TRACE')
+      fh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
+         record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
+      fh.push_application()
    
+   log.info('Using {} as copy-number neutral region', cn_region)
    try:
       result = genotype(gene_db=     gene, 
                         sam_path=    args.file,
@@ -266,7 +264,7 @@ def _genotype(gene: str, output: Optional, args) -> None:
                         solver=      args.solver,
                         phase=       args.phase,
                         reference=   args.reference,
-                        debug=       args.debug)
+                        debug=       debug)
       log.info(colorize('Result{} for {}: '.format('' if len(result) == 1 else 's', gene.upper())))
       for r in result:
          log.info(colorize('  {:30} ({})'.format(r.diplotype, ', '.join(f.major_repr() for f in r.solution))))

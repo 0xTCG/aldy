@@ -118,23 +118,23 @@ def genotype(gene_db: str,
    elif avg_cov < 20:
       log.warn("Average coverage is {}. We recommend at least 20x coverage for optimal results.", avg_cov)
    
-   json.info(f'"{os.path.basename(sam_path).split(".")[0]}": {{')
+   json_print(debug, f'"{os.path.basename(sam_path).split(".")[0]}": {{')
 
    # Get copy-number solutions
-   json.info('  "cn": {')
+   json_print(debug, '  "cn": {')
    cn_sols = cn.estimate_cn(gene, sample.coverage, solver=solver, user_solution=cn_solution, debug=debug)
-   json.info('  },')
+   json_print(debug, '  },')
 
    # Get major solutions and pick the best one
    log.info(f'Potential copy number configurations for {gene.name}:')
    major_sols = []
    
-   json.info('  "major": [', end='')
+   json_print(debug, '  "major": [', end='')
    for i, cn_sol in enumerate(cn_sols):
       sols = major.estimate_major(gene, sample.coverage, cn_sol, solver, debug=debug)
       log.info('  {:2}: {}', i + 1, cn_sol._solution_nice())
       major_sols += sols
-   json.info('],')
+   json_print(debug, '],')
 
    min_score = min(major_sols, key=lambda m: m.score).score
    major_sols = sorted([m for m in major_sols 
@@ -145,11 +145,11 @@ def genotype(gene_db: str,
    for i, major_sol in enumerate(major_sols):
       log.info('  {:2}: {}', i + 1, major_sol._solution_nice())
    
-   json.info('  "minor": [', end='')
+   json_print(debug, '  "minor": [', end='')
    minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver, debug=debug)
    min_score = min(minor_sols, key=lambda m: m.score).score
    minor_sols = [m for m in minor_sols if abs(m.score - min_score) < SOLUTION_PRECISION]
-   json.info(']')
+   json_print(debug, ']')
 
    log.info(f'Best minor star-alleles for {gene.name}:')
    for i, minor_sol in enumerate(minor_sols):
@@ -161,7 +161,7 @@ def genotype(gene_db: str,
       if output_file:
          diplotype.write_decomposition(sample_name, gene, sol_id, sol, output_file)
    
-   json.info('},')
+   json_print(debug, '},')
 
    # if do_remap != 0:
    #    log.critical('Remapping! Stay tuned...')
