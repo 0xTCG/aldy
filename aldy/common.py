@@ -256,3 +256,13 @@ def check_path(cmd: str) -> bool:
             return True
       return False
    return True
+
+
+_json = None
+def json_print(debug, *args, **kwargs):
+   if not debug: 
+      return
+   global _json
+   if not _json:
+      _json = open(f'{debug}.json', 'w')
+   print(*args, **kwargs, flush=True, file=_json)

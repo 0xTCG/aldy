@@ -6,7 +6,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import collections
 import copy
@@ -108,7 +108,8 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
 def estimate_cn(gene: Gene, 
                 coverage: Coverage, 
                 solver: str, 
-                user_solution=None) -> List[CNSolution]:
+                user_solution=None,
+                debug: Optional[str] = None) -> List[CNSolution]:
    """
    Estimate optimal copy number configuration given the gene and read data.
 
@@ -122,6 +123,9 @@ def estimate_cn(gene: Gene,
       user_solution (list[str], optional): 
          User-specified list of copy number configurations.
          ILP will not run is this parameter is provided.
+         Default is ``None``.
+      debug (str, optional):
+         If set, Aldy will create "<debug>.cn.lp" file for debug purposes.
          Default is ``None``.
 
    Returns: 
@@ -141,7 +145,7 @@ def estimate_cn(gene: Gene,
 
       region_cov = _region_coverage(gene, coverage)
       configs = _filter_configs(gene, coverage)
-      sol = solve_cn_model(gene, configs, max_observed_cn, region_cov, solver)
+      sol = solve_cn_model(gene, configs, max_observed_cn, region_cov, solver, debug)
 
       return sol
 
@@ -150,7 +154,8 @@ def solve_cn_model(gene: Gene,
                    cn_configs: Dict[str, CNConfig], 
                    max_cn: int, 
                    region_coverage: Dict[GeneRegion, Tuple[float, float]], 
-                   solver: str) -> List[CNSolution]:
+                   solver: str, 
+                   debug: Optional[str] = None) -> List[CNSolution]:
    """
    Solves the copy number estimation problem (similar to the closest vector problem).
 
@@ -164,6 +169,9 @@ def solve_cn_model(gene: Gene,
          for each region.
       solver (str):
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+      debug (str, optional):
+         If set, Aldy will create "<debug>.cn.lp" file for debug purposes.
+         Default is ``None``.
 
    Returns:
       list[:obj:`CNSolution`]: List of copy-number solutions.
@@ -175,7 +183,7 @@ def solve_cn_model(gene: Gene,
    log.debug('Detecting CN among: {}', ', '.join(sorted(cn_configs)))
 
    # Initialize the LP model
-   model = lpinterface.model('aldy_cnv', solver)
+   model = lpinterface.model('AldyCN', solver)
 
    # List of CN configurations (a.k.a. structures):
    # dict of (name, number): structure, where multiple copies of the same name get different numbers
@@ -198,48 +206,45 @@ def solve_cn_model(gene: Gene,
 
    # Add one binary variable to model for each structure copy.
    # Uppercase variables are LP variables
-   A = {(a, ai): model.addVar(vtype='B', name='A_{}_{}'.format(a, ai)) for a, ai in structures}
+   VCN = {(a, ai): model.addVar(vtype='B', name=f'CN_{a}_{ai}') for a, ai in structures}
 
    # We assume diploid genome, so the number of haplotype-inducing configurations is at most 2
-   haplo_inducing = model.quicksum(A[a] for a in A if a[1] <= 0)
+   haplo_inducing = model.quicksum(VCN[a] for a in VCN if a[1] <= 0)
    model.addConstr(haplo_inducing == 2)
-   log.trace('LP constraint: {} == 2', haplo_inducing)
 
    # Ensure that binary LP is properly formed (i.e. A_i <= A_{i-1})
    for a, ai in structures:
       if ai == -1:
-         log.trace("LP constraint: A_-1 <= A_0 for {}", a)
-         model.addConstr(A[a, ai] <= A[a, 0]) # second haplotype (-1) is present only if the first one (0) is there
+         model.addConstr(VCN[a, ai] <= VCN[a, 0]) # second haplotype (-1) is present only if the first one (0) is there
       elif ai > 1: # ignore 1, as A[1] can be 1 while A[0] is 0 to support cases such as *13/*13+*1
-         log.trace('LP constraint: A_{} <= A_{} for {}', ai, ai - 1, a)
-         model.addConstr(A[a, ai] <= A[a, ai - 1])
+         model.addConstr(VCN[a, ai] <= VCN[a, ai - 1])
       
    # Form the error variables
-   E = {}
-   print('    "data": {', end='')
+   VERR = {}
+   json_print(debug, '    "data": {', end='')
    for r, (exp_cov0, exp_cov1) in region_coverage.items():
-      print(f"'{str(r)[3:-1]}': ({exp_cov0}, {exp_cov1}), ", end='')
+      json_print(debug, f"'{str(r)[3:-1]}': ({exp_cov0}, {exp_cov1}), ", end='')
       expr = 0
       for s, structure in structures.items():
          if r in structure.cn[0]:
-            expr += A[s] * structure.cn[0][r]
+            expr += VCN[s] * structure.cn[0][r]
          if len(structure.cn) > 1 and r in structure.cn[1]:
-            expr -= A[s] * structure.cn[1][r]
-      E[r] = model.addVar(name='E_{}{}'.format(*r), lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
-
-      log.trace('LP contraint: {} == E_{} + {}', exp_cov0 - exp_cov1, r, expr)
-      model.addConstr(expr + E[r] == exp_cov0 - exp_cov1)
-   print('},')
+            expr -= VCN[s] * structure.cn[1][r]
+      VERR[r] = model.addVar(name='E_{}{}'.format(*r), lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
+      model.addConstr(expr + VERR[r] == exp_cov0 - exp_cov1)
+   json_print(debug, '},')
    # Set objective: minimize absolute errors AND the number of alleles (max. parsimony)
    # PCE_REGION (in CYP2D6) is penalized with extra score
-   objective = model.abssum(E.values(), 
+   objective = model.abssum(VERR.values(), 
                             coeffs={'E_{}{}'.format(*PCE_REGION): PCE_PENALTY_COEFF}) 
    # Minimize the number of alleles among equal solutions
-   objective += PARSIMONY_PENALTY * sum(A.values())
+   objective += PARSIMONY_PENALTY * sum(VCN.values())
    # Penalize left fusions (further ensure max. parsimony)
-   fusion_cost = model.quicksum(A[s, k] for s, k in A if cn_configs[s].kind == CNConfig.CNConfigType.LEFT_FUSION)
+   fusion_cost = model.quicksum(VCN[s, k] for s, k in VCN if cn_configs[s].kind == CNConfig.CNConfigType.LEFT_FUSION)
    objective += LEFT_FUSION_PENALTY * fusion_cost
-   log.trace('LP objective: {}', objective)
+   model.setObjective(objective)
+   if debug:
+      model.dump(f'{debug}.cn.lp')
 
    def _explain_solution(sol):
       """Print the step-by-step explanation of each constraint for easier debugging"""
@@ -248,7 +253,6 @@ def solve_cn_model(gene: Gene,
       total = 0
       for r, (exp_cov0, exp_cov1) in region_coverage.items():
          expr = 0
-         covs = []
          for a, ai in sol:
             if r in structures[a, ai].cn[0]:
                expr += structures[a, ai].cn[0][r]
@@ -269,7 +273,7 @@ def solve_cn_model(gene: Gene,
    # Solve the model 
    result, mem = [], []
    try:
-      for status, opt, sol in model.solveAll(objective, A):
+      for status, opt, sol in model.solveAll(VCN):
          log.debug(f'LP status: {status}, opt: {opt}, solution {{}}',
                    ', '.join('*' + str(s) for s, _ in sol))
          _explain_solution(sol)
@@ -277,7 +281,7 @@ def solve_cn_model(gene: Gene,
          if sol_tuple not in mem: # Because A[1] can be 1 while A[0] is 0, we can have duplicates
             mem.append(sol_tuple) 
             result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
-      print('    "sol": ' + str([dict(r.solution) for r in result]))
+      json_print(debug, '    "sol": ' + str([dict(r.solution) for r in result]))
       return result
    except lpinterface.NoSolutionsError:
       return [CNSolution(float('inf'), solution=[], gene=gene)]

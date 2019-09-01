@@ -69,14 +69,12 @@ def main():
             avail_genes = [args.gene.lower()]
 
          # Prepare the log files
-         if args.log is None:
-            log_output = '{}.aldy.log'.format(os.path.splitext(args.file)[0])
-         else:
-            log_output = args.log
-         fh = logbook.FileHandler(log_output, mode='w', bubble=True, level='TRACE')
-         fh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
-            record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
-         fh.push_application()
+         if args.debug is not None:
+            log_output = f'{args.debug}/{os.path.splitext(args.file)[0]}.log'
+            fh = logbook.FileHandler(log_output, mode='w', bubble=True, level='TRACE')
+            fh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
+               record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
+            fh.push_application()
 
          # Prepare output file
          output = args.output
@@ -182,16 +180,14 @@ def _get_args():
       Default is off."""))
    genotype_parser.add_argument('--remap', default=0, #action='store_true', 
       help='Realign reads for better mutation calling. Requires samtools and bowtie2 in $PATH.')
-   genotype_parser.add_argument('--dump', action='store_true', 
-      help='Dump the anonymozed input file contents into <filename>.aldy.dump for debug purposes.')
+   genotype_parser.add_argument('--debug', default=None,
+      help='Specify the debug directory where the solver info is saved for debugging purposes.')
    genotype_parser.add_argument('--cn', '-c', default=None,
       help=td("""
          Manually set the copy number configuration.
          Input format is a comma-separated list of configuration IDs: e.g. "CN1,CN2".
          For a list of supported configuration IDs, please run aldy --show-cn. 
          For a commonly used diploid case (e.g. 2 copies of the main gene) specify -c 1,1"""))
-   # HACK: Internal parameters for development purposes: please do not use unless instructed
-   genotype_parser.add_argument('--cache', dest='cache', action='store_true', help=argparse.SUPPRESS)
 
    _ = subparsers.add_parser('test', parents=[base],
       help='Sanity-check Aldy on NA10860 sample. Recommended prior to the first use')
@@ -254,7 +250,11 @@ def _genotype(gene: str, output: Optional, args) -> None:
       cn_solution = cn_solution.split(',')
 
    threshold = float(args.threshold) / 100
-
+   
+   if debug:
+      os.makedirs(debug, exist_ok=True)
+      debug = f'{debug}/{os.path.splitext(args.file)[0]}'
+   
    try:
       result = genotype(gene_db=     gene, 
                         sam_path=    args.file,
@@ -264,10 +264,9 @@ def _genotype(gene: str, output: Optional, args) -> None:
                         cn_solution= cn_solution,
                         threshold=   threshold,
                         solver=      args.solver,
-                        cache=       False, 
                         phase=       args.phase,
                         reference=   args.reference,
-                        dump=        args.dump)
+                        debug=       args.debug)
       log.info(colorize('Result{} for {}: '.format('' if len(result) == 1 else 's', gene.upper())))
       for r in result:
          log.info(colorize('  {:30} ({})'.format(r.diplotype, ', '.join(f.major_repr() for f in r.solution))))

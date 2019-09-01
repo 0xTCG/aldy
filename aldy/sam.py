@@ -58,11 +58,10 @@ class Sample:
                 gene: Gene, 
                 threshold: float, 
                 profile: Optional[str],
-                cache: bool = False, 
                 phase: bool = False, 
                 reference: Optional[str] = None, 
                 cn_region: Optional[GRange] = DEFAULT_CN_NEUTRAL_REGION,
-                dump: bool = False) -> None:
+                debug: Optional[str] = None) -> None:
       """
       Initialization of the Sample class.
 
@@ -76,9 +75,6 @@ class Sample:
             Check `coverage.Coverage` for more information.
          profile (str, optional):
             A profile string description (e.g. 'prgnseq-v1') or a profile SAM/BAM file.
-         cache (bool):
-            Use Aldy caching for faster loading. Internal-use only. 
-            Default is False.
          phase (bool):
             Construct basic rudimentary phasing of the reads to aid the genotyping.
             Not recommended (slows down the pipeline with no tangible benefits).
@@ -91,30 +87,18 @@ class Sample:
             If none, profile loading and rescaling will not be done (in that case, Aldy will requires 
             ``--cn`` parameter to be provided by the user).
             Default is ``DEFAULT_CN_NEUTRAL_REGION``.
-         dump (bool):
-            If true, Aldy will create "<filename>.aldy.dump" file for debug purposes.
-            Default is False.
+         debug (str, optional):
+            If set, Aldy will create "<debug>.dump" file for debug purposes.
+            Default is ``None``.
       
       Raises:
          :obj:`aldy.common.AldyException` if the average coverage of the copy-number neutral region is too low (less than 2).
       """
 
       # Handle caching
-      def cache_fn(path, gene):
-         return path + '-{}.aldycache'.format(gene.name)
-      if cache and os.path.exists(cache_fn(sam_path, gene)):
-         log.debug('Loading cache')
-         with open(cache_fn(sam_path, gene)) as f:
-            d = pickle.load(f) # type: ignore       
-            self.__dict__.update(d)
-      else:
-         if phase and dump:
-            raise AldyException("Debug dumps do not work with --phase parameter")
-         self.load_aligned(sam_path, gene, threshold, phase, reference, cn_region, dump)
-         if cn_region:
-            self.detect_cn(gene, profile, cn_region)
-         if cache:
-            pickle.dump(self.__dict__, open(cache_fn(sam_path, gene), 'wb'))
+      self.load_aligned(sam_path, gene, threshold, phase, reference, cn_region, debug)
+      if cn_region:
+         self.detect_cn(gene, profile, cn_region)
 
       log.debug('Coverage is {}', self.coverage.average_coverage()) 
       if cn_region and self.coverage.diploid_avg_coverage() < 2:
@@ -128,7 +112,7 @@ class Sample:
                     phase: bool = False,
                     reference: Optional[str] = None, 
                     cn_region: Optional[GRange] = None,
-                    dump: bool = False) -> None:
+                    debug: Optional[str] = None) -> None:
       """
       Load the read, mutation and coverage data from SAM/BAM/CRAM/DeeZ file.
 
@@ -152,6 +136,9 @@ class Sample:
             If this parameter is not None, Aldy will use this parameter to override the default copy-number
             neutral region.
             Default is ``None``.
+         debug (str, optional):
+            If set, Aldy will create "<debug>.dump" file for debug purposes.
+            Default is ``None``.
 
       Raises:
          :obj:`aldy.common.AldyException` if BAM does not have index.
@@ -174,8 +161,9 @@ class Sample:
       muts: dict = collections.defaultdict(int) 
       norm: dict = collections.defaultdict(int)
 
-      if sam_path[-10:] == '.aldy.dump': 
-         assert not phase
+      if sam_path[-5:] == '.dump': 
+         if phase:
+            raise AldyException("Debug dumps do not work with --phase parameter")
          with gzip.open(sam_path, 'rb') as fd:
             log.warn('Loading debug dump from {}', sam_path)
             l, h, i = struct.calcsize('<l'), struct.calcsize('<h'), struct.calcsize('<i')
@@ -216,7 +204,7 @@ class Sample:
                sam.check_index()
             except AttributeError:
                pass # SAM files do not have index. BAMs can also lack it
-            except ValueError as ve: 
+            except ValueError as _: 
                raise AldyException(f'File {sam_path} has no index (it must be indexed)')
 
             #: str: Check do we need to append 'chr' or not
@@ -251,10 +239,10 @@ class Sample:
                if not is_cn_region_fetched and _in_region(cn_region, read, self._prefix): # type: ignore
                   read_cn_read(read)
 
-               r = self._parse_read(read, gene, norm, muts, _indel_sites, dump)
+               r = self._parse_read(read, gene, norm, muts, _indel_sites, debug is not None)
                if r:
                   total += 1
-                  if dump:
+                  if debug:
                      dump_data.append(r)
                   if phase:
                      if read.query_name in self.reads:
@@ -266,9 +254,10 @@ class Sample:
                      else:
                         self.reads[read.query_name] = (read, None)
 
-            if dump:
-               assert not phase
-               with gzip.open(sam_path + '.aldy.dump', 'wb') as fd:
+            if debug:
+               if phase:
+                  raise AldyException("Debug dumps do not work with --phase parameter")
+               with gzip.open(f'{debug}.dump', 'wb') as fd:
                   m, M = min(cnv_coverage.keys()), max(cnv_coverage.keys())
                   fd.write(struct.pack('<ll', m, M))
                   for i in range(m, M + 1):

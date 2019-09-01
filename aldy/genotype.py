@@ -36,10 +36,9 @@ def genotype(gene_db: str,
              cn_solution: Optional[List[str]] = None,
              threshold: float = 0.5, 
              solver: str = 'any',
-             cache: bool = False,
              phase: bool = False,
              reference: Optional[str] = None,
-             dump: bool = False) -> List[minor.MinorSolution]:
+             debug: Optional[str] = None) -> List[minor.MinorSolution]:
    """
    Genotype a sample.
 
@@ -72,9 +71,6 @@ def genotype(gene_db: str,
       solver (str):
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
          Default is ``'any'``.
-      cache (bool):
-         Use Aldy caching for faster loading. Internal-use only. 
-         Default is ``False``.
       phase (bool):
          Construct basic rudimentary phasing of the reads to aid the genotyping.
          Not recommended (slows down the pipeline with no tangible benefits).
@@ -82,9 +78,9 @@ def genotype(gene_db: str,
       reference (str, optional):
          A path to the reference genome that was used to encode DeeZ or CRAM files.
          Default is ``None``.
-      dump (bool):
-         If true, Aldy will create "<filename>.aldy.dump" file for debug purposes.
-         Default is ``False``.
+      debug (str, optional):
+         The debug prefix for the debugging information. ``None`` for no debug information.
+         Default is ``None``.
 
    Raises:
       :obj:`aldy.common.AldyException` if the average coverage is too low (less than 2).
@@ -109,11 +105,10 @@ def genotype(gene_db: str,
                        gene=gene, 
                        threshold=threshold, 
                        profile=profile,
-                       cache=False,
                        phase=False,
                        reference=reference,
                        cn_region=cn_region, 
-                       dump=dump)
+                       debug=debug)
 
    avg_cov = sample.coverage.average_coverage()
    if avg_cov < 2:
@@ -123,23 +118,23 @@ def genotype(gene_db: str,
    elif avg_cov < 20:
       log.warn("Average coverage is {}. We recommend at least 20x coverage for optimal results.", avg_cov)
    
-   print(f'"{os.path.basename(sam_path).split(".")[0]}": {{')
+   json.info(f'"{os.path.basename(sam_path).split(".")[0]}": {{')
 
    # Get copy-number solutions
-   print('  "cn": {')
-   cn_sols = cn.estimate_cn(gene, sample.coverage, solver=solver, user_solution=cn_solution)
-   print('  },')
+   json.info('  "cn": {')
+   cn_sols = cn.estimate_cn(gene, sample.coverage, solver=solver, user_solution=cn_solution, debug=debug)
+   json.info('  },')
 
    # Get major solutions and pick the best one
    log.info(f'Potential copy number configurations for {gene.name}:')
    major_sols = []
    
-   print('  "major": [', end='')
+   json.info('  "major": [', end='')
    for i, cn_sol in enumerate(cn_sols):
-      sols = major.estimate_major(gene, sample.coverage, cn_sol, solver)
+      sols = major.estimate_major(gene, sample.coverage, cn_sol, solver, debug=debug)
       log.info('  {:2}: {}', i + 1, cn_sol._solution_nice())
       major_sols += sols
-   print('],')
+   json.info('],')
 
    min_score = min(major_sols, key=lambda m: m.score).score
    major_sols = sorted([m for m in major_sols 
@@ -150,11 +145,11 @@ def genotype(gene_db: str,
    for i, major_sol in enumerate(major_sols):
       log.info('  {:2}: {}', i + 1, major_sol._solution_nice())
    
-   print('  "minor": [', end='')
-   minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver)
+   json.info('  "minor": [', end='')
+   minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver, debug=debug)
    min_score = min(minor_sols, key=lambda m: m.score).score
    minor_sols = [m for m in minor_sols if abs(m.score - min_score) < SOLUTION_PRECISION]
-   print(']')
+   json.info(']')
 
    log.info(f'Best minor star-alleles for {gene.name}:')
    for i, minor_sol in enumerate(minor_sols):
@@ -166,7 +161,7 @@ def genotype(gene_db: str,
       if output_file:
          diplotype.write_decomposition(sample_name, gene, sol_id, sol, output_file)
    
-   print('},')
+   json.info('},')
 
    # if do_remap != 0:
    #    log.critical('Remapping! Stay tuned...')

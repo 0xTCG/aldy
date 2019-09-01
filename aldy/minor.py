@@ -70,7 +70,8 @@ def estimate_minor(gene: Gene,
                    coverage: Coverage, 
                    major_sols: List[MajorSolution], 
                    solver: str,
-                   filter_fn: Optional[Callable] = None) -> List[MinorSolution]:
+                   filter_fn: Optional[Callable] = None,
+                   debug: Optional[str] = None) -> List[MinorSolution]:
    """
    Detect the minor star-allele in the sample.
 
@@ -85,6 +86,9 @@ def estimate_minor(gene: Gene,
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
       filter_fn (callable):
          Custom filtering function (used for testing only).
+      debug (str, optional):
+         If set, Aldy will create "<debug>.minor.lp" file for debug purposes.
+         Default is ``None``.
 
    Returns:
       list[:obj:`MinorSolution`]
@@ -116,7 +120,7 @@ def estimate_minor(gene: Gene,
    
    minor_sols = []
    for major_sol in sorted(major_sols, key=lambda s: list(s.solution.items())):
-      minor_sols += solve_minor_model(gene, alleles, cov, major_sol, mutations, solver)
+      minor_sols += solve_minor_model(gene, alleles, cov, major_sol, mutations, solver, debug)
    return minor_sols
 
 
@@ -125,7 +129,8 @@ def solve_minor_model(gene: Gene,
                       coverage: Coverage, 
                       major_sol: MajorSolution, 
                       mutations: Set[Mutation], 
-                      solver: str) -> List[MinorSolution]:
+                      solver: str,
+                      debug: Optional[str] = None) -> List[MinorSolution]:
    """
    Solves the minor star-allele detection problem via integer linear programming.
 
@@ -143,6 +148,9 @@ def solve_minor_model(gene: Gene,
          (all other mutations are ignored).
       solver (str): 
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+      debug (str, optional):
+         If set, Aldy will create "<debug>.minor.lp" file for debug purposes.
+         Default is ``None``.
 
    Returns:
       list[:obj:`MinorSolution`]
@@ -185,13 +193,13 @@ def solve_minor_model(gene: Gene,
    for a, cnt in alleles:
       if cnt == 0:
          continue
-      model.addConstr(VA[a, cnt] <= VA[a, cnt - 1])
+      model.addConstr(VA[a, cnt] <= VA[a, cnt - 1], name=f'CORD_{a.minor}_{cnt}')
 
    # Make sure that sum of all subaleles is exactly as the count of their major alleles
    for sa, cnt in major_sol.solution.items():
       expr = model.quicksum(v for ((ma, _, ad, mi), _), v in VA.items() 
                             if SolvedAllele(ma, None, ad, mi) == sa)
-      model.addConstr(expr == cnt)
+      model.addConstr(expr == cnt, name=f'CCNT_{sa.major}')
 
    # Add a binary variable for each allele/mutation pair where mutation belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or will be missing
@@ -239,46 +247,47 @@ def solve_minor_model(gene: Gene,
             constraints[ref_m] += N * VA[a]
 
    # Ensure that each constraint matches the observed coverage
-   print('  {')
-   print(f'    "cn": {str(dict(major_sol.cn_solution.solution))}, ')
-   print('    "major": ' + str({
+   json_print(debug, '  {')
+   json_print(debug, f'    "cn": {str(dict(major_sol.cn_solution.solution))}, ')
+   json_print(debug, '    "major": ' + str({
       tuple([s.major] + [(m[0], m[1]) for m in s.added]) if len(s.added) > 0 else s.major: v
       for s, v in major_sol.solution.items()}) + ", ")
-   print('    "data": {', end='')
+   json_print(debug, '    "data": {', end='')
    prev=0
    for m, expr in sorted(constraints.items()):
       cov = coverage[m] / coverage.single_copy(m.pos, major_sol.cn_solution) 
-      model.addConstr(expr + VERR[m] == cov)
+      model.addConstr(expr + VERR[m] == cov, 
+                      name=f'CCOV_{m.pos}_{m.op}')
       if m.pos != prev and prev != 0:
-         print('\n             ', end='')
+         json_print(debug, '\n             ', end='')
       prev=m.pos
-      print(f"({m.pos}, '{m.op}'): {coverage[m]:4}, ", end='')
-   print('}, ')
+      json_print(debug, f"({m.pos}, '{m.op}'): {coverage[m]:4}, ", end='')
+   json_print(debug, '}, ')
 
    # Ensure the following rules for all mutations:
    # 1) Each mutation is assigned only to alleles that are present in the solution
    for a, mv in VKEEP.items():
       for m, v in mv.items():
-         model.addConstr(v <= VA[a])
+         model.addConstr(v <= VA[a], name=f"CVK_{a[0].minor}_{m.pos}_{m.op}")
    for a, mv in VNEW.items():
       for m, v in mv.items():
-         model.addConstr(v <= VA[a])
+         model.addConstr(v <= VA[a], name=f"CVN_{a[0].minor}_{m.pos}_{m.op}")
    # 2) Each allele must express ALL its functional mutations
    for a in alleles:
       for m in alleles[a]: 
          if m.is_functional:
             assert(m in VKEEP[a])
-            model.addConstr(VKEEP[a][m] >= VA[a])
+            model.addConstr(VKEEP[a][m] >= VA[a], name=f"CFUNC_{a[0].minor}_{m.pos}_{m.op}")
    # 3) No allele can include mutation with coverage 0
    for a in VKEEP:
       for m, v in VKEEP[a].items():
          if not gene.has_coverage(a[0].major, m.pos):
-            model.addConstr(v <= 0)
+            model.addConstr(v <= 0, name=f"CZERO_{a[0].minor}_{m.pos}_{m.op}")
    # 4) No allele can include additional functional mutation (this should be done in the major model)
    for a in VNEW:
       for m, v in VNEW[a].items():
          if m.is_functional:
-            model.addConstr(v <= 0)
+            model.addConstr(v <= 0, name=f"CNEWFUNC_{a[0].minor}_{m.pos}_{m.op}")
    # 5) Prevent extra mutations if there is already existing mutation at that loci
    #    (either existing or already added)
    for pos in set(m.pos for m in constraints):
@@ -286,40 +295,44 @@ def solve_minor_model(gene: Gene,
          mp = [VA[a] * VKEEP[a][m] for m in VKEEP[a] if m.pos == pos]
          ma = [VA[a] * VNEW[a][m] for m in VNEW[a] if m.pos == pos]
          # TODO: add support for extra insertions!
-         model.addConstr(model.quicksum(ma) <= 1)
-         model.addConstr(model.quicksum(mp + ma) <= 1)
+         if len(ma) > 1: # useless if == 1 since variables are binary
+            model.addConstr(model.quicksum(ma) <= 1, name=f"CSINGLE_{a[0].minor}_{pos}")
+         if len(ma) + len(mp) > 1:
+            model.addConstr(model.quicksum(mp + ma) <= 1, name=f"CSINGLEFULL_{a[0].minor}_{pos}")
    # 5) Make sure that each copy of a mutation has at least one read supporting it
    for m in mutations:
       expr  = model.quicksum(VKEEP[a][m] * VA[a] for a in alleles if m in VKEEP[a])
       expr += model.quicksum(VNEW[a][m] * VA[a] for a in alleles if m in VNEW[a])
       if major_sol.cn_solution.position_cn(m.pos) == 0 or coverage[m] == 0:
-         model.addConstr(expr <= 0)
+         model.addConstr(expr <= 0, name=f"CNOCOV_{m.pos}_{m.op}")
       else:
          #print(f'> {m} :: {expr} <= {coverage[m]}')
-         model.addConstr(expr <= coverage[m])
+         model.addConstr(expr <= coverage[m], name=f"CMAXCOV_{m.pos}_{m.op}")
          # Ensure that at least one allele picks an existing non-filtered mutation
-         model.addConstr(expr >= 1) 
+         model.addConstr(expr >= 1, name=f"CMINONE_{m.pos}_{m.op}") 
    # 6) Do the same for non-mutations
    for pos in set(m.pos for m in constraints):
       expr = []
       for a in alleles:
          e  = [(1 - VKEEP[a][m]) * VA[a] for m in VKEEP[a] if m.pos == pos]
          e += [(1 - VNEW[a][m]) * VA[a] for m in VNEW[a] if m.pos == pos]
-         assert(len(e) > 0)
          expr += e
+      if len(expr) == 0:
+         continue
       expr = model.quicksum(expr)
       m = Mutation(pos, '_')
       if major_sol.cn_solution.position_cn(m.pos) == 0:
-         model.addConstr(expr <= 0)
+         model.addConstr(expr <= 0, name=f"CNOCOV_{m.pos}_{m.op}")
       else:
          # If there is no coverage at pos at all despite CN being > 0 
          # (or if there is coverage only on functional mutations that cannot be selected), 
          # allow alleles to select non-existent non-mutation to prevent infeasible model.
          # Should not happen with "sane" datasets...
-         model.addConstr(expr <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m]))
+         model.addConstr(expr <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m]), 
+                         name=f"CMAXCOV_{m.pos}_{m.op}")
          # Ensure that at least one allele picks an existing non-filtered non-mutation
-         if coverage[m] > 0:
-            model.addConstr(expr >= 1) 
+         #if coverage[m] > 0:
+         #   model.addConstr(expr >= 1, name=f"CMINONE_{m.pos}_{m.op}") 
   
    # Objective: absolute sum of errors
    objective = model.abssum(v for _, v in VERR.items())
@@ -340,11 +353,13 @@ def solve_minor_model(gene: Gene,
                    model.quicksum(VA[a] * (1 - v) for a in sorted(alleles) for _, v in sorted(VKEEP[a].items()))
       objective += ADD_PENALTY_FACTOR * \
                    model.quicksum(v for a in sorted(alleles) for _, v in sorted(VNEW[a].items()))
+   model.setObjective(objective)
+   if debug:
+      model.dump(f'{debug}.minor.lp')
 
    # Solve the model
    try:
-      status, opt = model.solve(objective)
-      # model.model.write('minor.lp')
+      _, opt = model.solve()
       solution = []
       for allele, value in VA.items():
          if model.getValue(value) <= 0:
@@ -361,7 +376,7 @@ def solve_minor_model(gene: Gene,
                                       allele[0].minor,
                                       allele[0].added + tuple(added),
                                       tuple(missing)))
-      print('    "sol": ' + str([
+      json_print(debug, '    "sol": ' + str([
           (s.minor, [(m[0], m[1]) for m in s.added], [(m[0], m[1]) for m in s.missing])
           for s in solution]))
       sol = MinorSolution(score=opt,
@@ -371,9 +386,9 @@ def solve_minor_model(gene: Gene,
       return [sol]
    except lpinterface.NoSolutionsError:
       log.debug('No minor solutions')
-      print('    <<NOSOL>>')
-      # Enable to debug infeasible models
-      #model.model.computeIIS()
-      #model.model.write("minor.ilp")
+      json_print(debug, '    <<NOSOL>>')
+      if debug and False: # Enable to debug infeasible models
+         model.model.computeIIS()
+         model.dump(f"{debug}.iis.ilp")
       return []
 

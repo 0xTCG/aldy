@@ -65,6 +65,17 @@ class Gurobi:
          self.update()
       return v
 
+   
+   def setObjective(self, objective, method: str = 'min'):
+      """
+      Sets the model objective via ``objective``.
+      """
+      self.objective = objective
+      self.model.setObjective(
+         self.objective,
+         self.gurobipy.GRB.MINIMIZE if method == 'min' else self.gurobipy.GRB.MAXIMIZE)
+      self.update()
+
 
    def quicksum(self, expr: Iterable):
       """
@@ -98,20 +109,20 @@ class Gurobi:
       accessible via ``varName`` call (1 if not defined).
       """
       vv = []
-      for v in vars:
+      for i, v in enumerate(vars):
          name = self.varName(v)
          coeff = 1 if coeffs is None or name not in coeffs else coeffs[name]
-         absvar = self.addVar(lb=0, update=False)
+         absvar = self.addVar(lb=0, update=False, name=f'ABS_{v.VarName}')
          vv.append(absvar * coeff)
-         self.addConstr(absvar + v >= 0)
-         self.addConstr(absvar - v >= 0)
+         self.addConstr(absvar + v >= 0, name=f'CABSL_{i}')
+         self.addConstr(absvar - v >= 0, name=f'CABSR_{i}')
       self.update()
       return self.quicksum(vv)
 
 
-   def solve(self, objective=None, method: str = 'min', init: Optional[Callable] = None) -> Tuple[str, float, dict]:
+   def solve(self, init: Optional[Callable] = None) -> Tuple[str, float, dict]:
       """
-      Solves the model with objective ``objective``.
+      Solve the model. Assumes that objective is set.
 
       Additional parameters of the solver can be set via ``init`` function that takes 
       the model instance as a sole argument.
@@ -122,13 +133,6 @@ class Gurobi:
       Raises:
          :obj:`NoSolutionsError` if the model is infeasible.
       """
-
-      if objective is not None:
-         self.objective = objective
-      self.model.setObjective(
-         self.objective,
-         self.gurobipy.GRB.MINIMIZE if method == 'min' else self.gurobipy.GRB.MAXIMIZE)
-      self.update()
 
       self.model.params.outputFlag = 0
       self.model.params.logFile = ''
@@ -143,13 +147,11 @@ class Gurobi:
 
 
    def solveAll(self, 
-                objective, 
                 keys: dict, 
-                method: str = 'min', 
                 init: Optional[Callable] = None) -> Tuple[str, float, List[tuple]]:
       """
-      Solves the model with objective ``objective``
-      and returns the list of all combinations of the variables ``keys`` that minimize the objective.
+      Solve the model. Assumes that objective is set.
+      Returns the list of all combinations of the variables ``keys`` that minimize the objective.
 
       Additional parameters of the solver can be set via ``init`` function that takes 
       the model instance as a sole argument.
@@ -157,10 +159,11 @@ class Gurobi:
       Returns:
          tuple[str, float, list[tuple[any]]]: Tuple describing the status of the solution and the objective value.
       """
-      status, opt_value = self.solve(objective, method, init)
+      status, opt_value = self.solve(init)
       sol = sorted_tuple(set(a for a, v in keys.items() if self.getValue(v))) 
       yield status, opt_value, sol
       yield from get_all_solutions(self, keys, opt_value, sol)
+
 
    def getValue(self, var):
       """
@@ -182,6 +185,9 @@ class Gurobi:
       var.ub = ub
       self.update()
 
+   
+   def dump(self, file):
+      self.model.write(file)
 
 class SCIP(Gurobi):
    """
@@ -204,16 +210,17 @@ class SCIP(Gurobi):
          del kwargs['update']
       return self.model.addVar(*args, **kwargs)
 
-   def quicksum(self, expr):
-      return self.pyscipopt.quicksum(expr)
-
-   def solve(self, objective=None, method: str = 'min', init: Optional[Callable] = None) -> Tuple[str, float]:
-      if objective is not None:
-         self.objective = objective
+   def setObjective(self, objective, method: str = 'min'):
+      self.objective = objective
       self.model.setObjective(
          self.objective,
          'minimize' if method == 'min' else 'maximize'
       )
+
+   def quicksum(self, expr):
+      return self.pyscipopt.quicksum(expr)
+
+   def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
       self.model.setRealParam('limits/time', 120)
       self.model.hideOutput()
       if init is not None:
@@ -234,6 +241,9 @@ class SCIP(Gurobi):
    def changeUb(self, var, ub):
       self.model.freeTransform()
       self.model.chgVarUb(var, ub)
+
+   def dump(self, file):
+      self.model.writeProblem(file)
 
 
 def model(name: str, solver: str):
