@@ -181,46 +181,46 @@ def solve_minor_model(gene: Gene,
       for cnt in range(1, max_cn):
          alleles[a, cnt] = alleles[a, 0]
       
-   A = {a: model.addVar(vtype='B', name=a[0].minor) for a in alleles}
+   VA = {a: model.addVar(vtype='B', name=a[0].minor) for a in alleles}
    for a, cnt in alleles:
       if cnt == 0:
          continue
-      model.addConstr(A[a, cnt] <= A[a, cnt - 1])
+      model.addConstr(VA[a, cnt] <= VA[a, cnt - 1])
 
    # Make sure that sum of all subaleles is exactly as the count of their major alleles
    for sa, cnt in major_sol.solution.items():
-      expr = model.quicksum(v for ((ma, _, ad, mi), _), v in A.items() 
+      expr = model.quicksum(v for ((ma, _, ad, mi), _), v in VA.items() 
                             if SolvedAllele(ma, None, ad, mi) == sa)
       model.addConstr(expr == cnt)
 
    # Add a binary variable for each allele/mutation pair where mutation belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or will be missing
-   MPRESENT = {a: {m: model.addVar(vtype='B', name=f'P_{m.pos}_{m.op.replace(".", "")}_{a[0].minor}') 
-                   for m in alleles[a]} 
-               for a in alleles}
+   VKEEP = {a: {m: model.addVar(vtype='B', name=f'K_{m.pos}_{m.op.replace(".", "")}_{a[0].minor}') 
+                for m in alleles[a]} 
+            for a in alleles}
    # Add a binary variable for each allele/mutation pair where mutation DOES NOT belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or not
-   MADD = {a: {} for a in alleles}
-   for a in MADD:
+   VNEW = {a: {} for a in alleles}
+   for a in VNEW:
       for m in mutations:
          if gene.has_coverage(a[0].major, m.pos) and m not in alleles[a]:
-            MADD[a][m] = model.addVar(vtype='B', name=f'A_{m.pos}_{m.op.replace(".", "")}_{a[0].minor}')
+            VNEW[a][m] = model.addVar(vtype='B', name=f'N_{m.pos}_{m.op.replace(".", "")}_{a[0].minor}')
    # Add an error variable for each mutation and populate the error constraints
-   error_vars = {m: model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{m.pos}_{m.op.replace(".", "")}') 
-                 for m in mutations}
+   VERR = {m: model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{m.pos}_{m.op.replace(".", "")}') 
+           for m in mutations}
    constraints = {m: 0 for m in mutations} 
    for m in mutations:
       for a in alleles:
          if m in alleles[a]:
-            constraints[m] += MPRESENT[a][m] * A[a]
+            constraints[m] += VKEEP[a][m] * VA[a]
          elif gene.has_coverage(a[0].major, m.pos):
             # Add this *only* if CN of this region in a given allele is positive 
-            constraints[m] += MADD[a][m] * A[a]
+            constraints[m] += VNEW[a][m] * VA[a]
 
    # Fill the constraints for non-variations (i.e. where nucleotide matches reference genome)
    for pos in set(m.pos for m in constraints):
       ref_m = Mutation(pos, '_') # type: ignore
-      error_vars[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{pos}_REF')
+      VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{pos}_REF')
       constraints[ref_m] = 0
       for a in alleles:
          if not gene.has_coverage(a[0].major, pos):
@@ -230,71 +230,72 @@ def solve_minor_model(gene: Gene,
          present_muts = [m for m in alleles[a] if m.pos == pos and m[1][:3] != 'INS']
          assert(len(present_muts) < 2)
          if len(present_muts) == 1:
-            constraints[ref_m] += (1 - MPRESENT[a][present_muts[0]]) * A[a]
+            constraints[ref_m] += (1 - VKEEP[a][present_muts[0]]) * VA[a]
          else:
             N = 1
-            for m in MADD[a]:
+            for m in VNEW[a]:
                if m.pos == pos and m[1][:3] != 'INS':
-                  N *= 1 - MADD[a][m]
-            constraints[ref_m] += N * A[a]
+                  N *= 1 - VNEW[a][m]
+            constraints[ref_m] += N * VA[a]
 
    # Ensure that each constraint matches the observed coverage
    print('  {')
    print(f'    "cn": {str(dict(major_sol.cn_solution.solution))}, ')
-   print( '    "major": ' + str({
-         tuple([s.major] + [(m[0], m[1]) for m in s.added]) if len(s.added) > 0 else s.major: v
-         for s, v in major_sol.solution.items()}) + ", ")
+   print('    "major": ' + str({
+      tuple([s.major] + [(m[0], m[1]) for m in s.added]) if len(s.added) > 0 else s.major: v
+      for s, v in major_sol.solution.items()}) + ", ")
    print('    "data": {', end='')
    prev=0
    for m, expr in sorted(constraints.items()):
       cov = coverage[m] / coverage.single_copy(m.pos, major_sol.cn_solution) 
-      model.addConstr(expr + error_vars[m] == cov)
+      model.addConstr(expr + VERR[m] == cov)
       if m.pos != prev and prev != 0:
          print('\n             ', end='')
       prev=m.pos
-      print(f"({m.pos}, '{m.op}'): {cov:.4f}, ", end='')
+      print(f"({m.pos}, '{m.op}'): {coverage[m]:4}, ", end='')
    print('}, ')
 
    # Ensure the following rules for all mutations:
    # 1) Each mutation is assigned only to alleles that are present in the solution
-   for a, mv in MPRESENT.items():
+   for a, mv in VKEEP.items():
       for m, v in mv.items():
-         model.addConstr(v <= A[a])
-   for a, mv in MADD.items():
+         model.addConstr(v <= VA[a])
+   for a, mv in VNEW.items():
       for m, v in mv.items():
-         model.addConstr(v <= A[a])
+         model.addConstr(v <= VA[a])
    # 2) Each allele must express ALL its functional mutations
    for a in alleles:
       for m in alleles[a]: 
          if m.is_functional:
-            assert(m in MPRESENT[a])
-            model.addConstr(MPRESENT[a][m] >= A[a])
+            assert(m in VKEEP[a])
+            model.addConstr(VKEEP[a][m] >= VA[a])
    # 3) No allele can include mutation with coverage 0
-   for a in MPRESENT:
-      for m, v in MPRESENT[a].items():
+   for a in VKEEP:
+      for m, v in VKEEP[a].items():
          if not gene.has_coverage(a[0].major, m.pos):
             model.addConstr(v <= 0)
    # 4) No allele can include additional functional mutation (this should be done in the major model)
-   for a in MADD:
-      for m, v in MADD[a].items():
+   for a in VNEW:
+      for m, v in VNEW[a].items():
          if m.is_functional:
             model.addConstr(v <= 0)
    # 5) Prevent extra mutations if there is already existing mutation at that loci
    #    (either existing or already added)
    for pos in set(m.pos for m in constraints):
       for a in alleles:
-         mp = [A[a] * MPRESENT[a][m] for m in MPRESENT[a] if m.pos == pos]
-         ma = [A[a] * MADD[a][m] for m in MADD[a] if m.pos == pos]
+         mp = [VA[a] * VKEEP[a][m] for m in VKEEP[a] if m.pos == pos]
+         ma = [VA[a] * VNEW[a][m] for m in VNEW[a] if m.pos == pos]
          # TODO: add support for extra insertions!
          model.addConstr(model.quicksum(ma) <= 1)
          model.addConstr(model.quicksum(mp + ma) <= 1)
    # 5) Make sure that each copy of a mutation has at least one read supporting it
    for m in mutations:
-      expr  = model.quicksum(MPRESENT[a][m] * A[a] for a in alleles if m in MPRESENT[a])
-      expr += model.quicksum(MADD[a][m] * A[a] for a in alleles if m in MADD[a])
+      expr  = model.quicksum(VKEEP[a][m] * VA[a] for a in alleles if m in VKEEP[a])
+      expr += model.quicksum(VNEW[a][m] * VA[a] for a in alleles if m in VNEW[a])
       if major_sol.cn_solution.position_cn(m.pos) == 0 or coverage[m] == 0:
          model.addConstr(expr <= 0)
       else:
+         #print(f'> {m} :: {expr} <= {coverage[m]}')
          model.addConstr(expr <= coverage[m])
          # Ensure that at least one allele picks an existing non-filtered mutation
          model.addConstr(expr >= 1) 
@@ -302,8 +303,8 @@ def solve_minor_model(gene: Gene,
    for pos in set(m.pos for m in constraints):
       expr = []
       for a in alleles:
-         e  = [(1 - MPRESENT[a][m]) * A[a] for m in MPRESENT[a] if m.pos == pos]
-         e += [(1 - MADD[a][m]) * A[a] for m in MADD[a] if m.pos == pos]
+         e  = [(1 - VKEEP[a][m]) * VA[a] for m in VKEEP[a] if m.pos == pos]
+         e += [(1 - VNEW[a][m]) * VA[a] for m in VNEW[a] if m.pos == pos]
          assert(len(e) > 0)
          expr += e
       expr = model.quicksum(expr)
@@ -321,39 +322,39 @@ def solve_minor_model(gene: Gene,
             model.addConstr(expr >= 1) 
   
    # Objective: absolute sum of errors
-   objective = model.abssum(v for _, v in error_vars.items())
+   objective = model.abssum(v for _, v in VERR.items())
    if solver == 'scip':
       # HACK: Non-linear objective linearization for SCIP:
       #       min f(x) <==> min w s.t. f(x) <= w
       w = model.addVar(name='W')
       nonlinear_obj = 0
       for a in alleles:
-         nonlinear_obj += MISS_PENALTY_FACTOR * A[a] * \
-                          model.quicksum((1 - v) for m, v in MPRESENT[a].items())
+         nonlinear_obj += MISS_PENALTY_FACTOR * VA[a] * \
+                          model.quicksum((1 - v) for m, v in VKEEP[a].items())
          objective += ADD_PENALTY_FACTOR * \
-                      model.quicksum(v for m, v in MADD[a].items())
+                      model.quicksum(v for m, v in VNEW[a].items())
       model.addConstr(nonlinear_obj <= w)
       objective += w
    else:
       objective += MISS_PENALTY_FACTOR * \
-                   model.quicksum(A[a] * (1 - v) for a in sorted(alleles) for _, v in sorted(MPRESENT[a].items()))
+                   model.quicksum(VA[a] * (1 - v) for a in sorted(alleles) for _, v in sorted(VKEEP[a].items()))
       objective += ADD_PENALTY_FACTOR * \
-                   model.quicksum(v for a in sorted(alleles) for _, v in sorted(MADD[a].items()))
+                   model.quicksum(v for a in sorted(alleles) for _, v in sorted(VNEW[a].items()))
 
    # Solve the model
    try:
       status, opt = model.solve(objective)
       # model.model.write('minor.lp')
       solution = []
-      for allele, value in A.items():
+      for allele, value in VA.items():
          if model.getValue(value) <= 0:
             continue
          added: List[Mutation] = []
          missing: List[Mutation] = []
-         for m, mv in MPRESENT[allele].items():
+         for m, mv in VKEEP[allele].items():
             if not model.getValue(mv):
                missing.append(m)
-         for m, mv in MADD[allele].items():
+         for m, mv in VNEW[allele].items():
             if model.getValue(mv):
                added.append(m)
          solution.append(SolvedAllele(allele[0].major,
@@ -370,8 +371,9 @@ def solve_minor_model(gene: Gene,
       return [sol]
    except lpinterface.NoSolutionsError:
       log.debug('No minor solutions')
+      print('    <<NOSOL>>')
       # Enable to debug infeasible models
-      # model.model.computeIIS()
-      # model.model.write("minor.ilp")
+      #model.model.computeIIS()
+      #model.model.write("minor.ilp")
       return []
 
