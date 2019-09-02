@@ -149,18 +149,20 @@ def genotype(gene_db: str,
    minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver, debug=debug)
    min_score = min(minor_sols, key=lambda m: m.score).score
    minor_sols = [m for m in minor_sols if abs(m.score - min_score) < SOLUTION_PRECISION]
-   json_print(debug, ']')
+   json_print(debug, '],')
 
    log.info(f'Best minor star-alleles for {gene.name}:')
    for i, minor_sol in enumerate(minor_sols):
       log.info('  {:2}: {}', i + 1, minor_sol._solution_nice())
    
+   json_print(debug, '  "diplotype": [', end='')
    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
    for sol_id, sol in enumerate(minor_sols):
       s = diplotype.estimate_diplotype(gene, sol)
+      json_print(debug, f'"{s}", ')
       if output_file:
          diplotype.write_decomposition(sample_name, gene, sol_id, sol, output_file)
-   
+   json_print(debug, ']')
    json_print(debug, '},')
 
    # if do_remap != 0:
