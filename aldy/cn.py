@@ -22,7 +22,7 @@ from .coverage import Coverage
 
 
 PCE_REGION = GeneRegion(11, 'pce') 
-""":obj:`aldy.common.GeneRegion`: *CYP2D6* PCE region that requires special handling (as *CYP2D7* does not have matching PCE region)."""
+""":obj:`aldy.common.GeneRegion`: *CYP2D7* PCE region that requires special handling (as *CYP2D6* does not have matching PCE region)."""
 
 MAX_CN = 20.0
 """float: Maximum supported number of copies for a gene."""
@@ -234,7 +234,7 @@ def solve_cn_model(gene: Gene,
       model.addConstr(expr + VERR[r] == exp_cov0 - exp_cov1)
    json_print(debug, '},')
    # Set objective: minimize absolute errors AND the number of alleles (max. parsimony)
-   # PCE_REGION (in CYP2D6) is penalized with extra score
+   # PCE_REGION (in CYP2D7) is penalized with extra score
    objective = model.abssum(VERR.values(), 
                             coeffs={'E_{}{}'.format(*PCE_REGION): PCE_PENALTY_COEFF}) 
    # Minimize the number of alleles among equal solutions

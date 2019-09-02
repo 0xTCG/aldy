@@ -374,12 +374,12 @@ class Gene:
          return tuple(i[1] for i in sorted(x[0].items())) + tuple(i[1] for i in sorted(x[1].items()))
       inverse_cn: Dict[tuple, str] = dict()
 
-      # Left fusions are fusions of type PSEUDOGENE + GENE (breakpoint has CN of 0.5 for no good reason)
+      # Left fusions are fusions of type PSEUDOGENE + GENE
       for a, brk in fusions_left.items():
          cn = dict()
          cn[0] = {r: float(0 if (r.number, r.kind) < brk else 1) for r in self.regions[0]}
          cn[1] = {r: float(1 if (r.number, r.kind) < brk else 0) for r in self.regions[1]}
-         cn[0][GeneRegion(*brk)] = cn[1][GeneRegion(*brk)] = 0.5
+         #cn[0][GeneRegion(*brk)] = cn[1][GeneRegion(*brk)] = 0.5
 
          key = freezekey(cn)
          if key not in inverse_cn:

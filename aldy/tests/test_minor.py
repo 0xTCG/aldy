@@ -64,8 +64,6 @@ def assert_minor(gene, data, shallow=False):
          pmiss |= set((m.pos, m.op) for m in i.missing)
          pnew |= set((m.pos, m.op) for m in i.added) 
 
-      print('>>', eall, emiss, enew)
-      print('>>', pall, pmiss, pnew)
       assert_equal(eall, pall)
       assert_equal(emiss, pmiss)
       assert_equal(enew, pnew)

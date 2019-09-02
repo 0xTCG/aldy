@@ -84,7 +84,7 @@ class GeneTest(unittest.TestCase):
             kind=CNConfig.CNConfigType.DEFAULT_CN, 
             alleles=set(['1', '1.a', '2', '3']), 
             description='Normal allelic configuration: all regions present in both gene and pseudogene'),
-         '4': CNConfig(cnify('0,  0,0,  0,0.5,  1, | 1,  1,1,  1,0.5,  0'), 
+         '4': CNConfig(cnify('0,  0,0,  0,1,  1, | 1,  1,1,  1,0,  0'), 
             kind=CNConfig.CNConfigType.LEFT_FUSION, 
             alleles=set(['4/1', '4/3']), 
             description='Fusion: pseudogene until 2i followed by the gene'),

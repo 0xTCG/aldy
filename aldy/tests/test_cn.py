@@ -32,6 +32,10 @@ def assert_cn(gene, expected, cov, expected_obj=None):
    assert_equal(sols, expected)
 
 
+sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='DEBUG')
+# sh.push_application()
+
+
 class CNSyntheticTest(unittest.TestCase):
    _multiprocess_can_split_ = True
 
@@ -42,7 +46,6 @@ class CNSyntheticTest(unittest.TestCase):
 
    def make_coverage(self, lst):
       cov = {}
-      i = 0
       for r in sorted(self.gene.unique_regions):
          cov[r] = next(lst)
       return cov
@@ -82,17 +85,17 @@ class CNSyntheticTest(unittest.TestCase):
 
 
    def test_left_fusion(self):
-      # Test two fused copies (*4 is defined as 00001|11100)
+      # Test two fused copies (*4 is defined as 00011|11100)
       assert_cn(self.gene, 
                 [{'4': 2}], 
-                self.make_coverage(zip([0,0, 0,1, 2], [2,2, 2,1, 0])),
+                self.make_coverage(zip([0,0, 0,2, 2], [2,2, 2,0, 0])),
                 2 * PARSIMONY_PENALTY + 2 * LEFT_FUSION_PENALTY)
       # Test one fused and one normal (*1) allele 
       # Note: each left fusion operates on the whole genic region; 
       #       thus, the maximum number of left fusions is 2
       assert_cn(self.gene, 
                  [{'4': 2, '1': 1}], 
-                 self.make_coverage(zip([1,1, 1,2, 3], [2,2, 2,1, 0])),
+                 self.make_coverage(zip([1,1, 1,3, 3], [2,2, 2,0, 0])),
                  3 * PARSIMONY_PENALTY + 2 * LEFT_FUSION_PENALTY)
 
 
@@ -207,7 +210,7 @@ class CNRealTest(unittest.TestCase):
    def test_left_fusion(self):
       # NA19790
       assert_cn(self.gene,
-                [{'1': 2, '78': 1}],
+                [{'1': 2, '78': 1}, {'1': 2, '67': 1}],
                 self.make_coverage({
                    '1e': (1.9, 2.0), '1i': (2.0, 1.9), '2e': (2.0, 2.0), '2i': (2.0, 2.0),
                    '5e': (2.8, 1.2), '5i': (2.9, 1.0), '6e': (2.7, 0.9), '6i': (2.8, 0.9),
