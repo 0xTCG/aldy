@@ -379,6 +379,7 @@ def solve_minor_model(gene: Gene,
       json_print(debug, '    "sol": ' + str([
           (s.minor, [(m[0], m[1]) for m in s.added], [(m[0], m[1]) for m in s.missing])
           for s in solution]))
+      json_print(debug, '  },')
       sol = MinorSolution(score=opt,
                            solution=solution,
                            major_solution=major_sol)
@@ -386,7 +387,8 @@ def solve_minor_model(gene: Gene,
       return [sol]
    except lpinterface.NoSolutionsError:
       log.debug('No minor solutions')
-      json_print(debug, '    <<NOSOL>>')
+      json_print(debug, '    "sol": []')
+      json_print(debug, '  },')
       if debug and False: # Enable to debug infeasible models
          model.model.computeIIS()
          model.dump(f"{debug}.iis.ilp")
