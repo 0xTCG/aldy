@@ -252,7 +252,8 @@ def _genotype(gene: str, output: Optional, args) -> None:
          record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
       fh.push_application()
    
-   log.info('Using {} as copy-number neutral region', cn_region)
+   log.debug('Using {} as copy-number neutral region', cn_region)
+   log.info('Analyzing sample {}...', os.path.basename(args.file))
    try:
       result = genotype(gene_db=     gene, 
                         sam_path=    args.file,
