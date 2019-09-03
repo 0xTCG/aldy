@@ -35,7 +35,7 @@ def main():
    # Set the logging verbosity
    level = args.verbosity.lower()
    level = next(v for k, v in logbook.base._reverse_level_names.items() if k.lower().startswith(level))
-   
+
    # Set the command-line logging
    sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level=level)
    sh.push_application()
@@ -77,9 +77,9 @@ def main():
          else:
             output = '{}.aldy'.format(os.path.splitext(args.file)[0])
             output = open(output, 'w')
-         
+
          for gene in avail_genes:
-            _genotype(gene, output, args) 
+            _genotype(gene, output, args)
          if output != sys.stdout:
             output.close()
       else:
@@ -112,65 +112,65 @@ def _get_args():
    Prepares the command-line arguments.
    """
 
-   parser = argparse.ArgumentParser(prog='aldy', 
+   parser = argparse.ArgumentParser(prog='aldy',
       description=td("""
-         Allelic decomposition and exact genotyping of highly polymorphic 
+         Allelic decomposition and exact genotyping of highly polymorphic
          and structurally variant genes"""))
 
    base = argparse.ArgumentParser(add_help=False)
-   base.add_argument('--verbosity', '-v', default='INFO', 
+   base.add_argument('--verbosity', '-v', default='INFO',
       help=td("""
          Logging verbosity. Acceptable values are:
          - T (trace)
          - D (debug)
          - I (info) and
-         - W (warn). 
+         - W (warn).
          Default is "I" (info)."""))
-   base.add_argument('--log', '-l', default=None, 
+   base.add_argument('--log', '-l', default=None,
       help='Location of the output log file. Default is [input].[gene].aldylog')
-   
+
    subparsers = parser.add_subparsers(dest="subparser")
-   
-   genotype_parser = subparsers.add_parser('genotype', 
+
+   genotype_parser = subparsers.add_parser('genotype',
       help='Genotype a SAM/BAM/CRAM/DeeZ file', parents=[base])
-   genotype_parser.add_argument('file', nargs='?', 
-      help='Input sample in SAM, BAM, CRAM or DeeZ format.') 
-   genotype_parser.add_argument('--gene', '-g', default='all', 
+   genotype_parser.add_argument('file', nargs='?',
+      help='Input sample in SAM, BAM, CRAM or DeeZ format.')
+   genotype_parser.add_argument('--gene', '-g', default='all',
       help='Gene to be genotyped. Default is "all" which attempt to genotype all supported genes.')
-   genotype_parser.add_argument('--profile', '-p', 
+   genotype_parser.add_argument('--profile', '-p',
       required=True,
       help=td("""
          Sequencing profile. Currently, the following profiles are supported out of the box:
          - illumina
          - pgrnseq-v1
          - pgrnseq-v2 and
-         - [wxs] (coming soon). 
-         You can also provide a SAM/BAM file as a profile. 
+         - [wxs] (coming soon).
+         You can also provide a SAM/BAM file as a profile.
          Please check documentation for more information."""))
-   genotype_parser.add_argument('--threshold', '-T', default=50, 
+   genotype_parser.add_argument('--threshold', '-T', default=50,
       help="Cut-off rate for variations (percent per copy). Default is 50.")
-   genotype_parser.add_argument('--reference', '-r', default=None, 
+   genotype_parser.add_argument('--reference', '-r', default=None,
       help="CRAM or DeeZ FASTQ reference")
-   genotype_parser.add_argument('--cn-neutral-region', '-n', default='22:42547463-42548249', 
+   genotype_parser.add_argument('--cn-neutral-region', '-n', default='22:42547463-42548249',
       help=td("""
-         Copy-number neutral region. Format of the region is chromosome:start-end 
-         (e.g. chr1:10000-20000). 
+         Copy-number neutral region. Format of the region is chromosome:start-end
+         (e.g. chr1:10000-20000).
          Default value is CYP2D8 within hg19 (22:42547463-42548249)."""))
-   genotype_parser.add_argument('--output', '-o', default=None, 
+   genotype_parser.add_argument('--output', '-o', default=None,
       help='Location of the output file (default: [input].[gene].aldy)')
-   genotype_parser.add_argument('--solver', '-s', default='any', 
+   genotype_parser.add_argument('--solver', '-s', default='any',
       help=td("""
          ILP Solver. Available solvers:
          - gurobi (Gurobi)
          - scip (SCIP)
          - any (attempts to use Gurobi, and if fails, uses SCIP).
          Default is "any" """))
-   genotype_parser.add_argument('--phase', '-P', default=0, action='store_true', 
+   genotype_parser.add_argument('--phase', '-P', default=0, action='store_true',
       help=td("""
-      Phase aligned reads for better variant calling. 
-      May provide neglegible benefits at the cost of significant slowdown. 
+      Phase aligned reads for better variant calling.
+      May provide neglegible benefits at the cost of significant slowdown.
       Default is off."""))
-   genotype_parser.add_argument('--remap', default=0, #action='store_true', 
+   genotype_parser.add_argument('--remap', default=0, #action='store_true',
       help='Realign reads for better mutation calling. Requires samtools and bowtie2 in $PATH.')
    genotype_parser.add_argument('--debug', default=None,
       help='Specify the debug directory where the solver info is saved for debugging purposes.')
@@ -178,28 +178,28 @@ def _get_args():
       help=td("""
          Manually set the copy number configuration.
          Input format is a comma-separated list of configuration IDs: e.g. "CN1,CN2".
-         For a list of supported configuration IDs, please run aldy --show-cn. 
+         For a list of supported configuration IDs, please run aldy --show-cn.
          For a commonly used diploid case (e.g. 2 copies of the main gene) specify -c 1,1"""))
 
    _ = subparsers.add_parser('test', parents=[base],
       help='Sanity-check Aldy on NA10860 sample. Recommended prior to the first use')
-   
-   _ = subparsers.add_parser('license', parents=[base], 
+
+   _ = subparsers.add_parser('license', parents=[base],
       help='Show Aldy license')
-   
+
    show_parser = subparsers.add_parser('show', parents=[base],
       help='Show all available copy number configurations of a given gene.')
-   show_parser.add_argument('--gene', '-g', default='all', 
+   show_parser.add_argument('--gene', '-g', default='all',
       help='Gene to be shown.')
 
    profile_parser = subparsers.add_parser('profile', parents=[base],
       help=td("""
-         Generate a sequencing profile for a given alignment file in SAM/BAM/CRAM format. 
+         Generate a sequencing profile for a given alignment file in SAM/BAM/CRAM format.
          Please check documentation for more information."""))
-   profile_parser.add_argument('file', nargs='?', 
-      help='Input sample in SAM, BAM, CRAM or DeeZ format.') 
+   profile_parser.add_argument('file', nargs='?',
+      help='Input sample in SAM, BAM, CRAM or DeeZ format.')
 
-   _ = subparsers.add_parser('help', parents=[base], 
+   _ = subparsers.add_parser('help', parents=[base],
       help='Show a help message and exit.')
 
    return parser, parser.parse_args()
@@ -220,12 +220,12 @@ def _genotype(gene: str, output: Optional, args) -> None:
    Args:
       gene (str)
       output (file, optional)
-      args: remaining arguments 
+      args: remaining arguments
 
    Raises:
       :obj:`aldy.common.AldyException` if ``cn_region`` is invalid.
    """
-   
+
    cn_region = args.cn_neutral_region
    if cn_region is not None:
       r = re.match(r'^(.+?):(\d+)-(\d+)$', cn_region)
@@ -235,13 +235,13 @@ def _genotype(gene: str, output: Optional, args) -> None:
       if ch.startswith('chr'):
          ch = ch[3:]
       cn_region = GRange(ch, int(r.group(2)), int(r.group(3)))
-   
+
    cn_solution = args.cn
    if cn_solution:
       cn_solution = cn_solution.split(',')
 
    threshold = float(args.threshold) / 100
-   
+
    debug = args.debug
    if debug:
       os.makedirs(debug, exist_ok=True)
@@ -249,13 +249,13 @@ def _genotype(gene: str, output: Optional, args) -> None:
       log_output = f'{debug}.log'
       fh = logbook.FileHandler(log_output, mode='w', bubble=True, level='TRACE')
       fh.formatter = lambda record, _: '[{}:{}/{}] {}'.format(
-         record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message) 
+         record.level_name[0], os.path.splitext(os.path.basename(record.filename))[0], record.func_name, record.message)
       fh.push_application()
-   
+
    log.debug('Using {} as copy-number neutral region', cn_region)
    log.info('Analyzing sample {}...', os.path.basename(args.file))
    try:
-      result = genotype(gene_db=     gene, 
+      result = genotype(gene_db=     gene,
                         sam_path=    args.file,
                         profile=     args.profile,
                         output_file= output,
@@ -280,7 +280,7 @@ def _run_test() -> None:
 
    log.warn('Aldy Sanity-Check Test')
    log.warn('Expected result is: *1/*4+*4')
-   
+
    # Masquerade args via this helper class
    class DictWrapper:
       def __init__(self, d):
@@ -290,7 +290,7 @@ def _run_test() -> None:
             return self.d[key]
          else:
             return None
-   _genotype(gene='cyp2d6', 
+   _genotype(gene='cyp2d6',
              output=None,
              args=DictWrapper({'file': script_path('aldy.resources/NA10860.bam'),
                                'profile': 'illumina',
@@ -301,5 +301,3 @@ def _run_test() -> None:
 
 if __name__ == "__main__":
    main()
-   #import cProfile
-   #cProfile.run('main()', filename='aldy.prof', sort='cumulative')

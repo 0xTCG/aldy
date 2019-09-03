@@ -45,7 +45,7 @@ def optimize(gene, reads, alleles, copy_number):
    d = dict()
    for r in reads:
       for a in reads[r]:
-         x[r][a] = model.addVar(vtype='B', name='x_{}_{}'.format(a, r), update=False)   
+         x[r][a] = model.addVar(vtype='B', name='x_{}_{}'.format(a, r), update=False)
       d[r] = model.addVar(vtype='B', name='d_{}'.format(r), update=False)
 
    # Coverage constraints
@@ -57,7 +57,7 @@ def optimize(gene, reads, alleles, copy_number):
    y = dict()
    for (a, k), lhs in z.items():
       pos = alleles[a][0][0] + k
-      
+
       v = model.addVar(lb=-model.INF, name='z_{}_{}'.format(a, k), update=False)
       model.addConstr(v == lhs - copy_number[gene.region_at[pos]] * round(copy_number.baseline[pos]))
 
@@ -75,7 +75,7 @@ def optimize(gene, reads, alleles, copy_number):
    #             mut[a, k][m] = model.addVar(vtype='I', name='mut_{}_{}_{}'.format(a, k, m), update=False)
    #          z[a, k, m] += x[r][a]
    # for (a, k, m), lhs in z.items():
-   #    pos = alleles[a][0][0] + k 
+   #    pos = alleles[a][0][0] + k
    #    v = model.addVar(lb=-model.INF, name='z_{}_{}_{}'.format(a, k, m), update=False)
    #    model.addConstr(v == lhs - mut[a, k][m] * round(copy_number.baseline[pos]))
    #    y[a, k, m] = model.addVar(lb=0, name='y_{}_{}_{}'.format(a, k, m), update=False)
@@ -90,7 +90,7 @@ def optimize(gene, reads, alleles, copy_number):
    score = lambda r, m: len(r.query_sequence) - r.get_tag('NM')
    obj  = model.quicksum(score(*reads[r][a]) * x[r][a] for r in x for a in x[r])
    obj -= model.quicksum(y.values())
-   
+
    # Existence constraints
    for r in reads:
       model.addConstr(model.quicksum(x[r].values()) + d[r] == 1)
@@ -129,7 +129,7 @@ def write_reads(sam_path, gene, alleles, reads, out_path):
             a.flag = x.flag
             a.reference_id = sam.get_tid('chr22')
             a.reference_start = x.reference_start + alleles[x.reference_name][0][0]
-            a.mapping_quality = x.mapping_quality 
+            a.mapping_quality = x.mapping_quality
             a.cigar = x.cigar
             a.next_reference_start = x.next_reference_start
             a.template_length = x.template_length
@@ -192,7 +192,7 @@ def get_reads(alleles, tempdir, sam_path):
             seq = read.query_sequence
             rname = read.query_name
             muts = dict()
-            
+
             for op, size in read.cigartuples:
                if op == 2:
                   muts[start] = 'DEL.{}'.format(ref[start:start + size])
@@ -231,11 +231,11 @@ def remap(sam_path, gene, sam, cn_sol, tempdir=None, force=True, cleanup=False, 
 
       log.warn('Reading realinged data...')
       reads = get_reads(alleles, tempdir, sam_path)
-      
+
       log.warn('Optimizing...')
       reads = optimize(gene, reads, alleles, cn_sol)
 
-      out = '{}.remap_ibrahim.bam'.format(os.path.basename(sam_path)) 
+      out = '{}.remap_ibrahim.bam'.format(os.path.basename(sam_path))
       if os.path.exists(out) and not force:
          raise AldyException('{} already exists--- make sure to use --force!'.format(out))
       write_reads(sam_path, gene, alleles, reads, out)
@@ -243,7 +243,3 @@ def remap(sam_path, gene, sam, cn_sol, tempdir=None, force=True, cleanup=False, 
    if cleanup:
       shutil.rmtree(tempdir)
    return out
-
-
-
-   

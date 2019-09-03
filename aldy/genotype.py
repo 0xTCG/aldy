@@ -27,14 +27,13 @@ from .lpinterface import model as lp_model
 from .version import __version__
 
 
-#@timing
-def genotype(gene_db: str, 
+def genotype(gene_db: str,
              sam_path: str,
              profile: Optional[str],
-             output_file: Optional = sys.stdout, 
+             output_file: Optional = sys.stdout,
              cn_region: Optional[GRange] = None,
              cn_solution: Optional[List[str]] = None,
-             threshold: float = 0.5, 
+             threshold: float = 0.5,
              solver: str = 'any',
              phase: bool = False,
              reference: Optional[str] = None,
@@ -46,19 +45,19 @@ def genotype(gene_db: str,
       list[:obj:`aldy.minor.MinorSolution`]: List of solutions.
 
    Args:
-      gene_db (str): 
+      gene_db (str):
          Gene name (if it is located in Aldy's gene database)
          or the location of gene YML description.
-      sam_path (str): 
+      sam_path (str):
          Location of SAM/BAM/CRAM/DeeZ file to be genotyped.
       profile (str, optional):
-         Coverage profile (e.g. 'illumina'). 
+         Coverage profile (e.g. 'illumina').
          Can be ``None`` if ``cn_solution`` is provided.
       cn_region (:obj:`aldy.common.GRange`, optional):
          Copy-number neutral region.
          Can be ``None`` (will use default CYP2D8 region or ``None`` if ``cn_solution`` is provided).
       output_file (file, optional):
-         Location of the output decomposition file. 
+         Location of the output decomposition file.
          Provide ``None`` for no output.
          Default is ``sys.stdout``.
       cn_solution (list[str], optional):
@@ -100,24 +99,24 @@ def genotype(gene_db: str,
    with open(sam_path): # Check does file exist
       pass
    if not cn_region:
-      cn_region = sam.DEFAULT_CN_NEUTRAL_REGION 
-   sample = sam.Sample(sam_path=sam_path, 
-                       gene=gene, 
-                       threshold=threshold, 
+      cn_region = sam.DEFAULT_CN_NEUTRAL_REGION
+   sample = sam.Sample(sam_path=sam_path,
+                       gene=gene,
+                       threshold=threshold,
                        profile=profile,
                        phase=False,
                        reference=reference,
-                       cn_region=cn_region, 
+                       cn_region=cn_region,
                        debug=debug)
 
    avg_cov = sample.coverage.average_coverage()
    if avg_cov < 2:
       raise AldyException(td("""
-         Average coverage of {0} for gene {1} is too low; skipping gene {1}. 
+         Average coverage of {0} for gene {1} is too low; skipping gene {1}.
          Please ensure that {1} is present in the input SAM/BAM.""").format(avg_cov, gene.name))
    elif avg_cov < 20:
       log.warn("Average coverage is {}. We recommend at least 20x coverage for optimal results.", avg_cov)
-   
+
    json_print(debug, f'"{os.path.basename(sam_path).split(".")[0]}": {{')
 
    # Get copy-number solutions
@@ -128,7 +127,7 @@ def genotype(gene_db: str,
    # Get major solutions and pick the best one
    log.info(f'Potential copy number configurations for {gene.name}:')
    major_sols = []
-   
+
    json_print(debug, '  "major": [', end='')
    for i, cn_sol in enumerate(cn_sols):
       sols = major.estimate_major(gene, sample.coverage, cn_sol, solver, debug=debug)
@@ -137,14 +136,14 @@ def genotype(gene_db: str,
    json_print(debug, '],')
 
    min_score = min(major_sols, key=lambda m: m.score).score
-   major_sols = sorted([m for m in major_sols 
-                        if abs(m.score - min_score) < SOLUTION_PRECISION], 
+   major_sols = sorted([m for m in major_sols
+                        if abs(m.score - min_score) < SOLUTION_PRECISION],
                        key=lambda m: m.score)
 
    log.info(f'Potential major star-alleles for {gene.name}:')
    for i, major_sol in enumerate(major_sols):
       log.info('  {:2}: {}', i + 1, major_sol._solution_nice())
-   
+
    json_print(debug, '  "minor": [', end='')
    minor_sols = minor.estimate_minor(gene, sample.coverage, major_sols, solver, debug=debug)
    min_score = min(minor_sols, key=lambda m: m.score).score
@@ -154,7 +153,7 @@ def genotype(gene_db: str,
    log.info(f'Best minor star-alleles for {gene.name}:')
    for i, minor_sol in enumerate(minor_sols):
       log.info('  {:2}: {}', i + 1, minor_sol._solution_nice())
-   
+
    json_print(debug, '  "diplotype": [', end='')
    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
    for sol_id, sol in enumerate(minor_sols):

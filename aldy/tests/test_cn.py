@@ -18,10 +18,10 @@ from aldy.common import *
 
 
 def assert_cn(gene, expected, cov, expected_obj=None):
-   sols = aldy.cn.solve_cn_model(gene, 
-                                 cn_configs=gene.cn_configs, 
-                                 max_cn=20, 
-                                 region_coverage=cov, 
+   sols = aldy.cn.solve_cn_model(gene,
+                                 cn_configs=gene.cn_configs,
+                                 max_cn=20,
+                                 region_coverage=cov,
                                  solver='gurobi')
    if expected_obj:
       for s in sols:
@@ -53,12 +53,12 @@ class CNSyntheticTest(unittest.TestCase):
 
    def test_basic(self):
       # Test two copies of *1
-      assert_cn(self.gene, 
+      assert_cn(self.gene,
                 [{'1': 2}],
                 self.make_coverage(zip([2,2, 2,2, 2], [2,2, 2,2, 2])),
                 2 * PARSIMONY_PENALTY)
       # Test two copies of *1 with slightly perturbed coverage
-      assert_cn(self.gene, 
+      assert_cn(self.gene,
                 [{'1': 2}],
                 self.make_coverage(zip([1.8,2.2, 2.1,1.9, 1.7], [2.05,1.95, 2,2, 2.7])),
                 2 * PARSIMONY_PENALTY + (0.2 * 2 + 0.1 * 2 + 0.3 + 0.05 * 2 + 0.7))
@@ -66,19 +66,19 @@ class CNSyntheticTest(unittest.TestCase):
 
    def test_deletion(self):
       # Test a single copy of *1 (*6 is deletion allele)
-      assert_cn(self.gene, 
+      assert_cn(self.gene,
                 [{'1': 1, '6': 1}],
                 self.make_coverage(zip([1,1, 1,1, 1], [2,2, 2,2, 2])),
                 2 * PARSIMONY_PENALTY)
       # Test whole gene deletion
-      assert_cn(self.gene, 
+      assert_cn(self.gene,
                 [{'6': 2}],
                 self.make_coverage(zip([0,0, 0,0, 0], [2,2, 2,2, 2])),
                 2 * PARSIMONY_PENALTY)
       # TODO: test 2 deletions with no coverage
       # sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='DEBUG')
       # sh.push_application()
-      # assert_cn(self.gene, 
+      # assert_cn(self.gene,
       #           [{'6': 2}],
       #           self.make_coverage(zip([0,0, 0,0, 0], [0,0, 0,0, 0])),
       #           2 * PARSIMONY_PENALTY)
@@ -86,22 +86,22 @@ class CNSyntheticTest(unittest.TestCase):
 
    def test_left_fusion(self):
       # Test two fused copies (*4 is defined as 00011|11100)
-      assert_cn(self.gene, 
-                [{'4': 2}], 
+      assert_cn(self.gene,
+                [{'4': 2}],
                 self.make_coverage(zip([0,0, 0,2, 2], [2,2, 2,0, 0])),
                 2 * PARSIMONY_PENALTY + 2 * LEFT_FUSION_PENALTY)
-      # Test one fused and one normal (*1) allele 
-      # Note: each left fusion operates on the whole genic region; 
+      # Test one fused and one normal (*1) allele
+      # Note: each left fusion operates on the whole genic region;
       #       thus, the maximum number of left fusions is 2
-      assert_cn(self.gene, 
-                 [{'4': 2, '1': 1}], 
+      assert_cn(self.gene,
+                 [{'4': 2, '1': 1}],
                  self.make_coverage(zip([1,1, 1,3, 3], [2,2, 2,0, 0])),
                  3 * PARSIMONY_PENALTY + 2 * LEFT_FUSION_PENALTY)
 
 
    def test_right_fusion(self):
       # Test one fused and one normal (*1) allele (*5 is defined as 11000|11222)
-      assert_cn(self.gene, 
+      assert_cn(self.gene,
                 [{'1': 1, '5': 1}],
                 self.make_coverage(zip([2,2, 1,1, 1], [2,2, 3,3, 3])),
                 2 * PARSIMONY_PENALTY)
@@ -109,12 +109,12 @@ class CNSyntheticTest(unittest.TestCase):
 
    def test_multiplication(self):
       # Test twelve copies of *1
-      assert_cn(self.gene, 
+      assert_cn(self.gene,
                 [{'1': 12}],
                 self.make_coverage(zip([12,12, 12,12, 12], [2,2, 2,2, 2])),
                 12 * PARSIMONY_PENALTY)
       # Test seven copies of *1 and one fused *5 copy
-      assert_cn(self.gene, 
+      assert_cn(self.gene,
                 [{'1': 7, '5': 1}],
                 self.make_coverage(zip([8,8, 7,7, 7], [2,2, 3,3, 3])),
                 8 * PARSIMONY_PENALTY)

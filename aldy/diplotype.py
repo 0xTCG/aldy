@@ -18,16 +18,16 @@ OUTPUT_COLS = 'Sample Gene SolutionID Major Minor Copy Allele Location Type Cove
 """list[str]: Output file column descriptions"""
 
 
-def write_decomposition(sample: str, 
-                        gene: Gene, 
-                        sol_id: int, 
-                        minor: MinorSolution, 
+def write_decomposition(sample: str,
+                        gene: Gene,
+                        sol_id: int,
+                        minor: MinorSolution,
                         f) -> None:
    """
    Writes the allelic decomposition to the file `f`.
 
    Args:
-      sample (str): 
+      sample (str):
          Sample name.
       gene (:obj:`aldy.gene.Gene`):
          Gene instance.
@@ -40,32 +40,32 @@ def write_decomposition(sample: str,
    """
 
    for copy, a in enumerate(minor.solution):
-      mutations = set(gene.alleles[a.major].func_muts) | set(gene.alleles[a.major].minors[a.minor].neutral_muts) 
-      mutations |= set(a.added) 
+      mutations = set(gene.alleles[a.major].func_muts) | set(gene.alleles[a.major].minors[a.minor].neutral_muts)
+      mutations |= set(a.added)
       mutations -= set(a.missing)
       items = []
       if len(mutations) > 0:
          for m in sorted(mutations):
-            items.append([sample, 
-                          gene.name, 
-                          sol_id, 
-                          minor.diplotype, 
+            items.append([sample,
+                          gene.name,
+                          sol_id,
+                          minor.diplotype,
                           ';'.join(ay.minor for ay in minor.solution),
-                          copy, 
+                          copy,
                           a.minor,
-                          m.pos, m.op, 
+                          m.pos, m.op,
                           -1,
                           ['NEUTRAL', 'DISRUPTING'][bool(m.is_functional)],
-                          m.aux.get('dbsnp', ''), 
+                          m.aux.get('dbsnp', ''),
                           m.aux.get('old', ''),
                           ''])
       else:
-         items.append([sample, 
-                       gene.name, 
-                       sol_id, 
-                       minor.diplotype, 
+         items.append([sample,
+                       gene.name,
+                       sol_id,
+                       minor.diplotype,
                        ';'.join(ay.minor for ay in minor.solution),
-                       copy, 
+                       copy,
                        a.minor,
                        '', '', '', '', '', '', ''])
       for it in items:
@@ -94,7 +94,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
    major_dict = collections.Counter(majors)
    dc = 0
 
-   # Handle tandems (heuristic where common tandems are groupped together, 
+   # Handle tandems (heuristic where common tandems are groupped together,
    #                 e.g. 1, 2, 13 -> 1+13/2 if [1,13] is a common tandem)
    for ta, tb in gene.common_tandems:
       while major_dict[ta] > 0 and major_dict[tb] > 0:
@@ -117,7 +117,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
          diplotype[dc % 2].extend(count * [str(allele)])
          major_dict[allele] -= count
          dc += 1
-   # Handle the rest 
+   # Handle the rest
    for allele, count in major_dict.items():
       if count > 0:
          if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
@@ -125,7 +125,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
          assert(count == 1)
          diplotype[dc % 2].append(str(allele))
          dc += 1
-   # Each diplotype should have at least one item 
+   # Each diplotype should have at least one item
    # e.g. 1, 1 -> becomes 1+1/_ due to duplicate heuristic -> fixed to 1/1
    if len(diplotype[1]) == 0:
       diplotype = (diplotype[0][:-1], [diplotype[0][-1]])
@@ -142,7 +142,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
       nd += [(x, ) for x in diplotype[i]]
       diplotype[i] = [f for e in sorted(nd) for f in e]
 
-   res = '/'.join('+'.join('*{}'.format(y) for y in x) 
+   res = '/'.join('+'.join('*{}'.format(y) for y in x)
                   for x in diplotype)
 
    solution.diplotype = res

@@ -18,9 +18,9 @@ class Coverage:
    Describes the positional and regional coverage of a sample.
    """
 
-   def __init__(self, 
-         coverage: Dict[int, Dict[str, int]], 
-         threshold: float, 
+   def __init__(self,
+         coverage: Dict[int, Dict[str, int]],
+         threshold: float,
          cnv_coverage: Dict[int, int]) -> None:
       """
       Coverage initialization.
@@ -47,7 +47,7 @@ class Coverage:
 
       self._rescaled: Dict[int, float] = {}
       self._region_coverage: Dict[Tuple[int, GeneRegion], float] = {}
-      
+
 
    def __getitem__(self, mut: Mutation) -> float:
       """
@@ -55,7 +55,7 @@ class Coverage:
          float: Coverage of the mutation ``mut``.
       """
       return self.coverage(mut)
-   
+
 
    def coverage(self, mut: Mutation) -> float:
       """
@@ -69,12 +69,12 @@ class Coverage:
 
 
    def _dump(self, threshold=0):
-      c = {x: {a: b for a, b in c.items()} 
+      c = {x: {a: b for a, b in c.items()}
            for x, c in self._coverage.items()}
       for pos, mc in c.items():
          for m in list(mc.keys()):
             if mc[m] < threshold:
-               del mc[m] 
+               del mc[m]
       for pos in list(c.keys()):
          if '_' in c[pos] and len(c[pos]) == 1:
             del c[pos]
@@ -88,10 +88,10 @@ class Coverage:
       Returns:
          float: Total coverage at the locus ``pos``.
       """
-      if pos not in self._coverage: 
+      if pos not in self._coverage:
          return 0
-      return float(sum(v 
-         for p, v in self._coverage[pos].items() 
+      return float(sum(v
+         for p, v in self._coverage[pos].items()
          if p[:3] != 'INS'))
 
 
@@ -110,11 +110,11 @@ class Coverage:
       Returns:
          float: Copy number of the locus ``pos``.
       """
-      if self._rescaled[pos] == 0: 
+      if self._rescaled[pos] == 0:
          return 0
       return self.total(pos) * (1 / self._rescaled[pos])
 
-   
+
    def single_copy(self, pos: int, cn_solution) -> float:
       """
       Args:
@@ -147,14 +147,14 @@ class Coverage:
    def filtered(self, filter_fn: Callable[[Mutation, float, float, float], bool]): # -> Coverage
       """
       Args:
-         filter_fn (callable): 
+         filter_fn (callable):
             Function that performs the filtering. Its arguments are:
 
             1. mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
             2. cov (float): coverage of the mutation
             3. total (float): total locus coverage
             4. thres (float): threshold value to be used for filtering
-            
+
             ``filter_fn`` returns ``False`` if a mutation is to be filtered out.
 
       Returns:
@@ -169,7 +169,7 @@ class Coverage:
          })
          for pos, pos_mut in self._coverage.items()
       })
-      
+
       new_cov = Coverage(cov, self._threshold, self._cnv_coverage) # type: ignore
       new_cov._rescaled = self._rescaled
       new_cov._region_coverage = self._region_coverage
@@ -182,11 +182,11 @@ class Coverage:
          float: Average coverage of the copy-number neutral region.
       """
       return float(sum(self._cnv_coverage.values())) / abs(self._cn_region.end - self._cn_region.start)
-      
 
-   def _normalize_coverage(self, 
-                           profile: Dict[str, Dict[int, float]], 
-                           gene_regions: Dict[int, Dict[GeneRegion, GRange]], 
+
+   def _normalize_coverage(self,
+                           profile: Dict[str, Dict[int, float]],
+                           gene_regions: Dict[int, Dict[GeneRegion, GRange]],
                            cn_region: GRange) -> None:
       """
       Normalizes the coverage of the sample to match the profile coverage.
@@ -208,7 +208,7 @@ class Coverage:
       cn_ratio = float(cnv_ref) / sam_ref
       log.debug('CNV factor: {} ({})', cn_ratio, 1.0 / cn_ratio)
 
-      self._rescaled: Dict[int, float] = {} 
+      self._rescaled: Dict[int, float] = {}
       self._region_coverage: Dict[Tuple[int, GeneRegion], float] = {}
       for gene, gr in gene_regions.items():
          for region, rng in gr.items():
@@ -236,7 +236,3 @@ class Coverage:
       cn = cn_solution.position_cn(mut.pos)
       total = total / cn if cn > 0 else total
       return mut.op == '_' or cov > max(1, total * thres)
-
-
-
-   

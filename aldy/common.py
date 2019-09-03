@@ -8,7 +8,7 @@
 
 from typing import Tuple, Iterable
 
-import pkg_resources 
+import pkg_resources
 import os
 import re
 import time
@@ -71,7 +71,7 @@ class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
    Notes:
       Has custom printer (``__str__``).
    """
-   
+
    def samtools(self, pad_left=500, pad_right=1, prefix='') -> str:
       """
       Samtools-compatible region string (e.g. chr1:10-20).
@@ -80,7 +80,7 @@ class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
          str
       """
       return '{}:{}-{}'.format(prefix + self.chr, self.start - 500, self.end + 1)
-   
+
    def __str__(self):
       return self.samtools(0, 0, '')
 
@@ -88,12 +88,12 @@ class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
 class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
    """
    Describes the region of a gene.
-   
+
    Attributes:
-      number (int): 
+      number (int):
          The region number (e.g. for exon 9, number is 9).
-      kind (str): 
-         Type of the region. Typically 'e' (for **e**\ xon), 'i' (for **i**\ ntron) 
+      kind (str):
+         Type of the region. Typically 'e' (for **e**\ xon), 'i' (for **i**\ ntron)
          but can be anything else.
 
    Notes:
@@ -104,7 +104,7 @@ class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
       return 'GR({}.{})'.format(self.number, self.kind)
 
 
-### Aldy auxiliaries 
+### Aldy auxiliaries
 
 
 def allele_number(x: str) -> str:
@@ -118,7 +118,7 @@ def allele_number(x: str) -> str:
 
 def allele_sort_key(x: str) -> Tuple[int, str]:
    """
-   Returns: 
+   Returns:
       tuple[int, str]: Key for sorting allele names (e.g. ``'13a'`` -> ``(13, 'a')``).
    """
    p = re.split(r'(\d+)', x)
@@ -139,7 +139,7 @@ def seq_to_amino(seq: str) -> str:
    Returns:
       str: Protein sequence formed from a DNA sequence.
    """
-   
+
    return ''.join(PROTEINS[seq[i:i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3))
 
 
@@ -155,7 +155,7 @@ def sorted_tuple(x: Iterable) -> tuple:
 
 def td(s: str) -> str:
    """
-   Abbreviation for textwrap.dedent. Useful for stripping indentation 
+   Abbreviation for textwrap.dedent. Useful for stripping indentation
    in multi-line docstrings.
    """
    return textwrap.dedent(s)
@@ -164,9 +164,9 @@ def td(s: str) -> str:
 def static_vars(**kwargs):
    """
    Decorator that adds static variables to a function.
-   
+
    Usage::
-      
+
       @static_vars(var=init_val)
    """
    def decorate(func):
@@ -180,10 +180,10 @@ def timing(f):
    """
    Decorator for timing a function.
    Prints the time spent in function after the function is completed.
-   
-   Usage:: 
 
-      @timing 
+   Usage::
+
+      @timing
 
    (without any parameters).
    """
@@ -213,8 +213,8 @@ def pr(x):
 
 def script_path(key: str) -> str:
    """
-   Args: 
-      key (str): a resource to be extracted. 
+   Args:
+      key (str): a resource to be extracted.
       Specify with ``path/file`` (e.g. ``aldy.resources/test.txt``).
 
    Returns:
@@ -243,7 +243,7 @@ def check_path(cmd: str) -> bool:
       bool: ``True`` if a command ``cmd`` is an executable in ``PATH`` or local directory.
    """
 
-   def is_exe(path): 
+   def is_exe(path):
       """
       Based on http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python/377028#377028
       """
@@ -260,7 +260,7 @@ def check_path(cmd: str) -> bool:
 
 _json = None
 def json_print(debug, *args, **kwargs):
-   if not debug: 
+   if not debug:
       return
    global _json
    if not _json:

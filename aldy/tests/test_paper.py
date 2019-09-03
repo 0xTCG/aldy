@@ -10,7 +10,7 @@ from nose.tools import *
 import unittest
 import logbook.more
 import ast
-import os 
+import os
 
 import aldy.genotype
 from aldy.common import script_path
@@ -18,10 +18,10 @@ from aldy.common import script_path
 
 def solve(data, path, profile, reference):
    sols = aldy.genotype.genotype(
-      'cyp2d6', 
+      'cyp2d6',
       sam_path=path,
       profile=profile,
-      output_file=None, 
+      output_file=None,
       reference=reference)
    assert_equal(data, [s.diplotype for s in sols])
 

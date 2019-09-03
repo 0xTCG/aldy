@@ -45,9 +45,9 @@ class Gurobi:
    def addVar(self, *args, **kwargs):
       """
       Add a variable to the model.
-      
+
       ``vtype`` named argument stands for the variable type:
-      
+
       - ``B`` for binary variable
       - ``I`` for integer variable
       - ``C`` or nothing for continuous variable.
@@ -65,7 +65,7 @@ class Gurobi:
          self.update()
       return v
 
-   
+
    def setObjective(self, objective, method: str = 'min'):
       """
       Sets the model objective via ``objective``.
@@ -102,10 +102,10 @@ class Gurobi:
 
    def abssum(self, vars: Iterable, coeffs: Optional[Dict[str, float]] = None):
       """
-      Returns absolute sum of the ``vars``: e.g. 
+      Returns absolute sum of the ``vars``: e.g.
          :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
       where :math:`c_i` is defined in the ``coeffs`` dictionary.
-      Key of the ``coeffs`` dictionary stands for the name of the variable 
+      Key of the ``coeffs`` dictionary stands for the name of the variable
       accessible via ``varName`` call (1 if not defined).
       """
       vv = []
@@ -124,7 +124,7 @@ class Gurobi:
       """
       Solve the model. Assumes that objective is set.
 
-      Additional parameters of the solver can be set via ``init`` function that takes 
+      Additional parameters of the solver can be set via ``init`` function that takes
       the model instance as a sole argument.
 
       Returns:
@@ -146,21 +146,21 @@ class Gurobi:
       return status.lower(), self.model.objVal
 
 
-   def solveAll(self, 
-                keys: dict, 
+   def solveAll(self,
+                keys: dict,
                 init: Optional[Callable] = None) -> Tuple[str, float, List[tuple]]:
       """
       Solve the model. Assumes that objective is set.
       Returns the list of all combinations of the variables ``keys`` that minimize the objective.
 
-      Additional parameters of the solver can be set via ``init`` function that takes 
+      Additional parameters of the solver can be set via ``init`` function that takes
       the model instance as a sole argument.
 
       Returns:
          tuple[str, float, list[tuple[any]]]: Tuple describing the status of the solution and the objective value.
       """
       status, opt_value = self.solve(init)
-      sol = sorted_tuple(set(a for a, v in keys.items() if self.getValue(v))) 
+      sol = sorted_tuple(set(a for a, v in keys.items() if self.getValue(v)))
       yield status, opt_value, sol
       yield from get_all_solutions(self, keys, opt_value, sol)
 
@@ -185,7 +185,7 @@ class Gurobi:
       var.ub = ub
       self.update()
 
-   
+
    def dump(self, file):
       self.model.write(file)
 
@@ -297,17 +297,17 @@ def model(name: str, solver: str):
          raise Exception('IP solver {} is not supported'.format(solver))
 
 
-def get_all_solutions(model: Gurobi, 
-                      var: dict, 
-                      opt: float, 
-                      current_sol: tuple, 
-                      iteration: int = 0, 
+def get_all_solutions(model: Gurobi,
+                      var: dict,
+                      opt: float,
+                      current_sol: tuple,
+                      iteration: int = 0,
                       mem: Optional[Set[tuple]] = None) -> Set[tuple]:
    """
    Enumerate all possible solutions that yield ``opt`` value for the ILP defined in ``model``.
 
    Args:
-      model (:obj:`Gurobi`): 
+      model (:obj:`Gurobi`):
          ILP model instance.
       var (dict[any, :obj:`Variable`]):
          Dictionary of the variables that can form the optimal solution `current_sol`.
