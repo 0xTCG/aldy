@@ -27,8 +27,8 @@ def solve(data, path, profile, reference):
 
 
 def test_pgx1_cyp2d6():
-   path = os.environ.get('ALDY_INTERNAL_SAMPLES', '.')
-   path = f'{path}/cdc/pgrnseq-v1/bams'
+   orig_path = os.environ.get('ALDY_INTERNAL_SAMPLES', '.')
+   path = f'{orig_path}/cdc/pgrnseq-v1/bams'
    with open(script_path('aldy.tests.paper/data-pgx1.json')) as f:
       data = f.read()
       data = ast.literal_eval(data)
@@ -37,12 +37,12 @@ def test_pgx1_cyp2d6():
              data[file],
              f'{path}/{file}.cram',
              'pgrnseq-v1',
-             f'{path}/cram-genome.fa')
+             f'{orig_path}/cram-genome.fa')
 
 
 def test_pgx2_cyp2d6():
-   path = os.environ.get('ALDY_INTERNAL_SAMPLES', '.')
-   path = f'{path}/baylor/pgrnseq-v2/bams'
+   orig_path = os.environ.get('ALDY_INTERNAL_SAMPLES', '.')
+   path = f'{orig_path}/baylor/pgrnseq-v2/bams'
    with open(script_path('aldy.tests.paper/data-pgx2.json')) as f:
       data = f.read()
       data = ast.literal_eval(data)
@@ -51,12 +51,12 @@ def test_pgx2_cyp2d6():
              data[file],
              f'{path}/{file}.cram',
              'pgrnseq-v2',
-             f'{path}/cram-genome.fa')
+             f'{orig_path}/cram-genome.fa')
 
 
 def test_illumina_cyp2d6():
-   path = os.environ.get('ALDY_INTERNAL_SAMPLES', '.')
-   path = f'{path}/1000genomes-illumina/bams'
+   orig_path = os.environ.get('ALDY_INTERNAL_SAMPLES', '.')
+   path = f'{orig_path}/1000genomes-illumina/bams'
    with open(script_path('aldy.tests.paper/data-illumina.json')) as f:
       data = f.read()
       data = ast.literal_eval(data)
@@ -65,4 +65,4 @@ def test_illumina_cyp2d6():
              data[file],
              f'{path}/{file}.bam',
              'illumina',
-             f'{path}/cram-genome.fa')
+             None)
