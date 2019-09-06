@@ -21,7 +21,7 @@ class Gurobi:
    An abstraction aroung Gurobi Python interface.
    """
 
-   def __init__(self, name):
+   def __init__(self, name, prev_model = None):
       self.gurobipy = importlib.import_module('gurobipy')
 
       self.INF = self.gurobipy.GRB.INFINITY
@@ -30,8 +30,11 @@ class Gurobi:
          for v in dir(self.gurobipy.GRB.status)
          if v[:2] != '__'
       }
-      self.model = self.gurobipy.Model(name)
-      self.model.reset()
+      if prev_model:
+         self.model = prev_model
+      else:
+         self.model = self.gurobipy.Model(name)
+         self.model.reset()
 
 
    def addConstr(self, *args, **kwargs):
@@ -112,7 +115,7 @@ class Gurobi:
       for i, v in enumerate(vars):
          name = self.varName(v)
          coeff = 1 if coeffs is None or name not in coeffs else coeffs[name]
-         absvar = self.addVar(lb=0, update=False, name=f'ABS_{v.VarName}')
+         absvar = self.addVar(lb=0, update=False, name=f'ABS_{name}')
          vv.append(absvar * coeff)
          self.addConstr(absvar + v >= 0, name=f'CABSL_{i}')
          self.addConstr(absvar - v >= 0, name=f'CABSR_{i}')
@@ -165,6 +168,26 @@ class Gurobi:
       yield from get_all_solutions(self, keys, opt_value, sol)
 
 
+   def solutions(self, 
+                 gap: float = 0, 
+                 best_obj: Optional[float] = None, 
+                 limit = None,
+                 init: Optional[Callable] = None):
+      def model_init(m):
+         m.params.poolSearchMode = 2
+         m.params.poolSolutions = limit or 2000000000
+         m.params.poolGap = gap
+      self.solve(init=model_init)
+      for soli in range(self.model.solCount):
+         self.model.params.solutionNumber = soli
+         vv = {v.VarName: v
+               for v in self.model.getVars()
+               if v.vtype == self.gurobipy.GRB.BINARY and round(v.xn) > 0}
+         yield (self.GUROBI_STATUS[self.model.status], 
+                self.model.poolObjVal,
+                sorted_tuple(set(vv.keys())))
+
+
    def getValue(self, var):
       """
       Get the value of the solved variable.
@@ -189,6 +212,7 @@ class Gurobi:
    def dump(self, file):
       self.model.write(file)
 
+
 class SCIP(Gurobi):
    """
    An abstraction aroung SCIP `PySCIPopt` Python interface.
@@ -197,18 +221,23 @@ class SCIP(Gurobi):
    def __init__(self, name):
       self.pyscipopt = importlib.import_module('pyscipopt')
       self.INF = 1e20
+      self.SOLVER_PRECISON = 1e-5 # Use Gurobi's default precision
       self.model = self.pyscipopt.Model(name)
+
 
    def update(self):
       pass
 
+
    def addConstr(self, *args, **kwargs):
       return self.model.addCons(*args, **kwargs)
+
 
    def addVar(self, *args, **kwargs):
       if 'update' in kwargs:
          del kwargs['update']
       return self.model.addVar(*args, **kwargs)
+
 
    def setObjective(self, objective, method: str = 'min'):
       self.objective = objective
@@ -217,11 +246,13 @@ class SCIP(Gurobi):
          'minimize' if method == 'min' else 'maximize'
       )
 
+
    def quicksum(self, expr):
       return self.pyscipopt.quicksum(expr)
 
+
    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
-      self.model.setRealParam('limits/time', 120)
+      # self.model.setRealParam('limits/time', 120)
       self.model.hideOutput()
       if init is not None:
          init(self.model)
@@ -232,18 +263,56 @@ class SCIP(Gurobi):
          raise NoSolutionsError(status)
       return status, self.model.getObjVal()
 
+
    def varName(self, var):
       return var.name
 
+
    def getValue(self, var):
-      return self.model.getVal(var)
+      x = self.model.getVal(var)
+      if var.vtype() == 'BINARY':
+         return round(x) > 0
+      if var.vtype() == 'INTEGER':
+         return int(round(x))
+      else:
+         return x
+
 
    def changeUb(self, var, ub):
       self.model.freeTransform()
       self.model.chgVarUb(var, ub)
 
+
    def dump(self, file):
       self.model.writeProblem(file)
+
+
+   def solutions(self, 
+                 gap: float = 0, 
+                 best_obj: Optional[float] = None, 
+                 limit = None,
+                 iteration = 0, 
+                 init: Optional[Callable] = None):
+      try:
+         status, obj = self.solve(init)
+         best_obj = obj if best_obj is None else best_obj
+         if status != 'optimal':
+            return 
+         ub = (1 + gap) * best_obj
+         if abs(obj - ub) >= self.SOLVER_PRECISON and obj > ub:
+            return
+         
+         vv = {v.name: v
+               for v in self.model.getVars() 
+               if v.vtype() == 'BINARY' and self.getValue(v) == 1}
+         yield status, obj, sorted_tuple(set(vv.keys()))
+         
+         if not limit or iteration + 1 < limit:
+            self.model.freeTransform()
+            self.addConstr(self.quicksum(vv.values()) <= len(vv) - 1)
+            yield from self.solutions(gap, best_obj, limit, iteration + 1, init)
+      except NoSolutionsError:
+         return
 
 
 def model(name: str, solver: str):

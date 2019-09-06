@@ -24,13 +24,14 @@ from aldy.common import *
 
 
 def assert_major(gene, major):
+   solver = os.getenv('ALDY_SOLVER', default='gurobi')
    cn_sol = aldy.cn.CNSolution(0, list(Counter(major['cn']).elements()), gene)
 
    cov = collections.defaultdict(dict)
    for (pos, op), c in major["data"].items():
       cov[pos][op] = c
    cov = aldy.coverage.Coverage(cov, 0.5, {})
-   sols = aldy.major.estimate_major(gene, cov, cn_sol, 'gurobi')
+   sols = aldy.major.estimate_major(gene, cov, cn_sol, solver)
 
    if 'score' in major:
       for s in sols:

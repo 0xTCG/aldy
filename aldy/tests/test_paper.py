@@ -17,12 +17,14 @@ from aldy.common import script_path
 
 
 def solve(data, path, profile, reference):
+   solver = os.getenv('ALDY_SOLVER', default='gurobi')
    sols = aldy.genotype.genotype(
       'cyp2d6',
       sam_path=path,
       profile=profile,
       output_file=None,
-      reference=reference)
+      reference=reference,
+      solver=solver)
    assert_equal(data, [s.diplotype for s in sols])
 
 

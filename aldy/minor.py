@@ -191,9 +191,8 @@ def solve_minor_model(gene: Gene,
 
    VA = {a: model.addVar(vtype='B', name=a[0].minor) for a in alleles}
    for a, cnt in alleles:
-      if cnt == 0:
-         continue
-      model.addConstr(VA[a, cnt] <= VA[a, cnt - 1], name=f'CORD_{a.minor}_{cnt}')
+      if cnt > 0:
+         model.addConstr(VA[a, cnt] <= VA[a, cnt - 1], name=f'CORD_{a.minor}_{cnt}')
 
    # Make sure that sum of all subaleles is exactly as the count of their major alleles
    for sa, cnt in major_sol.solution.items():

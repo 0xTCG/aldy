@@ -9,7 +9,7 @@
 from nose.tools import *
 import unittest
 import logbook.more
-import pandas
+import os
 
 import aldy.cn
 from aldy.cn import PARSIMONY_PENALTY, LEFT_FUSION_PENALTY
@@ -18,16 +18,18 @@ from aldy.common import *
 
 
 def assert_cn(gene, expected, cov, expected_obj=None):
+   solver = os.getenv('ALDY_SOLVER', default='gurobi')
    sols = aldy.cn.solve_cn_model(gene,
                                  cn_configs=gene.cn_configs,
                                  max_cn=20,
                                  region_coverage=cov,
-                                 solver='gurobi')
+                                 solver=solver)
    if expected_obj:
       for s in sols:
          assert_less(abs(s.score - expected_obj), SOLUTION_PRECISION)
    sols = sorted([sorted(s.solution.items()) for s in sols])
    expected = sorted([sorted(s.items()) for s in expected])
+   print(sols)
    assert_equal(len(sols), len(expected))
    assert_equal(sols, expected)
 

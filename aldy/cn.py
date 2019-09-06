@@ -108,6 +108,7 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
 def estimate_cn(gene: Gene,
                 coverage: Coverage,
                 solver: str,
+                gap: float = 0,
                 user_solution=None,
                 debug: Optional[str] = None) -> List[CNSolution]:
    """
@@ -120,6 +121,9 @@ def estimate_cn(gene: Gene,
          Read data coverage instance.
       solver (str):
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+      gap (float):
+         Relative optimality gap (percentage).
+         Default is 0 (report only optimal solutions).
       user_solution (list[str], optional):
          User-specified list of copy number configurations.
          ILP will not run is this parameter is provided.
@@ -145,7 +149,7 @@ def estimate_cn(gene: Gene,
 
       region_cov = _region_coverage(gene, coverage)
       configs = _filter_configs(gene, coverage)
-      sol = solve_cn_model(gene, configs, max_observed_cn, region_cov, solver, debug)
+      sol = solve_cn_model(gene, configs, max_observed_cn, region_cov, solver, gap, debug)
 
       return sol
 
@@ -155,6 +159,7 @@ def solve_cn_model(gene: Gene,
                    max_cn: int,
                    region_coverage: Dict[GeneRegion, Tuple[float, float]],
                    solver: str,
+                   gap: float = 0,
                    debug: Optional[str] = None) -> List[CNSolution]:
    """
    Solves the copy number estimation problem (similar to the closest vector problem).
@@ -169,6 +174,9 @@ def solve_cn_model(gene: Gene,
          for each region.
       solver (str):
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+      gap (float):
+         Relative optimality gap (percentage).
+         Default is 0 (report only optimal solutions).
       debug (str, optional):
          If set, Aldy will create "<debug>.cn.lp" file for debug purposes.
          Default is ``None``.
@@ -212,6 +220,12 @@ def solve_cn_model(gene: Gene,
    haplo_inducing = model.quicksum(VCN[a] for a in VCN if a[1] <= 0)
    model.addConstr(haplo_inducing == 2)
 
+   # Ensure that we cannot associate any allele to deletion allele
+   del_allele = gene.deletion_allele()
+   for (a, ai), v in VCN.items():
+      if a != del_allele:
+         model.addConstr(v + VCN[del_allele, -1] <= 1)
+
    # Ensure that binary LP is properly formed (i.e. A_i <= A_{i-1})
    for a, ai in structures:
       if ai == -1:
@@ -246,46 +260,19 @@ def solve_cn_model(gene: Gene,
    if debug:
       model.dump(f'{debug}.cn.lp')
 
-   def _explain_solution(sol):
-      """Print the step-by-step explanation of each constraint for easier debugging"""
-
-      log.debug("** Carriers: {}", ', '.join('*' + str(a) for a, ai in sol if ai <= 0))
-      total = 0
-      for r, (exp_cov0, exp_cov1) in region_coverage.items():
-         expr = 0
-         for a, ai in sol:
-            if r in structures[a, ai].cn[0]:
-               expr += structures[a, ai].cn[0][r]
-            if len(structures[a, ai].cn) > 1 and r in structures[a, ai].cn[1]:
-               expr -= structures[a, ai].cn[1][r]
-         E = abs(expr-(exp_cov0-exp_cov1))
-         if r == PCE_REGION: E *= PCE_PENALTY_COEFF
-         total += E
-         g = [a for a, ai in sol if r in structures[a, ai].cn[0] and structures[a, ai].cn[0][r] > 0]
-         p = [a for a, ai in sol if r in structures[a, ai].cn[1] and structures[a, ai].cn[1][r] > 0]
-         log.debug(f'** {r}: E = {E:.2f} ({expr} vs {exp_cov0-exp_cov1:.2f}) ::: {",".join(g)} / {",".join(p)}')
-      pc = PARSIMONY_PENALTY * len(sol)
-      log.debug(f'** Parsimony cost: {pc:.2f}')
-      fc = LEFT_FUSION_PENALTY * sum(1 for s, _ in sol if cn_configs[s].kind == CNConfig.CNConfigType.LEFT_FUSION)
-      log.debug(f'** Fusion cost: {fc:.2f}')
-      log.debug(f'== Error: {total + pc + fc:.2f} vs {opt:.2f}\n')
-
    # Solve the model
-   result, mem = [], []
    try:
-      for status, opt, sol in model.solveAll(VCN):
-         log.debug(f'LP status: {status}, opt: {opt}, solution {{}}',
-                   ', '.join('*' + str(s) for s, _ in sol))
-         _explain_solution(sol)
-         sol_tuple = sorted_tuple(tuple(conf for conf, _ in sol))
-         if sol_tuple not in mem: # Because A[1] can be 1 while A[0] is 0, we can have duplicates
-            mem.append(sol_tuple)
-            result.append(CNSolution(opt, solution=[conf for conf, _ in sol], gene=gene))
-      json_print(debug, '    "sol": ' + str([dict(r.solution) for r in result]))
-      return result
+      lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
+      result = {}
+      for status, opt, sol in model.solutions(gap):
+         log.debug(f'LP status: {status}, opt: {opt}')
+         sol_tuple = sorted_tuple(lookup[v] for v in sol)
+         if sol_tuple not in result: # Because A[1] can be 1 while A[0] is 0, we can have duplicates
+            result[sol_tuple] = CNSolution(opt, solution=list(sol_tuple), gene=gene)
+      json_print(debug, '    "sol": ' + str([dict(r.solution) for r in result.values()]))
+      return list(result.values())
    except lpinterface.NoSolutionsError:
-      return [CNSolution(float('inf'), solution=[], gene=gene)]
-
+      return []
 
 
 def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:

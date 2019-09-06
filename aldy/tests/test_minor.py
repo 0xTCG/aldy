@@ -25,6 +25,7 @@ from aldy.common import *
 
 
 def assert_minor(gene, data, shallow=False):
+   solver = os.getenv('ALDY_SOLVER', default='gurobi')
    cn_sol = aldy.cn.CNSolution(0, list(Counter(data['cn']).elements()), gene)
 
    cov = collections.defaultdict(dict)
@@ -37,7 +38,7 @@ def assert_minor(gene, data, shallow=False):
                                      tuple(Mutation(mp, mo, True) for mp, mo in maj[1]), tuple()): cnt
                    for maj, cnt in data['major'].items()}
    major = MajorSolution(0, major_solved, cn_sol)
-   sols = aldy.minor.estimate_minor(gene, cov, [major], 'gurobi')
+   sols = aldy.minor.estimate_minor(gene, cov, [major], solver)
 
    if 'score' in data:
       for s in sols:

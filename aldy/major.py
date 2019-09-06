@@ -99,6 +99,8 @@ def estimate_major(gene: Gene,
                    coverage: Coverage,
                    cn_solution: CNSolution,
                    solver: str,
+                   gap: float = 0,
+                   identifier: int = 0,
                    debug: Optional[str] = None) -> List[MajorSolution]:
    """
    Detect the major star-alleles in the sample.
@@ -112,6 +114,12 @@ def estimate_major(gene: Gene,
          Copy-number solution to be used for major star-allele calling.
       solver (str):
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+      gap (float):
+         Relative optimality gap (percentage).
+         Default is 0 (report only optimal solutions).
+      identifier (int):
+         Unique solution identifier. Used for generating debug information.
+         Default is 0.
       debug (str, optional):
          If set, Aldy will create "<debug>.major.lp" file for debug purposes.
          Default is ``None``.
@@ -130,7 +138,7 @@ def estimate_major(gene: Gene,
    if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):
       results = []
    else:
-      results = solve_major_model(gene, alleles, coverage, cn_solution, solver, debug)
+      results = solve_major_model(gene, alleles, coverage, cn_solution, solver, gap, identifier, debug)
    # TODO: re-implement phasing step from Aldy 1.4
    # TODO: Check for novel functional mutations and do something with them
    # novel_functional_mutations = _get_novel_mutations(gene, coverage, cn_solution)
@@ -143,6 +151,8 @@ def solve_major_model(gene: Gene,
                       coverage: Coverage,
                       cn_solution: CNSolution,
                       solver: str,
+                      gap: float = 0,
+                      identifier: int = 0,
                       debug: Optional[str] = None) -> List[MajorSolution]:
    """
    Solves the major star-allele detection problem via integer linear programming.
@@ -158,6 +168,12 @@ def solve_major_model(gene: Gene,
          Copy-number solution to be used for detecting major star-alleles (check :obj:`aldy.cn.CNSolution`).
       solver (str):
          ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+      gap (float):
+         Relative optimality gap (percentage).
+         Default is 0 (report only optimal solutions).
+      identifier (int):
+         Unique solution identifier. Used for generating debug information.
+         Default is 0.
       debug (str, optional):
          If set, Aldy will create "<debug>.major.lp" file for debug purposes.
          Default is ``None``.
@@ -186,7 +202,7 @@ def solve_major_model(gene: Gene,
       max_cn = cn_solution.solution[a.cn_config]
       for i in range(1, max_cn):
          alleles[an, i] = alleles[an, 0]
-   VA = {a: model.addVar(vtype='B', name=f'A_{a[0]}_{a[1]}') for a in alleles}
+   VA = {a: model.addVar(vtype='B', name=var_name(f'A_{a[0]}_{a[1]}')) for a in alleles}
 
    # Make sure that VA[i+1] <= VA[i] (to avoid equivalent solutions)
    for a, ai in alleles.keys():
@@ -194,14 +210,15 @@ def solve_major_model(gene: Gene,
          model.addConstr(VA[a, ai] <= VA[a, ai - 1])
 
    # Add an error variable to the ILP for any mutation
-   VERR = {m: model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{m.pos}_{m.op.replace(".", "")}')
+   VERR = {m: model.addVar(lb=-model.INF, ub=model.INF, name=var_name(f'E_{m.pos}_{m.op.replace(".", "")}'))
               for m in func_muts}
    constraints = {e: 0 for e in VERR}
    # Add a binary variable for any allele/novel mutation pair
    del_allele = gene.deletion_allele()
-   VNEW = {a: {m: model.addVar(vtype='B', name=f'N_{m.pos}_{m.op.replace(".", "")}_{a[0]}')
+   VNEW = {a: {m: model.addVar(vtype='B', name=var_name(f'N_{m.pos}_{m.op.replace(".", "")}_{a[0]}'))
                if a[0] != del_allele else 0 # deletion alleles should not be assigned any mutations
-               for m in constraints if m[0] not in set(mm[0] for mm in alleles[a].func_muts)}
+               for m in constraints 
+               if m[0] not in set(mm[0] for mm in alleles[a].func_muts) and gene.has_coverage(a[0], m.pos)}
            for a in alleles}
    # Populate constraints
    for a in alleles:
@@ -210,16 +227,13 @@ def solve_major_model(gene: Gene,
    # Add novel mutation constraints
    for a in VNEW:
       for m in list(VNEW[a].keys()):
-         if gene.has_coverage(a[0], m.pos):
-            constraints[m] += VA[a] * VNEW[a][m]
-         else:
-            del VNEW[a][m]
+         constraints[m] += VA[a] * VNEW[a][m]
 
    # Populate constraints of non-variations (i.e. matches with the reference genome)
    for pos in set(m.pos for m in constraints):
       ref_m = Mutation(pos, '_') # type: ignore
       constraints[ref_m] = 0
-      VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{pos}_REF')
+      VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=var_name(f'E_{pos}_REF'))
 
       for a in alleles:
          if not gene.has_coverage(a[0], pos):
@@ -236,7 +250,7 @@ def solve_major_model(gene: Gene,
          constraints[ref_m] += VA[a] * Ns
 
    # Each allele must express all of its functional mutations
-   json_print(debug, '  {')
+   json_print(debug, '  { # {}', identifier)
    json_print(debug, f'    "cn": {str(dict(cn_solution.solution))}, ')
    json_print(debug,  '    "data": {', end='')
    prev = 0
@@ -266,44 +280,39 @@ def solve_major_model(gene: Gene,
       NOVEL_MUTATION_PENAL * model.quicksum(VNEW[a][m] for a in VNEW for m in VNEW[a])
    model.setObjective(objective)
    if debug:
-      model.dump(f'{debug}.major.lp')
+      model.dump(f'{debug}.major{identifier}.lp')
 
    # Solve the ILP
    try:
-      keys = {**{(k,  ): v for k, v in VA.items()}, # wrap (k) to ensure that tuples can be compared
-              **{(a, m): VNEW[a][m] for a in VNEW for m in VNEW[a] if a[0] != del_allele}}
-      result, mem = [], []
+      lookup = {**{model.varName(v): a for a, v in VA.items()},
+                **{model.varName(v): (a, m) for a in VNEW for m, v in VNEW[a].items()}}
+      result = {}
       json_print(debug, '    "sol": [', end='')
-      for status, opt, sol in model.solveAll(keys):
-         log.debug('Major Solver status: {}, opt: {}', status, opt)
+      for status, opt, sol in model.solutions(gap):
+         print(f'Major solver status: {status}, opt: {opt}')
          solved_alleles = collections.defaultdict(lambda: []) # dict of allele IDs -> novel mutations
-         for s in sol: # handle 2-tuples properly (2-tuples have novel alleles)
-            if len(s) == 2:
-               solved_alleles[s[0]].append(s[1])
-            elif s[0] not in solved_alleles:
-               solved_alleles[s[0]] = []
-         exp_opt = _explain_solution(solved_alleles,
-                                     gene, coverage, cn_solution, alleles, constraints, model, VERR)
-         log.debug(f'== Error: {exp_opt} vs opt={opt:.2f}\n')
-
-         sol_tuple = tuple(sorted((a, nm) for (a, _), nm in solved_alleles.items()))
-         if sol_tuple not in mem:
-            mem.append(sol_tuple)
+         for s in sol:
+            if isinstance(lookup[s][0], tuple): # Novel allele
+               solved_alleles[lookup[s][0]].append(lookup[s][1])
+            elif s not in solved_alleles:
+               solved_alleles[lookup[s]] = []
+         sol_tuple = sorted_tuple((a, sorted_tuple(nm)) for (a, _), nm in solved_alleles.items())
+         if sol_tuple not in result:
             solution = collections.Counter(SolvedAllele(major=a,
-                                                        minor=None,
-                                                        added=tuple(mut),
-                                                        missing=tuple())
+                                                         minor=None,
+                                                         added=tuple(mut),
+                                                         missing=tuple())
                                           for (a, _), mut in solved_alleles.items())
             json_print(debug, str(dict(collections.Counter(
                tuple([a] + [(m[0], m[1]) for m in mut]) if len(mut) > 0 else a
                for (a, _), mut in solved_alleles.items()))) + ', ', end='')
             sol = MajorSolution(score=opt,
-                              solution=solution,
-                              cn_solution=cn_solution)
+                                 solution=solution,
+                                 cn_solution=cn_solution)
             log.debug('Major solution: {}'.format(sol))
-            result.append(sol)
+            result[sol_tuple] = sol
       json_print(debug, ']\n  }, ', end='')
-      return result
+      return result.values()
    except lpinterface.NoSolutionsError:
       return []
 
@@ -361,25 +370,3 @@ def _print_candidates(alleles: Dict[str, Allele],
             m, coverage[m],
             coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos)),
             'F', m.aux.get('old', ''))
-
-
-def _explain_solution(sol, gene, coverage, cn_solution, alleles, constraints, model, error_vars):
-   """Pretty-prints the step-by-step explanation of each constraint for easier debugging"""
-   log.debug(f"** Solution: {dict(sol)}")
-   total = 0
-   for m in sorted(constraints):
-      score = []
-      for a in sorted(sol):
-         if m[1].startswith('_'):
-            if not gene.has_coverage(a[0], m.pos):
-               continue
-            if not any(ma[0] == m[0] and not ma[1].startswith('INS')
-                        for ma in alleles[a].func_muts):
-               score.append(a)
-         else:
-            if m in alleles[a].func_muts:
-               score.append(a)
-      e = abs(model.getValue(error_vars[m]))
-      log.debug(f'** {m[0]}:{m[1]}: {coverage[m]:.2f} vs {abs(e-coverage[m]):.2f} (error = {e:.2f}) @@ alleles = {score}')
-      total += e
-   return total
