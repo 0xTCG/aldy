@@ -17,82 +17,15 @@ from functools import reduce
 
 from . import lpinterface
 from .common import *
-from .cn import CNSolution, MAX_CN
+from .cn import MAX_CN
 from .gene import Allele, Mutation, Gene, CNConfig
 from .coverage import Coverage
+from .solutions import CNSolution, MajorSolution, SolvedAllele
 
 
 # Model parameters
 NOVEL_MUTATION_PENAL = MAX_CN + 1
 """float: Penalty for each novel mutation (0 for no penalty)"""
-
-
-class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'added', 'missing'])):
-   """
-   Describes a candidate star-allele configuration.
-   Immutable class.
-
-   Attributes:
-      major (str):
-         Major star-allele identifier.
-      minor (str, optional):
-         Minor star-allele identifier. Can be None.
-      added (tuple[:obj:`aldy.gene.Mutation`]):
-         Tuple of mutations that are added to this copy of a major/minor star-allele
-         (e.g. these mutations are not present in the database defition of allele).
-      missing (tuple[:obj:`aldy.gene.Mutation`]):
-         Tuple of mutations that are ommited from this copy of a major/minor star-allele
-         (e.g. these mutations are present in the database defition of allele but not in the sample).
-
-   Notes:
-      Has custom printer (``__str__``).
-   """
-
-
-   def major_repr(self):
-      return '*{}{}'.format(self.major,
-         ''.join(' +' + str(m) for m in sorted(m for m in self.added if m.is_functional)))
-
-
-   def __str__(self):
-      return '*{}{}{}'.format(
-         self.minor if self.minor else self.major,
-         ''.join(' +' + str(m) for m in sorted(self.added,
-                                               key=lambda m: (-m.is_functional, m.pos, m.op))),
-         ''.join(' -' + str(m) for m in sorted(self.missing)))
-
-
-class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution', 'cn_solution'])):
-   """
-   Describes a potential (possibly optimal) major star-allele configuration.
-   Immutable class.
-
-   Attributes:
-      score (float):
-         ILP model error score (0 for user-provided solutions).
-      solution (dict[:obj:`SolvedAllele`, int]):
-         Dictionary of major star-alleles where each major star-allele is
-         associated with its copy number
-         (e.g. ``{1: 2}`` means that we have two copies of \*1).
-      cn_solution (:obj:`aldy.cn.CNSolution`):
-         Associated copy-number solution used for calculating the major
-         star-alleles.
-
-   Notes:
-      Has custom printer (``__str__``).
-   """
-
-
-   def _solution_nice(self):
-      return ', '.join(f'{v}x{s}'
-                       for s, v in sorted(self.solution.items(),
-                                          key=lambda x: allele_sort_key(x[0].major)))
-
-
-   def __str__(self):
-      return f'MajorSol[{self.score:.2f}; ' + \
-             f'sol=({self._solution_nice()}); ' + \
-             f'cn={self.cn_solution}'
 
 
 def estimate_major(gene: Gene,
@@ -202,20 +135,20 @@ def solve_major_model(gene: Gene,
       max_cn = cn_solution.solution[a.cn_config]
       for i in range(1, max_cn):
          alleles[an, i] = alleles[an, 0]
-   VA = {a: model.addVar(vtype='B', name=var_name(f'A_{a[0]}_{a[1]}')) for a in alleles}
+   VA = {a: model.addVar(vtype='B', name=f'A_{a[0]}_{a[1]}') for a in alleles}
 
    # Make sure that VA[i+1] <= VA[i] (to avoid equivalent solutions)
    for a, ai in alleles.keys():
       if ai > 0:
-         model.addConstr(VA[a, ai] <= VA[a, ai - 1])
+         model.addConstr(VA[a, ai] <= VA[a, ai - 1], name=f'CORD_{a}_{ai}')
 
    # Add an error variable to the ILP for any mutation
-   VERR = {m: model.addVar(lb=-model.INF, ub=model.INF, name=var_name(f'E_{m.pos}_{m.op.replace(".", "")}'))
+   VERR = {m: model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{m.pos}_{m.op}')
               for m in func_muts}
    constraints = {e: 0 for e in VERR}
    # Add a binary variable for any allele/novel mutation pair
    del_allele = gene.deletion_allele()
-   VNEW = {a: {m: model.addVar(vtype='B', name=var_name(f'N_{m.pos}_{m.op.replace(".", "")}_{a[0]}'))
+   VNEW = {a: {m: model.addVar(vtype='B', name=f'N_{m.pos}_{m.op}_{a[0]}')
                if a[0] != del_allele else 0 # deletion alleles should not be assigned any mutations
                for m in constraints 
                if m[0] not in set(mm[0] for mm in alleles[a].func_muts) and gene.has_coverage(a[0], m.pos)}
@@ -233,7 +166,7 @@ def solve_major_model(gene: Gene,
    for pos in set(m.pos for m in constraints):
       ref_m = Mutation(pos, '_') # type: ignore
       constraints[ref_m] = 0
-      VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=var_name(f'E_{pos}_REF'))
+      VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{pos}_REF')
 
       for a in alleles:
          if not gene.has_coverage(a[0], pos):
@@ -256,7 +189,7 @@ def solve_major_model(gene: Gene,
    prev = 0
    for m, expr in sorted(constraints.items()):
       cov = coverage[m] / coverage.single_copy(m.pos, cn_solution)
-      model.addConstr(expr + VERR[m] == cov)
+      model.addConstr(expr + VERR[m] == cov, name=f'CFUNC_{m.pos}_{m.op}')
       if m.pos != prev and prev != 0:
          json_print(debug, '\n             ', end='')
       prev = m.pos
@@ -266,13 +199,13 @@ def solve_major_model(gene: Gene,
    # Each CN config must be satisfied by matching alleles
    for cnf, cnt in cn_solution.solution.items():
       expr = sum(VA[a] for a in VA if alleles[a].cn_config == cnf)
-      model.addConstr(expr == cnt)
+      model.addConstr(expr == cnt, name=f'CSAT_{cnf}')
 
    # Each functional mutation must be chosen by some allele and expressed
    for m in func_muts:
       expr  = model.quicksum(VA[a] for a in alleles if m in alleles[a].func_muts)
       expr += model.quicksum(VA[a] * VNEW[a][m] for a in alleles if m in VNEW[a] and m not in alleles[a].func_muts)
-      model.addConstr(expr >= 1)
+      model.addConstr(expr >= 1, name=f'CEXP_{m.pos}_{m.op}')
 
    # Set objective: minimize the absolute sum of errors
    objective = \
@@ -289,7 +222,7 @@ def solve_major_model(gene: Gene,
       result = {}
       json_print(debug, '    "sol": [', end='')
       for status, opt, sol in model.solutions(gap):
-         print(f'Major solver status: {status}, opt: {opt}')
+         log.debug(f'Major solver status: {status}, opt: {opt}')
          solved_alleles = collections.defaultdict(lambda: []) # dict of allele IDs -> novel mutations
          for s in sol:
             if isinstance(lookup[s][0], tuple): # Novel allele

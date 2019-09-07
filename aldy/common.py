@@ -266,7 +266,3 @@ def json_print(debug, *args, **kwargs):
    if not _json:
       _json = open(f'{debug}.json', 'w')
    print(*args, **kwargs, flush=True, file=_json)
-
-
-def var_name(s: str) -> str:
-   return s.replace('.', '_').replace('-', '__').replace('/', '__')[:200]

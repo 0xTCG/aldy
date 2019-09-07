@@ -19,6 +19,7 @@ from . import gene
 from .common import *
 from .gene import GeneRegion, CNConfig, Gene
 from .coverage import Coverage
+from .solutions import CNSolution
 
 
 PCE_REGION = GeneRegion(11, 'pce')
@@ -40,69 +41,6 @@ MAX_CN_ERROR = 10.0
 
 PARSIMONY_PENALTY = 0.5
 """float: Penalty applied to each gene copy (0 for no penalty)."""
-
-
-class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gene', 'region_cn'])):
-   """
-   Describes a potential (possibly optimal) copy-number configuration.
-   Immutable class.
-
-   Attributes:
-      score (float):
-         ILP model error score (0 for user-provided solutions).
-      solution (dict[str, int]):
-         Dictionary of copy-number configurations where a value denotes the copy-number
-         of each configuration (e.g. ``{1: 2}`` means that there are two copies of \*1
-         configuration).
-      region_cn (dict[:obj:`aldy.common.GeneRegion`, int]):
-         Dictionary of region copy numbers in this solution.
-      gene (:obj:`aldy.gene.Gene`):
-         Gene instance.
-
-   Notes:
-      Has custom printer (``__str__``).
-   """
-
-   def __new__(self, score: float, solution: List[str], gene: Gene):
-      vec: Dict[int, Dict[GeneRegion, float]] = collections.defaultdict(lambda: collections.defaultdict(int))
-      for conf in solution:
-         for g in gene.cn_configs[conf].cn:
-            for r in gene.cn_configs[conf].cn[g]:
-               vec[g][r] += gene.cn_configs[conf].cn[g][r]
-      return super(CNSolution, self).__new__(self,
-                                             score,
-                                             collections.Counter(solution),
-                                             gene,
-                                             {a: dict(b) for a, b in vec.items()})
-
-
-   def position_cn(self, pos: int) -> float:
-      """
-      Returns:
-         float: Copy number of the loci ``pos``.
-      """
-      try:
-         g, region = self.gene.region_at(pos)
-         return self.region_cn[g][region]
-      except KeyError:
-         return 0
-
-
-   def _solution_nice(self):
-      return ','.join(f'{v}x*{k}'
-                      for k, v in sorted(self.solution.items(),
-                                         key=lambda x: allele_sort_key(x[0])))
-
-
-   def __str__(self):
-      regions = sorted(set(r for g in self.region_cn for r in self.region_cn[g]))
-      return 'CNSol[{:.2f}; sol=({}); cn={}]'.format(
-         self.score,
-         self._solution_nice(),
-         '|'.join(''.join('{:.0f}'.format(self.region_cn[g][r])
-                          if r in self.region_cn[g] else '_'
-                          for r in regions)
-                  for g in sorted(self.region_cn)))
 
 
 def estimate_cn(gene: Gene,
@@ -217,21 +155,21 @@ def solve_cn_model(gene: Gene,
    VCN = {(a, ai): model.addVar(vtype='B', name=f'CN_{a}_{ai}') for a, ai in structures}
 
    # We assume diploid genome, so the number of haplotype-inducing configurations is at most 2
-   haplo_inducing = model.quicksum(VCN[a] for a in VCN if a[1] <= 0)
-   model.addConstr(haplo_inducing == 2)
+   diplo_inducing = model.quicksum(VCN[a] for a in VCN if a[1] <= 0)
+   model.addConstr(diplo_inducing == 2, name='CDIPLO')
 
    # Ensure that we cannot associate any allele to deletion allele
    del_allele = gene.deletion_allele()
    for (a, ai), v in VCN.items():
       if a != del_allele:
-         model.addConstr(v + VCN[del_allele, -1] <= 1)
+         model.addConstr(v + VCN[del_allele, -1] <= 1, name=f"CDEL_{a}_{ai}")
 
    # Ensure that binary LP is properly formed (i.e. A_i <= A_{i-1})
    for a, ai in structures:
-      if ai == -1:
-         model.addConstr(VCN[a, ai] <= VCN[a, 0]) # second haplotype (-1) is present only if the first one (0) is there
+      if ai == -1: # second haplotype (-1) is present only if the first one (0) is there
+         model.addConstr(VCN[a, ai] <= VCN[a, 0], name=f"CORD_{a}_{ai}")
       elif ai > 1: # ignore 1, as A[1] can be 1 while A[0] is 0 to support cases such as *13/*13+*1
-         model.addConstr(VCN[a, ai] <= VCN[a, ai - 1])
+         model.addConstr(VCN[a, ai] <= VCN[a, ai - 1], name=f"CORD_{a}_{ai}")
 
    # Form the error variables
    VERR = {}
@@ -245,7 +183,7 @@ def solve_cn_model(gene: Gene,
          if len(structure.cn) > 1 and r in structure.cn[1]:
             expr -= VCN[s] * structure.cn[1][r]
       VERR[r] = model.addVar(name='E_{}{}'.format(*r), lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
-      model.addConstr(expr + VERR[r] == exp_cov0 - exp_cov1)
+      model.addConstr(expr + VERR[r] == exp_cov0 - exp_cov1, name="CCOV_{}{}".format(*r))
    json_print(debug, '},')
    # Set objective: minimize absolute errors AND the number of alleles (max. parsimony)
    # PCE_REGION (in CYP2D7) is penalized with extra score

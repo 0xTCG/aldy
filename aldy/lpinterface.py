@@ -12,6 +12,10 @@ import importlib
 from .common import log, sorted_tuple, SOLUTION_PRECISION
 
 
+def escape_name(s: str) -> str:
+   return s.replace('.', '').replace('-', 'm').replace('/', '__')[:200]
+
+
 class NoSolutionsError(Exception):
    pass
 
@@ -41,6 +45,8 @@ class Gurobi:
       """
       Add a constraint to the model.
       """
+      if 'name' in kwargs:
+         kwargs['name'] = escape_name(kwargs['name'])
       c = self.model.addConstr(*args, **kwargs)
       return c
 
@@ -59,6 +65,8 @@ class Gurobi:
          kwargs['vtype'] = self.gurobipy.GRB.BINARY
       elif 'vtype' in kwargs and kwargs['vtype'] == 'I':
          kwargs['vtype'] = self.gurobipy.GRB.INTEGER
+      if 'name' in kwargs:
+         kwargs['name'] = escape_name(kwargs['name'])
       update = True
       if 'update' in kwargs:
          update = kwargs['update']
@@ -230,10 +238,14 @@ class SCIP(Gurobi):
 
 
    def addConstr(self, *args, **kwargs):
+      if 'name' in kwargs:
+         kwargs['name'] = escape_name(kwargs['name'])
       return self.model.addCons(*args, **kwargs)
 
 
    def addVar(self, *args, **kwargs):
+      if 'name' in kwargs:
+         kwargs['name'] = escape_name(kwargs['name'])
       if 'update' in kwargs:
          del kwargs['update']
       return self.model.addVar(*args, **kwargs)

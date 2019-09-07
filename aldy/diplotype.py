@@ -11,7 +11,7 @@ import sys
 
 from .common import *
 from .gene import Gene, CNConfig
-from .minor import MinorSolution
+from .solutions import MinorSolution
 
 
 OUTPUT_COLS = 'Sample Gene SolutionID Major Minor Copy Allele Location Type Coverage Effect dbSNP Code Status'.split()

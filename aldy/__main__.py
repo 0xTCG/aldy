@@ -170,6 +170,10 @@ def _get_args():
       Phase aligned reads for better variant calling.
       May provide neglegible benefits at the cost of significant slowdown.
       Default is off."""))
+   genotype_parser.add_argument('--gap', '-G', default=0,
+      help=td("""Solver optimality gap. 
+         Aldy will report solutions whose score exceeds the optimal solution's score by the value of gap.
+         Default is 0 (only optimal solutions allowed)."""))
    genotype_parser.add_argument('--remap', default=0, #action='store_true',
       help='Realign reads for better mutation calling. Requires samtools and bowtie2 in $PATH.')
    genotype_parser.add_argument('--debug', default=None,
@@ -265,6 +269,7 @@ def _genotype(gene: str, output: Optional, args) -> None:
                         solver=      args.solver,
                         phase=       args.phase,
                         reference=   args.reference,
+                        gap=         float(args.gap),
                         debug=       debug)
       log.info(colorize('Result{} for {}: '.format('' if len(result) == 1 else 's', gene.upper())))
       for r in result:
