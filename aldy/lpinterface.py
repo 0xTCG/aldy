@@ -131,6 +131,18 @@ class Gurobi:
       return self.quicksum(vv)
 
 
+   def prod(self, res, terms):
+      """
+      Sets :math:`res = \prod terms` where ``terms`` variables are all binary
+      by adding appropriate linear constraints.
+      Returns ``res``.
+      """
+      for v in terms:
+         self.addConstr(res <= v)
+      self.addConstr(res >= self.quicksum(terms) - (len(terms) - 1))
+      return res
+
+
    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float, dict]:
       """
       Solve the model. Assumes that objective is set.

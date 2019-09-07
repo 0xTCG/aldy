@@ -175,13 +175,14 @@ def solve_cn_model(gene: Gene,
    VERR = {}
    json_print(debug, '    "data": {', end='')
    for r, (exp_cov0, exp_cov1) in region_coverage.items():
+      print(r)
       json_print(debug, f"'{str(r)[3:-1]}': ({exp_cov0}, {exp_cov1}), ", end='')
       expr = 0
       for s, structure in structures.items():
          if r in structure.cn[0]:
-            expr += VCN[s] * structure.cn[0][r]
+            expr += structure.cn[0][r] * VCN[s]
          if len(structure.cn) > 1 and r in structure.cn[1]:
-            expr -= VCN[s] * structure.cn[1][r]
+            expr -= structure.cn[1][r] * VCN[s]
       VERR[r] = model.addVar(name='E_{}{}'.format(*r), lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
       model.addConstr(expr + VERR[r] == exp_cov0 - exp_cov1, name="CCOV_{}{}".format(*r))
    json_print(debug, '},')
@@ -190,10 +191,13 @@ def solve_cn_model(gene: Gene,
    objective = model.abssum(VERR.values(),
                             coeffs={'E_{}{}'.format(*PCE_REGION): PCE_PENALTY_COEFF})
    # Minimize the number of alleles among equal solutions
-   objective += PARSIMONY_PENALTY * sum(VCN.values())
-   # Penalize left fusions (further ensure max. parsimony)
-   fusion_cost = model.quicksum(VCN[s, k] for s, k in VCN if cn_configs[s].kind == CNConfig.CNConfigType.LEFT_FUSION)
-   objective += LEFT_FUSION_PENALTY * fusion_cost
+   # Also penalize left fusions (to further ensure max. parsimony)
+   objective += model.quicksum(
+      # MPICL requires only one term for each variable in the objective function
+      (LEFT_FUSION_PENALTY + PARSIMONY_PENALTY) * v 
+      if cn_configs[s].kind == CNConfig.CNConfigType.LEFT_FUSION
+      else PARSIMONY_PENALTY * v
+      for (s, k), v in VCN.items())
    model.setObjective(objective)
    if debug:
       model.dump(f'{debug}.cn.lp')

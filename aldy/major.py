@@ -147,9 +147,11 @@ def solve_major_model(gene: Gene,
               for m in func_muts}
    constraints = {e: 0 for e in VERR}
    # Add a binary variable for any allele/novel mutation pair
+   # For each binary variable, add a multiplication variable MUL = VNEW[a, m] * VA[a] for linearizing binary product
    del_allele = gene.deletion_allele()
-   VNEW = {a: {m: model.addVar(vtype='B', name=f'N_{m.pos}_{m.op}_{a[0]}')
-               if a[0] != del_allele else 0 # deletion alleles should not be assigned any mutations
+   VNEW = {a: {m: (model.addVar(vtype='B', name=f'N_{m.pos}_{m.op}_{a[0]}'),
+                   model.addVar(vtype='B', name=f'MUL_N_{m.pos}_{m.op}_{a[0]}'))
+               if a[0] != del_allele else (0, 0) # deletion alleles should not be assigned any mutations
                for m in constraints 
                if m[0] not in set(mm[0] for mm in alleles[a].func_muts) and gene.has_coverage(a[0], m.pos)}
            for a in alleles}
@@ -158,16 +160,16 @@ def solve_major_model(gene: Gene,
       for m in alleles[a].func_muts:
          constraints[m] += VA[a]
    # Add novel mutation constraints
+   # Also ensure that MUL = 1 <=> VA * VNEW = 1
    for a in VNEW:
-      for m in list(VNEW[a].keys()):
-         constraints[m] += VA[a] * VNEW[a][m]
+      for m, (vn, vm) in VNEW[a].items():
+         constraints[m] += model.prod(vm, [VA[a], vn])
 
    # Populate constraints of non-variations (i.e. matches with the reference genome)
    for pos in set(m.pos for m in constraints):
       ref_m = Mutation(pos, '_') # type: ignore
       constraints[ref_m] = 0
       VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{pos}_REF')
-
       for a in alleles:
          if not gene.has_coverage(a[0], pos):
             continue
@@ -175,12 +177,12 @@ def solve_major_model(gene: Gene,
          if any(ma[0] == pos and not ma[1][:3] == 'INS' for ma in alleles[a].func_muts):
             continue
          # Make sure that this allele has no novel alleles at this position
-         Ns = [VNEW[a][m] for m in VNEW[a] if m[0] == pos and m[1][:3] != 'INS']
-         if len(Ns) > 0:
-            Ns = 1 - reduce(operator.mul, Ns, 1)
-         else:
-            Ns = 1
-         constraints[ref_m] += VA[a] * Ns
+         constraints[ref_m] += VA[a]
+         muts = [m for m in VNEW[a] if m[0] == pos and m[1][:3] != 'INS']
+         for m in muts: 
+            constraints[ref_m] -= VNEW[a][m][1]
+         # We ensure that only one additional mutation can be selected here
+         model.addConstr(model.quicksum(VNEW[a][m][0] for m in muts) <= 1)
 
    # Each allele must express all of its functional mutations
    json_print(debug, '  { # {}', identifier)
@@ -204,13 +206,13 @@ def solve_major_model(gene: Gene,
    # Each functional mutation must be chosen by some allele and expressed
    for m in func_muts:
       expr  = model.quicksum(VA[a] for a in alleles if m in alleles[a].func_muts)
-      expr += model.quicksum(VA[a] * VNEW[a][m] for a in alleles if m in VNEW[a] and m not in alleles[a].func_muts)
+      expr += model.quicksum(VNEW[a][m][1] for a in alleles if m in VNEW[a] and m not in alleles[a].func_muts)
       model.addConstr(expr >= 1, name=f'CEXP_{m.pos}_{m.op}')
 
    # Set objective: minimize the absolute sum of errors
    objective = \
       model.abssum(e for e in VERR.values()) + \
-      NOVEL_MUTATION_PENAL * model.quicksum(VNEW[a][m] for a in VNEW for m in VNEW[a])
+      NOVEL_MUTATION_PENAL * model.quicksum(VNEW[a][m][0] for a in VNEW for m in VNEW[a])
    model.setObjective(objective)
    if debug:
       model.dump(f'{debug}.major{identifier}.lp')
@@ -218,14 +220,16 @@ def solve_major_model(gene: Gene,
    # Solve the ILP
    try:
       lookup = {**{model.varName(v): a for a, v in VA.items()},
-                **{model.varName(v): (a, m) for a in VNEW for m, v in VNEW[a].items()}}
+                **{model.varName(v): (a, m) for a in VNEW for m, (v, _) in VNEW[a].items()}}
       result = {}
       json_print(debug, '    "sol": [', end='')
       for status, opt, sol in model.solutions(gap):
          log.debug(f'Major solver status: {status}, opt: {opt}')
          solved_alleles = collections.defaultdict(lambda: []) # dict of allele IDs -> novel mutations
          for s in sol:
-            if isinstance(lookup[s][0], tuple): # Novel allele
+            if s not in lookup: 
+               continue
+            elif isinstance(lookup[s][0], tuple): # Novel allele
                solved_alleles[lookup[s][0]].append(lookup[s][1])
             elif s not in solved_alleles:
                solved_alleles[lookup[s]] = []
