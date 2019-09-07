@@ -276,6 +276,10 @@ def _genotype(gene: str, output: Optional, args) -> None:
          log.info(colorize('  {:30} ({})'.format(r.diplotype, ', '.join(f.major_repr() for f in r.solution))))
    except AldyException as ex:
       log.error(ex)
+   
+   if debug:
+      log.debug('Preparing debug archive...')
+      os.system(f'tar czvf {args.debug}.tar.gz2 {args.debug}')
 
 
 def _run_test() -> None:
