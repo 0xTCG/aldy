@@ -19,7 +19,7 @@ import aldy.major
 import aldy.minor
 import aldy.coverage
 from aldy.gene import Gene, Mutation
-from aldy.major import MajorSolution, SolvedAllele
+from aldy.major import MajorSolution, SolvedAllele, NOVEL_MUTATION_PENAL
 from aldy.minor import ADD_PENALTY_FACTOR, MISS_PENALTY_FACTOR
 from aldy.common import *
 
@@ -35,7 +35,7 @@ def assert_minor(gene, data, shallow=False):
 
    major_solved = {SolvedAllele(maj, None, tuple(), tuple()) if not isinstance(maj, tuple)
                    else SolvedAllele(maj[0], None,
-                                     tuple(Mutation(mp, mo, True) for mp, mo in maj[1]), tuple()): cnt
+                                     tuple(Mutation(mp, mo, True) for mp, mo in maj[1:]), tuple()): cnt
                    for maj, cnt in data['major'].items()}
    major = MajorSolution(0, major_solved, cn_sol)
    sols = aldy.minor.estimate_minor(gene, cov, [major], solver)
@@ -118,12 +118,27 @@ class MinorSyntheticTest(unittest.TestCase):
    def test_add(self):
       assert_minor(self.gene, {
          "cn": {'1': 2},
-         "data": {(115, '_'): 0, (115, 'SNP.TA'): 20,
+         "data": {(115, '_'): 0,  (115, 'SNP.TA'): 20,
                   (148, '_'): 20, (148, 'INS.A'): 10,
                   (151, '_'): 10, (151, 'SNP.CT'): 10},
          "major": {'1': 1, '3': 1},
          "sol": [('1B', [], []), ('3', [], [(115, 'SNP.TA')])],
          "score": ADD_PENALTY_FACTOR
+      })
+
+   
+   def test_major_novel(self):
+      assert_minor(self.gene, {
+        "cn": {'1': 2, '6': 1},
+        "data": {(111, '_'): 10, (111, 'DEL.AC'): 10,
+                 (115, '_'): 10, (115, 'SNP.TA'): 10,
+                 (148, '_'): 20,
+                 (151, '_'): 10, (151, 'SNP.CT'): 10},
+        "major": {('1', (111, 'DEL.AC')): 1, '3': 1, '6': 1},
+        "sol": [('1B',   [], [(111, 'DEL.AC')]), 
+                ('3',    [(148, 'INS.A')], []),
+                ('6DEL', [], [])],
+        "score": MISS_PENALTY_FACTOR + NOVEL_MUTATION_PENAL
       })
 
 
@@ -316,3 +331,38 @@ class MinorRealTest(unittest.TestCase):
       }, shallow=False)
       assert_less(s1, s2)
       assert_less(s1, s3)
+
+
+   def test_major_novel(self):
+      assert_minor(self.gene, {
+         "cn": {'1': 2}, 
+         "major": {'35': 1, ('4.b', (42525810, 'SNP.TC')): 1}, 
+         "data": {(42522311, 'SNP.CT'):  279, (42522311, '_'):  147, 
+                  (42522391, 'SNP.GA'):  315, (42522391, '_'):  317, 
+                  (42522612, 'SNP.CG'):  618, (42522612, '_'):    0, 
+                  (42523002, 'SNP.GA'):  477, (42523002, '_'):  245, 
+                  (42523208, 'SNP.CT'):  316, (42523208, '_'):  410, 
+                  (42523210, 'SNP.TC'):  419, (42523210, '_'):  316, 
+                  (42523408, 'SNP.TG'):  858, (42523408, '_'):    0, 
+                  (42523942, 'SNP.GA'):  356, (42523942, '_'):  326, 
+                  (42524695, 'SNP.TC'):  301, (42524695, '_'):  322, 
+                  (42524946, 'SNP.CT'):  362, (42524946, '_'):  387, 
+                  (42525131, 'SNP.CG'):  304, (42525131, '_'):    0, 
+                  (42525755, 'SNP.GA'):    0, (42525755, '_'):  359, 
+                  (42525797, 'SNP.GC'):   31, (42525797, '_'):   56, 
+                  (42525810, 'SNP.TC'):   16, (42525810, '_'):   19, 
+                  (42525951, 'SNP.AC'):  831, (42525951, '_'):    0, 
+                  (42526048, 'SNP.GC'):  850, (42526048, '_'):    0, 
+                  (42526483, 'SNP.CA'):  660, (42526483, '_'):    0, 
+                  (42526693, 'SNP.GA'):  417, (42526693, '_'):  311, 
+                  (42526762, 'SNP.CT'):  535, (42526762, '_'):  460, 
+                  (42526930, 'SNP.TC'):    0, (42526930, '_'):  563, 
+                  (42527470, 'SNP.CT'):  573, (42527470, '_'):  257, 
+                  (42527532, 'SNP.GA'):  354, (42527532, '_'):  222, 
+                  (42527792, 'SNP.CT'):  273, (42527792, '_'):  263, 
+                  (42528027, 'SNP.TC'):   14, (42528027, '_'):    1, 
+                  (42528381, 'SNP.GC'):    6, (42528381, '_'):   12, }, 
+         "sol": [('35B', [(42526930, 'SNP.TC')], []), 
+                 ('4EW', [], [(42525810, 'SNP.TC')])]
+      }, shallow=True)
+

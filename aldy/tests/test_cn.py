@@ -17,19 +17,22 @@ from aldy.gene import Gene
 from aldy.common import *
 
 
-def assert_cn(gene, expected, cov, expected_obj=None):
+def assert_cn(gene, expected, cov, expected_obj=None, gap=0):
    solver = os.getenv('ALDY_SOLVER', default='gurobi')
    sols = aldy.cn.solve_cn_model(gene,
                                  cn_configs=gene.cn_configs,
                                  max_cn=20,
                                  region_coverage=cov,
-                                 solver=solver)
+                                 solver=solver,
+                                 gap=gap)
    if expected_obj:
       for s in sols:
          assert_less(abs(s.score - expected_obj), SOLUTION_PRECISION)
+   best_sol_score = min(sols, key=lambda s:s.score).score
+   for s in sols:
+      assert_less(s.score - best_sol_score * (1 + gap), SOLUTION_PRECISION)
    sols = sorted([sorted(s.solution.items()) for s in sols])
    expected = sorted([sorted(s.items()) for s in expected])
-   print(sols)
    assert_equal(len(sols), len(expected))
    assert_equal(sols, expected)
 
@@ -77,9 +80,7 @@ class CNSyntheticTest(unittest.TestCase):
                 [{'6': 2}],
                 self.make_coverage(zip([0,0, 0,0, 0], [2,2, 2,2, 2])),
                 2 * PARSIMONY_PENALTY)
-      # TODO: test 2 deletions with no coverage
-      # sh = logbook.more.ColorizedStderrHandler(format_string='{record.message}', level='DEBUG')
-      # sh.push_application()
+      # TODO: test 2 deletions with no coverage (needs special handling as deletions imply 2D7 coverage)
       # assert_cn(self.gene,
       #           [{'6': 2}],
       #           self.make_coverage(zip([0,0, 0,0, 0], [0,0, 0,0, 0])),
@@ -218,3 +219,41 @@ class CNRealTest(unittest.TestCase):
                    '5e': (2.8, 1.2), '5i': (2.9, 1.0), '6e': (2.7, 0.9), '6i': (2.8, 0.9),
                    '3e': (2.1, 1.9), '9e': (3.1, 1.0), '11pce': (0, 1.0)
                 }))
+
+
+   def test_gap(self):
+      data = self.make_coverage({
+         '1e': (1.0, 1.9), '1i': (1.3, 1.6), '2e': (0.9, 1.6), '2i': (1.0, 1.9),
+         '5e': (0.9, 2.2), '5i': (0.9, 2.0), '6e': (0.9, 1.9), '6i': (0.9, 1.8),
+         '3e': (1.1, 1.7), '9e': (1.0, 1.8), '11pce': (0, 1.9)
+      })
+      assert_cn(self.gene,
+                [{'1': 1, '5': 1}],
+                data, gap=0.0)
+      assert_cn(self.gene,
+                [{'1':  1, '5':  1},
+                 {'13': 1, '68': 1},
+                 {'16': 1, '36': 1},
+                 {'16': 1, '61': 1},
+                 {'16': 1, '63': 1},
+                 {'36': 1, '76': 1},
+                 {'36': 1, '77': 1},
+                 {'61': 1, '76': 1},
+                 {'61': 1, '77': 1},
+                 {'63': 1, '76': 1},
+                 {'63': 1, '77': 1}],
+                data, gap=0.1)
+      assert_cn(self.gene,
+                [{'1':  1, '5':  1},
+                 {'13': 1, '68': 1},
+                 {'16': 1, '36': 1},
+                 {'16': 1, '61': 1},
+                 {'16': 1, '63': 1},
+                 {'36': 1, '76': 1},
+                 {'36': 1, '77': 1},
+                 {'61': 1, '76': 1},
+                 {'61': 1, '77': 1},
+                 {'63': 1, '76': 1},
+                 {'63': 1, '77': 1},
+                 {'68': 1, '79': 1}],
+                data, gap=0.65)

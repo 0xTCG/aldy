@@ -8,6 +8,7 @@
 from typing import Any, Optional, Dict, Tuple, List, Iterable, Callable, Set
 
 import importlib
+import collections
 
 from .common import log, sorted_tuple, SOLUTION_PRECISION
 
@@ -124,7 +125,7 @@ class Gurobi:
          name = self.varName(v)
          coeff = 1 if coeffs is None or name not in coeffs else coeffs[name]
          absvar = self.addVar(lb=0, update=False, name=f'ABS_{name}')
-         vv.append(absvar * coeff)
+         vv.append(coeff * absvar)
          self.addConstr(absvar + v >= 0, name=f'CABSL_{i}')
          self.addConstr(absvar - v >= 0, name=f'CABSR_{i}')
       self.update()
@@ -221,21 +222,13 @@ class Gurobi:
          return var.x
 
 
-   def changeUb(self, var, ub: float) -> None:
-      """
-      Change the upper-bound of the variable.
-      """
-      var.ub = ub
-      self.update()
-
-
    def dump(self, file):
       self.model.write(file)
 
 
 class SCIP(Gurobi):
    """
-   An abstraction aroung SCIP `PySCIPopt` Python interface.
+   An abstraction around SCIP `PySCIPopt` Python interface.
    """
 
    def __init__(self, name):
@@ -285,7 +278,7 @@ class SCIP(Gurobi):
       status = self.model.getStatus()
       if status == 'infeasible':
          raise NoSolutionsError(status)
-      return status, self.model.getObjVal()
+      return status.lower(), self.model.getObjVal()
 
 
    def varName(self, var):
@@ -302,13 +295,20 @@ class SCIP(Gurobi):
          return x
 
 
-   def changeUb(self, var, ub):
-      self.model.freeTransform()
-      self.model.chgVarUb(var, ub)
-
-
    def dump(self, file):
       self.model.writeProblem(file)
+
+   
+   def variables(self):
+      return self.model.getVars() 
+
+
+   def is_binary(self, v):
+      return v.vtype() == 'BINARY'
+
+
+   def change_model(self):
+      self.model.freeTransform()
 
 
    def solutions(self, 
@@ -326,17 +326,205 @@ class SCIP(Gurobi):
          if abs(obj - ub) >= self.SOLVER_PRECISON and obj > ub:
             return
          
-         vv = {v.name: v
-               for v in self.model.getVars() 
-               if v.vtype() == 'BINARY' and self.getValue(v) == 1}
+         vv = {self.varName(v): v for v in self.variables() if self.is_binary(v) and self.getValue(v) == 1}
          yield status, obj, sorted_tuple(set(vv.keys()))
          
          if not limit or iteration + 1 < limit:
-            self.model.freeTransform()
+            self.change_model()
             self.addConstr(self.quicksum(vv.values()) <= len(vv) - 1)
             yield from self.solutions(gap, best_obj, limit, iteration + 1, init)
       except NoSolutionsError:
          return
+
+
+class CBC(SCIP):
+   """
+   An abstraction around CBC via Google's `or-tools` Python interface.
+   """
+
+   def __init__(self, name):
+      self.ortools = importlib.import_module('ortools.linear_solver.pywraplp')
+      self.model = self.ortools.Solver(name, self.ortools.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
+      self.INF = self.model.infinity()
+      self.SOLVER_PRECISON = 1e-5 # Use Gurobi's default precision
+      self.STATUS = collections.defaultdict(lambda: 'UNKNOWN', {
+         self.ortools.Solver.OPTIMAL: 'OPTIMAL',
+         self.ortools.Solver.FEASIBLE: 'FEASIBLE',
+         self.ortools.Solver.INFEASIBLE: 'INFEASIBLE',
+         self.ortools.Solver.UNBOUNDED: 'UNBOUNDED',
+         self.ortools.Solver.ABNORMAL: 'ABNORMAL',
+         self.ortools.Solver.NOT_SOLVED: 'NOT_SOLVED',
+      })
+
+
+   def update(self):
+      pass
+
+
+   def addConstr(self, *args, **kwargs):
+      if 'name' in kwargs:
+         kwargs['name'] = escape_name(kwargs['name'])
+      return self.model.Add(*args, **kwargs)
+
+
+   def addVar(self, *args, **kwargs):
+      name = escape_name(kwargs.get('name', ''))
+      lb = kwargs.get('lb', 0)
+      ub = kwargs.get('ub', self.INF)
+      if 'vtype' in kwargs and kwargs['vtype'] == 'B':
+         v = self.model.BoolVar(name)
+      elif 'vtype' in kwargs and kwargs['vtype'] == 'I':
+         v = self.model.IntVar(lb, ub, name)
+      else:
+         v = self.model.NumVar(lb, ub, name)
+      return v
+
+
+   def setObjective(self, objective, method: str = 'min'):
+      self.objective = objective
+      if method == 'min':
+         self.model.Minimize(self.objective)
+      else:
+         self.model.Maximize(self.objective)
+
+
+   def quicksum(self, expr):
+      return self.model.Sum(expr)
+
+
+   def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
+      if init is not None:
+         init(self.model)
+      status = self.model.Solve()
+
+      if status == self.ortools.Solver.INFEASIBLE:
+         raise NoSolutionsError(status)
+      if not self.model.VerifySolution(self.SOLVER_PRECISON, True):
+         raise NoSolutionsError(status)
+      return self.STATUS[status].lower(), self.model.Objective().Value()
+
+
+   def varName(self, var):
+      return var.name()
+
+
+   def getValue(self, var):
+      x = var.solution_value()
+      if var.integer():
+         x = int(round(x))
+         if abs(var.lb()) < SOLUTION_PRECISION and abs(1 - var.ub()) < SOLUTION_PRECISION:
+            return x > 0
+         else:
+            return x
+      else:
+         return x
+
+
+   def dump(self, file):
+      log.warn('Dumping not supported with CBC solver')
+      pass
+
+
+   def variables(self):
+      return self.model.variables() 
+
+
+   def is_binary(self, v):
+      return isinstance(self.getValue(v), bool)
+
+
+   def change_model(self):
+      pass
+
+
+class MIPCL(SCIP):
+   """
+   An abstraction around CBC via Google's `or-tools` Python interface.
+   """
+
+   def __init__(self, name):
+      self.mip = importlib.import_module('mipcl_py.mipshell.mipshell')
+      self.model = self.mip.Problem(name)
+      self.INF = self.mip.VAR_INF
+      self.SOLVER_PRECISON = 1e-5 # Use Gurobi's default precision
+
+
+   def update(self):
+      pass
+
+
+   def addConstr(self, *args, **kwargs):
+      pass
+
+
+   def addVar(self, *args, **kwargs):
+      if 'vtype' in kwargs:
+         kwargs['type'] = kwargs['vtype']
+         del kwargs['vtype']
+      if 'type' in kwargs and kwargs['type'] == 'B':
+         kwargs['type'] = self.mip.BIN
+      elif 'type' in kwargs and kwargs['type'] == 'I':
+         kwargs['type'] = self.mip.INT
+      elif 'type' in kwargs:
+         kwargs['type'] = self.mip.REAL
+      if 'name' in kwargs:
+         kwargs['name'] = escape_name(kwargs['name'])
+      v = self.mip.Var(*args, **kwargs)
+      return v
+
+
+   def setObjective(self, objective, method: str = 'min'):
+      self.objective = objective
+      if method == 'min':
+         self.model.minimize(self.objective)
+      else:
+         self.model.maximize(self.objective)
+
+
+   def quicksum(self, expr):
+      return self.mip.sum_(expr)
+
+
+   def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
+      if init is not None:
+         init(self.model)
+      self.model.optimize()
+
+      if not model.is_solutionOptimal:
+         raise NoSolutionsError(status)
+      return 'optimal', self.model.getObjVal()
+
+
+   def varName(self, var):
+      return var.name
+
+
+   def getValue(self, var):
+      x = var.val
+      if var.type == self.mip.INT:
+         return int(round(x))
+      elif var.type == self.mip.BIN:
+         return int(round(x)) > 0
+      else:
+         return x
+
+
+   def dump(self, file):
+      log.warn('Dumping not supported with MIPCL solver')
+      pass
+
+
+   def vars(self):
+      return self.model.vars
+
+
+   def is_binary(self, v):
+      return var.type == self.mip.BIN
+
+
+   def change_model(self):
+      pass
+
 
 
 def model(name: str, solver: str):
@@ -375,10 +563,26 @@ def model(name: str, solver: str):
          model = None
       return model
 
+   def test_cbc(name):
+      """
+      Tests if OR-Tools are present. Requires Google's `ortools`.
+      """
+      try:
+         model = CBC(name)
+         log.trace('Using CBC')
+      except ImportError as e:
+         log.warn('CBC (Google OR-Tools) not found. Please install ortools Python package.')
+         log.error('{}', e)
+         model = None
+      return model
+
+
    if solver == 'any':
       model = test_gurobi(name)
       if model is None:
          model = test_scip(name)
+      if model is None:
+         model = test_cbc(name)
       if model is None:
          raise Exception('No IP solver found. Aldy cannot solve any problems without matching IP solver. Please try installing Gurobi or SCIP.')
       return model
@@ -389,55 +593,3 @@ def model(name: str, solver: str):
       else:
          raise Exception('IP solver {} is not supported'.format(solver))
 
-
-def get_all_solutions(model: Gurobi,
-                      var: dict,
-                      opt: float,
-                      current_sol: tuple,
-                      iteration: int = 0,
-                      mem: Optional[Set[tuple]] = None) -> Set[tuple]:
-   """
-   Enumerate all possible solutions that yield ``opt`` value for the ILP defined in ``model``.
-
-   Args:
-      model (:obj:`Gurobi`):
-         ILP model instance.
-      var (dict[any, :obj:`Variable`]):
-         Dictionary of the variables that can form the optimal solution `current_sol`.
-         Key is the variable identifier that forms the solution tuple.
-      opt (float):
-         The optimal solution of the model.
-      current_sol (tuple[any]):
-         The current solution in the pool. Used to build next solution.
-         Tuple members are keys in ``var`` dictionary.
-      iteration (int):
-         Recursion level depth. Used to terminate the functions early.
-         Max allowed depth: 10.
-      mem (list[tuple[any]]):
-         Memoization table to avoid recomputation of the already seen solutions.
-
-   Note:
-      Variables in ``var`` **MUST BE** binary variables in order for this to work properly!
-
-   Returns:
-      list[tuple[str]]
-   """
-
-   if mem is None:
-      mem = set()
-   if current_sol in mem or iteration > 10:
-      return
-   mem.add(current_sol)
-   for a in current_sol:
-      # Disable a variable
-      model.changeUb(var[a], 0)
-      try:
-         status, obj = model.solve()
-         if status == 'optimal' and abs(obj - opt) < SOLUTION_PRECISION:
-            new_solution = sorted_tuple(set(vn for vn, v in var.items() if model.getValue(v)))
-            yield status, obj, new_solution
-            yield from get_all_solutions(model, var, opt, new_solution, iteration + 1, mem)
-      except NoSolutionsError:
-         pass
-      # Re-enable variable
-      model.changeUb(var[a], 1)

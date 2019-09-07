@@ -175,7 +175,6 @@ def solve_cn_model(gene: Gene,
    VERR = {}
    json_print(debug, '    "data": {', end='')
    for r, (exp_cov0, exp_cov1) in region_coverage.items():
-      print(r)
       json_print(debug, f"'{str(r)[3:-1]}': ({exp_cov0}, {exp_cov1}), ", end='')
       expr = 0
       for s, structure in structures.items():

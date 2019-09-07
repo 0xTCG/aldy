@@ -149,8 +149,8 @@ def solve_major_model(gene: Gene,
    # Add a binary variable for any allele/novel mutation pair
    # For each binary variable, add a multiplication variable MUL = VNEW[a, m] * VA[a] for linearizing binary product
    del_allele = gene.deletion_allele()
-   VNEW = {a: {m: (model.addVar(vtype='B', name=f'N_{m.pos}_{m.op}_{a[0]}'),
-                   model.addVar(vtype='B', name=f'MUL_N_{m.pos}_{m.op}_{a[0]}'))
+   VNEW = {a: {m: (model.addVar(vtype='B', name=f'N_{m.pos}_{m.op}_{a[0]}_{a[1]}'),
+                   model.addVar(vtype='B', name=f'MUL_N_{m.pos}_{m.op}_{a[0]}_{a[1]}'))
                if a[0] != del_allele else (0, 0) # deletion alleles should not be assigned any mutations
                for m in constraints 
                if m[0] not in set(mm[0] for mm in alleles[a].func_muts) and gene.has_coverage(a[0], m.pos)}
@@ -182,7 +182,7 @@ def solve_major_model(gene: Gene,
          for m in muts: 
             constraints[ref_m] -= VNEW[a][m][1]
          # We ensure that only one additional mutation can be selected here
-         model.addConstr(model.quicksum(VNEW[a][m][0] for m in muts) <= 1)
+         model.addConstr(model.quicksum(VNEW[a][m][0] for m in muts) <= 1, name=f'CONE_{pos}_{a[0]}_{a[1]}')
 
    # Each allele must express all of its functional mutations
    json_print(debug, '  { # {}', identifier)

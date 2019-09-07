@@ -17,6 +17,7 @@ from .common import *
 from .gene import Mutation, Gene, Allele, Suballele
 from .sam import Sample
 from .cn import MAX_CN
+from .major import NOVEL_MUTATION_PENAL
 from .coverage import Coverage
 from .solutions import MajorSolution, SolvedAllele, MinorSolution
 from .diplotype import estimate_diplotype
@@ -162,7 +163,7 @@ def solve_minor_model(gene: Gene,
       for cnt in range(1, max_cn):
          alleles[a, cnt] = alleles[a, 0]
 
-   VA = {a: model.addVar(vtype='B', name=a[0].minor) for a in alleles}
+   VA = {a: model.addVar(vtype='B', name=f'A_{a[0].major}_{a[0].minor}_{a[1]}') for a in alleles}
    for a, cnt in alleles:
       if cnt > 0:
          model.addConstr(VA[a, cnt] <= VA[a, cnt - 1], name=f'CORD_{a.minor}_{cnt}')
@@ -176,8 +177,8 @@ def solve_minor_model(gene: Gene,
    # Add a binary variable for each allele/mutation pair where mutation belongs to that allele
    # that will indicate whether such mutation will be assigned to that allele or will be missing.
    # Second variable represents the corresponding VA * VKEEP product.
-   VKEEP = {a: {m: (model.addVar(vtype='B', name=f'K_{m.pos}_{m.op}_{a[0].minor}'),
-                    model.addVar(vtype='B', name=f'MUL_K_{m.pos}_{m.op}_{a[0].minor}'))
+   VKEEP = {a: {m: (model.addVar(vtype='B', name=f'K_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}'),
+                    model.addVar(vtype='B', name=f'MUL_K_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}'))
                 for m in alleles[a]}
             for a in alleles}
    # Add a binary variable for each allele/mutation pair where mutation DOES NOT belongs to that allele
@@ -187,8 +188,8 @@ def solve_minor_model(gene: Gene,
    for a in VNEW:
       for m in mutations:
          if gene.has_coverage(a[0].major, m.pos) and m not in alleles[a]:
-            VNEW[a][m] = (model.addVar(vtype='B', name=f'N_{m.pos}_{m.op}_{a[0].minor}'),
-                          model.addVar(vtype='B', name=f'MUL_N_{m.pos}_{m.op}_{a[0].minor}'))
+            VNEW[a][m] = (model.addVar(vtype='B', name=f'N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}'),
+                          model.addVar(vtype='B', name=f'MUL_N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}'))
    # Add an error variable for each mutation and populate the error constraints
    VERR = {m: model.addVar(lb=-model.INF, ub=model.INF, name=f'E_{m.pos}_{m.op}') for m in mutations}
    constraints = {m: 0 for m in mutations}
@@ -220,7 +221,7 @@ def solve_minor_model(gene: Gene,
             for m in muts:
                constraints[ref_m] -= VNEW[a][m][1]
             # We ensure that only one additional mutation can be selected here
-            model.addConstr(model.quicksum(VNEW[a][m][0] for m in muts) <= 1)
+            model.addConstr(model.quicksum(VNEW[a][m][0] for m in muts) <= 1, name=f'CONE_{pos}_{a[0].major}_{a[0].minor}_{a[1]}')
 
    # Ensure that each constraint matches the observed coverage
    json_print(debug, '  {')
@@ -245,26 +246,26 @@ def solve_minor_model(gene: Gene,
    # 1) Each mutation is assigned only to alleles that are present in the solution
    for a, mv in VKEEP.items():
       for m, v in mv.items():
-         model.addConstr(v[0] <= VA[a], name=f"CVK_{a[0].minor}_{m.pos}_{m.op}")
+         model.addConstr(v[0] <= VA[a], name=f"CVK_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}")
    for a, mv in VNEW.items():
       for m, v in mv.items():
-         model.addConstr(v[0] <= VA[a], name=f"CVN_{a[0].minor}_{m.pos}_{m.op}")
+         model.addConstr(v[0] <= VA[a], name=f"CVN_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}")
    # 2) Each allele must express ALL its functional mutations
    for a in alleles:
       for m in alleles[a]:
          if m.is_functional:
             assert(m in VKEEP[a])
-            model.addConstr(VKEEP[a][m][0] >= VA[a], name=f"CFUNC_{a[0].minor}_{m.pos}_{m.op}")
+            model.addConstr(VKEEP[a][m][0] >= VA[a], name=f"CFUNC_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}")
    # 3) No allele can include mutation with coverage 0
    for a in VKEEP:
       for m, v in VKEEP[a].items():
          if not gene.has_coverage(a[0].major, m.pos):
-            model.addConstr(v[0] <= 0, name=f"CZERO_{a[0].minor}_{m.pos}_{m.op}")
+            model.addConstr(v[0] <= 0, name=f"CZERO_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}")
    # 4) No allele can include additional functional mutation (this should be done in the major model)
    for a in VNEW:
       for m, v in VNEW[a].items():
          if m.is_functional:
-            model.addConstr(v[0] <= 0, name=f"CNEWFUNC_{a[0].minor}_{m.pos}_{m.op}")
+            model.addConstr(v[0] <= 0, name=f"CNEWFUNC_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}")
    # 5) Prevent extra mutations if there is already existing mutation at that loci
    #    (either existing or already added)
    for pos in set(m.pos for m in constraints):
@@ -273,9 +274,9 @@ def solve_minor_model(gene: Gene,
          ma = [VNEW[a][m][1] for m in VNEW[a] if m.pos == pos]
          # TODO: add support for extra insertions!
          if len(ma) > 1: # useless if == 1 since variables are binary
-            model.addConstr(model.quicksum(ma) <= 1, name=f"CSINGLE_{a[0].minor}_{pos}")
+            model.addConstr(model.quicksum(ma) <= 1, name=f"CSINGLE_{pos}_{a[0].major}_{a[0].minor}_{a[1]}")
          if len(ma) + len(mp) > 1:
-            model.addConstr(model.quicksum(mp + ma) <= 1, name=f"CSINGLEFULL_{a[0].minor}_{pos}")
+            model.addConstr(model.quicksum(mp + ma) <= 1, name=f"CSINGLEFULL_{pos}_{a[0].major}_{a[0].minor}_{a[1]}")
    # 5) Make sure that each copy of a mutation has at least one read supporting it
    for m in mutations:
       expr  = model.quicksum(VKEEP[a][m][1] for a in alleles if m in VKEEP[a])
@@ -315,6 +316,11 @@ def solve_minor_model(gene: Gene,
                 model.quicksum(v[1] for a in VKEEP for _, v in VKEEP[a].items())
    objective += ADD_PENALTY_FACTOR * \
                 model.quicksum(v[0] for a in VNEW for _, v in VNEW[a].items())
+   objective += NOVEL_MUTATION_PENAL * \
+                model.quicksum(v[0] for a in VKEEP for m, v in VKEEP[a].items()
+                               if m.is_functional 
+                               and m not in gene.alleles[a[0].major].func_muts)
+
    model.setObjective(objective)
    if debug:
       model.dump(f'{debug}.minor{identifier}.lp')
