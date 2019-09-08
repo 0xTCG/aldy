@@ -4,10 +4,12 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, Tuple, Callable, List
+from typing import Dict, Tuple, Callable
 
-from .common import *
-from .gene import Mutation
+import collections
+
+from .common import log
+from .gene import Mutation, GeneRegion, GRange
 
 
 class Coverage:
@@ -26,7 +28,7 @@ class Coverage:
 
         Args:
             coverage (dict[int, dict[str, int]]):
-                Coverage for each locus within a sample represented as a dictionary 
+                Coverage for each locus within a sample represented as a dictionary
                 that maps mutation (or a reference position indicated by `_`)
                 to the number of reads supporting that mutation.
                 For example, ``coverage[10]['SNP.AG'] = 2`` means that there are 2
@@ -36,10 +38,10 @@ class Coverage:
                 Any mutation with the coverage less than `t`% is filtered out.
                 Ranges from 0 to 1 (normalized percentage).
             cnv_coverage (dict[int, int]):
-                Coverage of the copy-number neutral region of the sample: 
-                each genomic locus within that region points to the corresponsing read 
+                Coverage of the copy-number neutral region of the sample:
+                each genomic locus within that region points to the corresponsing read
                 coverage.
-                Used for coverage rescaling. 
+                Used for coverage rescaling.
         """
         self._coverage = coverage
         self._threshold = threshold
@@ -77,7 +79,7 @@ class Coverage:
     def percentage(self, m: Mutation) -> float:
         """
         Returns:
-            float: Coverage of the mutation ``mut`` expressed as a percentage 
+            float: Coverage of the mutation ``mut`` expressed as a percentage
             in the range 0-100.
         """
         total = self.total(m.pos)
@@ -133,10 +135,10 @@ class Coverage:
                     1. mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
                     2. cov (float): coverage of the mutation
                     3. total (float): total coverage of the mutation locus
-                    4. thres (float): filtering threshold 
-  
+                    4. thres (float): filtering threshold
+
                 ``filter_fn`` returns ``False`` if a mutation is filtered out.
-  
+
         Returns:
             :obj:`Coverage`: Filtered coverage.
         """
@@ -150,8 +152,11 @@ class Coverage:
                         o: c
                         for o, c in pos_mut.items()
                         if filter_fn(
-                            Mutation(pos, o), c, self.total(pos), self._threshold
-                        )  # type: ignore
+                            Mutation(pos, o),  # type: ignore
+                            c,
+                            self.total(pos),
+                            self._threshold,
+                        )
                     },
                 )
                 for pos, pos_mut in self._coverage.items()
@@ -180,11 +185,11 @@ class Coverage:
     ) -> None:
         """
         Normalize the sample coverage to match the profile coverage.
-  
+
         Args:
             profile (dict[str, dict[int, float]]):
                 Profile coverage in the form `chromosome: (position -> coverage)`.
-            gene_regions 
+            gene_regions
             (dict[int, dict[:obj:`aldy.common.GeneRegion`, :obj:`aldy.common.GRange`]]):
                 List of genic regions for each gene.
             cn_region (:obj:`aldy.common.GRange`):
@@ -207,7 +212,7 @@ class Coverage:
         self._region_coverage: Dict[Tuple[int, GeneRegion], float] = {}
         for gene, gr in gene_regions.items():
             for region, rng in gr.items():
-                s = sum(self.total(i) for i in range(rng.start, rng.end))  #!IMPORTANT
+                s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT
                 p = sum(profile[rng.chr][i] for i in range(rng.start, rng.end))
                 self._rescaled.update(
                     {
@@ -236,4 +241,3 @@ class Coverage:
         cn = cn_solution.position_cn(mut.pos)
         total = total / cn if cn > 0 else total
         return mut.op == "_" or cov > max(1, total * thres)
-

@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Any, Optional, Dict, Tuple, List, Iterable, Callable, Set
+from typing import Optional, Dict, Tuple, Iterable, Callable
 
 import importlib
 import collections
@@ -72,7 +72,7 @@ class Gurobi:
         Add a variable to the model.
 
         ``vtype`` is the variable type:
-  
+
         - ``B`` for binary variable
         - ``I`` for integer variable
         - ``C`` or nothing for continuous variable.
@@ -130,7 +130,7 @@ class Gurobi:
         Return the absolute sum of ``vars``: e.g.
            :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
         where :math:`c_i` is defined in the ``coeffs`` dictionary.
-  
+
         Key of the ``coeffs`` dictionary stands for the name of the variable
         (should be accessible via ``varName`` call; 1 if not defined).
         """
@@ -147,7 +147,8 @@ class Gurobi:
 
     def prod(self, res, terms):
         """
-        Ensure that :math:`res = \prod terms` (where ``terms`` is a sequence of binary variables)
+        Ensure that :math:`res = \prod terms`
+        (where ``terms`` is a sequence of binary variables)
         by adding the appropriate linear constraints.
         Returns ``res``.
         """
@@ -156,16 +157,16 @@ class Gurobi:
         self.addConstr(res >= self.quicksum(terms) - (len(terms) - 1))
         return res
 
-    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float, dict]:
+    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
         """
         Solve the model. Assumes that the objective is set.
-  
+
         Additional parameters of the solver can be set via ``init`` function that takes
         the model instance as the sole argument.
-  
+
         Returns:
            tuple[str, float]: Status of the solution and the objective value.
-  
+
         Raises:
            :obj:`NoSolutionsError` if the model is infeasible.
         """
@@ -226,19 +227,23 @@ class Gurobi:
         init: Optional[Callable] = None,
     ):
         """
-        Solve the model and returns the list of all optimal solutions. Assumes that the objective is set.
-        Any solution whose score is less than (1 + `gap`) times the optimal solution score will be included.
-  
-        A solution is defined as a dictionary of set binary variables within the solution that are accessed 
+        Solve the model and returns the list of all optimal solutions.
+        Assumes that the objective is set.
+        Any solution whose score is less than (1 + `gap`) times
+        the optimal solution score will be included.
+
+        A solution is defined as a dictionary of set binary variables within
+        the solution that are accessed
         by their name.
-  
+
         Additional parameters of the solver can be set via ``init`` function that takes
         the model instance as the sole argument.
-  
+
         This is a generic version that supports any solver.
-  
+
         Returns:
-           generator[tuple[str, float, any]]: Status of the solution, the objective value and the solution itself.
+           generator[tuple[str, float, any]]: Status of the solution,
+           the objective value and the solution itself.
         """
 
         try:
@@ -436,7 +441,7 @@ class CBC(SCIP):
 
 class MIPCL(SCIP):
     """
-    Wrapper around MIPCL's Python interface (mipshell). 
+    Wrapper around MIPCL's Python interface (mipshell).
     Warning: Only Linux is supported.
     """
 
@@ -482,8 +487,8 @@ class MIPCL(SCIP):
             init(self.model)
         self.model.optimize()
 
-        if not model.is_solutionOptimal:
-            raise NoSolutionsError(status)
+        if not self.model.is_solutionOptimal:
+            raise NoSolutionsError("infeasible")
         return "optimal", self.model.getObjVal()
 
     def varName(self, var):
@@ -506,7 +511,7 @@ class MIPCL(SCIP):
         return self.model.vars
 
     def is_binary(self, v):
-        return var.type == self.mip.BIN
+        return v.type == self.mip.BIN
 
     def change_model(self):
         pass
@@ -560,9 +565,7 @@ def model(name: str, solver: str):
             model = CBC(name)
             log.trace("Using CBC")
         except ImportError as e:
-            log.warn(
-                "CBC (Google OR-Tools) not found. Please install ortools Python package."
-            )
+            log.warn("CBC/OR-Tools not found. Please install ortools Python package.")
             log.error("{}", e)
             model = None
         return model
@@ -585,4 +588,3 @@ def model(name: str, solver: str):
             return locals()[fname](name)
         else:
             raise Exception("ILP solver {} is not supported".format(solver))
-

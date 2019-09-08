@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 
 from .test_major_synthetic import assert_major
 
@@ -287,4 +287,3 @@ def test_left_fusion_2(real_gene):  # NA19790/v2
             ],
         },
     )
-

@@ -36,6 +36,7 @@ def pytest_generate_tests(metafunc):
                 data = f.read()
                 data = ast.literal_eval(data)
                 return data
+
         samples = []
         for file, data in read_data("aldy.tests.paper/data-pgx1.json").items():
             samples.append(
@@ -60,4 +61,3 @@ def pytest_generate_tests(metafunc):
                 (data, f"{path}/1000genomes-illumina/bams/{file}.bam", "illumina", None)
             )
         metafunc.parametrize("real_sample", samples)
-

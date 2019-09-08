@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 
 from .test_minor_synthetic import assert_minor
 
@@ -423,4 +423,3 @@ def test_major_novel(real_gene):
         },
         shallow=True,
     )
-

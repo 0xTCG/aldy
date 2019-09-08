@@ -6,7 +6,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 import os
 
 import aldy.genotype

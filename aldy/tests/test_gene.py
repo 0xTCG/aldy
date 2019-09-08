@@ -4,10 +4,10 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 
-from aldy.gene import *
-from aldy.common import *
+from aldy.gene import Mutation, CNConfig, Allele, Suballele
+from aldy.common import GeneRegion, GRange
 
 
 def test_gene_basic(toy_gene):
@@ -83,7 +83,8 @@ def test_gene_alleles(toy_gene):
             cnify("1,  1,1,  1,1,  1, | 1,  1,1,  1,1,  1"),
             kind=CNConfig.CNConfigType.DEFAULT_CN,
             alleles=set(["1", "1.a", "2", "3"]),
-            description="Normal allelic configuration: all regions present in both gene and pseudogene",
+            description="Normal allelic configuration: "
+            + "all regions present in both gene and pseudogene",
         ),
         "4": CNConfig(
             cnify("0,  0,0,  0,1,  1, | 1,  1,1,  1,0,  0"),
@@ -212,4 +213,3 @@ def test_structure(toy_gene):
     coding_seq = "".join(c for _, c in sorted(toy_gene.coding_region.lookup.items()))
     assert coding_seq == "GTACGTACGTGTACGTACGTGTACGTACGT", "Coding sequence"
     assert toy_gene.coding_region.aminoacid == "VRTCTYVYVR", "Protein"
-

@@ -4,12 +4,11 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 
 from aldy.solutions import SolvedAllele, MinorSolution, MajorSolution
 from aldy.diplotype import estimate_diplotype
 from aldy.gene import Mutation
-from aldy.common import *
 
 
 def assert_diplotype(gene, test, majors):

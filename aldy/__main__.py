@@ -13,15 +13,15 @@ import os
 import sys
 import platform
 import datetime
-import multiprocessing
-import functools
-import traceback
 import tempfile
+import pkg_resources
+import traceback
+import re
 
-from .common import *
-from .gene import Gene
+from .common import log, script_path, AldyException, td, colorize
+from .gene import Gene, GRange
 from .cn import LEFT_FUSION_PENALTY
-from .sam import Sample, DEFAULT_CN_NEUTRAL_REGION
+from .sam import Sample
 from .genotype import genotype
 from .version import __version__
 
@@ -114,7 +114,7 @@ def main():
         log.critical(ex)
         log.warn(traceback.format_exc())
         exit(1)
-    except:
+    except:  # noqa
         exc = sys.exc_info()[0]
         log.critical("Unrecoverable error: {}", str(exc))
         log.warn(traceback.format_exc())
@@ -161,8 +161,8 @@ def _get_args():
         "--gene",
         "-g",
         default="all",
-        help='Gene whose genotype is to be called. Default is "all" which calls genotypes '
-        + "for all supported genes.",
+        help='Gene whose genotype is to be called. Default is "all" which calls '
+        + "genotypes for all supported genes.",
     )
     genotype_parser.add_argument(
         "--profile",
@@ -196,7 +196,7 @@ def _get_args():
         "-n",
         default="22:42547463-42548249",
         help=td(
-            """Copy-number neutral region in the format chromosome:start-end 
+            """Copy-number neutral region in the format chromosome:start-end
                (e.g. chr1:10000-20000).
                Default is CYP2D8 region within hg19 (22:42547463-42548249)."""
         ),
@@ -225,8 +225,8 @@ def _get_args():
         "-G",
         default=0,
         help=td(
-            """Solver optimality gap. 
-               Any solution whose score is less than (1+gap) times the optimal solution 
+            """Solver optimality gap.
+               Any solution whose score is less than (1+gap) times the optimal solution
                score will be reported.
                Default is 0 (report only optimal solutions)."""
         ),
@@ -237,22 +237,25 @@ def _get_args():
     genotype_parser.add_argument(
         "--debug",
         default=None,
-        help="Create a directory that will contain the debug information and core dumps.",
+        help="Create a directory that will contain the debug information "
+        + "and core dumps.",
     )
     genotype_parser.add_argument(
-        "--fusion-penalty", "-f",
+        "--fusion-penalty",
+        "-f",
         default=LEFT_FUSION_PENALTY,
-        help=f"Fusion penalty. Use higher values to avoid fusions. Default is {LEFT_FUSION_PENALTY}.",
+        help="Fusion penalty. Use higher values to avoid fusions. "
+        + f"Default is {LEFT_FUSION_PENALTY}.",
     )
     genotype_parser.add_argument(
         "--cn",
         "-c",
         default=None,
         help=td(
-            """Manually set the copy number configuration as a list of comma-separated 
+            """Manually set the copy number configuration as a list of comma-separated
                configuration IDs (e.g. "CN1,CN2").
                For a list of supported configuration IDs, please run `aldy show`.
-               For the most common diploid case that contains no structural variations 
+               For the most common diploid case that contains no structural variations
                (e.g. two copies of the main gene), use 1,1."""
         ),
     )
@@ -366,7 +369,9 @@ def _genotype(gene: str, output: Optional[str], args) -> None:
             try:
                 prefix = f"{tmp}/{os.path.splitext(os.path.basename(args.file))[0]}"
                 log_output = f"{prefix}.log"
-                fh = logbook.FileHandler(log_output, mode="w", bubble=True, level="TRACE")
+                fh = logbook.FileHandler(
+                    log_output, mode="w", bubble=True, level="TRACE"
+                )
                 fh.formatter = lambda record, _: "[{}:{}/{}] {}".format(
                     record.level_name[0],
                     os.path.splitext(os.path.basename(record.filename))[0],
@@ -393,4 +398,3 @@ def _run_test() -> None:
 
 if __name__ == "__main__":
     main()
-

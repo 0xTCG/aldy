@@ -6,15 +6,11 @@
 
 from typing import Dict, List, Tuple, Optional
 
-import collections
 import copy
-import os
 
 from . import lpinterface
-from . import sam
-from . import gene
 
-from .common import *
+from .common import log, json_print, sorted_tuple, AldyException
 from .gene import GeneRegion, CNConfig, Gene
 from .coverage import Coverage
 from .solutions import CNSolution
@@ -22,7 +18,7 @@ from .lpinterface import escape_name
 
 
 PCE_REGION = GeneRegion(11, "pce")
-""":obj:`aldy.common.GeneRegion`: *CYP2D7* PCE region that requires special handling 
+""":obj:`aldy.common.GeneRegion`: *CYP2D7* PCE region that requires special handling
    (because *CYP2D6* does not have a matching PCE region)."""
 
 MAX_CN = 20.0
@@ -31,7 +27,7 @@ MAX_CN = 20.0
 # Model parameters
 
 LEFT_FUSION_PENALTY = 0.1
-"""float: Extra penalty applied to left fusions to account for their rarity 
+"""float: Extra penalty applied to left fusions to account for their rarity
    (0 for no penalty)."""
 
 PCE_PENALTY_COEFF = 1.5
@@ -41,8 +37,8 @@ MAX_CN_ERROR = MAX_CN
 """float: Upper bound for absolute error."""
 
 PARSIMONY_PENALTY = 0.5
-"""float: Extra penalty applied to each present gene copy to account for solution parsimony 
-   (0 for no penalty)."""
+"""float: Extra penalty applied to each present gene copy to account for
+   solution parsimony (0 for no penalty)."""
 
 
 def estimate_cn(
@@ -68,7 +64,7 @@ def estimate_cn(
             Relative optimality gap. Use non-zero values to allow non-optimal solutions.
             Default is 0 (reports only optimal solutions).
         fusion_penalty (float):
-            Fusion penalty. Use higher values to avoid fusions. 
+            Fusion penalty. Use higher values to avoid fusions.
             Default is 0.1.
         user_solution (list[str], optional):
             User-specified list of copy number configurations.
@@ -131,15 +127,16 @@ def solve_cn_model(
         max_cn (int):
             Maximum allowed copy number.
         region_coverage (dict[:obj:`aldy.common.GeneRegion`, tuple[float, float]]):
-            Observed copy number of the main gene and the pseudogene for each genic region.
+            Observed copy number of the main gene and the pseudogene
+            for each genic region.
         solver (str):
-            ILP solver to use. 
+            ILP solver to use.
             Check :obj:`aldy.lpinterface` for the list of supported solvers.
         gap (float):
             Relative optimality gap. Use non-zero values to allow non-optimal solutions.
             Default is 0 (reports only optimal solutions).
         fusion_penalty (float):
-            Fusion penalty. Use higher values to avoid fusions. 
+            Fusion penalty. Use higher values to avoid fusions.
             Default is 0.1.
         debug (str, optional):
             If set, create a "`debug`.cn.lp" file for debug purposes.
@@ -150,7 +147,7 @@ def solve_cn_model(
 
     Notes:
         Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_
-        (section Methods/Copy number and structural variation estimation) 
+        (section Methods/Copy number and structural variation estimation)
         for the detailed description of ILP model.
     """
 
@@ -159,7 +156,7 @@ def solve_cn_model(
     # List of CN configurations (a.k.a. structures):
     # dict of (`name`, `number`): structure, where multiple copies of the same `name`
     # get different numbers (binary LP transformation).
-    # Note that `number` = {0, -1} represents *full configuration* with *all* pseudogenes.
+    # Note that `number` = {0, -1} represents full configuration with *all* pseudogenes.
     # Thus a diploid genome must have exactly *2* full configurations.
     # Any `number` > 0 describes only the main gene configuration
     # (a.k.a. "weak" configurations), and there can be many such configurations.
@@ -171,7 +168,8 @@ def solve_cn_model(
         for i in range(1, max_cn):
             structures[a, i] = copy.deepcopy(structures[a, 0])
             for g in structures[a, i].cn:
-                # if this is pseudogene, remove a copy (i.e. create a "weak configuration")
+                # If this is a pseudogene, remove a copy
+                # (i.e. create a "weak configuration")
                 if g != 0:
                     structures[a, i].cn[g] = {
                         r: v - 1 for r, v in structures[a, i].cn[g].items()
@@ -190,7 +188,7 @@ def solve_cn_model(
     # Ensure that we cannot link any allele to the whole-gene deletion.
     del_allele = gene.deletion_allele()
     for (a, ai), v in VCN.items():
-        if a != del_allele:
+        if del_allele and a != del_allele:
             model.addConstr(v + VCN[del_allele, -1] <= 1, name=f"CDEL_{a}_{ai}")
 
     # Ensure that binary transformation is properly formed (i.e. A_i <= A_{i-1}).
@@ -244,14 +242,16 @@ def solve_cn_model(
     # Solve the model
     try:
         lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
-        result = {}
+        result: dict = {}
         for status, opt, sol in model.solutions(gap):
             log.debug(f"CN solver: {status}, opt: {opt:.2f}")
             sol_tuple = sorted_tuple(lookup[v] for v in sol)
             # Because A[1] can be 1 while A[0] is 0, we can have biologically
             # duplicate solutions
             if sol_tuple not in result:
-                result[sol_tuple] = CNSolution(opt, solution=list(sol_tuple), gene=gene)
+                result[sol_tuple] = CNSolution(  # type: ignore
+                    opt, solution=list(sol_tuple), gene=gene
+                )
                 log.debug("CN solver: {}", result[sol_tuple])
         json_print(
             debug, '    "sol": ' + str([dict(r.solution) for r in result.values()])
@@ -264,8 +264,8 @@ def solve_cn_model(
 
 def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
     """
-    Filter out low-quality mutations and copy number configurations that are not supported 
-    by the remaining mutations.
+    Filter out low-quality mutations and copy number configurations
+    that are not supported by the remaining mutations.
 
     Returns:
         dict[str, :obj:`aldy.gene.CNConfig`]
@@ -294,13 +294,13 @@ def _region_coverage(
     gene: Gene, coverage: Coverage
 ) -> Dict[GeneRegion, Tuple[float, float]]:
     """
-    Calculate the coverage  of the main gene and the pseudogene in each genic region. 
-    Returns dictionary where 
+    Calculate the coverage  of the main gene and the pseudogene in each genic region.
+    Returns dictionary where
 
     Returns:
-        dict[:obj:`aldy.common.GeneRegion, tuple[float, float]]: Region coverage that links
-        genic regions (e.g. exon 1) to the coverage of the main gene and the pseudogene 
-        (expressed as a tuple).
+        dict[:obj:`aldy.common.GeneRegion, tuple[float, float]]: Region coverage
+        that links genic regions (e.g. exon 1) to the coverage of the main gene
+        and the pseudogene (expressed as a tuple).
     """
 
     if 1 in gene.regions:  # Check if we have pseudogenes at all
@@ -354,7 +354,7 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
         :obj:`aldy.solutions.CNSolution`: User-provided copy number solution.
 
     Raises:
-        :obj:`aldy.common.AldyException` if a user-provided solution does not match 
+        :obj:`aldy.common.AldyException` if a user-provided solution does not match
         the gene database.
     """
     for sol in sols:
@@ -364,7 +364,6 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
                 + f"{sol}. Please run 'aldy show --gene {gene.name}' for the list the"
                 + f"valid configurations"
             )
-    s = CNSolution(0, solution=sols, gene=gene)
+    s = CNSolution(0, solution=sols, gene=gene)  # type: ignore
     log.debug("CN solver: using user-provided solution: {}", s)
     return s
-

@@ -94,8 +94,8 @@ log = logbook.Logger("Aldy")
 
 
 SOLUTION_PRECISION = 1e-2
-"""float: Solution precision (all values whose difference is less than SOLUTION_PRECISION 
-   are considered equal)"""
+"""float: Solution precision (all values whose difference is less than
+   SOLUTION_PRECISION are considered equal)"""
 
 
 class AldyException(Exception):
@@ -141,7 +141,7 @@ class GeneRegion(collections.namedtuple("GeneRegion", ["number", "kind"])):
         number (int):
             Region number (e.g. for exon 9, the number is 9).
         kind (str):
-            Type of the region. Usually either 'e' (for **e**\ xon) or 
+            Type of the region. Usually either 'e' (for **e**\ xon) or
             'i' (for **i**\ ntron), but can be anything else.
 
     Notes:
@@ -152,7 +152,7 @@ class GeneRegion(collections.namedtuple("GeneRegion", ["number", "kind"])):
         return "GR({}.{})".format(self.number, self.kind)
 
 
-### Aldy auxiliaries
+# Aldy auxiliaries
 
 
 def allele_number(x: str) -> str:
@@ -193,7 +193,7 @@ def seq_to_amino(seq: str) -> str:
     )
 
 
-### Language auxiliaries
+# Language auxiliaries
 
 
 def sorted_tuple(x: Iterable) -> tuple:
@@ -299,7 +299,8 @@ def check_path(cmd: str) -> bool:
 
     def is_exe(path):
         """
-        Based on http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python/377028#377028
+        Based on
+        http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
         """
         return os.path.isfile(path) and os.access(path, os.X_OK)
 
@@ -340,4 +341,3 @@ class DictWrapper:
             return self.d[key]
         else:
             return None
-

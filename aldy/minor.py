@@ -3,18 +3,11 @@
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
-
-from typing import List, Dict, Tuple, Set, Callable, Optional
-from functools import reduce, partial
-
-import math
-import collections
-import multiprocessing
+from typing import List, Set, Callable, Optional, Tuple, Dict
 
 from . import lpinterface
-from .common import *
-from .gene import Mutation, Gene, Allele, Suballele
-from .sam import Sample
+from .common import log, json_print, allele_sort_key
+from .gene import Mutation, Gene
 from .cn import MAX_CN
 from .major import NOVEL_MUTATION_PENAL
 from .coverage import Coverage
@@ -66,8 +59,9 @@ def estimate_minor(
     """
 
     # Get the list of potential alleles and mutations
-    alleles: List[Tuple[str, str]] = list()
-    # Consider all major and minor mutations *from all available major solutions* together
+    alleles: List[SolvedAllele] = list()
+    # Consider all major and minor mutations
+    # *from all available major solutions* together
     mutations: Set[Mutation] = set()
     for major_sol in major_sols:
         for (ma, _, added, _) in major_sol.solution:
@@ -93,7 +87,7 @@ def estimate_minor(
     else:
         cov = coverage.filtered(default_filter_fn)
 
-    minor_sols = []
+    minor_sols: List[MinorSolution] = []
     for i, major_sol in enumerate(
         sorted(major_sols, key=lambda s: list(s.solution.items()))
     ):
@@ -124,7 +118,8 @@ def solve_minor_model(
         coverage (:obj:`aldy.coverage.Coverage`):
             Sample coverage used to find out the coverage of each mutation.
         major_sol (:obj:`aldy.solutions.MajorSolution`):
-            Major star-allele solution to be used for detecting minor star-alleles (check :obj:`aldy.solutions.MajorSolution`).
+            Major star-allele solution to be used for detecting minor star-alleles
+            (check :obj:`aldy.solutions.MajorSolution`).
         mutations (set[:obj:`aldy.gene.Mutation`]):
             List of mutations to be considered during the solution build-up
             (all other mutations are ignored).
@@ -141,7 +136,8 @@ def solve_minor_model(
         list[:obj:`aldy.solutions.MinorSolution`]
 
     Notes:
-        Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_ (section Methods/Genotype refining) for the model explanation.
+        Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_
+        (section Methods/Genotype refining) for the model explanation.
         Currently returns only the first optimal solution.
     """
 
@@ -150,7 +146,7 @@ def solve_minor_model(
     model = lpinterface.model("AldyMinor", solver)
 
     # Establish minor alleles and their mutations
-    alleles = {
+    alleles: Dict[Tuple[SolvedAllele, int], Set[Mutation]] = {
         (a, 0): set(gene.alleles[a.major].func_muts)
         | set(gene.alleles[a.major].minors[a.minor].neutral_muts)
         | set(a.added)
@@ -172,7 +168,8 @@ def solve_minor_model(
         if cnt > 0:
             model.addConstr(VA[a, cnt] <= VA[a, cnt - 1], name=f"CORD_{a.minor}_{cnt}")
 
-    # Make sure that the sum of all subaleles matches the count of the corresponding major alleles
+    # Make sure that the sum of all subaleles matches the count
+    # of the corresponding major alleles
     for sa, cnt in major_sol.solution.items():
         expr = model.quicksum(
             v
@@ -181,10 +178,11 @@ def solve_minor_model(
         )
         model.addConstr(expr == cnt, name=f"CCNT_{sa.major}")
 
-    # Add a binary variable for each allele/mutation pair, where mutation belongs to that allele,
-    # that will indicate whether such mutation will be kept or not.
-    # Second variable stands for the corresponding VA * VKEEP binary product (binary product transformation).
-    VKEEP = {
+    # Add a binary variable for each allele/mutation pair, where mutation belongs
+    # to that allele, that will indicate whether such mutation will be kept or not.
+    # Second variable stands for the corresponding VA * VKEEP binary product
+    # (binary product transformation).
+    VKEEP: dict = {
         a: {
             m: (
                 model.addVar(
@@ -199,23 +197,27 @@ def solve_minor_model(
         }
         for a in alleles
     }
-    # Add a binary variable for each allele/mutation pair, where mutation DOES NOT belongs to that allele,
-    # that will indicate whether such mutation will be assigned to that allele or not.
-    # Second variable stands for the corresponding VA * VNEW product (binary product transformation).
-    VNEW = {a: {} for a in alleles}
-    for a in VNEW:
-        for m in mutations:
-            if gene.has_coverage(a[0].major, m.pos) and m not in alleles[a]:
-                VNEW[a][m] = (
-                    model.addVar(
-                        vtype="B",
-                        name=f"N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
-                    ),
-                    model.addVar(
-                        vtype="B",
-                        name=f"MUL_N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
-                    ),
-                )
+    # Add a binary variable for each allele/mutation pair, where mutation DOES NOT
+    # belong to that allele,that will indicate whether such mutation will be assigned
+    # to that allele or not.
+    # Second variable stands for the corresponding VA * VNEW product
+    # (binary product transformation).
+    VNEW: dict = {
+        a: {
+            m: (
+                model.addVar(
+                    vtype="B", name=f"N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}"
+                ),
+                model.addVar(
+                    vtype="B",
+                    name=f"MUL_N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
+                ),
+            )
+            for m in mutations
+            if gene.has_coverage(a[0].major, m.pos) and m not in alleles[a]
+        }
+        for a in alleles
+    }
     # Add an error variable for each mutation, and populate error constraints
     VERR = {
         m: model.addVar(lb=-model.INF, ub=model.INF, name=f"E_{m.pos}_{m.op}")
@@ -267,14 +269,15 @@ def solve_minor_model(
                 else s.major: v
                 for s, v in major_sol.solution.items()
             }
-        )
-        end=", "
+        ),
+        end=", ",
     )
     json_print(debug, '    "data": {', end="")
     prev = 0
     for m, expr in sorted(constraints.items()):
         scov = coverage.single_copy(m.pos, major_sol.cn_solution)
-        # If scov = 0, no mutations should be selected at that locus (enforced by other constraints)
+        # If scov = 0, no mutations should be selected at that locus
+        # (enforced by other constraints)
         cov = coverage[m] / scov if scov > 0 else 0
         model.addConstr(expr + VERR[m] == cov, name=f"CCOV_{m.pos}_{m.op}")
         if m.pos != prev and prev != 0:
@@ -314,7 +317,8 @@ def solve_minor_model(
                     v[0] <= 0,
                     name=f"CZERO_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
                 )
-    # 4) No allele can include an extra functional mutation (that should be done in the major model)
+    # 4) No allele can include an extra functional mutation
+    #    (that should be done in the major model)
     for a in VNEW:
         for m, v in VNEW[a].items():
             if m.is_functional:
@@ -322,8 +326,8 @@ def solve_minor_model(
                     v[0] <= 0,
                     name=f"CNEWFUNC_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
                 )
-    # 5) Avoid extra mutations if there is an existing mutation at the corresponding locus
-    #    (either from the definition or added via VNEW)
+    # 5) Avoid extra mutations if there is an existing mutation at the corresponding
+    #    locus (either from the definition or added via VNEW)
     for pos in set(m.pos for m in constraints):
         for a in alleles:
             mp = [VKEEP[a][m][1] for m in VKEEP[a] if m.pos == pos]
@@ -362,10 +366,10 @@ def solve_minor_model(
         if major_sol.cn_solution.position_cn(m.pos) == 0:
             model.addConstr(expr <= 0, name=f"CNOCOV_{m.pos}_{m.op}")
         else:
-            # If there is no coverage at `pos` at all despite CN being > 0
-            # (or if there is coverage only on a functional mutation that cannot be selected),
-            # allow the allele to select a non-existent non-mutation to prevent infeasibility.
-            # Should not happen with "sane" datasets...
+            # If there is no coverage at `pos` at all despite CN being > 0 (or if there
+            # is coverage only on a functional mutation that cannot be selected),
+            # allow the allele to select a non-existent non-mutation to prevent
+            # infeasibility. Should not happen with "sane" datasets...
             model.addConstr(
                 expr <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m]),
                 name=f"CMAXCOV_{m.pos}_{m.op}",
@@ -473,4 +477,3 @@ def _print_candidates(gene, alleles, major_sol, coverage):
                 str(m_region),
                 m.aux.get("old", ""),
             )
-

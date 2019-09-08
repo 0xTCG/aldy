@@ -4,16 +4,31 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Dict, Set, Tuple
+from typing import List, Tuple
 
-import sys
+import collections
 
-from .common import *
-from .gene import Gene, CNConfig
+from .common import allele_sort_key
+from .gene import Gene
 from .solutions import MinorSolution
 
 
-OUTPUT_COLS = "Sample Gene SolutionID Major Minor Copy Allele Location Type Coverage Effect dbSNP Code Status".split()
+OUTPUT_COLS = [
+    "Sample",
+    "Gene",
+    "SolutionID",
+    "Major",
+    "Minor",
+    "Copy",
+    "Allele",
+    "Location",
+    "Type",
+    "Coverage",
+    "Effect",
+    "dbSNP",
+    "Code",
+    "Status",
+]
 """list[str]: Output column descriptions"""
 
 
@@ -27,7 +42,7 @@ def write_decomposition(
         sample (str): Sample name.
         gene (:obj:`aldy.gene.Gene`): Gene instance.
         sol_id (int): Solution ID (each solution must have a different ID).
-        minor (:obj:`aldy.solutions.MinorSolution`): 
+        minor (:obj:`aldy.solutions.MinorSolution`):
             Minor star-allele solution to be written.
         f (file): Output file.
     """
@@ -126,7 +141,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     if len(major_dict) == 1 and len(el) % 2 == 0:
         p, a = len(el) // 2, el[0]
         diplotype = (p * [a], p * [a])
-        major_dict = {}
+        major_dict = collections.Counter()
     for allele, count in major_dict.items():
         if count > 1:
             if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
@@ -150,18 +165,17 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
         diplotype = (diplotype[0][:-1], [diplotype[0][-1]])
 
     # Make sure that the elements are sorted and that the tandems are grouped together
-    diplotype = sorted(diplotype)
+    result = sorted(diplotype)
     for i in range(2):
         nd = []
         for ta, tb in gene.common_tandems:
-            if ta in diplotype[i] and tb in diplotype[i]:
+            if ta in result[i] and tb in result[i]:
                 nd.append((ta, tb))
-                diplotype[i].remove(ta)
-                diplotype[i].remove(tb)
-        nd += [(x,) for x in diplotype[i]]
-        diplotype[i] = [f for e in sorted(nd) for f in e]
+                result[i].remove(ta)
+                result[i].remove(tb)
+        nd += [(x, None) for x in diplotype[i]]
+        result[i] = [f for e in sorted(nd) for f in e]
 
-    res = "/".join("+".join("*{}".format(y) for y in x) for x in diplotype)
+    res = "/".join("+".join("*{}".format(y) for y in x) for x in result)
     solution.diplotype = res
     return res
-

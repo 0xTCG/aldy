@@ -4,19 +4,19 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 import os
 import re
 
-from aldy.gene import GeneRegion
 from aldy.__main__ import _genotype
-from aldy.common import *
+from aldy.common import DictWrapper, script_path, td, log
 
 
 def escape_ansi(line):
     """
-    Inspired by https://www.tutorialspoint.com/How-can-I-remove-the-ANSI-escape-sequences-from-a-string-in-python
-    """
+    Inspired by 
+    https://www.tutorialspoint.com/How-can-I-remove-the-ANSI-escape-sequences-from-a-string-in-python
+    """  # noqa
     return re.compile(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]").sub("", line)
 
 

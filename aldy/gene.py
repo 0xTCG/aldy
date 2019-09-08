@@ -7,12 +7,21 @@
 from typing import Tuple, Dict, List, Optional
 
 import os
+import re
 import enum
 import yaml
 import functools
 import collections
 
-from .common import *
+from .common import (
+    GeneRegion,
+    GRange,
+    AldyException,
+    allele_number,
+    sorted_tuple,
+    seq_to_amino,
+    rev_comp,
+)
 
 
 EXON = "e"
@@ -87,7 +96,7 @@ class Mutation(
     Attributes:
         pos (int): Reference genome position.
         op (str): Mutation description that can be:
-         
+
             - ``SNP.AB``:  a SNP from A to B (A, B are in ``[ACGT]``)
             - ``INS.xx``:  an insertion of xx (xx is ``[acgt]+``)
             - ``DEL.xx``:  a deletion of xx (xx is ``[ACGT]+``)
@@ -96,7 +105,7 @@ class Mutation(
             - 0 for non-functional (silent) mutations
             - 1 for functional (gene-disrupting) mutations
             - 2 for splice-disrupting mutations
-        
+
         aux (dict[str, str]): Auxiliary information.
             Currently used for storing dbSNP rsIDs (key: ``dbsnp``)
             and old Karolinska-style mutation IDs (key: ``old``).
@@ -136,7 +145,8 @@ class CNConfig(
         cn (dict[int, dict[:obj:`aldy.common.GeneRegion`, int]]):
             Value of the expected region copy number in each gene.
             For example, ``cn[0][GeneRegion(0, 1, EXON)] == 1`` means that the exon 1 of
-            the main gene (ID 0) has one copy (and thus should be present) in a configuration `cn`.
+            the main gene (ID 0) has one copy (and thus should be present)
+            in the configuration `cn`.
         kind (:obj:`CNConfigType`):
             Type of the copy-number configuration. See :obj:`CNConfigType` for details.
         alleles (set[str]):
@@ -186,30 +196,37 @@ class Gene:
             Gene name (e.g. CYP2D6).
         seq (str):
             Wild-type reference sequence that describes \*1 allele.
-            Should be location-compatible with hg19 (must contain no indels when aligned to the reference genome).
+            Should be location-compatible with hg19 (must contain no indels when
+            aligned to the reference genome).
         region (:obj:`aldy.common.GRange`):
             Wild-type reference sequence coordinates within the reference genome.
-        regions (dict[int, dict[:obj:`aldy.common.GeneRegion`, :obj:`aldy.common.GRange`]]):
+        regions (dict[int, dict[:obj:`aldy.common.GeneRegion`,
+                :obj:`aldy.common.GRange`]]):
             Exonic, intronic and special (e.g. UTR) regions in a gene.
-            Maps a gene ID to a dictionary that maps :obj:`aldy.common.GeneRegion` (e.g. exon 9)
-            to a :obj:`aldy.common.GRange` (e.g. chr1:10-20) within the reference genome.
+            Maps a gene ID to a dictionary that maps :obj:`aldy.common.GeneRegion`
+            (e.g. exon 9) to a :obj:`aldy.common.GRange` (e.g. chr1:10-20) within
+            the reference genome.
             Gene 0 is the main gene.
         pseudogenes (list[str]):
             List of pseudogene names (genes whose ID is greater than 0).
         common_tandems (list[tuple[str, str]]):
             List of common allele tandems. Used in diplotype assignment heuristics.
-            For example, the fact that \*13 is always followed by \*1 (encoded as ``('13', '1')``)
-            will be used to group \*13 and \*1 together within the same haplotype (e.g. \*13+\*1).
+            For example, the fact that \*13 is always followed by \*1
+            (encoded as ``('13', '1')``) will be used to group \*13 and \*1 together
+            within the same haplotype (e.g. \*13+\*1).
         cn_configs (dict[str, :obj:`CNConfig`]):
             Copy-number configurations associated with the gene.
-            `1` (akin to \*1) is the default CN config (no structural variations of any kind).
+            `1` (akin to \*1) is the default CN config
+            (no structural variations of any kind).
         alleles (dict[str, :obj:`Allele`]):
             Major star-alleles in the gene.
             Accessible via major star-allele name (e.g. ``'1'``).
         coding_region (:obj:`CodingRegion`):
-            Coding region of the gene (includes the protein sequence and the reference genome strand).
+            Coding region of the gene (includes the protein sequence and
+            the reference genome strand).
         mutations (dict[tuple[int, str], :obj:`Mutation`]):
-            A hashtable that provides links ``(position, mutation_type)`` to a corresponding :obj:`Mutation`.
+            A hashtable that provides links ``(position, mutation_type)`` to
+            a corresponding :obj:`Mutation`.
             Useful for querying functional mutations and auxiliary information.
     """
 
@@ -217,15 +234,16 @@ class Gene:
         "CodingRegion", ["rev_comp", "aminoacid", "lookup"]
     )
     """
-    Immutable class that describes the coding region of a gene. 
-    Attributes: aminoacid sequence (``aminoacid``) and reference genome strand (``rev_comp``).
+    Immutable class that describes the coding region of a gene.
+    Attributes: aminoacid sequence (``aminoacid``) and reference strand (``rev_comp``).
     """
 
     def __init__(
         self, path: Optional[str], name: Optional[str] = None, yml: Optional[str] = None
     ) -> None:
         """
-        Initialize the Gene class with the database description specified in YML file ``path``.
+        Initialize the Gene class with the database description
+        specified in YML file ``path``.
 
         Args:
             path (str, optional):
@@ -270,14 +288,16 @@ class Gene:
 
     def __init_regions(self, yml) -> None:
         """
-        Calculate the genic regions and pseudogenes (``regions``, ``unique_regions`` and ``pseudogenes``).
+        Calculate the genic regions and pseudogenes
+        (``regions``, ``unique_regions`` and ``pseudogenes``).
         Prepare ``region_at()`` call.
         """
         assert hasattr(self, "region")
 
         def calculate_regions(gene, exons, special):
             """
-            Given the list of exons, calculate intronic regions and return a dictionary of all regions.
+            Given the list of exons, calculate intronic regions and
+            return a dictionary of all regions.
             """
             regions = {
                 GeneRegion(e, EXON): GRange(self.region.chr, *ex)
@@ -308,7 +328,8 @@ class Gene:
                 )
 
         #: dict[int, (int, `GeneRegion`]):
-        #: reverse lookup (gene, region) of gene regions given a location within the reference genome.
+        #: reverse lookup (gene, region) of gene regions given a location
+        #: within the reference genome.
         self._region_at = {
             i: (g, r)
             for g, d in self.regions.items()
@@ -331,7 +352,8 @@ class Gene:
 
     def __init_alleles(self, yml) -> None:
         """
-        Initialize allele (``alleles``, ``common_tandems``) and copy number configurations (``cn_configs``).
+        Initialize allele (``alleles``, ``common_tandems``)
+        and copy number configurations (``cn_configs``).
         Initialize old notation lookup table (``old_notation``).
 
         Raises:
@@ -344,7 +366,8 @@ class Gene:
 
         # Human-readable CN descriptions
         descriptions = {
-            "1": "Normal allelic configuration: all regions present in both gene and pseudogene"
+            "1": "Normal allelic configuration: "
+            + "all regions present in both gene and pseudogene"
         }
 
         #: dict(:obj:`Mutation`, str):
@@ -357,7 +380,8 @@ class Gene:
         for allele_name, allele in yml["alleles"].items():
             if not re.match(r"^[A-Z0-9]+\*[0-9]+[A-Z0-9]*$", allele_name):
                 raise AldyException(
-                    "Allele names must be in format (alphanum?)*(number)(alphanum?) (e.g. CYP21*2A, *3)"
+                    "Allele names must be in format (alphanum?)*(number)(alphanum?) "
+                    + "(e.g. CYP21*2A, *3)"
                 )
             allele_name = allele_name.split("*")[1]
             mutations: List[Mutation] = []
@@ -373,7 +397,11 @@ class Gene:
                                 int(m["op"][1:-1]),
                                 (EXON if m["op"][0] == "e" else INTRON),
                             )
-                            descriptions[allele_name] = f"Fusion: pseudogene until {m["op"][:-1][::-1]} followed by the gene"
+                            descriptions[allele_name] = (
+                                "Fusion: pseudogene until "
+                                + m["op"][:-1][::-1]
+                                + " followed by the gene"
+                            )
                         else:
                             if m["op"][-1] == "+":
                                 m["op"] = m["op"][:-1]
@@ -381,7 +409,11 @@ class Gene:
                                 int(m["op"][1:]),
                                 (EXON if m["op"][0] == "e" else INTRON),
                             )
-                            descriptions[allele_name] = f"Conservation: Pseudogene retention after {m["op"][::-1]} within the gene"
+                            descriptions[allele_name] = (
+                                f"Conservation: Pseudogene retention after "
+                                + m["op"][::-1]
+                                + " within the gene"
+                            )
                     else:
                         m["aux"] = {}
                         if "dbsnp" in m:
@@ -398,8 +430,9 @@ class Gene:
         if "common_tandems" in yml:
             self.common_tandems = [tuple(y) for y in yml["common_tandems"]]
 
-        ## Set copy number configurations
-        # TODO: currently fusions only cover the space between the main gene and the first pseudogene. Multi-pseudogene fusions are not supported.
+        # Set copy number configurations
+        # TODO: currently fusions only cover the space between the main gene and
+        # the first pseudogene. Multi-pseudogene fusions are not supported.
 
         self.cn_configs: Dict[str, CNConfig] = dict()
 
@@ -485,8 +518,10 @@ class Gene:
             alleles_inverse[(cn_config, tuple(fn_muts))].add(a)
 
         self.alleles: Dict[str, Allele] = dict()
-        # Karolinska DB has a lot of ambiguities, and two alleles with the same 'number' can correspond to two different major alleles.
-        # This step fixes this ambiguity by prepending a different letter to each unique major allele that has number collision.
+        # Karolinska DB has a lot of ambiguities, and two alleles with the same 'number'
+        # can correspond to two different major alleles.
+        # This step fixes this ambiguity by prepending a different letter to each unique
+        # major allele that has number collision.
         used_names: Dict[str, int] = {}
         for key, minors in alleles_inverse.items():
             an = min(minors)
@@ -514,8 +549,9 @@ class Gene:
     def __init_partials(self) -> None:
         """
         Construct "partial" major alleles.
-        If a major allele is cut in half by a fusion, we will create a "new" major allele
-        that contains the functional mutations that have survived the fusion event.
+        If a major allele is cut in half by a fusion, we will create a "new" major
+        allele that contains the functional mutations that have survived
+        the fusion event.
 
         Note:
             This is currently supported only for left fusions.
@@ -532,14 +568,15 @@ class Gene:
             lambda x: self.cn_configs[x].kind == CNConfig.CNConfigType.LEFT_FUSION,
             self.cn_configs,
         ):
-            # Do not extend left fusions that are already defined by some functional mutations
+            # Do not extend left fusions that are already defined
+            # by some functional mutations
             # HACK: This is hacky but works well for now
             if len(self.alleles[f].func_muts) > 0:
                 continue
             add: Dict[tuple, Allele] = {}
             for an, a in self.alleles.items():
                 # We only make partial major alleles from non-fused major alleles
-                if a.cn_config != "1"
+                if a.cn_config != "1":
                     continue
                 new_name = "{}/{}".format(f, an)
                 new_muts = preserved_mutations(f, a.func_muts)
@@ -593,7 +630,8 @@ class Gene:
                 },
             )
 
-        # TODO: prune identical post-fusion alleles (e.g. *2 after *13A and *13B is the same--no need to have 2 items).
+        # TODO: prune identical post-fusion alleles
+        # (e.g. *2 after *13A and *13B is the same--- no need to have 2 items).
 
         for _, v in self.cn_configs.items():
             v.alleles.clear()
@@ -602,7 +640,8 @@ class Gene:
 
     def __init_structure(self, yml) -> None:
         """
-        Initialize ``mutations`` lookup table and coding region structure ``coding_region``.
+        Initialize ``mutations`` lookup table
+        and coding region structure ``coding_region``.
         """
 
         is_rev_comp = True if yml["rev_comp"] == 1 else False
@@ -618,18 +657,19 @@ class Gene:
         # Set up a coding region structure for aminoacid calculation
         self.coding_region = Gene.CodingRegion(is_rev_comp, aminoacid, lookup)
 
-        self.mutations: Dict[int, str] = {}
+        self.mutations: Dict[Tuple[int, str], Mutation] = {}
         for _, a in self.alleles.items():
             self.mutations.update({(m.pos, m.op): m for m in a.func_muts})
             for _, sa in a.minors.items():
                 self.mutations.update({(m.pos, m.op): m for m in sa.neutral_muts})
 
-    ####################################################################################################
+    # -----------------------------------------------------------------------------------
 
     def region_at(self, pos: int) -> Tuple[int, GeneRegion]:
         """
         Returns:
-            (int, :obj:`aldy.common.GeneRegion`): Tuple consisting of a gene ID and a region that harbours the given position in the gene.
+            (int, :obj:`aldy.common.GeneRegion`): Tuple consisting of a gene ID and
+            a region that harbours the given position in the gene.
 
         Args:
             pos (int): Position in the reference genome.
@@ -663,7 +703,8 @@ class Gene:
     def is_functional(self, m: Mutation) -> bool:
         """
         Returns:
-            bool: ``True`` if a mutation is functional (i.e. does it affect the underlying aminoacid or not).
+            bool: ``True`` if a mutation is functional
+            (i.e. does it affect the underlying aminoacid or not).
         """
         if m.pos not in self.coding_region.lookup:
             return False
@@ -679,7 +720,8 @@ class Gene:
     def deletion_allele(self) -> Optional[str]:
         """
         Returns:
-            str, optional: The deletion allele ID. Can be ``None`` if gene has no deletion allele.
+            str, optional: The deletion allele ID. Can be ``None``
+            if gene has no deletion allele.
         """
         try:
             return next(
@@ -730,4 +772,3 @@ class Gene:
         #       if '7.' + c in config:
         #          print(('{:' + max_width + '}').format(config['7.' + c]), end='')
         #    print('\n')
-

@@ -4,12 +4,12 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List
 
 import collections
 
-from .common import *
-from .gene import Gene, GeneRegion, Mutation
+from .common import allele_sort_key
+from .gene import Gene, GeneRegion
 
 
 class CNSolution(
@@ -23,7 +23,7 @@ class CNSolution(
         score (float):
             ILP model objective score (0 for user-provided solutions).
         solution (dict[str, int]):
-            Copy-number configurations mapped to the corresponding copy number 
+            Copy-number configurations mapped to the corresponding copy number
             (e.g. ``{1: 2}`` means that there are two copies of \*1 configuration).
         region_cn (dict[:obj:`aldy.common.GeneRegion`, int]):
             Gene region copy numbers inferred by this solution.
@@ -42,7 +42,7 @@ class CNSolution(
             for g in gene.cn_configs[conf].cn:
                 for r in gene.cn_configs[conf].cn[g]:
                     vec[g][r] += gene.cn_configs[conf].cn[g][r]
-        return super(CNSolution, self).__new__(
+        return super(CNSolution, self).__new__(  # type:ignore
             self,
             score,
             collections.Counter(solution),
@@ -103,7 +103,8 @@ class SolvedAllele(
             (i.e. these mutations are not present in the allele database definition).
         missing (tuple[:obj:`aldy.gene.Mutation`]):
             Mutations that are omitted from the star-allele
-            (i.e. these mutations are present in the allele database definition but not here).
+            (i.e. these mutations are present in the allele database definition
+            but not here).
 
     Notes:
         Has custom printer (``__str__``).
@@ -184,9 +185,11 @@ class MinorSolution(
             ILP model objective score.
         solution (list[:obj:`SolvedAllele`]):
             List of solved minor star-alleles.
-            Modifications to the minor alleles are represented in :obj:`SolvedAllele` format.
+            Modifications to the minor alleles are represented in
+            :obj:`SolvedAllele` format.
         major_solution (:obj:`aldy.solutions.MajorSolution`):
-            Major star-allele solution used for calculating the minor star-allele assignment.
+            Major star-allele solution used for calculating the
+            minor star-allele assignment.
         diplotype (str):
             Diplotype assignment (e.g. ``*1/*2``).
 
@@ -208,4 +211,3 @@ class MinorSolution(
             + f"sol=({self._solution_nice()}); "
             + f"major={self.major_solution}"
         )
-

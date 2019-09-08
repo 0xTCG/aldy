@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 import os
 import collections
 
@@ -13,7 +13,7 @@ from aldy.coverage import Coverage
 from aldy.gene import Mutation
 from aldy.major import NOVEL_MUTATION_PENAL
 from aldy.minor import estimate_minor, ADD_PENALTY_FACTOR, MISS_PENALTY_FACTOR
-from aldy.common import *
+from aldy.common import SOLUTION_PRECISION, sorted_tuple
 
 
 def assert_minor(gene, data, shallow=False):
@@ -58,8 +58,8 @@ def assert_minor(gene, data, shallow=False):
             for s in sols
         ]
         assert sorted(sols_expected) == sorted(sols_parsed)
-    else:  
-        # As assignments can vary between multiple optimal solutions, 
+    else:
+        # As assignments can vary between multiple optimal solutions,
         # just test minor allele assignments
         eall, emiss, enew = set(), set(), set()
         for i in data["sol"]:

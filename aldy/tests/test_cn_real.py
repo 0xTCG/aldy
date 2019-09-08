@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 import re
 
 from aldy.gene import GeneRegion
@@ -241,4 +241,3 @@ def test_gap(real_gene):
         data,
         gap=0.65,
     )
-

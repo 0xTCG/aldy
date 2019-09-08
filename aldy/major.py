@@ -4,27 +4,22 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Dict, Tuple, Set, Any, Optional
+from typing import List, Dict, Tuple, Any, Optional
 
 import collections
-import itertools
-import functools
-import multiprocessing
 import copy
-import operator
-from functools import reduce
 
 from . import lpinterface
-from .common import *
+from .common import log, AldyException, json_print, sorted_tuple, allele_sort_key
 from .cn import MAX_CN
-from .gene import Allele, Mutation, Gene, CNConfig
+from .gene import Allele, Mutation, Gene
 from .coverage import Coverage
 from .solutions import CNSolution, MajorSolution, SolvedAllele
 
 
 # Model parameters
 NOVEL_MUTATION_PENAL = MAX_CN + 1
-"""float: Penalty for each novel functional mutation (0 for no penalty). 
+"""float: Penalty for each novel functional mutation (0 for no penalty).
    Should be large enough to prevent novel mutations unless really necessary."""
 
 
@@ -74,7 +69,7 @@ def estimate_major(
     alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
     # Check if some CN solution has no matching allele
     if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):
-        results = []
+        results: List[MajorSolution] = []
     else:
         results = solve_major_model(
             gene, alleles, coverage, cn_solution, solver, gap, identifier, debug
@@ -107,7 +102,7 @@ def solve_major_model(
         coverage (:obj:`aldy.coverage.Coverage`):
             Mutation coverage data.
         cn_solution (:obj:`aldy.solutions.CNSolution`):
-            Copy-number solution that will be used for calling major star-alleles 
+            Copy-number solution that will be used for calling major star-alleles
             (:obj:`aldy.solutions.CNSolution`).
         solver (str):
             ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
@@ -125,12 +120,14 @@ def solve_major_model(
         list[:obj:`aldy.solutions.MajorSolution`]
 
     Notes:
-        Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_ (section Methods/Major star-allele identification) for the model explanation.
+        Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_
+        (section Methods/Major star-allele identification) for the model explanation.
     """
 
     model = lpinterface.model("AldyMajor", solver)
 
-    # Get the list of _all_ functional mutations present in the sample and the database (intersection)
+    # Get the list of _all_ functional mutations present in the sample
+    # and the database (intersection)
     func_muts = {
         M for m, M in gene.mutations.items() if M.is_functional and coverage[M] > 0
     }
@@ -254,12 +251,12 @@ def solve_major_model(
             **{model.varName(v): a for a, v in VA.items()},
             **{model.varName(v): (a, m) for a in VNEW for m, (v, _) in VNEW[a].items()},
         }
-        result = {}
+        result: Dict[Any, MajorSolution] = {}
         json_print(debug, '    "sol": [', end="")
         for status, opt, sol in model.solutions(gap):
             log.debug(f"Major solver: {status}, opt: {opt:.2f}")
             # Allele: novel mutations
-            solved_alleles = collections.defaultdict(lambda: [])
+            solved_alleles: Any = collections.defaultdict(lambda: [])
             for s in sol:
                 if s not in lookup:
                     continue
@@ -280,10 +277,11 @@ def solve_major_model(
                     dict(
                         collections.Counter(
                             tuple([a] + [(m[0], m[1]) for m in mut])
-                            if len(mut) > 0 else a
+                            if len(mut) > 0
+                            else a
                             for (a, _), mut in solved_alleles.items()
                         )
-                    )
+                    ),
                     end=", ",
                 )
                 sol = MajorSolution(
@@ -292,7 +290,7 @@ def solve_major_model(
                 log.debug("Major solver: {}".format(sol))
                 result[sol_tuple] = sol
         json_print(debug, "]\n  }, ", end="")
-        return result.values()
+        return list(result.values())
     except lpinterface.NoSolutionsError:
         log.debug("Major solver: no solutions")
         return []
@@ -305,8 +303,8 @@ def _filter_alleles(
     Filter out low-quality mutations and alleles that are not expressed.
 
     Returns:
-        tuple[dict[str, :obj:`aldy.gene.Allele`], :obj:`aldy.coverage.Coverage`]: 
-        Tuple of allele dictionary describing the feasible alleles, 
+        tuple[dict[str, :obj:`aldy.gene.Allele`], :obj:`aldy.coverage.Coverage`]:
+        Tuple of allele dictionary describing the feasible alleles,
         and the coverage description of high-confidence variants.
     """
 
@@ -368,4 +366,3 @@ def _print_candidates(
                 "F",
                 m.aux.get("old", ""),
             )
-

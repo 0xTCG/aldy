@@ -4,16 +4,15 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest
+import pytest  # noqa
 import os
 import collections
 
 from aldy.major import estimate_major
 from aldy.solutions import CNSolution
 from aldy.coverage import Coverage
-from aldy.gene import Gene, Mutation
 from aldy.major import NOVEL_MUTATION_PENAL
-from aldy.common import *
+from aldy.common import SOLUTION_PRECISION
 
 
 def assert_major(gene, major):
@@ -259,4 +258,3 @@ def test_novel_mutations(toy_gene):
             "score": NOVEL_MUTATION_PENAL,
         },
     )
-

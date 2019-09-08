@@ -5,10 +5,10 @@
 
 
 import os
-import pytest
+import pytest  # noqa
 
 from aldy.cn import PARSIMONY_PENALTY, LEFT_FUSION_PENALTY, solve_cn_model
-from aldy.common import *
+from aldy.common import SOLUTION_PRECISION
 
 
 def assert_cn(gene, expected, cov, expected_obj=None, gap=0):
@@ -75,7 +75,8 @@ def test_deletion(toy_gene):
         make_coverage(toy_gene, zip([0, 0, 0, 0, 0], [2, 2, 2, 2, 2])),
         2 * PARSIMONY_PENALTY,
     )
-    # TODO: test 2 deletions with no coverage (needs special handling as deletions imply 2D7 coverage)
+    # TODO: test 2 deletions with no coverage
+    # (needs special handling as deletions imply 2D7 coverage)
     # assert_cn(toy_gene,
     #           [{'6': 2}],
     #           ke_coverage(zip([0,0, 0,0, 0], [0,0, 0,0, 0])),
