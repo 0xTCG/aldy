@@ -67,7 +67,7 @@ To detect copy number configurations, run::
 Alternatively you can use ``solver='scip'`` if you have 
 `PySCIPOpt <https://github.com/SCIP-Interfaces/PySCIPOpt>`_ installed.
 
-Result is a list of :obj:`aldy.cn.CNSolution` objects described in API.
+Result is a list of :obj:`aldy.solutions.CNSolution` objects described in API.
 
 
 Calling major and minor star-alleles
@@ -99,7 +99,7 @@ to get the whole decomposition, then do the following::
   minor_sols = [m for m in minor_sols if abs(m.score - min_score) < 1e-3]
 
 
-``minor_sols`` will contain a list of :obj:`aldy.minor.MinorSolution` objects that point to the optimal major star-alleles and copy numbers.
+``minor_sols`` will contain a list of :obj:`aldy.solutions.MinorSolution` objects that point to the optimal major star-alleles and copy numbers.
 
 Finally, if you want to get a nice diplotype (e.g. \*1/\*2+\*3), run::
 

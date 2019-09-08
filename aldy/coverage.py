@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # 786
-
 # Aldy source: coverage.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
@@ -15,7 +12,7 @@ from .gene import Mutation
 
 class Coverage:
    """
-   Describes the positional and regional coverage of a sample.
+   Data structure that maintains the coverage information for a given sample.
    """
 
    def __init__(self,
@@ -27,19 +24,19 @@ class Coverage:
 
       Args:
          coverage (dict[int, dict[str, int]]):
-            Coverage for each locus in the sample, where such coverage
-            is given as a dictionary that maps mutation (or a reference position
-            indicated by `_`) to the number of reads supporting such mutation.
+            Coverage for each locus within a sample represented as a dictionary 
+            that maps mutation (or a reference position indicated by `_`)
+            to the number of reads supporting that mutation.
             For example, ``coverage[10]['SNP.AG'] = 2`` means that there are 2
             reads that have G (instead of A) at the genomic locus 10.
          threshold (float):
-            Threshold `t` used for filtering out low quality mutations.
-            Ranging from 0 to 1 (normalized percentage).
-            Typically any mutation with the coverage less than `t`% is filtered out.
+            Threshold `t` used for filtering out low-quality mutations.
+            Any mutation with the coverage less than `t`% is filtered out.
+            Ranges from 0 to 1 (normalized percentage).
          cnv_coverage (dict[int, int]):
-            Coverage of the copy-number neutral region in the sample used for
-            coverage rescaling. Dictionary key is the locus, while the value stands
-            for the read coverage.
+            Coverage of the copy-number neutral region of the sample: each genomic locus within that
+            region points to the corresponsing read coverage.
+            Used for coverage rescaling. 
       """
       self._coverage = coverage
       self._threshold = threshold
@@ -68,21 +65,6 @@ class Coverage:
          return 0
 
 
-   def _dump(self, threshold=0):
-      c = {x: {a: b for a, b in c.items()}
-           for x, c in self._coverage.items()}
-      for pos, mc in c.items():
-         for m in list(mc.keys()):
-            if mc[m] < threshold:
-               del mc[m]
-      for pos in list(c.keys()):
-         if '_' in c[pos] and len(c[pos]) == 1:
-            del c[pos]
-         elif len(c[pos]) == 0:
-            del c[pos]
-      return c
-
-
    def total(self, pos: int) -> float:
       """
       Returns:
@@ -98,7 +80,7 @@ class Coverage:
    def percentage(self, m: Mutation) -> float:
       """
       Returns:
-         float: Coverage of the mutation ``mut``, expressed as the percentage in the range 0-100.
+         float: Coverage of the mutation ``mut`` expressed as a percentage in the range 0-100.
       """
       total = self.total(m.pos)
       if total == 0: return 0
@@ -119,9 +101,9 @@ class Coverage:
       """
       Args:
          pos (int): genomic locus
-         cn_solution (:obj:`aldy.cn.CNSolution`): a copy-number solution
+         cn_solution (:obj:`aldy.solutions.CNSolution`): copy-number solution
       Returns:
-         float: Coverage of a single copy at the locus ``pos``.
+         float: Coverage of a single gene copy at the locus ``pos``.
       """
       if cn_solution.position_cn(pos) == 0:
          return 0
@@ -131,7 +113,7 @@ class Coverage:
    def region_coverage(self, gene: int, region: GeneRegion) -> float:
       """
       Returns:
-         float: Average coverage of the region ``region`` in the gene ``gene``.
+         float: Average coverage of the region ``region`` in ``gene``.
       """
       return self._region_coverage[gene, region]
 
@@ -148,14 +130,13 @@ class Coverage:
       """
       Args:
          filter_fn (callable):
-            Function that performs the filtering. Its arguments are:
+            Function that performs mutation filtering with the following arguments:
+              1. mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
+              2. cov (float): coverage of the mutation
+              3. total (float): total coverage of the mutation locus
+              4. thres (float): filtering threshold 
 
-            1. mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
-            2. cov (float): coverage of the mutation
-            3. total (float): total locus coverage
-            4. thres (float): threshold value to be used for filtering
-
-            ``filter_fn`` returns ``False`` if a mutation is to be filtered out.
+            ``filter_fn`` returns ``False`` if a mutation is filtered out.
 
       Returns:
          :obj:`Coverage`: Filtered coverage.
@@ -189,13 +170,13 @@ class Coverage:
                            gene_regions: Dict[int, Dict[GeneRegion, GRange]],
                            cn_region: GRange) -> None:
       """
-      Normalizes the coverage of the sample to match the profile coverage.
+      Normalize the sample coverage to match the profile coverage.
 
       Args:
          profile (dict[str, dict[int, float]]):
             Profile coverage in the form `chromosome: (position -> coverage)`.
          gene_regions (dict[int, dict[:obj:`aldy.common.GeneRegion`, :obj:`aldy.common.GRange`]]):
-            List of gene regions for each gene ID.
+            List of genic regions for each gene.
          cn_region (:obj:`aldy.common.GRange`):
             Copy-number neutral region.
       """
@@ -228,8 +209,9 @@ class Coverage:
       """
       return cov >= max(1, total * thres)
 
+
    @staticmethod
-   def cn_filter(mut: Mutation, cov: float, total: float, thres: float, cn_solution) -> bool: # cn_solution: CNSolution
+   def cn_filter(mut: Mutation, cov: float, total: float, thres: float, cn_solution) -> bool:
       """
       Filtering function that takes into the account the copy number of the mutation.
       """

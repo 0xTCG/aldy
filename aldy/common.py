@@ -1,6 +1,4 @@
-#!/usr/bin/env python
 # 786
-
 # Aldy source: common.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
@@ -40,7 +38,7 @@ REV_COMPLEMENT = {
    'A': 'T', 'T': 'A',
    'C': 'G', 'G': 'C',
 }
-"""dict[str, str]: Reverse-complement nucleotide table."""
+"""dict[str, str]: Reverse-complement DNA table."""
 
 
 log = logbook.Logger('Aldy')
@@ -48,25 +46,25 @@ log = logbook.Logger('Aldy')
 
 
 SOLUTION_PRECISION = 1e-2
-"""float: Solution precision (all objectives that differ less than this are considered equal)"""
+"""float: Solution precision (all values whose difference is less than SOLUTION_PRECISION are considered equal)"""
 
 
 class AldyException(Exception):
    """
-   Base Aldy exception class.
+   Aldy exception class.
    """
    pass
 
 
 class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
    """
-   Describes the range in the reference genome (e.g. chr22:10-20).
-   Immutable class.
+   A range within the reference genome (e.g. chr22:10-20).
+   Immutable.
 
    Attributes:
       chr (str): Chromosome identifier.
-      start (int): Starting position of the interval.
-      end (int): Ending position of the interval.
+      start (int): Start position of the interval.
+      end (int): End position of the interval.
 
    Notes:
       Has custom printer (``__str__``).
@@ -74,7 +72,7 @@ class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
 
    def samtools(self, pad_left=500, pad_right=1, prefix='') -> str:
       """
-      Samtools-compatible region string (e.g. chr1:10-20).
+      Samtools-compatible region representation (e.g. chr1:10-20).
 
       Returns:
          str
@@ -87,13 +85,13 @@ class GRange(collections.namedtuple('GRange', ['chr', 'start', 'end'])):
 
 class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
    """
-   Describes the region of a gene.
+   A region within a gene.
 
    Attributes:
       number (int):
-         The region number (e.g. for exon 9, number is 9).
+         Region number (e.g. for exon 9, the number is 9).
       kind (str):
-         Type of the region. Typically 'e' (for **e**\ xon), 'i' (for **i**\ ntron)
+         Type of the region. Usually either 'e' (for **e**\ xon) or 'i' (for **i**\ ntron),
          but can be anything else.
 
    Notes:
@@ -110,7 +108,7 @@ class GeneRegion(collections.namedtuple('GeneRegion', ['number', 'kind'])):
 def allele_number(x: str) -> str:
    """
    Returns:
-      str: Major allele number of the allele name string (e.g. ``'12A'`` -> ``12``).
+      str: Major allele number of the star-allele name (e.g. ``'12A'`` -> ``12``).
    """
    p = re.split(r'(\d+)', x)
    return p[1]
@@ -119,7 +117,7 @@ def allele_number(x: str) -> str:
 def allele_sort_key(x: str) -> Tuple[int, str]:
    """
    Returns:
-      tuple[int, str]: Key for sorting allele names (e.g. ``'13a'`` -> ``(13, 'a')``).
+      tuple[int, str]: Key for sorting star-alleles (e.g. ``'13a'`` -> ``(13, 'a')``).
    """
    p = re.split(r'(\d+)', x)
    return (int(p[1]), ''.join(p[2:]))
@@ -137,7 +135,7 @@ def rev_comp(seq: str) -> str:
 def seq_to_amino(seq: str) -> str:
    """
    Returns:
-      str: Protein sequence formed from a DNA sequence.
+      str: Protein sequence formed from the provided DNA sequence.
    """
 
    return ''.join(PROTEINS[seq[i:i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3))
@@ -148,7 +146,7 @@ def seq_to_amino(seq: str) -> str:
 
 def sorted_tuple(x: Iterable) -> tuple:
    """
-   Sorts a tuple.
+   Sort a tuple.
    """
    return tuple(sorted(x))
 
@@ -179,7 +177,7 @@ def static_vars(**kwargs):
 def timing(f):
    """
    Decorator for timing a function.
-   Prints the time spent in function after the function is completed.
+   Prints the time spent in the function after once it is completed.
 
    Usage::
 
@@ -206,7 +204,7 @@ def pp(x) -> str:
 
 def pr(x):
    """
-   Pretty-prints a variable to stdout.
+   Pretty-print a variable to stdout.
    """
    pprint.pprint(x)
 
@@ -214,11 +212,11 @@ def pr(x):
 def script_path(key: str) -> str:
    """
    Args:
-      key (str): a resource to be extracted.
-      Specify with ``path/file`` (e.g. ``aldy.resources/test.txt``).
+      key (str): resource to be extracted.
+      Specify as ``path/file`` (e.g. ``aldy.resources/test.txt``).
 
    Returns:
-      str: Full path of a package resource.
+      str: Full path of the resource.
 
    Raises:
       :obj:`aldy.common.AldyException`.
@@ -240,7 +238,7 @@ def colorize(text: str, color:str = 'green') -> str:
 def check_path(cmd: str) -> bool:
    """
    Returns:
-      bool: ``True`` if a command ``cmd`` is an executable in ``PATH`` or local directory.
+      bool: ``True`` if ``cmd`` is executable (in ``PATH`` or in the local directory).
    """
 
    def is_exe(path):
@@ -260,9 +258,26 @@ def check_path(cmd: str) -> bool:
 
 _json = None
 def json_print(debug, *args, **kwargs):
+   """
+   Print debug information to `debug`.json.
+   """
    if not debug:
       return
    global _json
    if not _json:
       _json = open(f'{debug}.json', 'w')
    print(*args, **kwargs, flush=True, file=_json)
+
+
+class DictWrapper:
+   """
+   Dictionary wrapper that hijacks `__getattr__` to allow element access.
+   """
+
+   def __init__(self, d):
+      self.d = d
+   def __getattr__(self, key):
+      if key in self.d:
+         return self.d[key]
+      else:
+         return None

@@ -1,5 +1,4 @@
 # 786
-
 # Aldy source: genotype.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
@@ -45,46 +44,46 @@ def genotype(gene_db: str,
    Genotype a sample.
 
    Returns:
-      list[:obj:`aldy.solutions.MinorSolution`]: List of solutions.
+      list[:obj:`aldy.solutions.MinorSolution`]: List of genotype solutions.
 
    Args:
       gene_db (str):
-         Gene name (if it is located in Aldy's gene database)
-         or the location of gene YML description.
+         Gene name (if it is located in the Aldy's gene database)
+         or the location of a gene database in YML format.
       sam_path (str):
-         Location of SAM/BAM/CRAM/DeeZ file to be genotyped.
+         Location of SAM/BAM/CRAM/DeeZ file that is to be analyzed.
       profile (str, optional):
          Coverage profile (e.g. 'illumina').
          Can be ``None`` if ``cn_solution`` is provided.
       cn_region (:obj:`aldy.common.GRange`, optional):
          Copy-number neutral region.
-         Can be ``None`` (will use default CYP2D8 region or ``None`` if ``cn_solution`` is provided).
+         Can be ``None`` (will use the default CYP2D8 region or ``None`` if ``cn_solution`` is provided).
       output_file (file, optional):
-         Location of the output decomposition file.
+         Location of an output decomposition file.
          Provide ``None`` for no output.
          Default is ``sys.stdout``.
       cn_solution (list[str], optional):
-         User-specified list of copy number configurations.
-         Copy-number detection ILP will not run is this parameter is provided.
+         User-specified list of the copy number configurations.
+         Copy-number detection solver will not run is this parameter is set.
          Default is ``None``.
       threshold (float):
-         Filtering threshold.
+         Mutation filtering threshold.
          Default is 0.5 (for 50%).
       solver (str):
-         ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+         ILP solver. Check :obj:`aldy.lpinterface` for the list of available solvers.
          Default is ``'any'``.
       phase (bool):
-         Construct basic rudimentary phasing of the reads to aid the genotyping.
-         Not recommended (slows down the pipeline with no tangible benefits).
+         Perform basic rudimentary phasing of the reads to aid the genotyping process.
+         DEPRECATED: currently does nothing.
          Default is ``False``.
       reference (str, optional):
-         A path to the reference genome that was used to encode DeeZ or CRAM files.
+         A reference genome for reading DeeZ or CRAM files.
          Default is ``None``.
       gap (float):
-         Relative optimality gap (percentage).
-         Default is 0 (report only optimal solutions).
+         Relative optimality gap. Use non-zero values to allow non-optimal solutions.
+         Default is 0 (reports only optimal solutions).
       debug (str, optional):
-         The debug prefix for the debugging information. ``None`` for no debug information.
+         Prefix for debug information and core dump files. ``None`` for no debug information.
          Default is ``None``.
 
    Raises:
@@ -98,12 +97,12 @@ def genotype(gene_db: str,
    db_file = script_path('aldy.resources.genes/{}.yml'.format(gene_db.lower()))
    if os.path.exists(db_file):
       gene_db = db_file
-   with open(gene_db): # Check does file exist
+   with open(gene_db): # Check if file exists
       pass
    gene = Gene(gene_db)
 
    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
-   with open(sam_path): # Check does file exist
+   with open(sam_path): # Check if file exists
       pass
    if not cn_region:
       cn_region = sam.DEFAULT_CN_NEUTRAL_REGION
@@ -111,18 +110,18 @@ def genotype(gene_db: str,
                        gene=gene,
                        threshold=threshold,
                        profile=profile,
-                       phase=False,
+                       phase=phase,
                        reference=reference,
                        cn_region=cn_region,
                        debug=debug)
 
    avg_cov = sample.coverage.average_coverage()
    if avg_cov < 2:
-      raise AldyException(td("""
-         Average coverage of {0} for gene {1} is too low; skipping gene {1}.
-         Please ensure that {1} is present in the input SAM/BAM.""").format(avg_cov, gene.name))
+      raise AldyException(td(f"""
+         Average coverage of {avg_cov:.2f} for gene {gene.name} is too low; skipping gene {gene.name}.
+         Please ensure that {gene.name} is present in the input SAM/BAM."""))
    elif avg_cov < 20:
-      log.warn("Average coverage is {}. We recommend at least 20x coverage for optimal results.", avg_cov)
+      log.warn("Average sample coverage is {}. We recommend at least 20x coverage for the best results.", avg_cov)
 
    json_print(debug, f'"{os.path.basename(sam_path).split(".")[0]}": {{')
 
@@ -133,25 +132,27 @@ def genotype(gene_db: str,
                             gap=gap, 
                             user_solution=cn_solution, 
                             debug=debug)
+   log.debug('*' * 80)
    json_print(debug, '  },')
+
+   # Add SLACK to each score to avoid division by zero or other numerical issues when the optimum is close to zero. 
+   # HACK: Value of 1 (1 gene copy) seems to be reasonable, but is not theoretically guaranteed to be better than any other value.
+   SLACK = 1
 
    # Get major solutions and pick the best one
    log.info(f'Potential {gene.name} copy number configurations for {sample_name}:')
    major_sols = []
-
-   # Add SLACK to each score to avoid division by zero or other numerical issues when optimum is close to zero. 
-   # Value of 1 (1 gene copy) seems to be reasonable
-   SLACK = 1
-
    json_print(debug, '  "major": [', end='')
+   cn_sols = sorted(cn_sols, key=lambda m: (int(1000 * m.score), m._solution_nice()))
    min_cn_score = min(cn_sols, key=lambda m: m.score).score
    for i, cn_sol in enumerate(cn_sols):
       log.info(f'  {i + 1:2}: {cn_sol._solution_nice()}')
-      log.info(f'      Score: {(min_cn_score + SLACK) / (cn_sol.score + SLACK):.2f}')
+      log.info(f'      Confidence: {(min_cn_score + SLACK) / (cn_sol.score + SLACK):.2f} (score = {cn_sol.score:.2f})')
       major_sols += major.estimate_major(gene, sample.coverage, cn_sol, 
                                          solver=solver, gap=gap,
                                          identifier=i,
                                          debug=debug)
+   log.debug('*' * 80)
    json_print(debug, '],')
 
    major_sols = [solutions.MajorSolution(m.score * ((m.cn_solution.score + SLACK) / (min_cn_score + SLACK)), 
@@ -160,45 +161,36 @@ def genotype(gene_db: str,
    min_major_score = min(major_sols, key=lambda m: m.score).score
    major_sols = sorted([m for m in major_sols
                         if m.score - min_major_score - gap < SOLUTION_PRECISION],
-                       key=lambda m: m.score)
+                       key=lambda m: (int(1000 * m.score), m._solution_nice()))
 
    log.info(f'Potential major {gene.name} star-alleles for {sample_name}:')
    for i, major_sol in enumerate(major_sols):
       log.info(f'  {i + 1:2}: {major_sol._solution_nice()}')
-      log.info(f'      Score: {(min_major_score + SLACK) / (major_sol.score + SLACK):.2f}')
+      log.info(f'      Confidence: {(min_major_score + SLACK) / (major_sol.score + SLACK):.2f} (score = {major_sol.score:.2f})')
 
    json_print(debug, '  "minor": [', end='')
    minor_sols = []
    for m in minor.estimate_minor(gene, sample.coverage, major_sols, solver, debug=debug):
-      n = solutions.MinorSolution(m.score * ((m.major_solution.score + SLACK) / (min_major_score + SLACK)), 
+      n = solutions.MinorSolution(m.score * ((m.major_solution.cn_solution.score + SLACK) / (min_cn_score + SLACK)), 
                                   m.solution, m.major_solution)
       n.diplotype = m.diplotype
       minor_sols.append(n)
    min_minor_score = min(minor_sols, key=lambda m: m.score).score
    minor_sols = sorted([m for m in minor_sols 
                         if m.score - min_minor_score - gap < SOLUTION_PRECISION],
-                       key=lambda m: m.score)
+                       key=lambda m: (int(1000 * m.score), m._solution_nice()))
+   log.debug('*' * 80)
    json_print(debug, '  ],')
 
    log.info(f'Best {gene.name} star-alleles for {sample_name}:')
    for i, minor_sol in enumerate(minor_sols):
-      log.info(f'  {i + 1:2}: {minor_sol.diplotype:40}')
+      log.info(f'  {i + 1:2}: {minor_sol.diplotype}')
       t = textwrap.wrap(minor_sol._solution_nice(), width=60, break_long_words=False)
       t = '\n             '.join(t)
       log.info(f'      Minor: {t}')
-      log.info(f'      Score: {(min_minor_score + SLACK) / (minor_sol.score + SLACK):.2f}')
+      log.info(f'      Confidence: {(min_minor_score + SLACK) / (minor_sol.score + SLACK):.2f} (score = {minor_sol.score:.2f})')
       if output_file:
          diplotype.write_decomposition(sample_name, gene, i + 1, minor_sol, output_file)
    json_print(debug, '},')
-
-   # if do_remap != 0:
-   #    log.critical('Remapping! Stay tuned...')
-   #    cn_sol = list(cn_sol.values())[0] #!! TODO IMPORTANT just use furst CN for now
-   #    new_path = remap.remap(sample_path, gene, sample, cn_sol, remap_mode=do_remap)
-   #    gene = gene_backup # refactor this somehow...
-   #    sam.SAM.CACHE = False
-   #    sample = sam.SAM(new_path, gene, threshold)
-   #    gene.alleles = filtering.initial_filter(gene, sample)
-   #    cn_sol = cn.estimate_cn(gene, sample, profile, cn_solution, solver)
 
    return minor_sols

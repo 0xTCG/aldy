@@ -1,5 +1,4 @@
 # 786
-
 # Aldy source: lpinterface.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
@@ -14,16 +13,22 @@ from .common import log, sorted_tuple, SOLUTION_PRECISION
 
 
 def escape_name(s: str) -> str:
+   """
+   Escape variable names to conform given names with the various solver requirements.
+   """
    return s.replace('.', '').replace('-', 'm').replace('/', '__')[:200]
 
 
 class NoSolutionsError(Exception):
+   """
+   Raised if a model is infeasible.
+   """
    pass
 
 
 class Gurobi:
    """
-   An abstraction aroung Gurobi Python interface.
+   Wrapper around Gurobi's Python interface (gurobipy).
    """
 
    def __init__(self, name, prev_model = None):
@@ -56,7 +61,7 @@ class Gurobi:
       """
       Add a variable to the model.
 
-      ``vtype`` named argument stands for the variable type:
+      ``vtype`` is the variable type:
 
       - ``B`` for binary variable
       - ``I`` for integer variable
@@ -80,7 +85,7 @@ class Gurobi:
 
    def setObjective(self, objective, method: str = 'min'):
       """
-      Sets the model objective via ``objective``.
+      Set the model objective.
       """
       self.objective = objective
       self.model.setObjective(
@@ -107,18 +112,19 @@ class Gurobi:
 
    def varName(self, var):
       """
-      Getter for variable name.
+      Return a variable name.
       """
       return var.varName
 
 
    def abssum(self, vars: Iterable, coeffs: Optional[Dict[str, float]] = None):
       """
-      Returns absolute sum of the ``vars``: e.g.
+      Return the absolute sum of ``vars``: e.g.
          :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
       where :math:`c_i` is defined in the ``coeffs`` dictionary.
+
       Key of the ``coeffs`` dictionary stands for the name of the variable
-      accessible via ``varName`` call (1 if not defined).
+      (should be accessible via ``varName`` call; 1 if not defined).
       """
       vv = []
       for i, v in enumerate(vars):
@@ -134,8 +140,8 @@ class Gurobi:
 
    def prod(self, res, terms):
       """
-      Sets :math:`res = \prod terms` where ``terms`` variables are all binary
-      by adding appropriate linear constraints.
+      Ensure that :math:`res = \prod terms` (where ``terms`` is a sequence of binary variables)
+      by adding the appropriate linear constraints.
       Returns ``res``.
       """
       for v in terms:
@@ -146,13 +152,13 @@ class Gurobi:
 
    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float, dict]:
       """
-      Solve the model. Assumes that objective is set.
+      Solve the model. Assumes that the objective is set.
 
       Additional parameters of the solver can be set via ``init`` function that takes
-      the model instance as a sole argument.
+      the model instance as the sole argument.
 
       Returns:
-         tuple[str, float]: Tuple describing the status of the solution and the objective value.
+         tuple[str, float]: Status of the solution and the objective value.
 
       Raises:
          :obj:`NoSolutionsError` if the model is infeasible.
@@ -170,30 +176,27 @@ class Gurobi:
       return status.lower(), self.model.objVal
 
 
-   def solveAll(self,
-                keys: dict,
-                init: Optional[Callable] = None) -> Tuple[str, float, List[tuple]]:
-      """
-      Solve the model. Assumes that objective is set.
-      Returns the list of all combinations of the variables ``keys`` that minimize the objective.
-
-      Additional parameters of the solver can be set via ``init`` function that takes
-      the model instance as a sole argument.
-
-      Returns:
-         tuple[str, float, list[tuple[any]]]: Tuple describing the status of the solution and the objective value.
-      """
-      status, opt_value = self.solve(init)
-      sol = sorted_tuple(set(a for a, v in keys.items() if self.getValue(v)))
-      yield status, opt_value, sol
-      yield from get_all_solutions(self, keys, opt_value, sol)
-
-
    def solutions(self, 
                  gap: float = 0, 
                  best_obj: Optional[float] = None, 
                  limit = None,
                  init: Optional[Callable] = None):
+      """
+      Solve the model and returns the list of all optimal solutions. Assumes that the objective is set.
+      Any solution whose score is less than (1 + `gap`) times the optimal solution score will be included.
+
+      A solution is defined as a dictionary of set binary variables within the solution that are accessed 
+      by their name.
+
+      Additional parameters of the solver can be set via ``init`` function that takes
+      the model instance as the sole argument.
+
+      This is a fast version that utilizes Gurobi's facilities to speed up the process.
+
+      Returns:
+         generator[tuple[str, float, any]]: Status of the solution, the objective value and the solution itself.
+      """
+
       def model_init(m):
          m.params.poolSearchMode = 2
          m.params.poolSolutions = limit or 2000000000
@@ -204,7 +207,7 @@ class Gurobi:
          vv = {v.VarName: v
                for v in self.model.getVars()
                if v.vtype == self.gurobipy.GRB.BINARY and round(v.xn) > 0}
-         yield (self.GUROBI_STATUS[self.model.status], 
+         yield (self.GUROBI_STATUS[self.model.status].lower(), 
                 self.model.poolObjVal,
                 sorted_tuple(set(vv.keys())))
 
@@ -212,7 +215,7 @@ class Gurobi:
    def getValue(self, var):
       """
       Get the value of the solved variable.
-      Automatically adjusts the return type depending on the variable type.
+      Automatically adjusts the return type based on the variable type.
       """
       if var.vtype == self.gurobipy.GRB.BINARY:
          return round(var.x) > 0
@@ -223,13 +226,17 @@ class Gurobi:
 
 
    def dump(self, file):
+      """
+      Dump the model description (in LP format) to a file.
+      """
       self.model.write(file)
 
 
 class SCIP(Gurobi):
    """
-   An abstraction around SCIP `PySCIPopt` Python interface.
+   Wrapper around SCIP's Python interface (pyscipopt).
    """
+
 
    def __init__(self, name):
       self.pyscipopt = importlib.import_module('pyscipopt')
@@ -300,14 +307,23 @@ class SCIP(Gurobi):
 
    
    def variables(self):
+      """
+      Return the list of model variables.
+      """
       return self.model.getVars() 
 
 
    def is_binary(self, v):
+      """
+      ``True`` if the variable is binary.
+      """
       return v.vtype() == 'BINARY'
 
 
    def change_model(self):
+      """
+      Callback that should be called prior to changing an already solved model.
+      """
       self.model.freeTransform()
 
 
@@ -317,6 +333,22 @@ class SCIP(Gurobi):
                  limit = None,
                  iteration = 0, 
                  init: Optional[Callable] = None):
+      """
+      Solve the model and returns the list of all optimal solutions. Assumes that the objective is set.
+      Any solution whose score is less than (1 + `gap`) times the optimal solution score will be included.
+
+      A solution is defined as a dictionary of set binary variables within the solution that are accessed 
+      by their name.
+
+      Additional parameters of the solver can be set via ``init`` function that takes
+      the model instance as the sole argument.
+
+      This is a generic version that supports any solver.
+
+      Returns:
+         generator[tuple[str, float, any]]: Status of the solution, the objective value and the solution itself.
+      """
+
       try:
          status, obj = self.solve(init)
          best_obj = obj if best_obj is None else best_obj
@@ -339,7 +371,7 @@ class SCIP(Gurobi):
 
 class CBC(SCIP):
    """
-   An abstraction around CBC via Google's `or-tools` Python interface.
+   Wrapper around CBC's Python interface (Google's ortools).
    """
 
    def __init__(self, name):
@@ -439,7 +471,8 @@ class CBC(SCIP):
 
 class MIPCL(SCIP):
    """
-   An abstraction around CBC via Google's `or-tools` Python interface.
+   Wrapper around MIPCL's Python interface (mipshell). 
+   Warning: Only Linux is supported.
    """
 
    def __init__(self, name):
@@ -529,9 +562,9 @@ class MIPCL(SCIP):
 
 def model(name: str, solver: str):
    """
-   Create the ILP solver instance for a model named ``name``.
-   If ``solver`` is ``'any'``, this function will attempt to use
-   Gurobi, and will fall back on SCIP if Gurobi fails.
+   Create an ILP solver instance for a model named ``name``.
+   If ``solver`` is ``'any'``, this function will try to use
+   Gurobi, and will fall back on SCIP (and then CBC) if Gurobi or SCIP is missing.
 
    Raises:
       :obj:`Exception` if no solver is found.
@@ -539,7 +572,7 @@ def model(name: str, solver: str):
 
    def test_gurobi(name):
       """
-      Tests if Gurobi is present. Requires Gurobi 7+.
+      Test if Gurobi is present. Requires Gurobi 7+.
       """
       try:
          model = Gurobi(name)
@@ -552,7 +585,7 @@ def model(name: str, solver: str):
 
    def test_scip(name):
       """
-      Tests if SCIP is present. Requires `PySCIPopt`.
+      Test if SCIP is present. Requires `PySCIPopt`.
       """
       try:
          model = SCIP(name)
@@ -565,7 +598,7 @@ def model(name: str, solver: str):
 
    def test_cbc(name):
       """
-      Tests if OR-Tools are present. Requires Google's `ortools`.
+      Test if OR-Tools are present. Requires Google's `ortools`.
       """
       try:
          model = CBC(name)
@@ -584,12 +617,12 @@ def model(name: str, solver: str):
       if model is None:
          model = test_cbc(name)
       if model is None:
-         raise Exception('No IP solver found. Aldy cannot solve any problems without matching IP solver. Please try installing Gurobi or SCIP.')
+         raise Exception('No ILP solver found. Aldy cannot operate without an ILP solver. Please install Gurobi, SCIP, or Google OR Tools.')
       return model
    else:
       fname = 'test_' + solver
       if fname in locals():
          return locals()[fname](name)
       else:
-         raise Exception('IP solver {} is not supported'.format(solver))
+         raise Exception('ILP solver {} is not supported'.format(solver))
 

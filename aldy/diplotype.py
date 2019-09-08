@@ -1,5 +1,4 @@
 # 786
-
 # Aldy source: diplotype.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
@@ -15,7 +14,7 @@ from .solutions import MinorSolution
 
 
 OUTPUT_COLS = 'Sample Gene SolutionID Major Minor Copy Allele Location Type Coverage Effect dbSNP Code Status'.split()
-"""list[str]: Output file column descriptions"""
+"""list[str]: Output column descriptions"""
 
 
 def write_decomposition(sample: str,
@@ -24,19 +23,14 @@ def write_decomposition(sample: str,
                         minor: MinorSolution,
                         f) -> None:
    """
-   Writes the allelic decomposition to the file `f`.
+   Write an allelic decomposition to the file `f`.
 
    Args:
-      sample (str):
-         Sample name.
-      gene (:obj:`aldy.gene.Gene`):
-         Gene instance.
-      sol_id (int):
-         ID of the solution (each solution should have different ID).
-      minor (:obj:`aldy.minor.MinorSolution`):
-         Final minor star-allele solution to be written.
-      f (file):
-         File to write a decomposition to.
+      sample (str): Sample name.
+      gene (:obj:`aldy.gene.Gene`): Gene instance.
+      sol_id (int): Solution ID (each solution must have a different ID).
+      minor (:obj:`aldy.solutions.MinorSolution`): Minor star-allele solution to be written.
+      f (file): Output file.
    """
 
    for copy, a in enumerate(minor.solution):
@@ -74,11 +68,14 @@ def write_decomposition(sample: str,
 
 def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
    """
-   Fills the ``diplotype`` attribute of the :obj:`aldy.minor.MinorSolution`
-   via the diplotype assignment heuristics and returns the diplotype assignment.
+   Calculate the diplotype assignment for a minor solution.
+   Assigns a ``diplotype`` attribute of the :obj:`aldy.solutions.MinorSolution`.
+   Relies on the diplotype assignment heuristics to assign correct diplotypes.
+   This heuristics has no biological validity whatsoever--- it is purely used
+   to pretty-print the final solutions.
 
    Returns:
-      str: Diplotype string.
+      str: Diplotype assignment.
    """
 
    del_allele = gene.deletion_allele()
@@ -94,7 +91,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
    major_dict = collections.Counter(majors)
    dc = 0
 
-   # Handle tandems (heuristic where common tandems are groupped together,
+   # Handle tandems (heuristic that groups common tandems together,
    #                 e.g. 1, 2, 13 -> 1+13/2 if [1,13] is a common tandem)
    for ta, tb in gene.common_tandems:
       while major_dict[ta] > 0 and major_dict[tb] > 0:
@@ -102,7 +99,8 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
          dc += 1
          major_dict[ta] -= 1
          major_dict[tb] -= 1
-   # Handle duplicates (heuristic where duplicate alleles are grouped together,
+   
+   # Handle duplicates (heuristics that groups duplicate alleles together,
    #                    e.g. 1, 1, 2 -> 1+1/2)
    # First check should we split them (e.g. 1, 1, 1, 1 -> 1+1/1+1)?
    el = list(major_dict.elements())
@@ -117,7 +115,8 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
          diplotype[dc % 2].extend(count * [str(allele)])
          major_dict[allele] -= count
          dc += 1
-   # Handle the rest
+  
+  # Handle the rest
    for allele, count in major_dict.items():
       if count > 0:
          if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
@@ -125,12 +124,13 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
          assert(count == 1)
          diplotype[dc % 2].append(str(allele))
          dc += 1
+
    # Each diplotype should have at least one item
    # e.g. 1, 1 -> becomes 1+1/_ due to duplicate heuristic -> fixed to 1/1
    if len(diplotype[1]) == 0:
       diplotype = (diplotype[0][:-1], [diplotype[0][-1]])
 
-   # Make sure that elements are sorted and that tandems are grouped together
+   # Make sure that the elements are sorted and that the tandems are grouped together
    diplotype = sorted(diplotype)
    for i in range(2):
       nd = []

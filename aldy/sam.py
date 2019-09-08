@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # 786
-
 # Aldy source: sam.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
@@ -25,28 +22,27 @@ from .gene import Gene, Mutation
 
 
 CIGAR2CODE: Dict[int, int] = {ord(y): x for x, y in enumerate("MIDNSHP=XB")}
-"""str: get a CIGAR ID for an ASCII ordinal of CIGAR character"""
+"""str: CIGAR characters for an ASCII ordinal of CIGAR character"""
 
 CIGAR_REGEX = re.compile(r"(\d+)([MIDNSHP=XB])")
-"""A regex that matches valid CIGAR strings"""
+"""regex: Regex that matches valid CIGAR strings"""
 
 
 DEFAULT_CN_NEUTRAL_REGION = GRange('22', 42547463, 42548249)
-"""obj:`aldy.common.GRange` A default copy-number neutral region that Aldy uses (exon 4-6 of the CYP2D8 gene)"""
+"""obj:`aldy.common.GRange` Default copy-number neutral region (exon 4-6 of the CYP2D8 gene)"""
 
 
 class Sample:
    """
-   Class that provides and interface for reading SAM/BAM/CRAM/DeeZ files.
-   Parses and stores the read alignments.
+   Interface for reading SAM/BAM/CRAM/DeeZ files that parses and stores read alignments.
 
    Attributes:
       coverage (:obj:`aldy.coverage.Coverage`):
          The coverage data for the sample.
-         Consult the documentation for :obj:`aldy.coverage.Coverage`.
+         Consult the :obj:`aldy.coverage.Coverage`.
       reads (dict[str, tuple[:obj:`pysam.AlignedSegment`, :obj:`pysam.AlignedSegment`]]):
-         Hashtable that keeps the paired-end reads as a tuple.
-         Key is the read name. Used only if ``phase`` is True.
+         Dictionary that keeps the paired-end reads together in a tuple.
+         Key is the read name. Used only if ``phase`` is set.
 
    Static methods:
       ``load_sam_profile`` (documentation below).
@@ -63,46 +59,44 @@ class Sample:
                 cn_region: Optional[GRange] = DEFAULT_CN_NEUTRAL_REGION,
                 debug: Optional[str] = None) -> None:
       """
-      Initialization of the Sample class.
+      Initialize a :obj:`Sample` object.
 
       Args:
          sam_path (str):
-            Path to the SAM/BAM/CRAM/DeeZ file.
+            Path to a SAM/BAM/CRAM/DeeZ file.
          gene (:obj:`aldy.gene.Gene`):
-            An instance of the gene to be analyzed.
+            Gene instance.
          threshold (float):
-            A threshold (ranging from 0 to 1) for filtering out low quality mutations.
-            Check `coverage.Coverage` for more information.
+            Threshold for filtering out low quality mutations. Ranges from 0 to 1.
+            Check :obj:`aldy.coverage.Coverage` for more information.
          profile (str, optional):
-            A profile string description (e.g. 'prgnseq-v1') or a profile SAM/BAM file.
+            Profile specification (e.g. 'prgnseq-v1') or a profile SAM/BAM file.
          phase (bool):
             Construct basic rudimentary phasing of the reads to aid the genotyping.
-            Not recommended (slows down the pipeline with no tangible benefits).
-            Default is False.
+            DEPRECATED: currently does nothing.
+            Default is ``False``.
          reference (str, optional):
-            A path to the reference genome that was used to encode DeeZ or CRAM files.
+            Reference genome for reading DeeZ or CRAM files.
             Default is None.
          cn_region (:obj:`aldy.common.GRange`, optional):
-            A location of copy-number neutral region to be used for coverage rescaling.
-            If none, profile loading and rescaling will not be done (in that case, Aldy will requires
-            ``--cn`` parameter to be provided by the user).
+            Copy-number neutral region to be used for coverage rescaling.
+            If None, profile loading and coverage rescaling will be skipped 
+            (and Aldy will require a ``--cn`` parameter to be user-provided).
             Default is ``DEFAULT_CN_NEUTRAL_REGION``.
          debug (str, optional):
-            If set, Aldy will create "<debug>.dump" file for debug purposes.
-            Default is ``None``.
+            If set, create a "`debug`.dump" file for debug purposes.
+            Default is None.
 
       Raises:
          :obj:`aldy.common.AldyException` if the average coverage of the copy-number neutral region is too low (less than 2).
       """
 
-      # Handle caching
       self.load_aligned(sam_path, gene, threshold, phase, reference, cn_region, debug)
       if cn_region:
          self.detect_cn(gene, profile, cn_region)
-
-      log.debug('Coverage is {}', self.coverage.average_coverage())
+      log.debug('SAM: avg_coverage = {}', self.coverage.average_coverage())
       if cn_region and self.coverage.diploid_avg_coverage() < 2:
-         raise AldyException("The coverage of the sample is too low (it is {}).".format(self.coverage.diploid_avg_coverage()))
+         raise AldyException("The average coverage of the sample is too low ({:1f}).".format(self.coverage.diploid_avg_coverage()))
 
 
    def load_aligned(self,
@@ -114,45 +108,45 @@ class Sample:
                     cn_region: Optional[GRange] = None,
                     debug: Optional[str] = None) -> None:
       """
-      Load the read, mutation and coverage data from SAM/BAM/CRAM/DeeZ file.
+      Load the read, mutation and coverage data from a SAM/BAM/CRAM/DeeZ file.
 
       Args:
          sam_path (str):
-            Path to the SAM/BAM/CRAM/DeeZ file.
+            Path to a SAM/BAM/CRAM/DeeZ file.
          gene (:obj:`aldy.gene.Gene`):
-            An instance of the gene to be analyzed.
+            Gene instance.
          threshold (float):
-            A threshold (ranging from 0 to 1) for filtering out low quality mutations.
-            Check `coverage.Coverage` for more information.
+            Threshold for filtering out low quality mutations. Ranges from 0 to 1.
+            Check :obj:`aldy.coverage.Coverage` for more information.
          phase (bool):
             Construct basic rudimentary phasing of the reads to aid the genotyping.
-            Not recommended (slows down the pipeline with no tangible benefits).
+            DEPRECATED: currently does nothing.
             Default is False.
          reference (str, optional):
-            A path to the reference genome that was used to encode DeeZ or CRAM files.
+            Reference genome for reading DeeZ or CRAM files.
             Default is None.
          cn_region (:obj:`aldy.common.GRange`, optional):
-            By default, Aldy uses CYP2D8 (``DEFAULT_CN_NEUTRAL_REGION``) as a copy-number neutral region.
-            If this parameter is not None, Aldy will use this parameter to override the default copy-number
-            neutral region.
-            Default is ``None``.
+            Copy-number neutral region to be used for coverage rescaling.
+            If None, profile loading and coverage rescaling will be skipped 
+            (and Aldy will require a ``--cn`` parameter to be user-provided).
+            Default is ``DEFAULT_CN_NEUTRAL_REGION`` (CYP2D8).
          debug (str, optional):
-            If set, Aldy will create "<debug>.dump" file for debug purposes.
-            Default is ``None``.
+            If set, create a "`debug`.dump" file for debug purposes.
+            Default is None.
 
       Raises:
-         :obj:`aldy.common.AldyException` if BAM does not have index.
+         :obj:`aldy.common.AldyException` if a BAM/CRAM file lacks an index.
       """
 
       # store paired-end reads (only if phasing is on)
       self.reads: Dict[str, Tuple[pysam.AlignedSegment, pysam.AlignedSegment]] = {}
 
-      log.debug('Alignment file: {}', sam_path)
+      log.debug('SAM: path = {}', sam_path)
 
-      # dict of int: int: the coverage at CN-neutral region
+      # dict of int: int: the coverage of the CN-neutral region
       cnv_coverage: Dict[int, int] = collections.defaultdict(int)
       # Get the list of indel sites that should be corrected
-      # TODO: currently checks only functional indels; other indels should be corrected as well
+      # TODO: currently uses only functional indels; other indels should be corrected as well
       _indel_sites: Dict[Mutation, tuple] = {
          m: (collections.defaultdict(int), 0)
          for an, a in gene.alleles.items()
@@ -203,15 +197,15 @@ class Sample:
             try:
                sam.check_index()
             except AttributeError:
-               pass # SAM files do not have index. BAMs can also lack it
+               pass # SAM files do not have an index. BAMs might also lack it
             except ValueError as _:
                raise AldyException(f'File {sam_path} has no index (it must be indexed)')
 
-            #: str: Check do we need to append 'chr' or not
+            #: str: Check if we need to append 'chr' or not
             self._prefix = _chr_prefix(gene.region.chr, [x['SN'] for x in sam.header['SQ']])
 
-            # Attempt to read CN-neutral region if the file has index (fast)
-            # If not, the main loop below will catch it
+            # Try to read CN-neutral region if there is an index (fast)
+            # If not, the main loop will catch it later on
             def read_cn_read(read):
                """Check is pysam.AlignmentSegment valid CN-neutral read, and if so, parse it"""
                start = read.reference_start
@@ -222,8 +216,7 @@ class Sample:
                      for i in range(size):
                         cnv_coverage[start + i] += 1
                      start += size
-            # Set it to fetched if CN-neutral region is pre-set (e.g. --cn parameter is provided)
-            # Read sample's CN-neutral region
+            # Set it to _fetched_ if a CN-neutral region is user-provided. Then read the CN-neutral region
             is_cn_region_fetched = cn_region is None
             if cn_region and sam.has_index():
                log.debug('File {} has index', sam_path)
@@ -235,7 +228,7 @@ class Sample:
             total = 0
             dump_data = []
             for read in sam.fetch(region=gene.region.samtools(prefix=self._prefix)):
-               # If we haven't read CN-neutral region, do it now
+               # If we haven't obtained CN-neutral region so far, do it now
                if not is_cn_region_fetched and _in_region(cn_region, read, self._prefix): # type: ignore
                   read_cn_read(read)
 
@@ -285,7 +278,7 @@ class Sample:
          coverage[pos][mut] = cov
 
       #: dict of int: (dict of str: int): coverage dictionary
-      #: keys are positions in the reference genome, while values are dictionaries
+      #: keys are loci in the reference genome, while values are dictionaries
       #: that describe the coverage of each mutation (_ stands for non-mutated nucleotide)
       self.coverage = Coverage(coverage, threshold, cnv_coverage)
       for mut, ins_cov in _indel_sites.items():
@@ -300,7 +293,7 @@ class Sample:
                    indel_sites=None,
                    dump=False) -> Optional[Tuple[Tuple[int, int], Any]]:
       """
-      Parses a pysam.AlignedSegment read.
+      Parse a :obj:`pysam.AlignedSegment` read.
 
       Params:
          read (:obj:`pysam.AlignedSegment`)
@@ -309,7 +302,7 @@ class Sample:
       Returns:
          optional: None if parsing was not successful. Otherwise, returns the tuple consisting of:
             - start and end positions of the read, and
-            - the list of mutations found in the read,
+            - the list of mutations found in the read.
 
       Params that are mutated:
          norm (:obj:`collections.defaultdict(int)`):
@@ -322,7 +315,7 @@ class Sample:
          return None
       if not read.cigartuples: # only valid alignments
          return None
-      if read.flag & 0x800: # no supplemetary alignments
+      if read.flag & 0x800: # avoid supplementary alignments
          return None
       if 'H' in read.cigarstring: # avoid hard-clipped reads
          return None
@@ -369,15 +362,16 @@ class Sample:
 
    def _correct_ins_coverage(self, mut: Mutation, j) -> None:
       """
-      Attempts to fix the low coverage of large tandem insertions.
+      Fix low coverage of large tandem insertions.
 
       Targets the cases where reference looks like
          ...X...
       and the donor genome looks like
-         ...XX... (i.e. X is tandemly inserted).
-      Then any read that looks covers only one insertion tandem (e.g. read X...)
-      will get mapped perfectly w/o any insertion tag to the tail of the tandem insertion,
-      and the insertion count will be too low (as aligner could not assign `I` CIGAR).
+         ...XX... (i.e. X is a tandem insertion).
+      Any read that covers only one tandem (e.g. read X...)
+      will get perfectly aligned (without trigerring an insertion tag) to the tail of the tandem insertion.
+      This results in under-estimation of the insertion abundance will 
+      (as aligner could not assign `I` CIGAR to the correct insertion).
       This function attempts to correct this bias.
 
       Notes:
@@ -394,7 +388,7 @@ class Sample:
       j0 = 0
       for orig_start, start, read_len in j[0]:
          ins_len = len(mut.op) - 4
-         # This is rather hackish way of detecting *40
+         # HACK: This is rather hackish way of detecting *40
          # min 20% on the sides, max ... how much?
          min_margin = MARGIN_RATIO * max(1, ins_len / INSERT_LEN_RESCALE) * read_len
          if start < mut.pos + max(INSERT_LEN_AMPLIFY * ins_len, min_margin) or \
@@ -420,13 +414,13 @@ class Sample:
 
    def detect_cn(self, gene: Gene, profile: str, cn_region: GRange) -> None:
       """
-      Rescales the ``self.coverage`` to fit the sequencing profile.
+      Rescale the ``self.coverage`` to fit the sequencing profile.
 
       Params:
          gene (:obj:`aldy.gene.Gene`):
-            Gene object.
+            Gene instance.
          profile (str):
-            Profile identifier (e.g. 'pgrnseq-v1'). Can be SAM/BAM file as well.
+            Profile identifier (e.g. 'pgrnseq-v1'). Can be a SAM/BAM file as well.
          cn_region (:obj:`aldy.common.GRange`):
             Coordinates of the copy-number neutral region.
 
@@ -456,25 +450,27 @@ class Sample:
                      gene_region: Optional[GRange] = None,
                      cn_region: Optional[GRange] = None) -> Dict[str, Dict[int, float]]:
       """
-      Loads the coverage profile.
+      Load the coverage profile.
 
       Returns:
-         defaultdict[str, dict[int, float]]: The profile dictionary in which
+         defaultdict[str, dict[int, float]]: A profile dictionary where
          keys are chromosome IDs (e.g. '7' for chr7)
-         and values are hashtables that map the genomic position to the
-         profile coverage at that loci.
-         This is defaultdict that yields 0 for the missing loci.
+         and values are dictionaries that map the genomic locus to the
+         corresponding profile coverage.
+         This is a :obj:`collections.defaultdict` that uses 0 as a placeholder for the missing loci.
 
       Args:
          profile_path:
-            Path to the profile file. SAM/BAM is also accepted (profile will be dynamically calculated in that case).
+            Path to a profile file. 
+            SAM/BAM files are also accepted if `is_bam` is set 
+            (profile will be dynamically calculated in that case).
          is_bam (bool):
-            A flag indicating is the file SAM/BAM or not.
+            A flag indicating if the `profile_path` is SAM/BAM or not.
          gene_region (:obj:`aldy.common.GRange`, optional):
-            A profile region to be extracted.
+            Region to be extracted from the profile.
             Default is None.
          cn_region (:obj:`aldy.common.GRange`, optional):
-            A copy-number neutral region to be extracted.
+            Copy-number neutral region to be extracted from the profile.
             Default is None.
 
       Raises:
@@ -506,7 +502,7 @@ class Sample:
                         factor: float = 2.0,
                         regions: Optional[List[GRange]] = None) -> List[Tuple[str, str, int, float]]:
       """
-      Loads the profile information from SAM/BAM file.
+      Load the profile information from a SAM/BAM file.
 
       Returns:
          list[str, str, int, float]: list of tuples ``(gene_name, chromosome, loci, coverage)``.
@@ -520,9 +516,9 @@ class Sample:
       Notes:
          Profiles that were used in Aldy paper:
 
-         1. PGRNseq-v1: PGXT104 was used for all genes (n.b. PGXT147 with rescale 2.52444127771 used for CYP2B6 beta).
+         1. PGRNseq-v1: PGXT104 was used for all genes (n.b. PGXT147 with rescale 2.52444127771 was used for CYP2B6 beta).
          2. PGRNseq-v2: NA19789.bam was used for all genes.
-         3. Illumina: by definition contains all ones (uniform profile).
+         3. Illumina: by definition contains all ones (uniform coverage profile).
       """
       if regions is None:
          gene_regions = sorted([ # paper gene coordinates in hg19
@@ -577,10 +573,10 @@ class Sample:
 
 def _chr_prefix(ch: str, chrs: List[str]) -> str: # assumes ch is not prefixed
    """
-   Checks whether ch (*without any chr prefix*) should be prefixed with chr or not.
+   Check if `ch` (*without any chr prefix*) should be prefixed with "chr" or not.
 
    Returns:
-      str: A prefix to be prepended to chromosome (empty if needed).
+      str: Prefix to be prepended to chromosome (empty if needed).
 
    Params:
       ch (str): chromosome name
@@ -593,10 +589,7 @@ def _chr_prefix(ch: str, chrs: List[str]) -> str: # assumes ch is not prefixed
 
 def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
    """
-   Check whether a read is located within a given region.
-
-   Returns:
-      bool
+   Returns ``True`` if a read is located within a given gene region.
 
    Notes:
       The region is padded with 500bp on the left side.
@@ -609,14 +602,14 @@ def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
 
 def _load_deez(deez_path: str, reference: Optional[str], region: GRange, cn_region: Optional[GRange]) -> str:
    """
-   Loads a DeeZ file instead of SAM/BAM by piping DeeZ to pysam.
-   Requires 'deez' executable in ``PATH``.
+   Load a DeeZ file instead of a SAM/BAM by piping DeeZ to pysam.
+   Requires 'deez' executable in the ``$PATH``.
 
    Returns:
       str: Pipe file descriptor (e.g. '/dev/fd/12345').
 
    Raises:
-      :obj:`aldy.common.AldyException` if reference is not set or if DeeZ is not found in the ``PATH``.
+      :obj:`aldy.common.AldyException` if a reference is not set or if DeeZ is not found in the ``$PATH``.
    """
 
    log.debug('Using DeeZ file {}', deez_path)
@@ -630,12 +623,12 @@ def _load_deez(deez_path: str, reference: Optional[str], region: GRange, cn_regi
    pipe = os.path.join(tmpdir, 'dzpipe')
    os.mkfifo(pipe)
 
-   # check the chr prefix
+   # Check for the chr prefix
    command = "deez --stats {} 2>&1 | grep 'Block' | awk '{{print $3}}'".format(deez_path)
    p = subprocess.check_output(command, shell=True)
    prefix = _chr_prefix(region.chr, p.split())
 
-   # start the decompression process
+   # Start the decompression process
    regions = region.samtools(prefix)
    if cn_region:
       regions += ";" + cn_region.samtools(prefix)
@@ -648,7 +641,7 @@ def _load_deez(deez_path: str, reference: Optional[str], region: GRange, cn_regi
 
 def _teardown_deez(pipe: str) -> None:
    """
-   Cleans-up the ``_load_deez`` handle
+   Clean up the ``_load_deez`` handle
    """
    if os.path.exists(pipe):
       os.unlink(pipe)

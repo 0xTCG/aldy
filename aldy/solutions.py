@@ -1,5 +1,4 @@
 # 786
-
 # Aldy source: solutions.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
@@ -15,18 +14,17 @@ from .gene import Gene, GeneRegion, Mutation
 
 class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gene', 'region_cn'])):
    """
-   Describes a potential (possibly optimal) copy-number configuration.
-   Immutable class.
+   Valid copy-number configuration assignment.
+   Immutable.
 
    Attributes:
       score (float):
-         ILP model error score (0 for user-provided solutions).
+         ILP model objective score (0 for user-provided solutions).
       solution (dict[str, int]):
-         Dictionary of copy-number configurations where a value denotes the copy-number
-         of each configuration (e.g. ``{1: 2}`` means that there are two copies of \*1
-         configuration).
+         Copy-number configurations mapped to the corresponding copy number 
+         (e.g. ``{1: 2}`` means that there are two copies of \*1 configuration).
       region_cn (dict[:obj:`aldy.common.GeneRegion`, int]):
-         Dictionary of region copy numbers in this solution.
+         Gene region copy numbers inferred by this solution.
       gene (:obj:`aldy.gene.Gene`):
          Gene instance.
 
@@ -50,7 +48,7 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
    def position_cn(self, pos: int) -> float:
       """
       Returns:
-         float: Copy number of the loci ``pos``.
+         float: Copy number at the locus ``pos``.
       """
       try:
          g, region = self.gene.region_at(pos)
@@ -78,8 +76,8 @@ class CNSolution(collections.namedtuple('CNSolution', ['score', 'solution', 'gen
 
 class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'added', 'missing'])):
    """
-   Describes a candidate star-allele configuration.
-   Immutable class.
+   Solved star-allele assignment.
+   Immutable.
 
    Attributes:
       major (str):
@@ -87,11 +85,11 @@ class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'ad
       minor (str, optional):
          Minor star-allele identifier. Can be None.
       added (tuple[:obj:`aldy.gene.Mutation`]):
-         Tuple of mutations that are added to this copy of a major/minor star-allele
-         (e.g. these mutations are not present in the database defition of allele).
+         Mutations that are added to the star-allele
+         (i.e. these mutations are not present in the allele database definition).
       missing (tuple[:obj:`aldy.gene.Mutation`]):
-         Tuple of mutations that are ommited from this copy of a major/minor star-allele
-         (e.g. these mutations are present in the database defition of allele but not in the sample).
+         Mutations that are omitted from the star-allele
+         (i.e. these mutations are present in the allele database definition but not here).
 
    Notes:
       Has custom printer (``__str__``).
@@ -99,11 +97,17 @@ class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'ad
 
 
    def major_repr(self):
+      """
+      Pretty-formats major star-allele name.
+      """
       return '*{}{}'.format(self.major,
          ''.join(' +' + str(m) for m in sorted(m for m in self.added if m.is_functional)))
 
 
    def __str__(self):
+      """
+      Pretty-formats minor star-allele name.
+      """
       return '*{}{}{}'.format(
          self.minor if self.minor else self.major,
          ''.join(' +' + str(m) for m in sorted(self.added,
@@ -113,19 +117,17 @@ class SolvedAllele(collections.namedtuple('SolvedAllele', ['major', 'minor', 'ad
 
 class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution', 'cn_solution'])):
    """
-   Describes a potential (possibly optimal) major star-allele configuration.
-   Immutable class.
+   Valid major star-allele assignment.
+   Immutable.
 
    Attributes:
       score (float):
-         ILP model error score (0 for user-provided solutions).
+         ILP model objective score.
       solution (dict[:obj:`SolvedAllele`, int]):
-         Dictionary of major star-alleles where each major star-allele is
-         associated with its copy number
+         Major star-alleles and the corresponding copy numbers
          (e.g. ``{1: 2}`` means that we have two copies of \*1).
       cn_solution (:obj:`aldy.solutions.CNSolution`):
-         Associated copy-number solution used for calculating the major
-         star-alleles.
+         Copy-number solution that was used to assign major star-alleles.
 
    Notes:
       Has custom printer (``__str__``).
@@ -146,19 +148,19 @@ class MajorSolution(collections.namedtuple('MajorSolution', ['score', 'solution'
 
 class MinorSolution(collections.namedtuple('MinorSolution', ['score', 'solution', 'major_solution'])):
    """
-   Describes a potential (possibly optimal) minor star-allele configuration.
-   Immutable class.
+   Valid minor star-allele assignment.
+   Immutable.
 
    Attributes:
       score (float):
-         ILP model error score (0 for user-provided solutions).
+         ILP model objective score.
       solution (list[:obj:`SolvedAllele`]):
-         List of minor star-alleles in the solution.
+         List of solved minor star-alleles.
          Modifications to the minor alleles are represented in :obj:`SolvedAllele` format.
       major_solution (:obj:`aldy.solutions.MajorSolution`):
          Major star-allele solution used for calculating the minor star-allele assignment.
       diplotype (str):
-         Assigned diplotype string (e.g. ``*1/*2``).
+         Diplotype assignment (e.g. ``*1/*2``).
 
    Notes:
       Has custom printer (``__str__``).
