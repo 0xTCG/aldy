@@ -13,13 +13,14 @@ import aldy.genotype
 
 
 def test_samples(real_sample):
-   data, path, profile, reference = real_sample
-   solver = os.getenv('ALDY_SOLVER', default='gurobi')
-   sols = aldy.genotype.genotype(
-      'cyp2d6',
-      sam_path=path,
-      profile=profile,
-      output_file=None,
-      reference=reference,
-      solver=solver)
-   assert sorted(data) == sorted([s.diplotype for s in sols])
+    data, path, profile, reference = real_sample
+    solver = os.getenv("ALDY_SOLVER", default="gurobi")
+    sols = aldy.genotype.genotype(
+        "cyp2d6",
+        sam_path=path,
+        profile=profile,
+        output_file=None,
+        reference=reference,
+        solver=solver,
+    )
+    assert sorted(data) == sorted([s.diplotype for s in sols])
