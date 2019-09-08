@@ -15,7 +15,7 @@ setup(name='aldy',
       license='Aldy/IURTC License. Free for academic/non-commercial use.',
       keywords=['cyp2d6', 'adme', 'genotyping', 'illumina', 'pgrnseq', 'getrm', 'allele'],
       
-      install_requires=['pyyaml', 'logbook', 'pysam'],
+      install_requires=['pyyaml', 'logbook', 'pysam', 'pytest', 'ortools'],
       entry_points={
          'console_scripts': ['aldy = aldy.__main__:main' ]
       },

@@ -22,7 +22,7 @@ def real_gene():
 
 
 def pytest_addoption(parser):
-    parser.addoption("--samples", action="store")
+    parser.addoption("--samples", action="store", default=None)
 
 
 def pytest_generate_tests(metafunc):
