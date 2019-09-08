@@ -148,6 +148,9 @@ def genotype(gene_db: str,
    for i, cn_sol in enumerate(cn_sols):
       log.info(f'  {i + 1:2}: {cn_sol._solution_nice()}')
       log.info(f'      Confidence: {(min_cn_score + SLACK) / (cn_sol.score + SLACK):.2f} (score = {cn_sol.score:.2f})')
+   log.info('')
+
+   for i, cn_sol in enumerate(cn_sols):
       major_sols += major.estimate_major(gene, sample.coverage, cn_sol, 
                                          solver=solver, gap=gap,
                                          identifier=i,
@@ -167,6 +170,7 @@ def genotype(gene_db: str,
    for i, major_sol in enumerate(major_sols):
       log.info(f'  {i + 1:2}: {major_sol._solution_nice()}')
       log.info(f'      Confidence: {(min_major_score + SLACK) / (major_sol.score + SLACK):.2f} (score = {major_sol.score:.2f})')
+   log.info('')
 
    json_print(debug, '  "minor": [', end='')
    minor_sols = []

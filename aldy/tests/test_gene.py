@@ -76,20 +76,20 @@ def test_gene_alleles(toy_gene):
       '1': CNConfig(cnify('1,  1,1,  1,1,  1, | 1,  1,1,  1,1,  1'),
          kind=CNConfig.CNConfigType.DEFAULT_CN,
          alleles=set(['1', '1.a', '2', '3']),
-         description='Normal allelic configuration: all regions present in both toy_gene and pseudogene'),
+         description='Normal allelic configuration: all regions present in both gene and pseudogene'),
       '4': CNConfig(cnify('0,  0,0,  0,1,  1, | 1,  1,1,  1,0,  0'),
          kind=CNConfig.CNConfigType.LEFT_FUSION,
          alleles=set(['4/1', '4/3']),
-         description='Fusion: pseudogene until 2i followed by the toy_gene'),
+         description='Fusion: pseudogene until 2i followed by the gene'),
       '5': CNConfig(cnify('1,  1,1,  0,0,  0, | 1,  1,1,  2,2,  2'),
          kind=CNConfig.CNConfigType.RIGHT_FUSION,
          alleles=set(['5']),
-         description='Conservation: Pseudogene retention after 2e within the toy_gene'),
+         description='Conservation: Pseudogene retention after 2e within the gene'),
       '6': CNConfig(cnify('0,  0,0,  0,0,  0, | 1,  1,1,  1,1,  1'),
          kind=CNConfig.CNConfigType.DELETION,
          alleles=set(['6']),
          description='Gene deletion')}, "CN configs"
-
+   
    # Test allele configurations
    assert sorted(toy_gene.alleles.keys()) == ['1', '1.a', '2', '3', '4/1', '4/3', '5', '6'], "Major alleles"
    assert toy_gene.alleles['1'] == Allele('1', cn_config='1',

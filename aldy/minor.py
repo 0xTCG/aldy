@@ -133,7 +133,7 @@ def solve_minor_model(gene: Gene,
       Currently returns only the first optimal solution.
    """
 
-   log.debug('\n' + '*' * 80)
+   log.debug('*' * 80)
    log.debug('Minor solver: major = {}', major_sol)
    model = lpinterface.model('AldyMinor', solver)
 

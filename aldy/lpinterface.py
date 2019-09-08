@@ -12,6 +12,10 @@ import collections
 from .common import log, sorted_tuple, SOLUTION_PRECISION
 
 
+SOLVER_PRECISON = 1e-5
+"""float: Default solver precision"""
+
+
 def escape_name(s: str) -> str:
    """
    Escape variable names to conform given names with the various solver requirements.
@@ -176,42 +180,6 @@ class Gurobi:
       return status.lower(), self.model.objVal
 
 
-   def solutions(self, 
-                 gap: float = 0, 
-                 best_obj: Optional[float] = None, 
-                 limit = None,
-                 init: Optional[Callable] = None):
-      """
-      Solve the model and returns the list of all optimal solutions. Assumes that the objective is set.
-      Any solution whose score is less than (1 + `gap`) times the optimal solution score will be included.
-
-      A solution is defined as a dictionary of set binary variables within the solution that are accessed 
-      by their name.
-
-      Additional parameters of the solver can be set via ``init`` function that takes
-      the model instance as the sole argument.
-
-      This is a fast version that utilizes Gurobi's facilities to speed up the process.
-
-      Returns:
-         generator[tuple[str, float, any]]: Status of the solution, the objective value and the solution itself.
-      """
-
-      def model_init(m):
-         m.params.poolSearchMode = 2
-         m.params.poolSolutions = limit or 2000000000
-         m.params.poolGap = gap
-      self.solve(init=model_init)
-      for soli in range(self.model.solCount):
-         self.model.params.solutionNumber = soli
-         vv = {v.VarName: v
-               for v in self.model.getVars()
-               if v.vtype == self.gurobipy.GRB.BINARY and round(v.xn) > 0}
-         yield (self.GUROBI_STATUS[self.model.status].lower(), 
-                self.model.poolObjVal,
-                sorted_tuple(set(vv.keys())))
-
-
    def getValue(self, var):
       """
       Get the value of the solved variable.
@@ -232,6 +200,69 @@ class Gurobi:
       self.model.write(file)
 
 
+   def variables(self):
+      """
+      Return the list of model variables.
+      """
+      return self.model.getVars() 
+
+
+   def is_binary(self, v):
+      """
+      ``True`` if the variable is binary.
+      """
+      return v.vtype == self.gurobipy.GRB.BINARY
+
+
+   def change_model(self):
+      """
+      Callback that should be called prior to changing an already solved model.
+      """
+      pass
+
+
+   def solutions(self, 
+                 gap: float = 0, 
+                 best_obj: Optional[float] = None, 
+                 limit = None,
+                 iteration = 0, 
+                 init: Optional[Callable] = None):
+      """
+      Solve the model and returns the list of all optimal solutions. Assumes that the objective is set.
+      Any solution whose score is less than (1 + `gap`) times the optimal solution score will be included.
+
+      A solution is defined as a dictionary of set binary variables within the solution that are accessed 
+      by their name.
+
+      Additional parameters of the solver can be set via ``init`` function that takes
+      the model instance as the sole argument.
+
+      This is a generic version that supports any solver.
+
+      Returns:
+         generator[tuple[str, float, any]]: Status of the solution, the objective value and the solution itself.
+      """
+
+      try:
+         status, obj = self.solve(init)
+         best_obj = obj if best_obj is None else best_obj
+         if status != 'optimal':
+            return 
+         ub = (1 + gap) * best_obj
+         if abs(obj - ub) >= SOLVER_PRECISON and obj > ub:
+            return
+         
+         vv = {self.varName(v): v for v in self.variables() if self.is_binary(v) and self.getValue(v) == 1}
+         yield status, obj, sorted_tuple(set(vv.keys()))
+         
+         if not limit or iteration + 1 < limit:
+            self.change_model()
+            self.addConstr(self.quicksum(vv.values()) <= len(vv) - 1)
+            yield from self.solutions(gap, best_obj, limit, iteration + 1, init)
+      except NoSolutionsError:
+         return
+
+
 class SCIP(Gurobi):
    """
    Wrapper around SCIP's Python interface (pyscipopt).
@@ -241,7 +272,6 @@ class SCIP(Gurobi):
    def __init__(self, name):
       self.pyscipopt = importlib.import_module('pyscipopt')
       self.INF = 1e20
-      self.SOLVER_PRECISON = 1e-5 # Use Gurobi's default precision
       self.model = self.pyscipopt.Model(name)
 
 
@@ -327,48 +357,6 @@ class SCIP(Gurobi):
       self.model.freeTransform()
 
 
-   def solutions(self, 
-                 gap: float = 0, 
-                 best_obj: Optional[float] = None, 
-                 limit = None,
-                 iteration = 0, 
-                 init: Optional[Callable] = None):
-      """
-      Solve the model and returns the list of all optimal solutions. Assumes that the objective is set.
-      Any solution whose score is less than (1 + `gap`) times the optimal solution score will be included.
-
-      A solution is defined as a dictionary of set binary variables within the solution that are accessed 
-      by their name.
-
-      Additional parameters of the solver can be set via ``init`` function that takes
-      the model instance as the sole argument.
-
-      This is a generic version that supports any solver.
-
-      Returns:
-         generator[tuple[str, float, any]]: Status of the solution, the objective value and the solution itself.
-      """
-
-      try:
-         status, obj = self.solve(init)
-         best_obj = obj if best_obj is None else best_obj
-         if status != 'optimal':
-            return 
-         ub = (1 + gap) * best_obj
-         if abs(obj - ub) >= self.SOLVER_PRECISON and obj > ub:
-            return
-         
-         vv = {self.varName(v): v for v in self.variables() if self.is_binary(v) and self.getValue(v) == 1}
-         yield status, obj, sorted_tuple(set(vv.keys()))
-         
-         if not limit or iteration + 1 < limit:
-            self.change_model()
-            self.addConstr(self.quicksum(vv.values()) <= len(vv) - 1)
-            yield from self.solutions(gap, best_obj, limit, iteration + 1, init)
-      except NoSolutionsError:
-         return
-
-
 class CBC(SCIP):
    """
    Wrapper around CBC's Python interface (Google's ortools).
@@ -378,7 +366,6 @@ class CBC(SCIP):
       self.ortools = importlib.import_module('ortools.linear_solver.pywraplp')
       self.model = self.ortools.Solver(name, self.ortools.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
       self.INF = self.model.infinity()
-      self.SOLVER_PRECISON = 1e-5 # Use Gurobi's default precision
       self.STATUS = collections.defaultdict(lambda: 'UNKNOWN', {
          self.ortools.Solver.OPTIMAL: 'OPTIMAL',
          self.ortools.Solver.FEASIBLE: 'FEASIBLE',
@@ -431,7 +418,7 @@ class CBC(SCIP):
 
       if status == self.ortools.Solver.INFEASIBLE:
          raise NoSolutionsError(status)
-      if not self.model.VerifySolution(self.SOLVER_PRECISON, True):
+      if not self.model.VerifySolution(SOLVER_PRECISON, True):
          raise NoSolutionsError(status)
       return self.STATUS[status].lower(), self.model.Objective().Value()
 
@@ -479,7 +466,6 @@ class MIPCL(SCIP):
       self.mip = importlib.import_module('mipcl_py.mipshell.mipshell')
       self.model = self.mip.Problem(name)
       self.INF = self.mip.VAR_INF
-      self.SOLVER_PRECISON = 1e-5 # Use Gurobi's default precision
 
 
    def update(self):

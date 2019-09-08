@@ -18,6 +18,7 @@ from .common import *
 from .gene import GeneRegion, CNConfig, Gene
 from .coverage import Coverage
 from .solutions import CNSolution
+from .lpinterface import escape_name
 
 
 PCE_REGION = GeneRegion(11, 'pce')
@@ -183,7 +184,7 @@ def solve_cn_model(gene: Gene,
    # Objective: minimize the sum of absolute errors.
    # PCE_REGION (in CYP2D7) is penalized with an extra score as it is important fusion marker.
    objective = model.abssum(VERR.values(),
-                            coeffs={'E_{}{}'.format(*PCE_REGION): PCE_PENALTY_COEFF})
+                            coeffs={escape_name('E_{}{}'.format(*PCE_REGION)): PCE_PENALTY_COEFF})
    # Objective: also minimize the total number of present alleles (maximum parsimony)
    # Also penalize left fusions as they are not likely to occur.
    objective += model.quicksum(

@@ -61,7 +61,7 @@ def estimate_major(gene: Gene,
       list[:obj:`aldy.solutions.MajorSolution`]
    """
 
-   log.debug('\n' + '*' * 80)
+   log.debug('*' * 80)
    log.debug('Major solver: cn = {}', cn_solution)
 
    if sum(cn_solution.solution.values()) < 2:
