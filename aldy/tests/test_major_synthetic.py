@@ -5,7 +5,6 @@
 
 
 import pytest  # noqa
-import os
 import collections
 
 from aldy.major import estimate_major

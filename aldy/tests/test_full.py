@@ -5,7 +5,6 @@
 
 
 import pytest  # noqa
-import os
 import re
 import subprocess
 
