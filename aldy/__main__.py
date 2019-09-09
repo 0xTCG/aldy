@@ -5,7 +5,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Optional
+from typing import Optional, Any
 
 import logbook.more
 import argparse
@@ -240,6 +240,7 @@ def _get_args():
         help="Create a directory that will contain the debug information "
         + "and core dumps.",
     )
+    genotype_parser.add_argument("--log", "-l", default=None, help="Log file location")
     genotype_parser.add_argument(
         "--fusion-penalty",
         "-f",
@@ -309,7 +310,7 @@ def _print_licence():
             print(l.strip())
 
 
-def _genotype(gene: str, output: Optional[str], args) -> None:
+def _genotype(gene: str, output: Optional[Any], args) -> None:
     """
     Genotype a file.
 
@@ -375,6 +376,10 @@ def _genotype(gene: str, output: Optional[str], args) -> None:
         except AldyException as ex:
             log.error(ex)
 
+    if args.log:
+        fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="DEBUG")
+        fh.formatter = lambda record, _: record.message
+        fh.push_application()
     if args.debug:
         with tempfile.TemporaryDirectory() as tmp:
             try:
@@ -394,7 +399,7 @@ def _genotype(gene: str, output: Optional[str], args) -> None:
                 run(prefix)
             finally:
                 log.info("Preparing debug archive...")
-                os.system(f"tar czvf {args.debug}.tar.gz -C {tmp} .")
+                os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
     else:
         run(None)
 

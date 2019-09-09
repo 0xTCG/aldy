@@ -7,8 +7,9 @@
 import pytest  # noqa
 import os
 import re
-import tempfile
 import subprocess
+
+from tempfile import NamedTemporaryFile as tmpfile
 
 from aldy.__main__ import _genotype
 from aldy.common import DictWrapper, script_path, td, log
@@ -23,7 +24,7 @@ def escape_ansi(line):
     return re.compile(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]").sub("", line)
 
 
-def assert_file(monkeypatch, file, expected, params=None):
+def assert_file(monkeypatch, file, expected, params=None, output=None):
     lines = []
 
     def log_info(*args):
@@ -46,11 +47,9 @@ def assert_file(monkeypatch, file, expected, params=None):
             **(params or {}),
         }
     )
-    _genotype("cyp2d6", None, args)
+    _genotype("cyp2d6", output, args)
     expected = expected.strip()
     lines = escape_ansi("\n".join(lines)).strip()
-    print(expected)
-    print(lines)
     assert lines == expected
 
 
@@ -241,9 +240,31 @@ def test_NA10860_debug(monkeypatch):
           *1/*4+*4                       (*1, *4, *4.i)
         Preparing debug archive..."""
     )
-    with tempfile.NamedTemporaryFile(suffix=".tar.gz") as tmp:
-        assert_file(monkeypatch, file, expected, {"debug": tmp.name[:-7]})
-        os.system(f"ls -lah {tmp.name[:-8]}*")
+    with tmpfile(suffix=".tar.gz") as tmp:
+        with tmpfile(mode="w") as out, tmpfile(mode="w") as out_log:
+            assert_file(
+                monkeypatch,
+                file,
+                expected,
+                {"debug": tmp.name[:-7], "log": out_log.name},
+                out,
+            )
+            out.flush()
+            out_log.flush()
+
+            with open(script_path("aldy.tests.resources/NA10860.out.expected")) as f:
+                expected = f.read()
+            with open(out.name) as f:
+                produced = f.read()
+            assert produced == expected
+
+            with open(out_log.name) as f:
+                log = f.read()
+            s = "Major solver: MajorSol[1.33; sol=(1x*4, 1x*4.f, 1x*61); "
+            s += "cn=CNSol[6.73; sol=(2x*1,1x*61); "
+            s += "cn=3333333333333322222_2|333333333333334444444]"
+            assert s in log
+
         out = subprocess.check_output(f"tar tzf {tmp.name}", shell=True).decode("utf-8")
         out = "\n".join(sorted(out.strip().split("\n")))
         expected = td(

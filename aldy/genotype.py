@@ -19,6 +19,7 @@ from . import solutions
 
 from .common import log, script_path, json_print, AldyException, SOLUTION_PRECISION
 from .gene import Gene, GRange
+from .diplotype import OUTPUT_COLS
 from .lpinterface import model as lp_model
 
 
@@ -234,6 +235,8 @@ def genotype(
     json_print(debug, "  ],")
 
     log.info(f"Best {gene.name} star-alleles for {sample_name}:")
+    if output_file:
+        print('#' + '\t'.join(OUTPUT_COLS), file=output_file)
     for i, minor_sol in enumerate(minor_sols):
         log.info(f"  {i + 1:2}: {minor_sol.diplotype}")
         tt = textwrap.wrap(minor_sol._solution_nice(), width=60, break_long_words=False)
@@ -242,6 +245,7 @@ def genotype(
         conf = (min_minor_score + SLACK) / (minor_sol.score + SLACK)
         log.info(f"      Confidence: {conf:.2f} (score = {minor_sol.score:.2f})")
         if output_file:
+            print(f"#Solution {i + 1}: {minor_sol._solution_nice()}", file=output_file)
             diplotype.write_decomposition(
                 sample_name, gene, i + 1, minor_sol, output_file
             )

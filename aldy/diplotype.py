@@ -94,7 +94,7 @@ def write_decomposition(
                 ]
             )
         for it in items:
-            print("\t".join(map(str, it)), file=f)
+            print("\t".join(str(i) for i in it), file=f)
 
 
 def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
