@@ -33,7 +33,7 @@ It is intended to be run on POSIX-based systems
 
 The easiest way to install Aldy is to use `pip`::
 
-    pip install git+https://github.com/inumanag/aldy.git
+    pip install aldy
 
 Append ``--user`` to the previous command to install Aldy locally
 if you cannot write to the system-wide Python directory.
