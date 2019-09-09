@@ -1,6 +1,16 @@
 Aldy
 ****
 
+.. image:: https://badge.fury.io/py/aldy.svg
+    :target: https://badge.fury.io/py/aldy
+    
+.. image:: https://travis-ci.com/inumanag/aldy.svg?branch=master
+    :target: https://travis-ci.com/inumanag/aldy
+    
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
+
 Aldy is a tool for allelic decomposition (haplotype reconstruction) and exact genotyping
 of highly polymorphic and structurally variant genes.
 More simply, it is a tool which can detect the copy number of a target gene,
