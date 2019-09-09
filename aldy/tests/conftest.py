@@ -23,10 +23,18 @@ def real_gene():
 
 def pytest_addoption(parser):
     parser.addoption("--samples", action="store", default=None)
+    parser.addoption("--solvers", action="store", default=None)
 
 
 def pytest_generate_tests(metafunc):
     path = metafunc.config.getoption("samples")
+    solvers = metafunc.config.getoption("solvers")
+    if solvers is None:
+        solvers = "gurobi"
+    solvers = solvers.split(",")
+
+    if "solver" in metafunc.fixturenames:
+        metafunc.parametrize("solver", solvers)
     if "real_sample" in metafunc.fixturenames and not path:
         metafunc.parametrize("real_sample", [])
     elif "real_sample" in metafunc.fixturenames and path:

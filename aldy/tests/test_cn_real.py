@@ -19,10 +19,10 @@ def make_coverage(d):
     return cov
 
 
-def test_many_copies_multiple_solutions(real_gene):
+def test_many_copies_multiple_solutions(real_gene, solver):
     # HG00465
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [
             {"1": 2, "36": 2},
             {"1": 2, "61": 2},
@@ -49,10 +49,10 @@ def test_many_copies_multiple_solutions(real_gene):
     )
 
 
-def test_right_fusion(real_gene):
+def test_right_fusion(real_gene, solver):
     # HG01190
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [{"1": 1, "68": 1}],
         make_coverage(
             {
@@ -72,10 +72,10 @@ def test_right_fusion(real_gene):
     )
 
 
-def test_normal(real_gene):
+def test_normal(real_gene, solver):
     # HG02260
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [{"1": 2}],
         make_coverage(
             {
@@ -95,10 +95,10 @@ def test_normal(real_gene):
     )
 
 
-def test_deletion(real_gene):
+def test_deletion(real_gene, solver):
     # NA12336
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [{"1": 1, "5": 1}],
         make_coverage(
             {
@@ -118,10 +118,10 @@ def test_deletion(real_gene):
     )
 
 
-def test_right_fusion_with_copy(real_gene):
+def test_right_fusion_with_copy(real_gene, solver):
     # NA12878
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [{"1": 2, "68": 1}],
         make_coverage(
             {
@@ -141,10 +141,10 @@ def test_right_fusion_with_copy(real_gene):
     )
 
 
-def test_normal2(real_gene):
+def test_normal2(real_gene, solver):
     # NA19239
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [{"1": 2}],
         make_coverage(
             {
@@ -164,10 +164,10 @@ def test_normal2(real_gene):
     )
 
 
-def test_left_fusion(real_gene):
+def test_left_fusion(real_gene, solver):
     # NA19790
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [{"1": 2, "78": 1}, {"1": 2, "67": 1}],
         make_coverage(
             {
@@ -187,7 +187,7 @@ def test_left_fusion(real_gene):
     )
 
 
-def test_gap(real_gene):
+def test_gap(real_gene, solver):
     data = make_coverage(
         {
             "1e": (1.0, 1.9),
@@ -203,9 +203,9 @@ def test_gap(real_gene):
             "11pce": (0, 1.9),
         }
     )
-    assert_cn(real_gene, [{"1": 1, "5": 1}], data, gap=0.0)
+    assert_cn(real_gene, solver, [{"1": 1, "5": 1}], data, gap=0.0)
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [
             {"1": 1, "5": 1},
             {"13": 1, "68": 1},
@@ -223,7 +223,7 @@ def test_gap(real_gene):
         gap=0.1,
     )
     assert_cn(
-        real_gene,
+        real_gene, solver,
         [
             {"1": 1, "5": 1},
             {"13": 1, "68": 1},

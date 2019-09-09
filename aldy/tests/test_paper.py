@@ -7,14 +7,12 @@
 
 
 import pytest  # noqa
-import os
 
 import aldy.genotype
 
 
-def test_samples(real_sample):
+def test_samples(real_sample, solver):
     data, path, profile, reference = real_sample
-    solver = os.getenv("ALDY_SOLVER", default="gurobi")
     sols = aldy.genotype.genotype(
         "cyp2d6",
         sam_path=path,

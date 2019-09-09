@@ -65,18 +65,34 @@ Sanity check
 ============
 
 After installing Aldy and a compatible ILP solver, please make sure to test
-the installation by issuing the following command (this should take around a minute)::
+the installation by issuing the following command (this should take a few minutes)::
 
     aldy test
 
 In case everything is set up properly, you should see something like this::
 
-    *** Aldy v1.9 (Python 3.6.6) ***
-    (c) 2016-2018 Aldy Authors & Indiana University Bloomington. All rights reserved.
-    Aldy Sanity-Check Test
-    Expected result is: *1/*4+*4
-    Result:
-      *1/*4+*4                       (1, 4N, 4AW)
+    *** Aldy v2.0 (Python 3.6.6, darwin) ***
+    *** (c) 2016-2019 Aldy Authors & Indiana University Bloomington. All rights reserved.
+    *** Free for non-commercial/academic use only.
+    ========================================== test session starts ==========================================
+    platform darwin -- Python 3.6.6, pytest-5.1.2, py-1.8.0, pluggy-0.12.0
+    plugins: xdist-1.29.0, forked-1.0.2, cov-2.7.1
+    collected 62 items
+
+    tests/test_cn_real.py ........                                                                    [ 12%]
+    tests/test_cn_synthetic.py .....                                                                  [ 20%]
+    tests/test_diplotype_real.py ....                                                                 [ 27%]
+    tests/test_diplotype_synthetic.py ......                                                          [ 37%]
+    tests/test_full.py .....                                                                          [ 45%]
+    tests/test_gene.py ....                                                                           [ 51%]
+    tests/test_major_real.py ...........                                                              [ 69%]
+    tests/test_major_synthetic.py .......                                                             [ 80%]
+    tests/test_minor_real.py ......                                                                   [ 90%]
+    tests/test_minor_synthetic.py .....                                                               [ 98%]
+    tests/test_paper.py s                                                                             [100%]
+
+    =============================== 61 passed, 1 skipped in 106.83s (0:01:46) ===============================
+
 
 Running
 =======

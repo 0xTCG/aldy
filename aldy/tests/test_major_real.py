@@ -9,13 +9,14 @@ import pytest  # noqa
 from .test_major_synthetic import assert_major
 
 
-def test_normal(real_gene):
-    assert_major(real_gene, {"cn": {"1": 2}, "data": {}, "sol": [{"1": 2}]})
+def test_normal(real_gene, solver):
+    assert_major(real_gene, solver, {"cn": {"1": 2}, "data": {}, "sol": [{"1": 2}]})
 
 
-def test_different_1(real_gene):  # NA17102/v1
+def test_different_1(real_gene, solver):  # NA17102/v1
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -33,10 +34,11 @@ def test_different_1(real_gene):  # NA17102/v1
     )
 
 
-def test_many_alleles_1(real_gene):
+def test_many_alleles_1(real_gene, solver):
     # HG00436/v1
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 3},
             "data": {
@@ -55,6 +57,7 @@ def test_many_alleles_1(real_gene):
     # NA24217/v1
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 4},
             "data": {
@@ -72,7 +75,7 @@ def test_many_alleles_1(real_gene):
     )
 
 
-def test_right_fusion_1(real_gene):  # NA23878/v1
+def test_right_fusion_1(real_gene, solver):  # NA23878/v1
     data = {
         (42522612, "_"): 0,
         (42522612, "SNP.CG"): 953,
@@ -86,10 +89,13 @@ def test_right_fusion_1(real_gene):  # NA23878/v1
         (42526693, "SNP.GA"): 1425,
     }
     assert_major(
-        real_gene, {"cn": {"1": 2, "61": 1}, "data": data, "sol": [{"4": 2, "61": 1}]}
+        real_gene,
+        solver,
+        {"cn": {"1": 2, "61": 1}, "data": data, "sol": [{"4": 2, "61": 1}]},
     )
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2, "36": 1},
             "data": data,
@@ -98,9 +104,10 @@ def test_right_fusion_1(real_gene):  # NA23878/v1
     )
 
 
-def test_left_fusion_1(real_gene):  # NA19785/v1
+def test_left_fusion_1(real_gene, solver):  # NA19785/v1
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2, "79": 1},
             "data": {
@@ -121,9 +128,10 @@ def test_left_fusion_1(real_gene):  # NA19785/v1
     )
 
 
-def test_novel_allele_1(real_gene):  # NA17012/v1
+def test_novel_allele_1(real_gene, solver):  # NA17012/v1
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 1, "5": 1},
             "data": {
@@ -139,10 +147,11 @@ def test_novel_allele_1(real_gene):  # NA17012/v1
     )
 
 
-def test_different_2(real_gene):
+def test_different_2(real_gene, solver):
     # NA19828/v2
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -159,6 +168,7 @@ def test_different_2(real_gene):
     # NA10861/v2
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -185,6 +195,7 @@ def test_different_2(real_gene):
     # NA19239/v2
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -202,9 +213,10 @@ def test_different_2(real_gene):
     )
 
 
-def test_multiple_solutions_2(real_gene):  # NA18507/v2
+def test_multiple_solutions_2(real_gene, solver):  # NA18507/v2
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 3},
             "data": {
@@ -222,7 +234,7 @@ def test_multiple_solutions_2(real_gene):  # NA18507/v2
     )
 
 
-def test_many_alleles_2(real_gene):  # HG00463/v2
+def test_many_alleles_2(real_gene, solver):  # HG00463/v2
     data = {
         (42522612, "_"): 0,
         (42522612, "SNP.CG"): 1008,
@@ -230,10 +242,13 @@ def test_many_alleles_2(real_gene):  # HG00463/v2
         (42526693, "SNP.GA"): 1977,
     }
     assert_major(
-        real_gene, {"cn": {"1": 2, "36": 2}, "data": data, "sol": [{"10": 2, "36": 2}]}
+        real_gene,
+        solver,
+        {"cn": {"1": 2, "36": 2}, "data": data, "sol": [{"10": 2, "36": 2}]},
     )
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2, "36": 1, "61": 1},
             "data": data,
@@ -242,9 +257,10 @@ def test_many_alleles_2(real_gene):  # HG00463/v2
     )
 
 
-def test_right_fusion_2(real_gene):  # NA12878/v2
+def test_right_fusion_2(real_gene, solver):  # NA12878/v2
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2, "68": 1},
             "data": {
@@ -266,9 +282,10 @@ def test_right_fusion_2(real_gene):  # NA12878/v2
     )
 
 
-def test_left_fusion_2(real_gene):  # NA19790/v2
+def test_left_fusion_2(real_gene, solver):  # NA19790/v2
     assert_major(
         real_gene,
+        solver,
         {
             "cn": {"1": 2, "78": 1},
             "data": {

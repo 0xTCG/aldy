@@ -5,7 +5,6 @@
 
 
 import pytest  # noqa
-import os
 import collections
 
 from aldy.solutions import CNSolution, SolvedAllele, MajorSolution
@@ -16,8 +15,7 @@ from aldy.minor import estimate_minor, ADD_PENALTY_FACTOR, MISS_PENALTY_FACTOR
 from aldy.common import SOLUTION_PRECISION, sorted_tuple
 
 
-def assert_minor(gene, data, shallow=False):
-    solver = os.getenv("ALDY_SOLVER", default="gurobi")
+def assert_minor(gene, solver, data, shallow=False):
     cn_sol = CNSolution(0, list(collections.Counter(data["cn"]).elements()), gene)
 
     cov = collections.defaultdict(dict)
@@ -79,10 +77,11 @@ def assert_minor(gene, data, shallow=False):
     return sols[0].score if len(sols) > 0 else 0
 
 
-def test_basic(toy_gene):
+def test_basic(toy_gene, solver):
     # Test two copies of *1
     assert_minor(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {(115, "_"): 20},
@@ -93,9 +92,10 @@ def test_basic(toy_gene):
     )
 
 
-def test_minor(toy_gene):
+def test_minor(toy_gene, solver):
     assert_minor(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {(115, "_"): 9, (115, "SNP.TA"): 11},
@@ -106,9 +106,10 @@ def test_minor(toy_gene):
     )
 
 
-def test_miss(toy_gene):
+def test_miss(toy_gene, solver):
     assert_minor(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -125,9 +126,10 @@ def test_miss(toy_gene):
     )
 
 
-def test_add(toy_gene):
+def test_add(toy_gene, solver):
     assert_minor(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -145,9 +147,10 @@ def test_add(toy_gene):
     )
 
 
-def test_major_novel(toy_gene):
+def test_major_novel(toy_gene, solver):
     assert_minor(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2, "6": 1},
             "data": {

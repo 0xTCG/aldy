@@ -9,9 +9,9 @@ import pytest  # noqa
 from .test_minor_synthetic import assert_minor
 
 
-def test_normal(real_gene):  # NA07439/v1 : currently test only one solution
+def test_normal(real_gene, solver):  # NA07439/v1 : currently test only one solution
     assert_minor(
-        real_gene,
+        real_gene, solver,
         {
             "cn": {"1": 3},
             "major": {"4.b": 2, "41": 1},
@@ -81,9 +81,9 @@ def test_normal(real_gene):  # NA07439/v1 : currently test only one solution
     )
 
 
-def test_multiple(real_gene):  # HG00436/v1
+def test_multiple(real_gene, solver):  # HG00436/v1
     assert_minor(
-        real_gene,
+        real_gene, solver,
         {
             "cn": {"1": 3},
             "major": {"2": 1, "2.a": 1, "71": 1},
@@ -165,9 +165,9 @@ def test_multiple(real_gene):  # HG00436/v1
     )
 
 
-def test_fusion(real_gene):  # HG01190/v1
+def test_fusion(real_gene, solver):  # HG01190/v1
     assert_minor(
-        real_gene,
+        real_gene, solver,
         {
             "cn": {"1": 1, "68": 1},
             "major": {"4": 1, "68": 1},
@@ -216,9 +216,9 @@ def test_fusion(real_gene):  # HG01190/v1
     )
 
 
-def test_deletion(real_gene):  # HG00276/v1
+def test_deletion(real_gene, solver):  # HG00276/v1
     assert_minor(
-        real_gene,
+        real_gene, solver,
         {
             "cn": {"1": 1, "5": 1},
             "major": {"4": 1, "5": 1},
@@ -262,7 +262,7 @@ def test_deletion(real_gene):  # HG00276/v1
     )
 
 
-def test_comparison(real_gene):  # NA06991/v1
+def test_comparison(real_gene, solver):  # NA06991/v1
     data = {
         (42522391, "SNP.GA"): 342,
         (42522391, "_"): 409,
@@ -322,7 +322,7 @@ def test_comparison(real_gene):  # NA06991/v1
         (42528223, "_"): 1,
     }
     s1 = assert_minor(
-        real_gene,
+        real_gene, solver,
         {
             "cn": {"1": 2},
             "major": {"1": 1, "4": 1},
@@ -332,7 +332,7 @@ def test_comparison(real_gene):  # NA06991/v1
         shallow=False,
     )
     s2 = assert_minor(
-        real_gene,
+        real_gene, solver,
         {
             "cn": {"1": 2},
             "major": {"10": 1, "4.h": 1},
@@ -345,7 +345,7 @@ def test_comparison(real_gene):  # NA06991/v1
         shallow=True,
     )
     s3 = assert_minor(
-        real_gene,
+        real_gene, solver,
         {
             "cn": {"1": 2},
             "major": {"39": 1, "4.f": 1},
@@ -358,9 +358,9 @@ def test_comparison(real_gene):  # NA06991/v1
     assert s1 < s3
 
 
-def test_major_novel(real_gene):
+def test_major_novel(real_gene, solver):
     assert_minor(
-        real_gene,
+        real_gene, solver,
         {
             "cn": {"1": 2},
             "major": {"35": 1, ("4.b", (42525810, "SNP.TC")): 1},

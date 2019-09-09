@@ -15,8 +15,7 @@ from aldy.major import NOVEL_MUTATION_PENAL
 from aldy.common import SOLUTION_PRECISION
 
 
-def assert_major(gene, major):
-    solver = os.getenv("ALDY_SOLVER", default="gurobi")
+def assert_major(gene, solver, major):
     cn_sol = CNSolution(0, list(collections.Counter(major["cn"]).elements()), gene)
 
     cov = collections.defaultdict(dict)
@@ -48,15 +47,18 @@ def assert_major(gene, major):
     assert sorted(sols_expected) == sorted(sols_parsed)
 
 
-def test_basic(toy_gene):
+def test_basic(toy_gene, solver):
     # Test two copies of *1
-    assert_major(toy_gene, {"cn": {"1": 2}, "data": {}, "sol": [{"1": 2}], "score": 0})
+    assert_major(
+        toy_gene, solver, {"cn": {"1": 2}, "data": {}, "sol": [{"1": 2}], "score": 0}
+    )
 
 
-def test_deletion(toy_gene):
+def test_deletion(toy_gene, solver):
     # Test a single copy of *1C
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 1, "6": 1},
             "data": {(105, "_"): 0, (105, "SNP.TA"): 10},
@@ -66,10 +68,11 @@ def test_deletion(toy_gene):
     )
 
 
-def test_two_copies(toy_gene):
+def test_two_copies(toy_gene, solver):
     # Test two copies (*1/*2)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -85,6 +88,7 @@ def test_two_copies(toy_gene):
     # Test two copies (*2/*3)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -102,6 +106,7 @@ def test_two_copies(toy_gene):
     # Test slightly perturbed two copies (*2/*3)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {
@@ -118,10 +123,11 @@ def test_two_copies(toy_gene):
     )
 
 
-def test_multiple_copies(toy_gene):
+def test_multiple_copies(toy_gene, solver):
     # Test four copies (*1+*1/*2+*2)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 4},
             "data": {
@@ -136,10 +142,11 @@ def test_multiple_copies(toy_gene):
     )
 
 
-def test_left_fusion(toy_gene):
+def test_left_fusion(toy_gene, solver):
     # Test left fusion that has no SNPs (*4[*1]/*1+*2)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2, "4": 1},
             "data": {
@@ -155,6 +162,7 @@ def test_left_fusion(toy_gene):
     # Test left fusion that has SNPs (*4[*3]/*1+*3)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2, "4": 1},
             "data": {(151, "_"): 10, (151, "SNP.CT"): 20},
@@ -165,6 +173,7 @@ def test_left_fusion(toy_gene):
     # Test left fusion combination (*4[*3]/*1C+*3)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2, "4": 1},
             "data": {
@@ -180,6 +189,7 @@ def test_left_fusion(toy_gene):
     # Test left fusion combination (*4[*3]/*4[*1]+*3)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 1, "4": 2},
             "data": {
@@ -194,10 +204,11 @@ def test_left_fusion(toy_gene):
     )
 
 
-def test_right_fusion(toy_gene):
+def test_right_fusion(toy_gene, solver):
     # Test right fusion (*5/*1)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 1, "5": 1},
             "data": {(111, "_"): 10, (111, "DEL.AC"): 10},
@@ -208,6 +219,7 @@ def test_right_fusion(toy_gene):
     # Test right fusion (*5/*2)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 1, "5": 1},
             "data": {
@@ -223,6 +235,7 @@ def test_right_fusion(toy_gene):
     # Test right fusion (*5/*3)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 1, "5": 1},
             "data": {
@@ -237,10 +250,11 @@ def test_right_fusion(toy_gene):
     )
 
 
-def test_novel_mutations(toy_gene):
+def test_novel_mutations(toy_gene, solver):
     # Test novel mutations within a single gene (other is deleted)
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 1, "6": 1},
             "data": {(111, "_"): 0, (111, "DEL.AC"): 20},
@@ -251,6 +265,7 @@ def test_novel_mutations(toy_gene):
     # Test novel mutations
     assert_major(
         toy_gene,
+        solver,
         {
             "cn": {"1": 2},
             "data": {(111, "_"): 10, (111, "DEL.AC"): 10},

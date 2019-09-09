@@ -24,7 +24,7 @@ def escape_ansi(line):
     return re.compile(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]").sub("", line)
 
 
-def assert_file(monkeypatch, file, expected, params=None, output=None):
+def assert_file(monkeypatch, file, solver, expected, params=None, output=None):
     lines = []
 
     def log_info(*args):
@@ -32,7 +32,6 @@ def assert_file(monkeypatch, file, expected, params=None, output=None):
         lines.append(s)
 
     monkeypatch.setattr(log, "info", log_info)
-    solver = os.getenv("ALDY_SOLVER", default="gurobi")
     args = DictWrapper(
         {
             **{
@@ -53,7 +52,7 @@ def assert_file(monkeypatch, file, expected, params=None, output=None):
     assert lines == expected
 
 
-def test_NA10860(monkeypatch):
+def test_NA10860(monkeypatch, solver):
     file = script_path("aldy.tests.resources/NA10860.bam")
     expected = td(
         """
@@ -88,10 +87,10 @@ def test_NA10860(monkeypatch):
         CYP2D6 results:
           *1/*4+*4                       (*1, *4, *4.i)"""
     )
-    assert_file(monkeypatch, file, expected)
+    assert_file(monkeypatch, file, solver, expected)
 
 
-def test_NA10860_gap(monkeypatch):
+def test_NA10860_gap(monkeypatch, solver):
     file = script_path("aldy.tests.resources/NA10860.bam")
     expected = td(
         """
@@ -142,10 +141,10 @@ def test_NA10860_gap(monkeypatch):
         CYP2D6 results:
           *1/*4+*4                       (*1, *4, *4.i)"""
     )
-    assert_file(monkeypatch, file, expected, {"gap": 0.10})
+    assert_file(monkeypatch, file, solver, expected, {"gap": 0.10})
 
 
-def test_hard(monkeypatch):
+def test_hard(monkeypatch, solver):
     file = script_path("aldy.tests.resources/HARD.dump")
     expected = td(
         """
@@ -171,10 +170,10 @@ def test_hard(monkeypatch):
         CYP2D6 results:
           *2+*2/*68+*4+*80               (*2, *2, *4, *68, *80/4)"""
     )
-    assert_file(monkeypatch, file, expected, {"profile": "pgrnseq-v1"})
+    assert_file(monkeypatch, file, solver, expected, {"profile": "pgrnseq-v1"})
 
 
-def test_hard_fusion(monkeypatch):
+def test_hard_fusion(monkeypatch, solver):
     file = script_path("aldy.tests.resources/HARD.dump")
     expected = td(
         """
@@ -200,11 +199,15 @@ def test_hard_fusion(monkeypatch):
           *2+*2/*4+*4                    (*2, *2, *4, *4.b)"""
     )
     assert_file(
-        monkeypatch, file, expected, {"profile": "pgrnseq-v1", "fusion_penalty": 5}
+        monkeypatch,
+        file,
+        solver,
+        expected,
+        {"profile": "pgrnseq-v1", "fusion_penalty": 5},
     )
 
 
-def test_NA10860_debug(monkeypatch):
+def test_NA10860_debug(monkeypatch, solver):
     file = script_path("aldy.tests.resources/NA10860.bam")
     expected = td(
         """
@@ -245,6 +248,7 @@ def test_NA10860_debug(monkeypatch):
             assert_file(
                 monkeypatch,
                 file,
+                solver,
                 expected,
                 {"debug": tmp.name[:-7], "log": out_log.name},
                 out,

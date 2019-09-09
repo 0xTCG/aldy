@@ -11,8 +11,7 @@ from aldy.cn import PARSIMONY_PENALTY, LEFT_FUSION_PENALTY, solve_cn_model
 from aldy.common import SOLUTION_PRECISION
 
 
-def assert_cn(gene, expected, cov, expected_obj=None, gap=0):
-    solver = os.getenv("ALDY_SOLVER", default="gurobi")
+def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0):
     sols = solve_cn_model(
         gene,
         cn_configs=gene.cn_configs,
@@ -41,17 +40,17 @@ def make_coverage(gene, lst):
     return cov
 
 
-def test_basic(toy_gene):
+def test_basic(toy_gene, solver):
     # Test two copies of *1
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"1": 2}],
         make_coverage(toy_gene, zip([2, 2, 2, 2, 2], [2, 2, 2, 2, 2])),
         2 * PARSIMONY_PENALTY,
     )
     # Test two copies of *1 with slightly perturbed coverage
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"1": 2}],
         make_coverage(
             toy_gene, zip([1.8, 2.2, 2.1, 1.9, 1.7], [2.05, 1.95, 2, 2, 2.7])
@@ -60,17 +59,17 @@ def test_basic(toy_gene):
     )
 
 
-def test_deletion(toy_gene):
+def test_deletion(toy_gene, solver):
     # Test a single copy of *1 (*6 is deletion allele)
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"1": 1, "6": 1}],
         make_coverage(toy_gene, zip([1, 1, 1, 1, 1], [2, 2, 2, 2, 2])),
         2 * PARSIMONY_PENALTY,
     )
     # Test whole gene deletion
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"6": 2}],
         make_coverage(toy_gene, zip([0, 0, 0, 0, 0], [2, 2, 2, 2, 2])),
         2 * PARSIMONY_PENALTY,
@@ -83,10 +82,10 @@ def test_deletion(toy_gene):
     #           * PARSIMONY_PENALTY)
 
 
-def test_left_fusion(toy_gene):
+def test_left_fusion(toy_gene, solver):
     # Test two fused copies (*4 is defined as 00011|11100)
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"4": 2}],
         make_coverage(toy_gene, zip([0, 0, 0, 2, 2], [2, 2, 2, 0, 0])),
         2 * PARSIMONY_PENALTY + 2 * LEFT_FUSION_PENALTY,
@@ -95,34 +94,34 @@ def test_left_fusion(toy_gene):
     # Note: each left fusion operates on the whole genic region;
     #       thus, the maximum number of left fusions is 2
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"4": 2, "1": 1}],
         make_coverage(toy_gene, zip([1, 1, 1, 3, 3], [2, 2, 2, 0, 0])),
         3 * PARSIMONY_PENALTY + 2 * LEFT_FUSION_PENALTY,
     )
 
 
-def test_right_fusion(toy_gene):
+def test_right_fusion(toy_gene, solver):
     # Test one fused and one normal (*1) allele (*5 is defined as 11000|11222)
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"1": 1, "5": 1}],
         make_coverage(toy_gene, zip([2, 2, 1, 1, 1], [2, 2, 3, 3, 3])),
         2 * PARSIMONY_PENALTY,
     )
 
 
-def test_multiplication(toy_gene):
+def test_multiplication(toy_gene, solver):
     # Test twelve copies of *1
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"1": 12}],
         make_coverage(toy_gene, zip([12, 12, 12, 12, 12], [2, 2, 2, 2, 2])),
         12 * PARSIMONY_PENALTY,
     )
     # Test seven copies of *1 and one fused *5 copy
     assert_cn(
-        toy_gene,
+        toy_gene, solver,
         [{"1": 7, "5": 1}],
         make_coverage(toy_gene, zip([8, 8, 7, 7, 7], [2, 2, 3, 3, 3])),
         8 * PARSIMONY_PENALTY,

@@ -17,6 +17,7 @@ import tempfile
 import pkg_resources
 import traceback
 import re
+import pytest
 
 from .common import log, script_path, AldyException, td, colorize
 from .gene import Gene, GRange
@@ -414,7 +415,7 @@ def _run_test() -> None:
     Run the Aldy test suite.
     """
 
-    pass
+    pytest.main(["--pyargs", "aldy"])
 
 
 if __name__ == "__main__":
