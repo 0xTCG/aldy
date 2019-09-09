@@ -3,10 +3,10 @@ Aldy
 
 .. image:: https://badge.fury.io/py/aldy.svg
     :target: https://badge.fury.io/py/aldy
-    
 .. image:: https://travis-ci.com/inumanag/aldy.svg?branch=master
     :target: https://travis-ci.com/inumanag/aldy
-    
+.. image:: https://readthedocs.org/projects/aldy/badge/
+    :target: https://aldy.readthedocs.io/en/latest
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
