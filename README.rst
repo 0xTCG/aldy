@@ -1,9 +1,10 @@
 Aldy
 ****
 
-Aldy is a tool for allelic decomposition and exact genotyping of highly polymorphic and structurally variant genes.
-More simply, it is a tool which can detect the copy number of a target gene, and the structure and genotype of each 
-gene copy present in the sample.
+Aldy is a tool for allelic decomposition (haplotype reconstruction) and exact genotyping 
+of highly polymorphic and structurally variant genes.
+More simply, it is a tool which can detect the copy number of a target gene, 
+and the structure and genotype of each gene copy present in the sample.
 
 Aldy has been published in `Nature Communications <https://www.nature.com/articles/s41467-018-03273-1>`_ 
 (`doi:10.1038/s41467-018-03273-1 <http://doi.org/10.1038/s41467-018-03273-1>`_). 
@@ -16,23 +17,24 @@ Documentation is available `at Read the Docs <https://aldy.readthedocs.io/en/lat
 Installation
 ============
 
-Aldy is written in Python, and supports both Python 3.6+. It is intended to be run on POSIX-based systems 
-(only Linux and macOS have been tested).
+Aldy is written in Python, and requires Python 3.6+. 
+It is intended to be run on POSIX-based systems 
+(so far, only Linux and macOS have been tested).
 
 The easiest way to install Aldy is to use `pip`::
 
     pip install aldy
 
-Add ``--user`` to install it locally if you cannot write to the system-wide Python directory.
+Append ``--user`` to the previous command to install Aldy locally 
+if you cannot write to the system-wide Python directory.
 
 
 Prerequisite: ILP solver
 ------------------------
 
-Although Aldy can be installed without any ILP solver, it cannot produce any meaningful results without 
-a supported ILP solver. Unfortunately, as of now, none of the currently supported solvers can be installed automatically.
+Aldy requires a mixed integer solver to run.
 
-Solvers which are currently supported include:
+The following solvers are currently supported:
 
 * `Gurobi <http://www.gurobi.com>`_ (**highly recommended**):
   a commercial solver which is free for academic purposes.

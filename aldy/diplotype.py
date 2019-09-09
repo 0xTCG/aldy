@@ -167,13 +167,13 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     # Make sure that the elements are sorted and that the tandems are grouped together
     result = sorted(diplotype)
     for i in range(2):
-        nd = []
+        nd: List[tuple] = []
         for ta, tb in gene.common_tandems:
             if ta in result[i] and tb in result[i]:
                 nd.append((ta, tb))
                 result[i].remove(ta)
                 result[i].remove(tb)
-        nd += [(x, None) for x in diplotype[i]]
+        nd += [(x,) for x in result[i]]
         result[i] = [f for e in sorted(nd) for f in e]
 
     res = "/".join("+".join("*{}".format(y) for y in x) for x in result)

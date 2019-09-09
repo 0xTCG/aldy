@@ -33,6 +33,7 @@ def estimate_minor(
     major_sols: List[MajorSolution],
     solver: str,
     filter_fn: Optional[Callable] = None,
+    max_solutions: int = 1,
     debug: Optional[str] = None,
 ) -> List[MinorSolution]:
     """
@@ -50,6 +51,9 @@ def estimate_minor(
         filter_fn (callable):
             Custom filtering function.
             Default is ``None``.
+        max_solutions (int):
+            Maximum number of solutions to report.
+            Default is 1.
         debug (str, optional):
             If set, create a "`debug`.minor`identifier`.lp" file for debug purposes.
             Default is ``None``.
@@ -92,7 +96,7 @@ def estimate_minor(
         sorted(major_sols, key=lambda s: list(s.solution.items()))
     ):
         minor_sols += solve_minor_model(
-            gene, alleles, cov, major_sol, mutations, solver, i, debug
+            gene, alleles, cov, major_sol, mutations, solver, i, max_solutions, debug
         )
     return minor_sols
 
@@ -105,6 +109,7 @@ def solve_minor_model(
     mutations: Set[Mutation],
     solver: str,
     identifier: int = 0,
+    max_solutions: int = 1,
     debug: Optional[str] = None,
 ) -> List[MinorSolution]:
     """
@@ -128,6 +133,9 @@ def solve_minor_model(
         identifier (int):
             Unique solution identifier. Used for generating debug information.
             Default is 0.
+        max_solutions (int):
+            Maximum number of solutions to report.
+            Default is 1.
         debug (str, optional):
             If set, Aldy will create "<debug>.minor.lp" file for debug purposes.
             Default is ``None``.
@@ -402,48 +410,53 @@ def solve_minor_model(
 
     # Solve the model
     try:
-        status, opt = model.solve()
-        log.debug(f"Minor solver: {status}, opt: {opt:.2f}")
+        results = {}
+        for status, opt, sol in model.solutions():
+            log.debug(f"Minor solver: {status}, opt: {opt:.2f}")
 
-        solution = []
-        for allele, value in VA.items():
-            if model.getValue(value) <= 0:
-                continue
-            added: List[Mutation] = []
-            missing: List[Mutation] = []
-            for m, mv in VKEEP[allele].items():
-                if not model.getValue(mv[0]):
-                    missing.append(m)
-            for m, mv in VNEW[allele].items():
-                if model.getValue(mv[0]):
-                    added.append(m)
-            solution.append(
-                SolvedAllele(
-                    allele[0].major,
-                    allele[0].minor,
-                    allele[0].added + tuple(added),
-                    tuple(missing),
-                )
-            )
-        json_print(
-            debug,
-            '    "sol": {}, '.format(
-                [
-                    (
-                        s.minor,
-                        [(m[0], m[1]) for m in s.added],
-                        [(m[0], m[1]) for m in s.missing],
+            solution = []
+            for allele, value in VA.items():
+                if model.getValue(value) <= 0:
+                    continue
+                added: List[Mutation] = []
+                missing: List[Mutation] = []
+                for m, mv in VKEEP[allele].items():
+                    if not model.getValue(mv[0]):
+                        missing.append(m)
+                for m, mv in VNEW[allele].items():
+                    if model.getValue(mv[0]):
+                        added.append(m)
+                solution.append(
+                    SolvedAllele(
+                        allele[0].major,
+                        allele[0].minor,
+                        allele[0].added + tuple(added),
+                        tuple(missing),
                     )
-                    for s in solution
-                ]
-            ),
-        )
-        sol = MinorSolution(score=opt, solution=solution, major_solution=major_sol)
-        _ = estimate_diplotype(gene, sol)
-        json_print(debug, f'    "diplotype": "{sol.diplotype}"')
-        json_print(debug, "  },")
-        log.debug(f"Minor solver: {sol}")
-        return [sol]
+                )
+            json_print(
+                debug,
+                '    "sol": {}, '.format(
+                    [
+                        (
+                            s.minor,
+                            [(m[0], m[1]) for m in s.added],
+                            [(m[0], m[1]) for m in s.missing],
+                        )
+                        for s in solution
+                    ]
+                ),
+            )
+            sol = MinorSolution(score=opt, solution=solution, major_solution=major_sol)
+            _ = estimate_diplotype(gene, sol)
+            json_print(debug, f'    "diplotype": "{sol.diplotype}"')
+            json_print(debug, "  },")
+            log.debug(f"Minor solver: {sol}")
+            if str(sol) not in results:
+                results[str(sol)] = sol
+            if len(results) >= max_solutions:
+                break
+        return results.values()
     except lpinterface.NoSolutionsError:
         log.debug("Minor solver: no solutions")
         json_print(debug, '    "sol": []')

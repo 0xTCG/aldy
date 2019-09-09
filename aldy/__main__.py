@@ -7,7 +7,7 @@
 
 from typing import Optional
 
-import logbook
+import logbook.more
 import argparse
 import os
 import sys
@@ -248,6 +248,12 @@ def _get_args():
         + f"Default is {LEFT_FUSION_PENALTY}.",
     )
     genotype_parser.add_argument(
+        "--max-minor-solutions",
+        default=1,
+        help="Maximum number of minor solutions to report for each major solution. "
+        + f"Default is 1.",
+    )
+    genotype_parser.add_argument(
         "--cn",
         "-c",
         default=None,
@@ -355,12 +361,17 @@ def _genotype(gene: str, output: Optional[str], args) -> None:
                 fusion_penalty=float(args.fusion_penalty),
                 reference=args.reference,
                 gap=float(args.gap),
+                max_minor_solutions=int(args.max_minor_solutions),
                 debug=debug,
             )
-            log.info(colorize(f"{gene.upper()} result{' s'[len(result) > 1]}:"))
+            log.info(colorize(f"{gene.upper()} results:"))
+            reported = set()
             for r in result:
                 minors = ", ".join(sorted([f.major_repr() for f in r.solution]))
-                log.info(colorize(f"  {r.diplotype:30} ({minors})"))
+                s = f"  {r.diplotype:30} ({minors})"
+                if s not in reported:
+                    log.info(colorize(s))
+                    reported.add(s)
         except AldyException as ex:
             log.error(ex)
 
@@ -383,7 +394,7 @@ def _genotype(gene: str, output: Optional[str], args) -> None:
                 run(prefix)
             finally:
                 log.info("Preparing debug archive...")
-                os.system(f"tar czvf {args.debug}.tar.gz2 -C {tmp} .")
+                os.system(f"tar czvf {args.debug}.tar.gz -C {tmp} .")
     else:
         run(None)
 

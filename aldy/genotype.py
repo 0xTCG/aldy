@@ -35,6 +35,7 @@ def genotype(
     phase: bool = False,
     reference: Optional[str] = None,
     gap: int = 0,
+    max_minor_solutions: int = 1,
     debug: Optional[str] = None,
 ) -> List[solutions.MinorSolution]:
     """
@@ -84,6 +85,9 @@ def genotype(
         gap (float):
             Relative optimality gap. Use non-zero values to allow non-optimal solutions.
             Default is 0 (reports only optimal solutions).
+        max_minor_solutions (int):
+            Maximum number of minor solutions to report for each major solution.
+            Default is 1.
         debug (str, optional):
             Prefix for debug information and core dump files.
             ``None`` for no debug information.
@@ -160,11 +164,13 @@ def genotype(
     major_sols: list = []
     json_print(debug, '  "major": [', end="")
     cn_sols = sorted(cn_sols, key=lambda m: (int(1000 * m.score), m._solution_nice()))
+    if len(cn_sols) == 0:
+        raise AldyException("No solutions found!")
     min_cn_score = min(cn_sols, key=lambda m: m.score).score
     for i, cn_sol in enumerate(cn_sols):
         log.info(f"  {i + 1:2}: {cn_sol._solution_nice()}")
         conf = (min_cn_score + SLACK) / (cn_sol.score + SLACK)
-        log.info("      Confidence: {:.2f} (score = {cn_sol.score:.2f})")
+        log.info(f"      Confidence: {conf:.2f} (score = {cn_sol.score:.2f})")
     log.info("")
 
     for i, cn_sol in enumerate(cn_sols):
@@ -204,7 +210,12 @@ def genotype(
     json_print(debug, '  "minor": [', end="")
     minor_sols = []
     for m in minor.estimate_minor(
-        gene, sample.coverage, major_sols, solver, debug=debug
+        gene,
+        sample.coverage,
+        major_sols,
+        solver,
+        max_solutions=max_minor_solutions,
+        debug=debug,
     ):
         n = solutions.MinorSolution(
             m.score
