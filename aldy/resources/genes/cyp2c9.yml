@@ -239,7 +239,7 @@
     "CYP2C9*25": {
       "phenotype": {"invivo": "", "invitro": "None"}, 
       "mutations": [
-        {"pos": 96701978, "op": "DEL.AGAAATGGAA", "old": "3531:delAGAAATGGAA", "functional": 3, "dbsnp": []}
+        {"pos": 96701970, "op": "DEL.AGAAATGGAA", "old": "3531:delAGAAATGGAA", "functional": 3, "dbsnp": []}
       ]
     }, 
     "CYP2C9*26": {

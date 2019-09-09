@@ -1375,6 +1375,15 @@
         {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
       ]
     }, 
+    "CYP2D6*42W": {
+      "phenotype": {"invivo": "None (dx)", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42525131, "op": "SNP.CG", "old": "1661:G>C", "functional": 0, "dbsnp": ["rs1058164"]}, 
+        {"pos": 42523942, "op": "SNP.GA", "old": "2850:C>T", "functional": 1, "dbsnp": ["rs16947"]}, 
+        {"pos": 42523532, "op": "INS.ca", "old": "3259:insGT", "functional": 3, "dbsnp": ["rs72549346"]}, 
+        {"pos": 42522612, "op": "SNP.CG", "old": "4180:G>C", "functional": 1, "dbsnp": ["rs1135840"]}
+      ]
+    }, 
     "CYP2D6*43": {
       "phenotype": {"invivo": "", "invitro": ""}, 
       "mutations": [
@@ -1903,7 +1912,7 @@
       "mutations": [
         {"pos": 42528027, "op": "SNP.TC", "old": "-1235:A>G", "functional": 0, "dbsnp": ["rs28735595"]}, 
         {"pos": 42527532, "op": "SNP.GA", "old": "-740:C>T", "functional": 0, "dbsnp": ["rs28624811"]}, 
-        {"pos": 42527470, "op": "SNP.TC", "old": "-678:A>G", "functional": 0, "dbsnp": ["rs28633410"]}, 
+        {"pos": 42527470, "op": "SNP.CT", "old": "-678:A>G", "functional": 0, "dbsnp": ["rs28633410"]}, 
         {"pos": 42526775, "op": "SNP.CT", "old": "18:G>A", "functional": 0, "dbsnp": ["rs148382141"]}, 
         {"pos": 42526548, "op": "SNP.TC", "old_pos": 5491, "old": "CYP2D7:i1:5491", "functional": 0, "dbsnp": ["rs1081000"]}, 
         {"pos": 42526560, "op": "SNP.TG", "old_pos": 5503, "old": "CYP2D7:i1:5503", "functional": 0, "dbsnp": ["rs28695233"]}, 
