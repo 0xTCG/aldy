@@ -1,8 +1,13 @@
 language: python
 python:
-  - "3.6"
-  - "3.7"
+- '3.6'
+- '3.7'
 install:
-  - python setup.py install
+- python setup.py install
 script:
-  - pytest aldy --solvers=cbc
+- pytest aldy --solvers=cbc
+deploy:
+  provider: pypi
+  user: inumanag
+  password:
+    secure: tdAk08MB6JXZIJo0exAe+iDOlKUQP24ZF+4gfUUlrhkjlrHjY43HcAnX3jP5Aapmg2Arz4PJVeYUrCZPND1WM0bm/mmOKvfRADVZIkWfdnDj1k/8QmLKbJ4rzdNG3oNDvH3dAWc5Vka+CCryXCNHOuF/7JfnBhpFFd0rJrrJ7BQPVzNk2cKiej9IZCy20eY04px6vY9Cq1EUnOndMu2r3qp3YYxydtkwXXS0ZDmjKAyCmfv9wDwGFX/o5MQQliLv6qKKJ2yJQqeyoYVBz/TVt03EDSZBx/em13SVYFeUrfgCa/Ej0vIjkzTvLVQDR79aiRX4+Scqlf9jvv/RRmQWTzJFk5u6UNj1LxNbiY0oRdThvk+szVuIfOkLJoyoNfmxfGs46pU68Uw9fYUTT/8fD54gWgBO7RCQzUTY3WwEGAOwPtqJIBLuZOMUfvcwDfUIlCzJWTiUt3PAokpH2Z0VyqIb8/XITjIlW4wJDYHYC36eMZa90Lw2fkClg+y/KUWM0MBPPyLDBUhNnWp3UdyKiza+SAmAT9Ns0767Fkoa9krk83AEanWp0vOoGG/Fp66Vp445GJZFocws9AtPpKRJrqDXO9aJxhhA3ik/e8oJh1Ty1WXdVKvkVZ74EstcHeheEbxTkcSjolDsaPiqTN+xNQwuU3RoU9zqAkDMSfxxQLU=
