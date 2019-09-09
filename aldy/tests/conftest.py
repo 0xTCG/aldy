@@ -38,7 +38,7 @@ def pytest_generate_tests(metafunc):
                 return data
 
         samples = []
-        for file, data in read_data("aldy.tests.paper/data-pgx1.json").items():
+        for file, data in read_data("aldy.tests.resources/data-pgx1.json").items():
             samples.append(
                 (
                     data,
@@ -47,7 +47,7 @@ def pytest_generate_tests(metafunc):
                     f"{path}/cram-genome.fa",
                 )
             )
-        for file, data in read_data("aldy.tests.paper/data-pgx2.json").items():
+        for file, data in read_data("aldy.tests.resources/data-pgx2.json").items():
             samples.append(
                 (
                     data,
@@ -56,7 +56,7 @@ def pytest_generate_tests(metafunc):
                     f"{path}/cram-genome.fa",
                 )
             )
-        for file, data in read_data("aldy.tests.paper/data-illumina.json").items():
+        for file, data in read_data("aldy.tests.resources/data-illumina.json").items():
             samples.append(
                 (data, f"{path}/1000genomes-illumina/bams/{file}.bam", "illumina", None)
             )
