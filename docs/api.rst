@@ -64,7 +64,7 @@ To detect copy number configurations, run::
   import aldy.cn
   cn_sols = aldy.cn.estimate_cn(gene, sample.coverage, solver='gurobi')
 
-Alternatively you can use ``solver='scip'`` if you have 
+You can also use ``solver='cbc'``, or alternatively ``solver='scip'`` if you have 
 `PySCIPOpt <https://github.com/SCIP-Interfaces/PySCIPOpt>`_ installed.
 
 Result is a list of :obj:`aldy.solutions.CNSolution` objects described in API.
@@ -101,12 +101,8 @@ to get the whole decomposition, then do the following::
 
 ``minor_sols`` will contain a list of :obj:`aldy.solutions.MinorSolution` objects that point to the optimal major star-alleles and copy numbers.
 
-Finally, if you want to get a nice diplotype (e.g. \*1/\*2+\*3), run::
+Finally, if you want to get a nice diplotype (e.g. \*1/\*2+\*3), just type::
 
-  import aldy.diplotype
-
-  for sol_id, sol in enumerate(minor_sols):
-    diplotype = diplotype.estimate_diplotype(gene, sol)
-    print(diplotype) # prints the diplotype
+  minor_solution.diplotype
 
 More detailed explanation of these functions is available in the :ref:`aldy_api`.

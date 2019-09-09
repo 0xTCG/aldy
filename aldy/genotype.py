@@ -236,7 +236,7 @@ def genotype(
 
     log.info(f"Best {gene.name} star-alleles for {sample_name}:")
     if output_file:
-        print('#' + '\t'.join(OUTPUT_COLS), file=output_file)
+        print("#" + "\t".join(OUTPUT_COLS), file=output_file)
     for i, minor_sol in enumerate(minor_sols):
         log.info(f"  {i + 1:2}: {minor_sol.diplotype}")
         tt = textwrap.wrap(minor_sol._solution_nice(), width=60, break_long_words=False)

@@ -47,7 +47,12 @@ def main():
     )
     sh.push_application()
 
-    log.info("*** Aldy v{} (Python {}) ***", __version__, platform.python_version())
+    log.info(
+        "*** Aldy v{} (Python {}, {}) ***",
+        __version__,
+        platform.python_version(),
+        sys.platform,
+    )
     log.info(
         "*** (c) 2016-{} Aldy Authors & Indiana University Bloomington. "
         + "All rights reserved.",
@@ -305,7 +310,7 @@ def _print_licence():
     """
     Print Aldy license.
     """
-    with open(script_path("aldy.resources/LICENSE.md")) as f:
+    with open(script_path("aldy.resources/LICENSE.rst")) as f:
         for l in f:
             print(l.strip())
 
