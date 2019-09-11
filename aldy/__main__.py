@@ -35,7 +35,7 @@ def main():
     parser, args = _get_args()
 
     # Set the logging verbosity
-    level = args.verbosity.lower()
+    level = (args.verbosity if "verbosity" in args else "I").lower()
     level = next(
         v
         for k, v in logbook.base._reverse_level_names.items()
@@ -62,7 +62,7 @@ def main():
     log.info("*** Free for non-commercial/academic use only.")
 
     try:
-        if args.subparser == "help":
+        if not args.subparser or args.subparser == "help":
             parser.print_help()
         elif args.subparser == "license":
             _print_licence()
@@ -72,7 +72,14 @@ def main():
             database_file = script_path(
                 "aldy.resources.genes/{}.yml".format(args.gene.lower())
             )
-            Gene(database_file).print_configurations()
+            if args.minor:
+                Gene(database_file).print_minors(args.minor)
+            elif args.major:
+                Gene(database_file).print_majors(args.major)
+            elif args.cn_config:
+                Gene(database_file).print_cns(args.cn_config)
+            else:
+                Gene(database_file).print_summary()
         elif args.subparser == "profile":
             p = Sample.load_sam_profile(args.file)
             for i in p:
@@ -282,12 +289,19 @@ def _get_args():
     _ = subparsers.add_parser("license", parents=[base], help="Show Aldy license")
 
     show_parser = subparsers.add_parser(
-        "show",
-        parents=[base],
-        help="Show all available copy number configurations for a given gene.",
+        "show", parents=[base], help="Show database definitions for a given gene."
     )
     show_parser.add_argument(
-        "--gene", "-g", default="all", help="Gene whose configurations are to be shown."
+        "--gene", "-g", required=True, help="Gene whose configurations are to be shown."
+    )
+    show_parser.add_argument(
+        "--major", "-m", default=None, help="Show a major star-allele definition."
+    )
+    show_parser.add_argument(
+        "--cn-config", "-c", default=None, help="Show a copy number configuration."
+    )
+    show_parser.add_argument(
+        "--minor", "-M", default=None, help="Show a minor star-allele definition."
     )
 
     profile_parser = subparsers.add_parser(

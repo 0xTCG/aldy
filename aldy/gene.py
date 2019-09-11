@@ -12,6 +12,7 @@ import enum
 import yaml
 import functools
 import collections
+import textwrap
 
 from .common import (
     GeneRegion,
@@ -21,6 +22,8 @@ from .common import (
     sorted_tuple,
     seq_to_amino,
     rev_comp,
+    log,
+    allele_sort_key,
 )
 
 
@@ -739,36 +742,104 @@ class Gene:
         m_gene, m_region = self.region_at(pos)
         return self.cn_configs[self.alleles[a].cn_config].cn[m_gene][m_region] > 0
 
-    def print_configurations(self):
-        raise NotImplementedError
+    def print_summary(self):
+        log.info(f"Gene {self.name}")
+        log.info(f"  Reference genome locus: {self.region}")
+        pseudo = ", ".join(f"{p} (ID {i + 1})" for i, p in enumerate(self.pseudogenes))
+        log.info(f"  Pseudogenes: {pseudo}")
+        amino = "\n    ".join(textwrap.wrap(self.coding_region.aminoacid))
+        log.info(f"  Aminoacid:\n    {amino}")
+        log.info("  Genic regions:")
 
-        # TODO: do this
-        # log.error('Gene {}\n', self.name)
-        # for name, config in sorted(self.cnv_configurations.items()):
-        #    c6 = [c[2:] for c in config if c.startswith('6.')]
-        #    c7 = [c[2:] for c in config if c.startswith('7.')]
-        #    labels = sorted(list(set(c6) | set(c7)))
-        #    max_width = str(max(3, max(len(x) for x in labels)) + 1)
+        regions = set(j for _, i in self.regions.items() for j in i)
+        log.info("    {:<7}  {:>25} {:>25}", "Region", "Gene", "Pseudogene")
+        for r in sorted(regions):
+            lg = str(self.regions[0].get(r, "-"))
+            lp = str(self.regions[1].get(r, "-"))
+            log.info(f"    {r.number:2} {r.kind.lower():4}: {lg:>25} {lp:>25}")
 
-        #    description = '{}\n'.format(self.descriptions[name]) if name in self.descriptions else ''
-        #    alleles = sorted(set('*' + a.split('/')[0] for a in self.alleles if self.alleles[a].cnv_configuration == name))
-        #    description += 'Alleles: '
-        #    for i in range(0, len(alleles), 12):
-        #       if i != 0: description += '\n         ';
-        #       description += ', '.join(alleles[i:i + 12])
+        log.info(f"  Copy number configurations:")
+        a = "\n    ".join(
+            textwrap.wrap(", ".join(sorted(self.cn_configs, key=allele_sort_key)))
+        )
+        log.info(f"    {a}")
 
-        #    log.warn('Name: {}\n{}'.format(name, description))
-        #    print('            ', end='')
-        #    for c in labels:
-        #       print(('{:>' + max_width + '}').format(c), end='')
-        #    print(' ')
-        #    print('Gene:       ', end='')
-        #    for c in labels:
-        #       if '6.' + c in config:
-        #          print(('{:' + max_width + '}').format(config['6.' + c]), end='')
-        #    print(' ')
-        #    print('Pseudogene: ', end='')
-        #    for c in labels:
-        #       if '7.' + c in config:
-        #          print(('{:' + max_width + '}').format(config['7.' + c]), end='')
-        #    print('\n')
+        log.info("  Major star-alleles:")
+        a = "\n    ".join(
+            textwrap.wrap(
+                ", ".join(f"*{a}" for a in sorted(self.alleles, key=allele_sort_key))
+            )
+        )
+        log.info(f"    {a}")
+
+    def print_cns(self, cn_config):
+        if cn_config not in self.cn_configs:
+            raise AldyException(f"Copy number configuration {cn_config} not found")
+        config = self.cn_configs[cn_config]
+        log.info(f"Gene {self.name}")
+        log.info(f"  Copy number configuration {cn_config}:\n  {config.description}")
+
+        alleles = sorted(config.alleles, key=allele_sort_key)
+        log.info("  Major star-alleles:")
+        a = "\n    ".join(textwrap.wrap(", ".join(f"*{a}" for a in alleles)))
+        log.info(f"    {a}")
+
+        log.info("  Copy number profile:")
+        regions = set(j for i in config.cn for j in config.cn[i])
+        log.info("    {:7}    Gene Pseudo", " ")
+        for r in sorted(regions):
+            lg = config.cn[0].get(r, 0.0)
+            lp = config.cn[1].get(r, 0.0)
+            lg = "-" if lg == 0 else f"{lg:.0f}"
+            lp = "-" if lp == 0 else f"{lp:.0f}"
+            log.info(f"    {r.number:2} {r.kind.lower():4}: {lg:>6} {lp:>6}")
+
+    def print_majors(self, major):
+        if major not in self.alleles:
+            raise AldyException(f"Major star-allele {major} not found")
+        allele = self.alleles[major]
+        # Allele
+        log.info(f"Gene {self.name}")
+        log.info(f"Major star-allele {allele.name}:")
+        log.info(f"  Copy number configuration {allele.cn_config}")
+
+        log.info("  Functional mutations:")
+        for m in sorted(allele.func_muts):
+            dbsnp = m.aux.get("dbsnp", "")
+            kar = m.aux.get("old", "")
+            pos = f"{self.region.chr}:{m.pos}"
+            log.info(f"    {pos:<11} {m.op} {dbsnp:12} {kar}")
+
+        log.info("  Minor star-alleles:")
+        a = "\n    ".join(textwrap.wrap(", ".join(f"*{a}" for a in allele.minors)))
+        log.info(f"    {a}")
+
+    def print_minors(self, minor):
+        log.info(f"Gene {self.name}")
+        found = False
+        for major, allele in sorted(self.alleles.items()):
+            if minor not in allele.minors:
+                continue
+            found = True
+            log.info(f"\nMinor star-allele {minor}:")
+            log.info(f"  Major star-allele: {allele.name}:")
+            log.info(f"  Copy number configuration: {allele.cn_config}")
+            if len(allele.minors[minor].alt_names) > 0:
+                alt = ", ".join(sorted(allele.minors[minor].alt_names))
+                log.info(f"  Alternative names: {alt}")
+
+            log.info("  Functional mutations:")
+            for m in sorted(allele.func_muts):
+                dbsnp = m.aux.get("dbsnp", "")
+                kar = m.aux.get("old", "")
+                pos = f"{self.region.chr}:{m.pos}"
+                log.info(f"    {pos:<11} {m.op} {dbsnp:12} {kar}")
+
+            log.info("  Silent mutations:")
+            for m in sorted(allele.minors[minor].neutral_muts):
+                dbsnp = m.aux.get("dbsnp", "")
+                kar = m.aux.get("old", "")
+                pos = f"{self.region.chr}:{m.pos}"
+                log.info(f"    {pos:<11} {m.op} {dbsnp:12} {kar}")
+        if not found:
+            raise AldyException(f"Minor star-allele {minor} not found")

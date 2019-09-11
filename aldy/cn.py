@@ -90,6 +90,16 @@ def estimate_cn(
             for r in gene.regions[g]
         )
         region_cov = _region_coverage(gene, coverage)
+        total_cov = sum(r0 + r1 for r0, r1 in region_cov.values())
+        min_cov = min(
+            sum(sum(v.values()) for _, v in gene.cn_configs[c].cn.items())
+            for c in gene.cn_configs
+        )
+        if total_cov < min_cov / 2.0:
+            raise AldyException(
+                f"Coverage for {gene.name} too low for copy number calling."
+            )
+
         configs = _filter_configs(gene, coverage)
         log.debug("CN solver: configs = {}", ", ".join(sorted(configs)))
         log.debug("CN solver: max_cn = {}", max_observed_cn)
@@ -313,9 +323,9 @@ def _region_coverage(
         # so we insert a dummy PCE region to prevent KeyNotFound errors
         if PCE_REGION in gene.regions[1] and PCE_REGION not in gene.regions[0]:
             cov[PCE_REGION] = (0, coverage.region_coverage(1, PCE_REGION))
-        return cov
     else:
-        return {r: (coverage.region_coverage(0, r), 0) for r in gene.unique_regions}
+        cov = {r: (coverage.region_coverage(0, r), 0) for r in gene.unique_regions}
+    return cov
 
 
 def _print_coverage(gene: Gene, coverage: Coverage) -> None:

@@ -439,84 +439,6 @@ class CBC(SCIP):
         pass
 
 
-class MIPCL(SCIP):
-    """
-    Wrapper around MIPCL's Python interface (mipshell).
-    Warning: Only Linux is supported.
-    """
-
-    def __init__(self, name):
-        self.mip = importlib.import_module("mipcl_py.mipshell.mipshell")
-        self.model = self.mip.Problem(name)
-        self.INF = self.mip.VAR_INF
-        self.names = collections.defaultdict(int)
-
-    def update(self):
-        pass
-
-    def addConstr(self, *args, **kwargs):
-        pass
-
-    def addVar(self, *args, **kwargs):
-        if "vtype" in kwargs:
-            kwargs["type"] = kwargs["vtype"]
-            del kwargs["vtype"]
-        if "type" in kwargs and kwargs["type"] == "B":
-            kwargs["type"] = self.mip.BIN
-        elif "type" in kwargs and kwargs["type"] == "I":
-            kwargs["type"] = self.mip.INT
-        elif "type" in kwargs:
-            kwargs["type"] = self.mip.REAL
-        if "name" in kwargs:
-            kwargs["name"] = escape_name(kwargs["name"], self.names)
-        v = self.mip.Var(*args, **kwargs)
-        return v
-
-    def setObjective(self, objective, method: str = "min"):
-        self.objective = objective
-        if method == "min":
-            self.model.minimize(self.objective)
-        else:
-            self.model.maximize(self.objective)
-
-    def quicksum(self, expr):
-        return self.mip.sum_(expr)
-
-    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
-        if init is not None:
-            init(self.model)
-        self.model.optimize()
-
-        if not self.model.is_solutionOptimal:
-            raise NoSolutionsError("infeasible")
-        return "optimal", self.model.getObjVal()
-
-    def varName(self, var):
-        return var.name
-
-    def getValue(self, var):
-        x = var.val
-        if var.type == self.mip.INT:
-            return int(round(x))
-        elif var.type == self.mip.BIN:
-            return int(round(x)) > 0
-        else:
-            return x
-
-    def dump(self, file):
-        log.warn("Dumping not supported with MIPCL solver")
-        pass
-
-    def vars(self):
-        return self.model.vars
-
-    def is_binary(self, v):
-        return v.type == self.mip.BIN
-
-    def change_model(self):
-        pass
-
-
 def model(name: str, solver: str):
     """
     Create an ILP solver instance for a model named ``name``.
@@ -573,9 +495,9 @@ def model(name: str, solver: str):
     if solver == "any":
         model = test_gurobi(name)
         if model is None:
-            model = test_scip(name)
-        if model is None:
             model = test_cbc(name)
+        if model is None:
+            model = test_scip(name)
         if model is None:
             raise Exception(
                 "No ILP solver found. Aldy cannot operate without an ILP solver. "

@@ -2,12 +2,19 @@ language: python
 python:
 - '3.6'
 - '3.7'
+before_install:
+  - export VERSION=6.0.2
+  - export DEBFILE=SCIPOptSuite-$VERSION-Linux-Ub1604.deb
+  - wget http://scip.zib.de/download/release/$DEBFILE
+  - sudo dpkg -i $DEBFILE
+  - pip install pyscipopt
 install:
 - python setup.py install
 script:
-- pytest aldy --solvers=cbc
-#deploy:
-#  provider: pypi
-#  user: inumanag
-#  password:
-#    secure: V4HzrZLZw85cjgSceuLRoGwHFBF2thRmAcxvCltZ2eDp9+j1VCnO/L+uWpE8LzJ5GBZpsEu+H5xJZS9DBDf5m6vCVMgDewsK6GGY0hlsUvmwz2050fIz3NKBSATjwZK20nrHX/Wamiuk9LgBQQVsdp1kmii5/3hAsy7TBMrr4g3njfLlygl5lbAzneqnb/GKXr9ZM5zkcmAHxg2n4bsoY1YPpjXercvDj/2qz11cq8QKJ+YnCgnLCuifC4F7yQ/FHqJFFgQn0PLIXaiAC/JNLWKzdDVKcV8x+8ZGVvzAa0o/oBiOZd9gwkclrnOpfQ0zRUEjAndEeCiCIbMdtxnY0esGGoxPMZ1YleOOxyJb1CH1kEY9OvQpGwx5HlmA055I5PVQwRMx9Q9U2CBhfM0xnT7frN0W77umzlWBJ6RcF8VmvWpFex3GDfSdLtnERkuUGFpCmNajR3GFH3P8RaHLTE0ixCX8didFnXkd61nSs8StpsQKCtzR01VqSBHYoIqcTWUQ9HVfojH6wuGfcno8l5XxQEIJHAOVsPgH9eZ/ljvoW97s5yFPcUB59hTfHuUrNagoOZvi6+1fYVhY5JHJOxLkRr6LORXXTlZWj/leUQuAu/qPLUZDY89MzIQXhRGxA/ugwTngsiW6y1vqkcB5ddqlXCNiI/LgJegKNy3teV8=
+- pytest aldy --solvers=cbc,scip
+- aldy test
+# deploy:
+#   provider: pypi
+#   user: inumanag
+#   password:
+#     secure: V4HzrZLZw85cjgSceuLRoGwHFBF2thRmAcxvCltZ2eDp9+j1VCnO/L+uWpE8LzJ5GBZpsEu+H5xJZS9DBDf5m6vCVMgDewsK6GGY0hlsUvmwz2050fIz3NKBSATjwZK20nrHX/Wamiuk9LgBQQVsdp1kmii5/3hAsy7TBMrr4g3njfLlygl5lbAzneqnb/GKXr9ZM5zkcmAHxg2n4bsoY1YPpjXercvDj/2qz11cq8QKJ+YnCgnLCuifC4F7yQ/FHqJFFgQn0PLIXaiAC/JNLWKzdDVKcV8x+8ZGVvzAa0o/oBiOZd9gwkclrnOpfQ0zRUEjAndEeCiCIbMdtxnY0esGGoxPMZ1YleOOxyJb1CH1kEY9OvQpGwx5HlmA055I5PVQwRMx9Q9U2CBhfM0xnT7frN0W77umzlWBJ6RcF8VmvWpFex3GDfSdLtnERkuUGFpCmNajR3GFH3P8RaHLTE0ixCX8didFnXkd61nSs8StpsQKCtzR01VqSBHYoIqcTWUQ9HVfojH6wuGfcno8l5XxQEIJHAOVsPgH9eZ/ljvoW97s5yFPcUB59hTfHuUrNagoOZvi6+1fYVhY5JHJOxLkRr6LORXXTlZWj/leUQuAu/qPLUZDY89MzIQXhRGxA/ugwTngsiW6y1vqkcB5ddqlXCNiI/LgJegKNy3teV8=
