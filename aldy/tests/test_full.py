@@ -287,3 +287,33 @@ def test_NA10860_debug(monkeypatch, solver):
             ./NA10860.minor5.lp"""
         ).strip()
         assert out == expected
+
+
+def test_NA10860_cn(monkeypatch, solver):
+    file = script_path("aldy.tests.resources/NA10860.bam")
+    expected = td(
+        """
+        Genotyping sample NA10860.bam...
+        Potential CYP2D6 copy number configurations for NA10860:
+           1: 2x*1
+              Confidence: 1.00 (score = 0.00)
+
+        Potential major CYP2D6 star-alleles for NA10860:
+           1: 1x*1, 1x*4
+              Confidence: 1.00 (score = 2.69)
+           2: 1x*4.f, 1x*39
+              Confidence: 1.00 (score = 2.69)
+           3: 1x*4.h, 1x*10
+              Confidence: 1.00 (score = 2.69)
+
+        Best CYP2D6 star-alleles for NA10860:
+           1: *1/*4
+              Minor: *1 +42528223:SNP.GA, *4AW
+              Confidence: 1.00 (score = 11.88)
+           2: *1/*4
+              Minor: *1, *4AW +42528223:SNP.GA
+              Confidence: 1.00 (score = 11.88)
+        CYP2D6 results:
+          *1/*4                          (*1, *4)"""
+    )
+    assert_file(monkeypatch, file, solver, expected, {"cn": "1,1"})

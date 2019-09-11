@@ -404,7 +404,27 @@ Commands:
 
 * ``show``
 
-  Show all copy number configurations supported by a gene (requires ``--gene``).
+  Show a gene description (requires ``--gene``).
+
+  - ``-g, --gene GENE``
+
+    Gene profile.
+
+
+  Optional parameters:
+
+  - ``-c, --cn-config [CN_CONFIG]``
+
+    Describe the copy number configuration CN_CONFIG.
+
+  - ``-m, --major [MAJOR]``
+
+    Describe the major star-allele MAJOR.
+
+  - ``-M, --minor [MINOR]``
+
+    Describe the minor star-allele MINOR.
+
 
 * ``profile [FILE]``
 
@@ -499,6 +519,18 @@ Commands:
     Larger values mean lower likelihood of seeing fusions.
 
     *Default:* 0.1
+
+
+Acknowledgements
+================
+
+The following people made Aldy much better software:
+
+- Michael Ford @michael-ford
+- Farid Rashidi @faridrashidi
+- David Twesigomwe @twesigomwedavid
+- Lawrence Hon @lhon
+- Zach Langley @zlangley
 
 
 Contact & Bug Reports
