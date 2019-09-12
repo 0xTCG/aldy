@@ -208,8 +208,8 @@ class Coverage:
         cn_ratio = float(cnv_ref) / sam_ref
         log.debug("CNV factor: {} ({})", cn_ratio, 1.0 / cn_ratio)
 
-        self._rescaled: Dict[int, float] = {}
-        self._region_coverage: Dict[Tuple[int, GeneRegion], float] = {}
+        self._rescaled = {}
+        self._region_coverage = {}
         for gene, gr in gene_regions.items():
             for region, rng in gr.items():
                 s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT

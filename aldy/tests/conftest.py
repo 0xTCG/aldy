@@ -30,7 +30,7 @@ def pytest_generate_tests(metafunc):
     path = metafunc.config.getoption("samples")
     solvers = metafunc.config.getoption("solvers")
     if solvers is None:
-        solvers = "gurobi"
+        solvers = "any"
     solvers = solvers.split(",")
 
     if "solver" in metafunc.fixturenames:
