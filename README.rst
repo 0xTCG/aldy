@@ -526,11 +526,11 @@ Acknowledgements
 
 The following people made Aldy much better software:
 
-- Michael Ford @michael-ford
-- Farid Rashidi @faridrashidi
-- David Twesigomwe @twesigomwedavid
-- Lawrence Hon @lhon
-- Zach Langley @zlangley
+- Michael Ford `@michael-ford <https://github.com/michael-ford>`_
+- Farid Rashidi `@faridrashidi <https://github.com/faridrashidi>`_
+- David Twesigomwe `@twesigomwedavid <https://github.com/twesigomwedavid>`_
+- Lawrence Hon `@lhon <https://github.com/lhon>`_
+- Zach Langley `@zlangley <https://github.com/zlangley>`_
 
 
 Contact & Bug Reports
