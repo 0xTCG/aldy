@@ -42,6 +42,6 @@ deploy:
   user: inumanag
   password:
     secure: "vyU7YaWldww1AlJ/4TPeCSFvbNe1qstLtG7mXeyK0fYAMzPZUch4gL/rYOJwElo3qxPXTHMXkk51Qam6x6/7U3uYp8f/fZeWknSSC/vN2dQGpd1r7Ozw8jinGhrJ62Obwxu5zZXtG0BKvS86hFyEv23f6Q1XomRp9YiBDypCQp/zB5XrBrrLo5/yPXyeiOTfd5M7NkpOcsMtpmDzw5L5iigq8ixR4wIG3pSvsMFz1PeET/VVNwEAjuybvTDKVBDXmlxvr8THiqdOzF9gJsoEy+MlgiVTPifdx8mJiGYgeNUa5wC3gzplbImBYrrS+6RQj/5FHvtxEk/JReV1DEfj+ZgFhBkEuHN8etTDc/rmjIr1RLDLu1u57I+dhs9OfPmEe4PNLzrisLrmkJy/ppCkjfmThgaWSTxyDp4mYzgWx4yCYh5hS6vcKS3SPk+X8QQSPiCcPxOlL2p//6bi3oXK5r8Fv5oY3/Q65lJVjvS8F68kFLDOn2uycVa0WByQMB8xbZTqS+68rIp6y/0tM9D3XQv6UZKBkpO5SLepBGfnrQMilAcYAym4R/2zr+/kPwc6lfc6Pzk2YFxD56reNlGJzlpk0Wx9t5WTg7+Ujxkdrb/qFQMhJczzorbkTCR5R2heXpNZ+U6Er+9noeeC95WaRUKdnElEnwf5mZ78dl4YjNs="
-  server: https://upload.pypi.org/legacy
+    #  server: https://upload.pypi.org/legacy
 after_success:
   - codecov
