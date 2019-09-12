@@ -47,16 +47,19 @@ Aldy requires a mixed integer solver to run.
 
 The following solvers are currently supported:
 
-* `Gurobi <http://www.gurobi.com>`_ (**recommended**):
+* `CBC / Google OR-Tools <https://developers.google.com/optimization/>`_:
+  a free, open-source MIP solver that is shipped by default with Google's OR-Tools.
+  `pip` installs it by default when installing Aldy.
+
+* `Gurobi <http://www.gurobi.com>`_:
   a commercial solver which is free for academic purposes.
-  Most thoroughly tested solver.
+  Most thoroughly tested solver: if you encounter any issues with CBC, try Gurobi.
   After installing it, don't forget to install ``gurobipy`` package by going to
   Gurobi's installation directory
   (e.g. ``/opt/gurobi/linux64`` on Linux or ``/Library/gurobi751/mac64/`` on macOS)
   and typing::
 
       python3 setup.py install
-
 
 * `SCIP <http://scip.zib.de>`_: another solver which is also free for academic purposes.
   SCIP is easier to install than Gurobi (no registration or activation required).
@@ -66,10 +69,6 @@ The following solvers are currently supported:
   SCIP bindings via `pip`: ``pip install pyscipopt``. If it fails, make sure to set
   `SCIPOPTDIR` environmental variable to point to SCIP's install directory.
 
-
-* `CBC / Google OR-Tools <https://developers.google.com/optimization/>`_:
-  a free, open-source MIP solver that is shipped by default with Google's OR-Tools.
-  Install OR-Tools via ``pip install ortools`` to use this solver.
 
 
 Sanity check
