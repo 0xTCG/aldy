@@ -49,7 +49,7 @@ The following solvers are currently supported:
 
 * `CBC / Google OR-Tools <https://developers.google.com/optimization/>`_:
   a free, open-source MIP solver that is shipped by default with Google's OR-Tools.
-  `pip` installs it together with Aldy.
+  `pip` installs it by default when installing Aldy.
 
 * `Gurobi <http://www.gurobi.com>`_:
   a commercial solver which is free for academic purposes.
