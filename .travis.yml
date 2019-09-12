@@ -33,7 +33,7 @@ script:
   - flake8 aldy
   - mypy aldy
   - mkdir -p tmp; cd tmp; aldy test; cd ..
-  - pytest --cov=./ aldy --solvers=cbc,scip
+  - pytest --cov=./ -v aldy --solvers=cbc,scip
 deploy:
   provider: pypi
   on:

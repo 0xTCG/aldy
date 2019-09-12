@@ -19,6 +19,7 @@ import traceback
 import re
 import pytest
 
+from . import common
 from .common import log, script_path, AldyException, td, colorize
 from .gene import Gene, GRange
 from .cn import LEFT_FUSION_PENALTY
@@ -419,6 +420,9 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 run(prefix)
             finally:
                 log.info("Preparing debug archive...")
+                if common._json:
+                    common._json.close()
+                    common._json = None
                 os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
     else:
         run(None)
