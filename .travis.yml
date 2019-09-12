@@ -2,19 +2,42 @@ language: python
 python:
 - '3.6'
 - '3.7'
+addons:
+  apt:
+    packages:
+    - libblas3
+    - libgfortran3
+    - libgmp10
+    - libgsl2
+    - liblapack3
+    - zlib1g
+    - libstdc++6
+    - libc6
+    - libgcc1
 before_install:
+  - python --version
+  - pip install -U pip
+  - pip install -U pytest
+  - pip install pytest-cov codecov
+  # Install SCIP
   - export VERSION=6.0.2
   - export DEBFILE=SCIPOptSuite-$VERSION-Linux-Ub1604.deb
   - wget http://scip.zib.de/download/release/$DEBFILE
   - sudo dpkg -i $DEBFILE
   - pip install pyscipopt
 install:
-- python setup.py install
+  - pip install .
 script:
-- pytest aldy --solvers=cbc,scip
-- aldy test
-# deploy:
-#   provider: pypi
-#   user: inumanag
-#   password:
-#     secure: V4HzrZLZw85cjgSceuLRoGwHFBF2thRmAcxvCltZ2eDp9+j1VCnO/L+uWpE8LzJ5GBZpsEu+H5xJZS9DBDf5m6vCVMgDewsK6GGY0hlsUvmwz2050fIz3NKBSATjwZK20nrHX/Wamiuk9LgBQQVsdp1kmii5/3hAsy7TBMrr4g3njfLlygl5lbAzneqnb/GKXr9ZM5zkcmAHxg2n4bsoY1YPpjXercvDj/2qz11cq8QKJ+YnCgnLCuifC4F7yQ/FHqJFFgQn0PLIXaiAC/JNLWKzdDVKcV8x+8ZGVvzAa0o/oBiOZd9gwkclrnOpfQ0zRUEjAndEeCiCIbMdtxnY0esGGoxPMZ1YleOOxyJb1CH1kEY9OvQpGwx5HlmA055I5PVQwRMx9Q9U2CBhfM0xnT7frN0W77umzlWBJ6RcF8VmvWpFex3GDfSdLtnERkuUGFpCmNajR3GFH3P8RaHLTE0ixCX8didFnXkd61nSs8StpsQKCtzR01VqSBHYoIqcTWUQ9HVfojH6wuGfcno8l5XxQEIJHAOVsPgH9eZ/ljvoW97s5yFPcUB59hTfHuUrNagoOZvi6+1fYVhY5JHJOxLkRr6LORXXTlZWj/leUQuAu/qPLUZDY89MzIQXhRGxA/ugwTngsiW6y1vqkcB5ddqlXCNiI/LgJegKNy3teV8=
+  - aldy test
+  - pytest --cov=./ aldy --solvers=cbc,scip
+deploy:
+  provider: pypi
+  on:
+    branch: master
+    tags: true
+  user: "inumanag"
+  password:
+    secure: "vyU7YaWldww1AlJ/4TPeCSFvbNe1qstLtG7mXeyK0fYAMzPZUch4gL/rYOJwElo3qxPXTHMXkk51Qam6x6/7U3uYp8f/fZeWknSSC/vN2dQGpd1r7Ozw8jinGhrJ62Obwxu5zZXtG0BKvS86hFyEv23f6Q1XomRp9YiBDypCQp/zB5XrBrrLo5/yPXyeiOTfd5M7NkpOcsMtpmDzw5L5iigq8ixR4wIG3pSvsMFz1PeET/VVNwEAjuybvTDKVBDXmlxvr8THiqdOzF9gJsoEy+MlgiVTPifdx8mJiGYgeNUa5wC3gzplbImBYrrS+6RQj/5FHvtxEk/JReV1DEfj+ZgFhBkEuHN8etTDc/rmjIr1RLDLu1u57I+dhs9OfPmEe4PNLzrisLrmkJy/ppCkjfmThgaWSTxyDp4mYzgWx4yCYh5hS6vcKS3SPk+X8QQSPiCcPxOlL2p//6bi3oXK5r8Fv5oY3/Q65lJVjvS8F68kFLDOn2uycVa0WByQMB8xbZTqS+68rIp6y/0tM9D3XQv6UZKBkpO5SLepBGfnrQMilAcYAym4R/2zr+/kPwc6lfc6Pzk2YFxD56reNlGJzlpk0Wx9t5WTg7+Ujxkdrb/qFQMhJczzorbkTCR5R2heXpNZ+U6Er+9noeeC95WaRUKdnElEnwf5mZ78dl4YjNs="
+  server: https://upload.pypi.org/legacy
+after_success:
+  - codecov
