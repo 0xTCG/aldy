@@ -9,6 +9,7 @@ Aldy
     :target: https://aldy.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 .. image:: https://codecov.io/github/inumanag/aldy/coverage.svg?branch=master
+    :target: https://codecov.io/github/inumanag/aldy
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
