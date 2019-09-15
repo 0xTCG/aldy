@@ -16,6 +16,7 @@ from . import major
 from . import minor
 from . import diplotype
 from . import solutions
+from . import remap
 
 from .common import log, script_path, json_print, AldyException, SOLUTION_PRECISION
 from .gene import Gene, GRange
@@ -38,6 +39,7 @@ def genotype(
     gap: int = 0,
     max_minor_solutions: int = 1,
     debug: Optional[str] = None,
+    do_remap: int = 0,
 ) -> List[solutions.MinorSolution]:
     """
     Genotype a sample.
@@ -93,6 +95,9 @@ def genotype(
             Prefix for debug information and core dump files.
             ``None`` for no debug information.
             Default is ``None``.
+        do_remap (int):
+            Realign reads for better mutation calling.
+            Default is 0.
 
     Raises:
         :obj:`aldy.common.AldyException` if the average coverage is too low (below 2).
@@ -173,6 +178,32 @@ def genotype(
         conf = (min_cn_score + SLACK) / (cn_sol.score + SLACK)
         log.info(f"      Confidence: {conf:.2f} (score = {cn_sol.score:.2f})")
     log.info("")
+
+    if do_remap != 0:
+        log.critical('Remapping! Stay tuned...')
+        cn_sol = cn_sols[0] #!! TODO IMPORTANT just use furst CN for now
+        new_path = remap.remap(sam_path, gene, sample, cn_sol, remap_mode=do_remap, out_dir=os.path.dirname(output_file.name))
+        # gene = gene_backup # refactor this somehow...
+        sam.SAM.CACHE = False
+        sample = sam.Sample(
+            sam_path=new_path,
+            gene=gene,
+            threshold=threshold,
+            profile=profile,
+            phase=phase,
+            reference=reference,
+            cn_region=cn_region,
+            debug=debug,
+        )
+        cn_sols = cn.estimate_cn(
+            gene,
+            sample.coverage,
+            solver=solver,
+            gap=gap,
+            user_solution=cn_solution,
+            fusion_penalty=fusion_penalty,
+            debug=debug,
+        )
 
     for i, cn_sol in enumerate(cn_sols):
         major_sols += major.estimate_major(

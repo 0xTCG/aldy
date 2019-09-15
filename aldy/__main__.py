@@ -245,9 +245,11 @@ def _get_args():
                Default is 0 (report only optimal solutions)."""
         ),
     )
-    # genotype_parser.add_argument('--remap', default=0,
-    #   help='Realign reads for better mutation calling.
-    # Requires samtools and bowtie2 in $PATH.')
+    genotype_parser.add_argument(
+        '--remap',
+        default=0,
+        help="Realign reads for better mutation calling. "
+        + "Requires samtools and bowtie2 in $PATH.")
     genotype_parser.add_argument(
         "--debug",
         default=None,
@@ -385,6 +387,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 gap=float(args.gap),
                 max_minor_solutions=int(args.max_minor_solutions),
                 debug=debug,
+                do_remap=int(args.remap)
             )
             log.info(colorize(f"{gene.upper()} results:"))
             reported = set()
