@@ -184,7 +184,7 @@ def genotype(
         cn_sol = cn_sols[0] #!! TODO IMPORTANT just use furst CN for now
         new_path = remap.remap(sam_path, gene, sample, cn_sol, remap_mode=do_remap, out_dir=os.path.dirname(output_file.name))
         # gene = gene_backup # refactor this somehow...
-        sam.SAM.CACHE = False
+        # sam.SAM.CACHE = False
         sample = sam.Sample(
             sam_path=new_path,
             gene=gene,

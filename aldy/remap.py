@@ -34,11 +34,11 @@ from .common import *
 
 def cmd(cmd):
     log.debug('Executing ' + cmd)
-    return str(subprocess.check_output(cmd, shell=True))
+    return subprocess.check_output(cmd, shell=True)
 
 
 @timing
-def optimize(gene, reads, alleles, copy_number, avg_coverage):
+def optimize(gene, reads, alleles, copy_number, coverage):
     model = lpinterface.model('reads', 'gurobi')
 
     # Binary variables for reads
@@ -60,7 +60,8 @@ def optimize(gene, reads, alleles, copy_number, avg_coverage):
         pos = alleles[a][0][0] + k
         
         v = model.addVar(lb=-model.INF, name='z_{}_{}'.format(a, k), update=False)
-        model.addConstr(v == lhs - copy_number[gene.region_at(pos)[0]] * round(copy_number.baseline[pos]))
+        #model.addConstr(v == lhs - copy_number[gene.region_at(pos)[0]] * round(coverage._rescaled[pos]))
+        model.addConstr(v == lhs - copy_number.position_cn(pos) * 10)
 
         y[a, k] = model.addVar(lb=0, name='y_{}_{}'.format(a, k), update=False)
         model.model.addGenConstrAbs(y[a, k], v)
@@ -88,6 +89,7 @@ def optimize(gene, reads, alleles, copy_number, avg_coverage):
     model.update()
 
     # Objective
+    avg_coverage = coverage.average_coverage()
     score = lambda r, m: len(r.query_sequence) - r.get_tag('NM')
     obj  = model.quicksum(avg_coverage*score(*reads[r][a]) * x[r][a] for r in x for a in x[r])
     obj -= model.quicksum(y.values())
@@ -100,7 +102,8 @@ def optimize(gene, reads, alleles, copy_number, avg_coverage):
     def params(m):
         m.params.timeLimit = 30 * 60
         m.params.outputFlag = 1
-    model.solve(objective=obj, method='max', init=params)
+    model.setObjective(objective=obj, method='max')
+    model.solve(init=params)
 
     # Remove bad reads
     result = {}
@@ -137,10 +140,10 @@ def write_reads(sam_path, gene, alleles, reads, out_path):
                 a.query_qualities = x.query_qualities
                 a.tags = x.tags
                 out.write(a)
-            cnv_chromosome, cnv_start, cnv_end = gene.cnv_region
-            region = 'chr{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)
-            for read in sam.fetch(region=region):
-                out.write(read)
+            # cnv_chromosome, cnv_start, cnv_end = gene.cnv_region
+            # region = 'chr{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)
+            # for read in sam.fetch(region=region):
+            #     out.write(read)
     cmd('samtools index {}'.format(out_path))
 
 
@@ -175,7 +178,7 @@ def realign(alleles, tempdir, sam_path):
             # out = cmd('mrfast --index {0}/{1}.fa'.format(tempdir, i))
             
             # out = cmd('bwa index {0}/{1}.fa'.format(tempdir, i))
-            log.trace(out)
+            # log.trace(out)
     log.warn('Creating bowtie2 reference')
     makeref()
 
@@ -193,7 +196,7 @@ def realign(alleles, tempdir, sam_path):
             
             # out = cmd('bwa aln {0}/{1}.fa {2} > {2}.{1}.sai'.format(tempdir, i, newpath))
             # out = cmd('bwa sampe {0}/{1}.fa {2}.{1}.sai {2} > {2}.{1}.sam'.format(tempdir, i, newpath))
-            log.debug(out)
+            # log.debug(out)
     log.warn('Aligning reads via bowtie2')
     regions = ['chr22:{}-{}'.format(*alleles[i][0]) for i in alleles]
     realign(sam_path, regions)
@@ -256,7 +259,7 @@ def remap(sam_path, gene, sam, cn_sol, out_dir, tempdir=None, force=True, cleanu
         reads = get_reads(alleles, tempdir, sam_path)
         
         log.warn('Optimizing...')
-        reads = optimize(gene, reads, alleles, cn_sol, sam.coverage.average_coverage())
+        reads = optimize(gene, reads, alleles, cn_sol, sam.coverage)
 
         out = out_dir+'/{}.remapped.bam'.format(os.path.basename(sam_path)[:-len('.bam')])
         if os.path.exists(out) and not force:
