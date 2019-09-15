@@ -34,7 +34,7 @@ from .common import *
 
 def cmd(cmd):
     log.debug('Executing ' + cmd)
-    return subprocess.check_output(cmd, shell=True)
+    return str(subprocess.check_output(cmd, shell=True))
 
 
 @timing
@@ -60,7 +60,7 @@ def optimize(gene, reads, alleles, copy_number, avg_coverage):
         pos = alleles[a][0][0] + k
         
         v = model.addVar(lb=-model.INF, name='z_{}_{}'.format(a, k), update=False)
-        model.addConstr(v == lhs - copy_number[gene.region_at[pos]] * round(copy_number.baseline[pos]))
+        model.addConstr(v == lhs - copy_number[gene.region_at(pos)[0]] * round(copy_number.baseline[pos]))
 
         y[a, k] = model.addVar(lb=0, name='y_{}_{}'.format(a, k), update=False)
         model.model.addGenConstrAbs(y[a, k], v)
@@ -146,15 +146,14 @@ def write_reads(sam_path, gene, alleles, reads, out_path):
 
 def get_alleles(gene):
     def sequence(gene, id, pad=0):
-        print('-----------', gene.regions.items())
-        regs = [b for a, b in gene.regions.items() if a.startswith(str(id) + '.')]
+        regs = [(int(b.start),int(b.end)) for a, b in gene.regions[id].items()]
         mi, ma = min(r[0] for r in regs), max(r[1] for r in regs)
         st = gene.region[1]
         return (mi, ma), gene.seq[max(0, mi - st - pad):min(ma - st + pad, len(gene.seq))]
 
     return {
-        '6': sequence(gene, '6'),
-        '7': sequence(gene, '7'),
+        '6': sequence(gene, 0),
+        '7': sequence(gene, 1),
     }
 
 
@@ -257,8 +256,7 @@ def remap(sam_path, gene, sam, cn_sol, out_dir, tempdir=None, force=True, cleanu
         reads = get_reads(alleles, tempdir, sam_path)
         
         log.warn('Optimizing...')
-        avg_coverage = round(sum(sam.total(pos) for pos in sam.coverage) / float(len(sam.coverage)))
-        reads = optimize(gene, reads, alleles, cn_sol, avg_coverage)
+        reads = optimize(gene, reads, alleles, cn_sol, sam.coverage.average_coverage())
 
         out = out_dir+'/{}.remapped.bam'.format(os.path.basename(sam_path)[:-len('.bam')])
         if os.path.exists(out) and not force:
