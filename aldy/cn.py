@@ -7,7 +7,6 @@
 from typing import Dict, List, Tuple, Optional
 
 import copy
-import collections
 
 from . import lpinterface
 

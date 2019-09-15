@@ -38,87 +38,83 @@ def cmd(cmd):
 
 
 @timing
-def optimize(gene, reads, alleles, copy_number):
-    model = lpinterface.model("reads", "gurobi")
+def optimize(gene, reads, alleles, copy_number, avg_coverage):
+   model = lpinterface.model('reads', 'gurobi')
 
-    # Binary variables for reads
-    x = collections.defaultdict(dict)
-    d = dict()
-    for r in reads:
-        for a in reads[r]:
-            x[r][a] = model.addVar(vtype="B", name="x_{}_{}".format(a, r), update=False)
-        d[r] = model.addVar(vtype="B", name="d_{}".format(r), update=False)
+   # Binary variables for reads
+   x = collections.defaultdict(dict)
+   d = dict()
+   for r in reads:
+      for a in reads[r]:
+         x[r][a] = model.addVar(vtype='B', name='x_{}_{}'.format(a, r), update=False)   
+      d[r] = model.addVar(vtype='B', name='d_{}'.format(r), update=False)
 
-    # Coverage constraints
-    z = collections.defaultdict(int)
-    for r in reads:
-        for a, (read, read_mut) in reads[r].items():
-            for k in range(read.reference_start, read.reference_end):
-                z[a, k] += x[r][a]
-    y = dict()
-    for (a, k), lhs in z.items():
-        pos = alleles[a][0][0] + k
+   # Coverage constraints
+   z = collections.defaultdict(int)
+   for r in reads:
+      for a, (read, read_mut) in reads[r].items():
+         for k in range(read.reference_start, read.reference_end):
+            z[a, k] += x[r][a]
+   y = dict()
+   for (a, k), lhs in z.items():
+      pos = alleles[a][0][0] + k
+      
+      v = model.addVar(lb=-model.INF, name='z_{}_{}'.format(a, k), update=False)
+      model.addConstr(v == lhs - copy_number[gene.region_at[pos]] * round(copy_number.baseline[pos]))
 
-        v = model.addVar(lb=-model.INF, name="z_{}_{}".format(a, k), update=False)
-        model.addConstr(
-            v
-            == lhs - copy_number[gene.region_at[pos]] * round(copy_number.baseline[pos])
-        )
+      y[a, k] = model.addVar(lb=0, name='y_{}_{}'.format(a, k), update=False)
+      model.model.addGenConstrAbs(y[a, k], v)
 
-        y[a, k] = model.addVar(lb=0, name="y_{}_{}".format(a, k), update=False)
-        model.model.addGenConstrAbs(y[a, k], v)
+   ## Alternative: use mutation data
+   ## Much slower model!
+   # mut = collections.defaultdict(dict)
+   # for r in reads:
+   #    for a, (read, read_mut) in reads[r].items():
+   #       for k in range(read.reference_start, read.reference_end):
+   #          m = read_mut.get(k, '_')
+   #          if m not in mut[a, k]:
+   #             mut[a, k][m] = model.addVar(vtype='I', name='mut_{}_{}_{}'.format(a, k, m), update=False)
+   #          z[a, k, m] += x[r][a]
+   # for (a, k, m), lhs in z.items():
+   #    pos = alleles[a][0][0] + k 
+   #    v = model.addVar(lb=-model.INF, name='z_{}_{}_{}'.format(a, k, m), update=False)
+   #    model.addConstr(v == lhs - mut[a, k][m] * round(copy_number.baseline[pos]))
+   #    y[a, k, m] = model.addVar(lb=0, name='y_{}_{}_{}'.format(a, k, m), update=False)
+   #    model.model.addGenConstrAbs(y[a, k, m], v)
+   # for a, k in mut:
+   #    pos = alleles[a][0][0] + k
+   #    model.addConstr(copy_number[gene.region_at[pos]] == model.quicksum(mut[a, k].values()))
 
-    ## Alternative: use mutation data
-    ## Much slower model!
-    # mut = collections.defaultdict(dict)
-    # for r in reads:
-    #    for a, (read, read_mut) in reads[r].items():
-    #       for k in range(read.reference_start, read.reference_end):
-    #          m = read_mut.get(k, '_')
-    #          if m not in mut[a, k]:
-    #             mut[a, k][m] = model.addVar(vtype='I', name='mut_{}_{}_{}'.format(a, k, m), update=False)
-    #          z[a, k, m] += x[r][a]
-    # for (a, k, m), lhs in z.items():
-    #    pos = alleles[a][0][0] + k
-    #    v = model.addVar(lb=-model.INF, name='z_{}_{}_{}'.format(a, k, m), update=False)
-    #    model.addConstr(v == lhs - mut[a, k][m] * round(copy_number.baseline[pos]))
-    #    y[a, k, m] = model.addVar(lb=0, name='y_{}_{}_{}'.format(a, k, m), update=False)
-    #    model.model.addGenConstrAbs(y[a, k, m], v)
-    # for a, k in mut:
-    #    pos = alleles[a][0][0] + k
-    #    model.addConstr(copy_number[gene.region_at[pos]] == model.quicksum(mut[a, k].values()))
+   model.update()
 
-    model.update()
+   # Objective
+   score = lambda r, m: len(r.query_sequence) - r.get_tag('NM')
+   obj  = model.quicksum(avg_coverage*score(*reads[r][a]) * x[r][a] for r in x for a in x[r])
+   obj -= model.quicksum(y.values())
+   
+   # Existence constraints
+   for r in reads:
+      model.addConstr(model.quicksum(x[r].values()) + d[r] == 1)
 
-    # Objective
-    score = lambda r, m: len(r.query_sequence) - r.get_tag("NM")
-    obj = model.quicksum(score(*reads[r][a]) * x[r][a] for r in x for a in x[r])
-    obj -= model.quicksum(y.values())
+   # Solve
+   def params(m):
+      m.params.timeLimit = 30 * 60
+      m.params.outputFlag = 1
+   model.solve(objective=obj, method='max', init=params)
 
-    # Existence constraints
-    for r in reads:
-        model.addConstr(model.quicksum(x[r].values()) + d[r] == 1)
-
-    # Solve
-    def params(m):
-        m.params.timeLimit = 30 * 60
-        m.params.outputFlag = 1
-
-    model.solve(objective=obj, method="max", init=params)
-
-    # Remove bad reads
-    result = {}
-    deleted = 0
-    for r, xa in x.items():
-        if model.getValue(d[r]):
-            deleted += 1
-            continue
-        correct_allele = [a for a in xa if model.getValue(xa[a])]
-        assert len(correct_allele) == 1
-        correct_allele = correct_allele[0]
-        result[r] = reads[r][correct_allele]
-    log.warn("Discarded {} reads".format(deleted))
-    return result
+   # Remove bad reads
+   result = {}
+   deleted = 0
+   for r, xa in x.items():
+      if model.getValue(d[r]):
+         deleted += 1
+         continue
+      correct_allele = [a for a in xa if model.getValue(xa[a])]
+      assert(len(correct_allele) == 1)
+      correct_allele = correct_allele[0]
+      result[r] = reads[r][correct_allele]
+   log.warn('Discarded {} reads'.format(deleted))
+   return result
 
 
 def write_reads(sam_path, gene, alleles, reads, out_path):
@@ -168,33 +164,31 @@ def get_alleles(gene):
 
 
 def realign(alleles, tempdir, sam_path):
-    def makeref():
-        for i in "67":
-            with open("{}/{}.fa".format(tempdir, i), "w") as f:
-                print(">{}".format(i), file=f)
-                print("\n".join(textwrap.wrap(alleles[i][1])), file=f)
-            out = cmd("bowtie2-build {0}/{1}.fa {0}/{1}".format(tempdir, i))
-            log.trace(out)
+   def makeref():
+      for i in '67':
+         with open('{}/{}.fa'.format(tempdir, i), 'w') as f:
+            print('>{}'.format(i), file=f)
+            print('\n'.join(textwrap.wrap(alleles[i][1])), file=f)
+         out = cmd('bowtie2-build {0}/{1}.fa {0}/{1}'.format(tempdir, i))
+         # out = cmd('samtools faidx {0}/{1}.fa'.format(tempdir, i))
+         # out = cmd('/home/frashidi/Dropbox/bin/mrfast --index {0}/{1}.fa'.format(tempdir, i))
+         # out = cmd('bwa index {0}/{1}.fa'.format(tempdir, i))
+         log.trace(out)
+   log.warn('Creating bowtie2 reference')
+   makeref()
 
-    log.warn("Creating bowtie2 reference")
-    makeref()
-
-    def realign(path, regions):
-        newpath = "{}/{}.fq".format(tempdir, os.path.basename(path))
-        cmd(
-            "samtools view -h {} {} | samtools fastq - > {}".format(
-                path, " ".join(regions), newpath
-            )
-        )
-        for i in "67":
-            out = cmd(
-                "bowtie2 -x {0}/{1} {2} -S {2}.{1}.sam".format(tempdir, i, newpath)
-            )
-            log.debug(out)
-
-    log.warn("Aligning reads via bowtie2")
-    regions = ["chr22:{}-{}".format(*alleles[i][0]) for i in alleles]
-    realign(sam_path, regions)
+   def realign(path, regions):
+      newpath = '{}/{}.fq'.format(tempdir, os.path.basename(path))
+      cmd('samtools view -h {} {} | samtools fastq - > {}'.format(path, ' '.join(regions), newpath))
+      for i in '67':
+         out = cmd('bowtie2 -x {0}/{1} {2} -S {2}.{1}.sam'.format(tempdir, i, newpath))
+         # out = cmd('/home/frashidi/Dropbox/bin/mrfast -e 2 --search {0}/{1}.fa --seq {2} -o {2}.{1}.t.sam --best'.format(tempdir, i, newpath))
+         # cmd('cat {1}.{0}.t.sam | head -n -2 > {1}.{0}.sam'.format(i, newpath))
+         # out = cmd('bwa mem -h 12 {0}/{1}.fa {2} > {2}.{1}.sam'.format(tempdir, i, newpath))
+         log.debug(out)
+   log.warn('Aligning reads via bowtie2')
+   regions = ['chr22:{}-{}'.format(*alleles[i][0]) for i in alleles]
+   realign(sam_path, regions)
 
 
 def get_reads(alleles, tempdir, sam_path):
@@ -244,34 +238,35 @@ def get_reads(alleles, tempdir, sam_path):
 
 
 @timing
-def remap(
-    sam_path, gene, sam, cn_sol, tempdir=None, force=True, cleanup=False, remap_mode=1
-):
-    if tempdir is None:
-        tempdir = tempfile.mkdtemp(suffix="_tmpaldy", dir=".")
-    log.critical("Temp is " + tempdir)
+def remap(sam_path, gene, sam, cn_sol, tempdir=None, force=True, cleanup=False, remap_mode=1):
+   if tempdir is None:
+      tempdir = tempfile.mkdtemp(suffix='_tmpaldy', dir='.')
+   log.critical('Temp is ' + tempdir)
 
-    if str(remap_mode) == "2":
-        out = remap_farid.remap(sam_path, gene, sam, cn_sol, tempdir)
-    else:
-        log.critical("My remapper")
+   if str(remap_mode) == '2':
+      out = remap_farid.remap(sam_path, gene, sam, cn_sol, tempdir)
+   else:
+      log.critical("My remapper")
 
-        alleles = get_alleles(gene)
-        realign(alleles, tempdir, sam_path)
+      alleles = get_alleles(gene)
+      realign(alleles, tempdir, sam_path)
 
-        log.warn("Reading realinged data...")
-        reads = get_reads(alleles, tempdir, sam_path)
+      log.warn('Reading realinged data...')
+      reads = get_reads(alleles, tempdir, sam_path)
+      
+      log.warn('Optimizing...')
+      avg_coverage = round(sum(sam.total(pos) for pos in sam.coverage) / float(len(sam.coverage)))
+      reads = optimize(gene, reads, alleles, cn_sol, avg_coverage)
 
-        log.warn("Optimizing...")
-        reads = optimize(gene, reads, alleles, cn_sol)
+      out = '{}.remap_ibrahim.bam'.format(os.path.basename(sam_path)) 
+      if os.path.exists(out) and not force:
+         raise AldyException('{} already exists--- make sure to use --force!'.format(out))
+      write_reads(sam_path, gene, alleles, reads, out)
 
-        out = "{}.remap_ibrahim.bam".format(os.path.basename(sam_path))
-        if os.path.exists(out) and not force:
-            raise AldyException(
-                "{} already exists--- make sure to use --force!".format(out)
-            )
-        write_reads(sam_path, gene, alleles, reads, out)
+   if cleanup:
+      shutil.rmtree(tempdir)
+   return out
 
-    if cleanup:
-        shutil.rmtree(tempdir)
-    return out
+
+
+   
