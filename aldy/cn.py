@@ -7,6 +7,7 @@
 from typing import Dict, List, Tuple, Optional
 
 import copy
+import collections
 
 from . import lpinterface
 
@@ -81,6 +82,8 @@ def estimate_cn(
     log.debug("\n" + "*" * 80)
 
     if user_solution is not None:
+        if user_solution == ["estimate"]:
+            return list(_brute_force_estimate(gene, coverage))
         return [_parse_user_solution(gene, user_solution)]
     else:
         # TODO: filter CN configs with non-present alleles
@@ -377,3 +380,44 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
     s = CNSolution(0, solution=sols, gene=gene)  # type: ignore
     log.debug("CN solver: using user-provided solution: {}", s)
     return s
+
+
+def _brute_force_estimate(gene, coverage):
+    potentials = []
+    for s, v in coverage._coverage.items():
+        if "_" in v and len(v) > 1:
+            for vx, vy in v.items():
+                if s not in gene._region_at:
+                    continue
+                if "SNP" not in vx:
+                    continue
+                if not vy > 0:
+                    continue
+                if (s, vx) not in gene.mutations:
+                    continue
+                potentials.append((gene.mutations[s, vx], vy))
+
+    arr = []
+    for cp in range(2, 5):
+        cn = 100.0 / cp
+        err = 0
+        for mut, val in potentials:
+            p = coverage.percentage(mut)
+            opt = min(abs(cn * c - int(p)) for c in range(cp + 1))
+            err += opt
+        arr.append((err, cp))
+    arr = [(k[1], round(k[0], 1)) for k in sorted(arr)]
+
+    log.info(
+        "Most likely CNs based on SNP estimation (the lower the score, the better):"
+    )
+    p = arr[0][1]
+    likely = []
+    for cn, v in arr:
+        if abs(v - p) < 1e-3:
+            likely.append(cn)
+        log.info("  CN = {} (score = {:.2f})", cn, v)
+
+    log.info("Choosing CNs = {}", likely)
+    for cn in likely:
+        yield CNSolution(0, {"1": arr[0][0]}, gene)
