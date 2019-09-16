@@ -175,7 +175,7 @@ def _get_args(argv):
         parents=[base],
     )
     genotype_parser.add_argument(
-        "file", nargs="?", help="Input file in SAM, BAM, CRAM or DeeZ format."
+        "file", nargs="?", help="Input file in SAM, BAM or CRAM format."
     )
     genotype_parser.add_argument(
         "--gene",
@@ -209,7 +209,7 @@ def _get_args(argv):
         "--reference",
         "-r",
         default=None,
-        help="Genome reference used for reading CRAM or DeeZ files",
+        help="Genome reference used for reading CRAM files",
     )
     genotype_parser.add_argument(
         "--cn-neutral-region",

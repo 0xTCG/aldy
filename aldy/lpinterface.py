@@ -449,7 +449,7 @@ def model(name: str, solver: str):
       :obj:`Exception` if no solver is found.
     """
 
-    def test_gurobi(name):
+    def test_gurobi(name):  # pragma: no cover
         """
         Test if Gurobi is present. Requires Gurobi 7+.
         """

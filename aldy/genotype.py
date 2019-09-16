@@ -50,7 +50,7 @@ def genotype(
             Gene name (if it is located in the Aldy's gene database)
             or the location of a gene database in YML format.
         sam_path (str):
-            Location of SAM/BAM/CRAM/DeeZ file that is to be analyzed.
+            Location of SAM/BAM/CRAM file that is to be analyzed.
         profile (str):
             Coverage profile (e.g. 'illumina').
             Can be ``None`` if ``cn_solution`` is provided.
@@ -81,7 +81,7 @@ def genotype(
             DEPRECATED: currently does nothing.
             Default is ``False``.
         reference (str, optional):
-            A reference genome for reading DeeZ or CRAM files.
+            A reference genome for reading CRAM files.
             Default is ``None``.
         gap (float):
             Relative optimality gap. Use non-zero values to allow non-optimal solutions.
@@ -228,11 +228,11 @@ def genotype(
         )
         n.diplotype = m.diplotype
         minor_sols.append(n)
-    
+
     if len(minor_sols) == 0:
         raise AldyException(
-            "Aldy could not phase any major solution. " + 
-            "Please run with  --debug parameter and notify the authors of Aldy."
+            "Aldy could not phase any major solution. "
+            + "Please run with  --debug parameter and notify the authors of Aldy."
         )
     min_minor_score = min(minor_sols, key=lambda m: m.score).score
     minor_sols = sorted(
@@ -243,7 +243,7 @@ def genotype(
     json_print(debug, "  ],")
 
     log.info(f"Best {gene.name} star-alleles for {sample_name}:")
-    is_vcf = output_file and output_file.name[-4:] == '.vcf'
+    is_vcf = output_file and output_file.name[-4:] == ".vcf"
     if output_file and not is_vcf:
         print("#" + "\t".join(OUTPUT_COLS), file=output_file)
     for i, minor_sol in enumerate(minor_sols):

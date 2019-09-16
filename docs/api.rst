@@ -41,7 +41,7 @@ Alternatively we can use genes shipped with Aldy::
 Loading a SAM/BAM file
 ======================
 
-A SAM/BAM/CRAM/DeeZ file can be loaded as follows::
+A SAM/BAM/CRAM file can be loaded as follows::
 
   import aldy.sam
   sample = aldy.sam.Sample(sam_path='my/sample.bam', 
@@ -51,7 +51,7 @@ A SAM/BAM/CRAM/DeeZ file can be loaded as follows::
                            reference=None,
                            cn_region=aldy.sam.DEFAULT_CN_NEUTRAL_REGION)
 
-Pass a path to the reference genome (``reference`` parameter) if using CRAM or DeeZ file.
+Pass a path to the reference genome (``reference`` parameter) if using a CRAM file.
 Custom copy-number region can be passed via ``cn_region`` parameter (by default it points to *CYP2D8* region).
 Threshold should be always set to 0.5.
 

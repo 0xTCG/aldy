@@ -332,6 +332,70 @@ def test_NA10860_vcf(monkeypatch, solver):
         assert produced == expected
 
 
+EXPECTED_INS = f"""
+{HEADER}
+Genotyping sample INS.dump...
+Potential CYP2D6 copy number configurations for INS:
+   1: 2x*1
+      Confidence: 1.00 (score = 4.33)
+
+Potential major CYP2D6 star-alleles for INS:
+   1: 1x*1, 1x*40
+      Confidence: 1.00 (score = 0.51)
+
+Best CYP2D6 star-alleles for INS:
+   1: *1/*40
+      Minor: *1, *40
+      Confidence: 1.00 (score = 0.76)
+CYP2D6 results:
+  *1/*40                         (*1, *40)"""
+
+
+def test_fix_insertions(monkeypatch, solver):
+    file = script_path("aldy.tests.resources/INS.dump")
+    assert_file(
+        monkeypatch,
+        file,
+        solver,
+        EXPECTED_INS,
+        {"--profile": "pgrnseq-v1", "--max-minor-solutions": "1"},
+    )
+
+
+EXPECTED_PROFILE = f"""
+{HEADER}
+Generating profile for DPYD (1:97541297-98388616)
+Generating profile for CYP2C19 (10:96444999-96615001)
+Generating profile for CYP2C9 (10:96690999-96754001)
+Generating profile for CYP2C8 (10:96795999-96830001)
+Generating profile for CYP4F2 (19:15618999-16009501)
+Generating profile for CYP2A6 (19:41347499-41400001)
+Generating profile for CYP2D6 (22:42518899-42553001)
+Generating profile for TPMT (6:18126540-18157375)
+Generating profile for CYP3A5 (7:99244999-99278001)
+Generating profile for CYP3A4 (7:99353999-99465001)
+"""
+
+
+def test_profile(monkeypatch, capsys):
+    lines = []
+
+    def log_info(*args):
+        s = str.format(*args)
+        lines.append(s)
+
+    monkeypatch.setattr(log, "info", log_info)
+
+    main(["profile", script_path("aldy.tests.resources/NA10860.bam")])
+    lines = escape_ansi("\n".join(lines)).strip()
+    assert lines == EXPECTED_PROFILE.strip()
+
+    captured = capsys.readouterr()
+    with open(script_path("aldy.tests.resources/NA10860.profile")) as f:
+        expected = f.read()
+    assert captured.out == expected
+
+
 EXPECTED_SHOW = f"""
 {HEADER}
 Gene TOY
@@ -390,7 +454,7 @@ Major star-allele 2:
     1:119       INS.TT              
   Minor star-alleles:
     *2
-""" # noqa
+"""  # noqa
 
 
 def test_show_major(monkeypatch):
@@ -407,7 +471,7 @@ Minor star-allele 1C:
   Functional mutations:
     1:105       SNP.TA              
   Silent mutations:
-""" # noqa
+"""  # noqa
 
 
 def test_show_minor(monkeypatch):

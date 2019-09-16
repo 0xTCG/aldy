@@ -1330,6 +1330,12 @@
       "mutations": [
         {"pos": 42524202, "op": "DEL.AGTC", "old": "2587:delGACT", "functional": 3, "dbsnp": ["rs72549351"]}
       ]
+    },
+    "CYP2D6*38W": {
+      "phenotype": {"invivo": "None", "invitro": ""}, 
+      "mutations": [
+        {"pos": 42524201, "op": "DEL.TCAG", "old": "2587:delGACT", "functional": 3, "dbsnp": ["rs72549351"]}
+      ]
     }, 
     "CYP2D6*39": {
       "phenotype": {"invivo": "", "invitro": "Normal (b, dx)"}, 

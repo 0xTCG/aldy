@@ -11,11 +11,9 @@ import os
 import re
 import gzip
 import struct
-import subprocess
-import tempfile
 import collections
 
-from .common import log, GRange, AldyException, script_path, check_path
+from .common import log, GRange, AldyException, script_path
 from .coverage import Coverage
 from .gene import Gene, Mutation
 
@@ -34,7 +32,7 @@ DEFAULT_CN_NEUTRAL_REGION = GRange("22", 42547463, 42548249)
 
 class Sample:
     """
-    Interface for reading SAM/BAM/CRAM/DeeZ files that parses
+    Interface for reading SAM/BAM/CRAM files that parses
     and stores read alignments.
 
     Attributes:
@@ -66,7 +64,7 @@ class Sample:
 
         Args:
             sam_path (str):
-                Path to a SAM/BAM/CRAM/DeeZ file.
+                Path to a SAM/BAM/CRAM file.
             gene (:obj:`aldy.gene.Gene`):
                 Gene instance.
             threshold (float):
@@ -79,7 +77,7 @@ class Sample:
                 DEPRECATED: currently does nothing.
                 Default is ``False``.
             reference (str, optional):
-                Reference genome for reading DeeZ or CRAM files.
+                Reference genome for reading CRAM files.
                 Default is None.
             cn_region (:obj:`aldy.common.GRange`, optional):
                 Copy-number neutral region to be used for coverage rescaling.
@@ -117,11 +115,11 @@ class Sample:
         debug: Optional[str] = None,
     ) -> None:
         """
-        Load the read, mutation and coverage data from a SAM/BAM/CRAM/DeeZ file.
+        Load the read, mutation and coverage data from a SAM/BAM/CRAM file.
 
         Args:
             sam_path (str):
-                Path to a SAM/BAM/CRAM/DeeZ file.
+                Path to a SAM/BAM/CRAM file.
             gene (:obj:`aldy.gene.Gene`):
                 Gene instance.
             threshold (float):
@@ -132,7 +130,7 @@ class Sample:
                 DEPRECATED: currently does nothing.
                 Default is False.
             reference (str, optional):
-                Reference genome for reading DeeZ or CRAM files.
+                Reference genome for reading CRAM files.
                 Default is None.
             cn_region (:obj:`aldy.common.GRange`, optional):
                 Copy-number neutral region to be used for coverage rescaling.
@@ -210,8 +208,6 @@ class Sample:
                         else:
                             _indel_sites[ins][0][(ref_start, ref_end, read_len)] += 1
         else:
-            if sam_path[-3:] == ".dz":  # Prepare DeeZ reading
-                sam_path, pipe = _load_deez(sam_path, reference, gene.region, cn_region)
             with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
                 # Check do we have proper index to speed up the queries
                 try:
@@ -300,8 +296,6 @@ class Sample:
                             for p, md in m:
                                 fd.write(struct.pack("<hh", p - s, len(md)))
                                 fd.write(md.encode("ascii"))
-            if sam_path[-3:] == ".dz":  # Tear down DeeZ file
-                _teardown_deez(pipe)
 
         # Establish the coverage dictionary
         coverage: Dict[int, Dict[str, int]] = dict()
@@ -695,59 +689,3 @@ def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
         and read.reference_name == prefix + region.chr
         and region.start - 500 <= read.reference_start <= region.end
     )
-
-
-def _load_deez(
-    deez_path: str,
-    reference: Optional[str],
-    region: GRange,
-    cn_region: Optional[GRange],
-) -> str:
-    """
-    Load a DeeZ file instead of a SAM/BAM by piping DeeZ to pysam.
-    Requires 'deez' executable in the ``$PATH``.
-
-    Returns:
-        str: Pipe file descriptor (e.g. '/dev/fd/12345').
-
-    Raises:
-        :obj:`aldy.common.AldyException` if a reference is not set or
-        if DeeZ is not found in the ``$PATH``.
-    """
-
-    log.debug("Using DeeZ file {}", deez_path)
-
-    if reference is None:
-        raise AldyException("DeeZ files require reference")
-    if not check_path("deez"):
-        raise AldyException("'deez' not found (please double-check $PATH)")
-
-    tmpdir = tempfile.mkdtemp()
-    pipe = os.path.join(tmpdir, "dzpipe")
-    os.mkfifo(pipe)
-
-    # Check for the chr prefix
-    command = "deez --stats {} 2>&1 | grep 'Block' | awk '{{print $3}}'".format(
-        deez_path
-    )
-    p = subprocess.check_output(command, shell=True)
-    prefix = _chr_prefix(region.chr, p.split())
-
-    # Start the decompression process
-    regions = region.samtools(prefix)
-    if cn_region:
-        regions += ";" + cn_region.samtools(prefix)
-    command = 'deez {} -h -c -Q -r {} "{}" > {} 2>/dev/null'.format(
-        deez_path, reference, regions, pipe
-    )
-    log.debug(command)
-    p = subprocess.Popen(command, shell=True)
-    return pipe
-
-
-def _teardown_deez(pipe: str) -> None:
-    """
-    Clean up the ``_load_deez`` handle
-    """
-    if os.path.exists(pipe):
-        os.unlink(pipe)

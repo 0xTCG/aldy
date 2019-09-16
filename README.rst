@@ -109,7 +109,7 @@ In case everything is set up properly, you should see something like this::
 Running
 =======
 
-Aldy needs a SAM, BAM, CRAM or a DeeZ file for genotyping.
+Aldy needs a SAM, BAM, or a CRAM file for genotyping.
 We will be using BAM as an example.
 
 .. attention::
@@ -451,7 +451,7 @@ Commands:
 
   - ``FILE``
 
-    SAM, BAM, CRAM or DeeZ file. CRAM and DeeZ require ``--reference`` as well.
+    SAM, BAM, or CRAM file. CRAM requires ``--reference`` as well.
 
   - ``-T, --threshold THRESHOLD``
 
@@ -501,7 +501,7 @@ Commands:
 
   - ``-r, --reference REF``
 
-    FASTA reference for reference-encoded CRAM/DeeZ files.
+    FASTA reference for reference-encoded CRAM files.
 
   - ``-n, --cn-neutral-region CN_NEUTRAL``
 
