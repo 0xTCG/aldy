@@ -266,7 +266,7 @@ The columns stand for:
       but is **NOT** found in the sample (this also indicates that Aldy found a novel minor star-allele)
 
 VCF support
-^^^^^^^^^^^
+-----------
 
 The output will be a VCF file if the output file extension is `.vcf`. 
 Aldy will report a VCF sample for each potential solution, and the appropriate genotypes.
@@ -274,6 +274,7 @@ Aldy will also output tags `MA` and `MI` for major and minor solutions.
 
   **Note:** VCF is not optimal format for star-allele calling. Unless you really need it,
   we recommend using Aldy's default format.
+
 
 Problems & Debugging
 --------------------
