@@ -28,12 +28,12 @@ from .genotype import genotype
 from .version import __version__
 
 
-def main():
+def main(argv):
     """
     The main entry point.
     """
 
-    parser, args = _get_args()
+    parser, args = _get_args(argv)
 
     # Set the logging verbosity
     level = (args.verbosity if "verbosity" in args else "I").lower()
@@ -70,17 +70,23 @@ def main():
         elif args.subparser == "test":
             _run_test()
         elif args.subparser == "show":
-            database_file = script_path(
+            db_file = script_path(
                 "aldy.resources.genes/{}.yml".format(args.gene.lower())
             )
-            if args.minor:
-                Gene(database_file).print_minors(args.minor)
-            elif args.major:
-                Gene(database_file).print_majors(args.major)
-            elif args.cn_config:
-                Gene(database_file).print_cns(args.cn_config)
+            if os.path.exists(db_file):
+                gene_db = db_file
             else:
-                Gene(database_file).print_summary()
+                gene_db = args.gene
+            with open(gene_db):  # Check if file exists
+                pass
+            if args.minor:
+                Gene(gene_db).print_minors(args.minor)
+            elif args.major:
+                Gene(gene_db).print_majors(args.major)
+            elif args.cn_config:
+                Gene(gene_db).print_cns(args.cn_config)
+            else:
+                Gene(gene_db).print_summary()
         elif args.subparser == "profile":
             p = Sample.load_sam_profile(args.file)
             for i in p:
@@ -135,7 +141,7 @@ def main():
         exit(1)
 
 
-def _get_args():
+def _get_args(argv):
     """
     Parse command-line arguments.
     """
@@ -319,7 +325,7 @@ def _get_args():
         "help", parents=[base], help="Show program usage and exit."
     )
 
-    return parser, parser.parse_args()
+    return parser, parser.parse_args(argv)
 
 
 def _print_licence():
@@ -437,4 +443,4 @@ def _run_test() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

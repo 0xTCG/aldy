@@ -4,12 +4,12 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import collections
 
 from .common import allele_sort_key, td
-from .gene import Gene
+from .gene import Gene, Mutation
 from .coverage import Coverage
 from .solutions import MinorSolution
 from .version import __version__ as version
@@ -100,11 +100,7 @@ def write_decomposition(
 
 
 def write_vcf(
-    sample: str,
-    gene: Gene,
-    coverage: Coverage,
-    minors: List[MinorSolution],
-    f,
+    sample: str, gene: Gene, coverage: Coverage, minors: List[MinorSolution], f
 ):
     header = f"""
     ##fileformat=VCFv4.2
@@ -117,8 +113,7 @@ def write_vcf(
     ##FORMAT=<ID=MA,Number=1,Type=String,Description="Major genotype star-allele calls">
     ##FORMAT=<ID=MI,Number=1,Type=String,Description="Minor genotype star-allele calls">
     """
-    minors=[minors[0], minors[0]]
-    all_mutations = {
+    all_mutations: Dict[Mutation, List[dict]] = {
         m: [collections.defaultdict(int)] * len(minors)
         for minor in minors
         for a in minor.solution
@@ -135,19 +130,10 @@ def write_vcf(
             for m in mutations:
                 all_mutations[m][mi][ai] = 1
     print(
-        td(header).strip() + "\n"
+        td(header).strip()
+        + "\n"
         + "\t".join(
-            [
-                "#CHROM",
-                "POS",
-                "ID",
-                "REF",
-                "ALT",
-                "QUAL",
-                "FILTER",
-                "INFO",
-                "FORMAT",
-            ]
+            ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
             + [f"{sample}:{mi}:{m.diplotype}" for mi, m in enumerate(minors)]
         ),
         file=f,
@@ -165,7 +151,7 @@ def write_vcf(
         info = [
             "ANN={}".format(m.aux.get("old", ".")),
             "TYPE={}".format(["NEUTRAL", "DISRUPTING"][bool(m.is_functional)]),
-            "GENE=" + gene.name
+            "GENE=" + gene.name,
         ]
         data = []
         for mi, minor in enumerate(minors):
@@ -174,12 +160,16 @@ def write_vcf(
                 {
                     "GT": "|".join(str(all_mutations[m][mi][i]) for i in range(nall)),
                     "DP": str(coverage[m]),
-                    "MA": "|".join(
-                        f'*{minor.solution[i].major}' if all_mutations[m][mi][i] > 0 else "-"
+                    "MA": ",".join(
+                        f"*{minor.solution[i].major}"
+                        if all_mutations[m][mi][i] > 0
+                        else "-"
                         for i in range(nall)
                     ),
-                    "MI": "|".join(
-                        f'*{minor.solution[i].minor}' if all_mutations[m][mi][i] > 0 else "-"
+                    "MI": ",".join(
+                        f"*{minor.solution[i].minor}"
+                        if all_mutations[m][mi][i] > 0
+                        else "-"
                         for i in range(nall)
                     ),
                 }

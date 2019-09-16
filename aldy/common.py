@@ -127,7 +127,9 @@ class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
         Returns:
             str
         """
-        return "{}:{}-{}".format(prefix + self.chr, self.start - 500, self.end + 1)
+        return "{}:{}-{}".format(
+            prefix + self.chr, self.start - pad_left, self.end + pad_right
+        )
 
     def __str__(self):
         return self.samtools(0, 0, "")

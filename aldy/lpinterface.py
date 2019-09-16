@@ -37,7 +37,7 @@ class NoSolutionsError(Exception):
     pass
 
 
-class Gurobi:
+class Gurobi:  # pragma: no cover
     """
     Wrapper around Gurobi's Python interface (gurobipy).
     """

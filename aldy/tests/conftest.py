@@ -13,7 +13,7 @@ from aldy.common import script_path
 
 @pytest.fixture
 def toy_gene():
-    return Gene(script_path("aldy.tests/toy.yml"))
+    return Gene(script_path("aldy.tests.resources/toy.yml"))
 
 
 @pytest.fixture
