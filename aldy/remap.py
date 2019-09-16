@@ -140,10 +140,10 @@ def write_reads(sam_path, gene, alleles, reads, out_path):
                 a.query_qualities = x.query_qualities
                 a.tags = x.tags
                 out.write(a)
-            # cnv_chromosome, cnv_start, cnv_end = gene.cnv_region
-            # region = 'chr{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)
-            # for read in sam.fetch(region=region):
-            #     out.write(read)
+            cnv_chromosome, cnv_start, cnv_end = "22", 42547463, 42548249
+            region = 'chr{}:{}-{}'.format(cnv_chromosome, cnv_start - 500, cnv_end + 1)
+            for read in sam.fetch(region=region):
+                out.write(read)
     cmd('samtools index {}'.format(out_path))
 
 
