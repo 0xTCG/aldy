@@ -181,7 +181,8 @@ Output
 ======
 
 Aldy will by default generate the following file: ``file-[gene].aldy``
-(default location can be changed via ``-o`` parameter),
+(default location can be changed via ``-o`` parameter).
+Aldy also supports VCF file output: just append `.vcf` to the output file name.
 The summary of results are shown at the end of the output::
 
     $ aldy -p pgrnseq-v2 -g cyp2d6 NA19788_x.bam
@@ -264,6 +265,15 @@ The columns stand for:
     + ``MISSING``: neutral mutation is associated with the star-allele in the database,
       but is **NOT** found in the sample (this also indicates that Aldy found a novel minor star-allele)
 
+VCF support
+^^^^^^^^^^^
+
+The output will be a VCF file if the output file extension is `.vcf`. 
+Aldy will report a VCF sample for each potential solution, and the appropriate genotypes.
+Aldy will also output tags `MA` and `MI` for major and minor solutions.
+
+  **Note:** VCF is not optimal format for star-allele calling. Unless you really need it,
+  we recommend using Aldy's default format.
 
 Problems & Debugging
 --------------------
