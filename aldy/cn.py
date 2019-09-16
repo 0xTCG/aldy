@@ -419,4 +419,4 @@ def _brute_force_estimate(gene, coverage):
 
     log.info("Choosing CNs = {}", likely)
     for cn in likely:
-        yield CNSolution(0, {"1": arr[0][0]}, gene)
+        yield CNSolution(0, ["1"] * arr[0][0], gene)
