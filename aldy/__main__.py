@@ -442,5 +442,8 @@ def _run_test() -> None:
     pytest.main(["--pyargs", "aldy"])
 
 
-if __name__ == "__main__":
+def console():
     main(sys.argv[1:])
+
+if __name__ == "__main__":
+    console()
