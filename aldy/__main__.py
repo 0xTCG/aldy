@@ -445,5 +445,6 @@ def _run_test() -> None:
 def console():
     main(sys.argv[1:])
 
+
 if __name__ == "__main__":
     console()
