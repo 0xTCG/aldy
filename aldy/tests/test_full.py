@@ -329,7 +329,7 @@ def test_NA10860_vcf(monkeypatch, solver):
             expected = f.read()
         with open(out.name) as f:
             produced = f.read()
-        assert produced == expected
+        assert produced == expected.replace("aldy-v2.2", f"aldy-v{__version__}")
 
 
 EXPECTED_INS = f"""

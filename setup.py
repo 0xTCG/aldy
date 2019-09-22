@@ -36,6 +36,8 @@ setup(
             "aldy/tests/resources/*.expected",
             "*.yml",
             "aldy/tests/resources/*.yml",
+            "*.profile",
+            "aldy/tests/resources/*.profile",
         ],
     },
     test_suite="pytest-runner",
