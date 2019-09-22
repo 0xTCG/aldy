@@ -23,7 +23,6 @@ setup(
         "aldy.resources": ["*.rst", "aldy/resources/*.rst"],
         "aldy.resources.genes": ["*.yml", "aldy/resources/genes/*.yml"],
         "aldy.resources.profiles": ["*.profile", "aldy/resources/profiles/*.profile"],
-        "aldy.tests": ["*.yml", "aldy/tests/resources/*.yml"],
         "aldy.tests.resources": [
             "*.json",
             "aldy/tests/resources/*.json",
@@ -35,6 +34,8 @@ setup(
             "aldy/tests/resources/*.dump",
             "*.expected",
             "aldy/tests/resources/*.expected",
+            "*.yml",
+            "aldy/tests/resources/*.yml",
         ],
     },
     test_suite="pytest-runner",
