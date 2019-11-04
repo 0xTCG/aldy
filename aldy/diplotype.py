@@ -107,7 +107,7 @@ def write_vcf(
     ##source=aldy-v{version}
     ##INFO=<ID=ANN,Number=1,Type=String,Description="Location within {gene.name}">
     ##INFO=<ID=TYPE,Number=1,Type=String,Description="Mutation kind">
-    ##INFO=<ID=TYPE,Number=1,Type=String,Description="Gene">
+    ##INFO=<ID=GENE,Number=1,Type=String,Description="Gene">
     ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
     ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
     ##FORMAT=<ID=MA,Number=1,Type=String,Description="Major genotype star-allele calls">
