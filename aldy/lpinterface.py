@@ -457,10 +457,10 @@ def model(name: str, solver: str):
             model = Gurobi(name)
             log.trace("Using Gurobi")
         except ImportError as e:
-            log.warn(
-                "Gurobi not found. Please install Gurobi and gurobipy Python package."
-            )
-            log.error("{}", e)
+            # log.warn(
+            #     "Gurobi not found. Please install Gurobi and gurobipy Python package."
+            # )
+            # log.error("{}", e)
             model = None
         return model
 
@@ -472,10 +472,10 @@ def model(name: str, solver: str):
             model = SCIP(name)
             log.trace("Using SCIP")
         except ImportError as e:
-            log.warn(
-                "SCIP not found. Please install SCIP and pyscipopt Python package."
-            )
-            log.error("{}", e)
+            # log.warn(
+            #     "SCIP not found. Please install SCIP and pyscipopt Python package."
+            # )
+            # log.error("{}", e)
             model = None
         return model
 
@@ -487,15 +487,15 @@ def model(name: str, solver: str):
             model = CBC(name)
             log.trace("Using CBC")
         except ImportError as e:
-            log.warn("CBC/OR-Tools not found. Please install ortools Python package.")
-            log.error("{}", e)
+            # log.warn("CBC/OR-Tools not found. Please install ortools Python package.")
+            # log.error("{}", e)
             model = None
         return model
 
     if solver == "any":
-        model = test_gurobi(name)
+        model = test_cbc(name)
         if model is None:
-            model = test_cbc(name)
+            model = test_gurobi(name)
         if model is None:
             model = test_scip(name)
         if model is None:
