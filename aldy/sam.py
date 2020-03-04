@@ -509,7 +509,7 @@ class Sample:
 
         if os.path.exists(profile):
             ext = os.path.splitext(profile)
-            if ext in ["bam", "sam"]:
+            if ext[-1] in [".bam", ".sam"]:
                 prof = self._load_profile(
                     profile, is_bam=True, gene_region=gene.region, cn_region=cn_region
                 )
