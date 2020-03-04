@@ -176,8 +176,8 @@ class Sample:
                 )
                 m, M = struct.unpack("<ll", fd.read(l + l))
                 for j in range(m, M + 1):
-                    cnv_coverage[j], = struct.unpack("<i", fd.read(i))
-                ld, = struct.unpack("<l", fd.read(l))
+                    (cnv_coverage[j],) = struct.unpack("<i", fd.read(i))
+                (ld,) = struct.unpack("<l", fd.read(l))
                 for _ in range(ld):
                     ref_start, ref_end, read_len, num_mutations = struct.unpack(
                         "<llhh", fd.read(l + l + h + h)
@@ -286,7 +286,10 @@ class Sample:
                             "Debug dumps do not work with --phase parameter"
                         )
                     with gzip.open(f"{debug}.dump", "wb") as fd:
-                        m, M = min(cnv_coverage.keys()), max(cnv_coverage.keys())
+                        if len(cnv_coverage) == 0:
+                            m, M = 0, -1
+                        else:
+                            m, M = min(cnv_coverage.keys()), max(cnv_coverage.keys())
                         fd.write(struct.pack("<ll", m, M))
                         for i in range(m, M + 1):
                             fd.write(struct.pack("<i", cnv_coverage[i]))
@@ -450,6 +453,8 @@ class Sample:
         INSERT_LEN_AMPLIFY = 3
 
         total = self.coverage.total(mut.pos)
+        if total == 0:
+            return
         current_ratio = float(self.coverage[mut]) / total
 
         j0 = 0

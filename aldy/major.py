@@ -213,7 +213,10 @@ def solve_major_model(
     json_print(debug, '    "data": {', end="")
     prev = 0
     for m, expr in sorted(constraints.items()):
-        cov = coverage[m] / coverage.single_copy(m.pos, cn_solution)
+        if coverage.single_copy(m.pos, cn_solution) == 0:
+            cov = 0.0
+        else:
+            cov = coverage[m] / coverage.single_copy(m.pos, cn_solution)
         model.addConstr(expr + VERR[m] == cov, name=f"CFUNC_{m.pos}_{m.op}")
         if m.pos != prev and prev != 0:
             json_print(debug, "\n             ", end="")

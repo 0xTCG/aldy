@@ -8,7 +8,7 @@ from typing import Dict, Tuple, Callable
 
 import collections
 
-from .common import log
+from .common import log, AldyException
 from .gene import Mutation, GeneRegion, GRange
 
 
@@ -205,7 +205,15 @@ class Coverage:
             profile[cn_region.chr][i] for i in range(cn_region.start, cn_region.end)
         )
 
+        if sam_ref == 0:
+            raise AldyException(
+                "CN-neutral region has no reads. "
+                + "Double check your input file for CYP2D8 (are you using hg19), "
+                + "or pass an alternative CN-neutral region via -n parameter."
+            )
         cn_ratio = float(cnv_ref) / sam_ref
+        if cn_ratio == 0:
+            raise AldyException("Invalid CN-neutral region in the provided profile.")
         log.debug("CNV factor: {} ({})", cn_ratio, 1.0 / cn_ratio)
 
         self._rescaled = {}
