@@ -275,6 +275,21 @@ def colorize(text: str, color: str = "green") -> str:
     return logbook._termcolors.colorize(color, text)
 
 
+def parse_cn_region(cn_region):
+    if cn_region is not None:
+        r = re.match(r"^(.+?):(\d+)-(\d+)$", cn_region)
+        if not r:
+            raise AldyException(
+                f"Parameter --cn-neutral={cn_region} cannot be parsed. "
+                + "Must be chr:start-end (where start and end are numbers)"
+            )
+        ch = r.group(1)
+        if ch.startswith("chr"):
+            ch = ch[3:]
+        return GRange(ch, int(r.group(2)), int(r.group(3)))
+    return None
+
+
 _json = None
 
 

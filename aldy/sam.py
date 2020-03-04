@@ -584,7 +584,10 @@ class Sample:
 
     @staticmethod
     def load_sam_profile(
-        sam_path: str, factor: float = 2.0, regions: Optional[List[GRange]] = None
+        sam_path: str,
+        factor: float = 2.0,
+        regions: Optional[List[GRange]] = None,
+        cn_region: Optional[GRange] = None,
     ) -> List[Tuple[str, str, int, float]]:
         """
         Load the profile information from a SAM/BAM file.
@@ -625,6 +628,8 @@ class Sample:
             )
         else:
             gene_regions = [(str(i), r) for i, r in enumerate(sorted(regions))]
+        if cn_region:
+            gene_regions.append(("CN", cn_region))
         result: List[Tuple[str, str, int, float]] = []
         for gene, location in gene_regions:
             with pysam.AlignmentFile(sam_path) as sam:

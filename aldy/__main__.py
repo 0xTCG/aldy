@@ -16,12 +16,11 @@ import datetime
 import tempfile
 import pkg_resources
 import traceback
-import re
 import pytest
 
 from . import common
-from .common import log, script_path, AldyException, td, colorize
-from .gene import Gene, GRange
+from .common import log, script_path, AldyException, td, colorize, parse_cn_region
+from .gene import Gene
 from .cn import LEFT_FUSION_PENALTY
 from .sam import Sample
 from .genotype import genotype
@@ -88,7 +87,9 @@ def main(argv):
             else:
                 Gene(gene_db).print_summary()
         elif args.subparser == "profile":
-            p = Sample.load_sam_profile(args.file)
+            p = Sample.load_sam_profile(
+                args.file, cn_region=parse_cn_region(args.cn_neutral_region)
+            )
             for i in p:
                 print(*i)
         elif args.subparser == "genotype":
@@ -320,6 +321,16 @@ def _get_args(argv):
         ),
     )
     profile_parser.add_argument("file", nargs="?", help="SAM/BAM/CRAM file.")
+    profile_parser.add_argument(
+        "--cn-neutral-region",
+        "-n",
+        default=None,
+        help=td(
+            """Copy-number neutral region in the format chromosome:start-end
+               (e.g. chr1:10000-20000).
+               Default is CYP2D8 region within hg19 (22:42547463-42548249)."""
+        ),
+    )
 
     _ = subparsers.add_parser(
         "help", parents=[base], help="Show program usage and exit."
@@ -350,19 +361,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
         :obj:`aldy.common.AldyException` if ``cn_region`` is invalid.
     """
 
-    cn_region = args.cn_neutral_region
-    if cn_region is not None:
-        r = re.match(r"^(.+?):(\d+)-(\d+)$", cn_region)
-        if not r:
-            raise AldyException(
-                f"Parameter --cn-neutral={cn_region} cannot be parsed. "
-                + "Must be chr:start-end (where start and end are numbers)"
-            )
-        ch = r.group(1)
-        if ch.startswith("chr"):
-            ch = ch[3:]
-        cn_region = GRange(ch, int(r.group(2)), int(r.group(3)))
-
+    cn_region = parse_cn_region(args.cn_neutral_region)
     cn_solution = args.cn
     if cn_solution:
         cn_solution = cn_solution.split(",")
