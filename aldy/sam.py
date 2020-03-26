@@ -232,7 +232,7 @@ class Sample:
                     and if so, parse it
                     """
                     start = read.reference_start
-                    if read.cigartuples is None or (read.flag & 0x40) == 0:
+                    if read.cigartuples is None or ((read.flag & 1) and (read.flag & 0x40) == 0):
                         return
                     for op, size in read.cigartuples:
                         if op in [0, 7, 8, 2]:
