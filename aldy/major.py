@@ -354,7 +354,9 @@ def _print_candidates(
                 # coverage.region_at(m.pos),
                 m,
                 coverage[m],
-                coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos)),
+                coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
+                if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
+                else 0,
                 "F",
                 m.aux.get("old", ""),
             )
@@ -365,7 +367,9 @@ def _print_candidates(
                 "    {} {:4} ({:.1f} copies) {} {}",
                 m,
                 coverage[m],
-                coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos)),
+                coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
+                if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
+                else 0,
                 "F",
                 m.aux.get("old", ""),
             )

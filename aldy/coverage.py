@@ -204,7 +204,7 @@ class Coverage:
         cnv_ref = sum(
             profile[cn_region.chr][i] for i in range(cn_region.start, cn_region.end)
         )
-        
+
         if sam_ref == 0:
             raise AldyException(
                 "CN-neutral region has no reads. "
