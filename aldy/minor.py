@@ -505,12 +505,11 @@ def solve_minor_model(
 
                 print(coverage.sample, gene.name, allele[0].minor, end=' ')
                 for m in sorted(solution[-1].mutations(gene)):
-                    novel = 0
-                    if m in solution[-1].added:
-                        if m in gene.mutations:
-                            novel = 1
-                        else:
-                            novel = 2
+                    # if m in solution[-1].added:
+                    if m in gene.mutations:
+                        novel = 0
+                    else:
+                        novel = 1
                     phase = -1
                     if phases:
                         phase = next((pi for pi, p in enumerate(phases) if m in p), -1)
