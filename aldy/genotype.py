@@ -17,10 +17,59 @@ from . import minor
 from . import diplotype
 from . import solutions
 
-from .common import log, script_path, json_print, AldyException, SOLUTION_PRECISION
-from .gene import Gene, GRange
+from .common import (
+    colorize,
+    log,
+    script_path,
+    json_print,
+    AldyException,
+    SOLUTION_PRECISION,
+)
+from .gene import Gene, GRange, Mutation
 from .diplotype import OUTPUT_COLS
 from .lpinterface import model as lp_model
+
+
+def load_phase(gene: Gene, path: str) -> List[List[Mutation]]:
+    h0, h1 = [], []
+    phases = []
+    with open(path) as hap:
+        for li, line in enumerate(hap):
+            if line[:5] == "BLOCK":
+                if h0:
+                    phases += [h0, h1]
+                h0, h1 = [], []
+            elif line[:5] == "*****":
+                continue
+            else:
+                ls = line.split("\t")
+                if len(ls) < 7:
+                    raise AldyException(
+                        f"Invalid phasing line {li + 1} in {file} (less than 7 columns)"
+                    )
+                _, gt0, gt1, chr, pos, al0, al1, *_ = ls
+                gt0, gt1, pos = int(gt0), int(gt1), int(pos) - 1
+                if gt0 + gt1 != 1:
+                    continue
+                chr = chr[3:] if chr.startswith("chr") else chr
+                if chr != gene.region.chr:
+                    continue
+                if pos < gene.region.start or pos >= gene.region.end:
+                    continue
+
+                if (pos, f"SNP.{al0}{al1}") not in gene.mutations:
+                    if (pos, f"SNP.{al1}{al0}") in gene.mutations:
+                        log.warn(f"reorienting {pos} {al0} {al1}")
+                        al1, al0 = al0, al1
+                        gt0, gt1 = gt1, gt0
+                h0.append(Mutation(pos, f"SNP.{al0}{al1}" if gt0 else "_"))
+                h1.append(Mutation(pos, f"SNP.{al0}{al1}" if gt1 else "_"))
+    if h0:
+        phases += [h0, h1]
+    # log.info('Phasing!!!')
+    # for p in sorted(phases, key=lambda x: x[0]):
+    # print([str(m) for m in sorted(p)])
+    return phases
 
 
 def genotype(
@@ -33,11 +82,13 @@ def genotype(
     threshold: float = 0.5,
     fusion_penalty: float = cn.LEFT_FUSION_PENALTY,
     solver: str = "any",
-    phase: bool = False,
     reference: Optional[str] = None,
     gap: int = 0,
     max_minor_solutions: int = 1,
     debug: Optional[str] = None,
+    multiple_warn_level: int = 1,
+    phase: Optional[str] = None,
+    report: bool = False,
 ) -> List[solutions.MinorSolution]:
     """
     Genotype a sample.
@@ -75,11 +126,8 @@ def genotype(
         solver (str):
             ILP solver. Check :obj:`aldy.lpinterface` for the list of available solvers.
             Default is ``'any'``.
-        phase (bool):
-            Perform basic rudimentary phasing of the reads
-            to aid the genotyping process.
-            DEPRECATED: currently does nothing.
-            Default is ``False``.
+        phase (str, optional):
+            Location of HapCUT or HapTree-compatible phased blocks.
         reference (str, optional):
             A reference genome for reading CRAM files.
             Default is ``None``.
@@ -119,9 +167,8 @@ def genotype(
         gene=gene,
         threshold=threshold,
         profile=profile,
-        phase=phase,
         reference=reference,
-        cn_region=cn_region,
+        cn_region=None if cn_solution else cn_region,
         debug=debug,
     )
 
@@ -161,6 +208,8 @@ def genotype(
     SLACK = 1
 
     # Get major solutions and pick the best one
+    if multiple_warn_level >= 3 and len(cn_sols) > 1:
+        log.warn("WARNING: multiple copy-number solutions found!")
     log.info(f"Potential {gene.name} copy number configurations for {sample_name}:")
     major_sols: list = []
     json_print(debug, '  "major": [', end="")
@@ -173,6 +222,8 @@ def genotype(
         conf = (min_cn_score + SLACK) / (cn_sol.score + SLACK)
         log.info(f"      Confidence: {conf:.2f} (score = {cn_sol.score:.2f})")
     log.info("")
+
+    phases = load_phase(gene, phase) if phase else None
 
     for i, cn_sol in enumerate(cn_sols):
         major_sols += major.estimate_major(
@@ -203,6 +254,8 @@ def genotype(
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )
 
+    if multiple_warn_level >= 2 and len(major_sols) > 1:
+        log.warn("WARNING: multiple major solutions found!")
     log.info(f"Potential major {gene.name} star-alleles for {sample_name}:")
     for i, major_sol in enumerate(major_sols):
         log.info(f"  {i + 1:2}: {major_sol._solution_nice()}")
@@ -219,6 +272,7 @@ def genotype(
         solver,
         max_solutions=max_minor_solutions,
         debug=debug,
+        phases=phases,
     ):
         n = solutions.MinorSolution(
             m.score
@@ -246,6 +300,8 @@ def genotype(
     is_vcf = output_file and output_file.name[-4:] == ".vcf"
     if output_file and not is_vcf:
         print("#" + "\t".join(OUTPUT_COLS), file=output_file)
+    if multiple_warn_level >= 1 and len(minor_sols) > 1:
+        log.warn("WARNING: multiple optimal solutions found!")
     for i, minor_sol in enumerate(minor_sols):
         log.info(f"  {i + 1:2}: {minor_sol.diplotype}")
         tt = textwrap.wrap(minor_sol._solution_nice(), width=60, break_long_words=False)
@@ -261,5 +317,15 @@ def genotype(
     if is_vcf:
         diplotype.write_vcf(sample_name, gene, sample.coverage, minor_sols, output_file)
     json_print(debug, "},")
+
+    if report:
+        log.info(colorize(f"{gene.name} results:"))
+        reported = set()
+        for r in minor_sols:
+            minors = ", ".join(sorted([f.major_repr(gene) for f in r.solution]))
+            s = f"  {r.diplotype:30} ({minors})"
+            if s not in reported:
+                log.info(colorize(s))
+                reported.add(s)
 
     return minor_sols

@@ -287,6 +287,14 @@ def _get_args(argv):
                (e.g. two copies of the main gene), use 1,1."""
         ),
     )
+    genotype_parser.add_argument(
+        "--multiple-warn-level",
+        "-W",
+        default=1,
+        help="Show warning if multiple solutions are found. Can be 1 (warn after genotyping) or 2 (also warn if there are multiple major solutions)."
+        + f"Default is 1 (warn after the genotyping).",
+    )
+    genotype_parser.add_argument("--phase", help="Use phase file.")
 
     _ = subparsers.add_parser(
         "test",
@@ -384,21 +392,15 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 cn_solution=cn_solution,
                 threshold=threshold,
                 solver=args.solver,
-                phase=False,
                 fusion_penalty=float(args.fusion_penalty),
                 reference=args.reference,
                 gap=float(args.gap),
                 max_minor_solutions=int(args.max_minor_solutions),
                 debug=debug,
+                multiple_warn_level=args.multiple_warn_level,
+                phase=args.phase,
+                report=True,
             )
-            log.info(colorize(f"{gene.upper()} results:"))
-            reported = set()
-            for r in result:
-                minors = ", ".join(sorted([f.major_repr() for f in r.solution]))
-                s = f"  {r.diplotype:30} ({minors})"
-                if s not in reported:
-                    log.info(colorize(s))
-                    reported.add(s)
         except AldyException as ex:
             log.error(ex)
 

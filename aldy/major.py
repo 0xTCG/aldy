@@ -12,7 +12,7 @@ import copy
 from . import lpinterface
 from .common import log, AldyException, json_print, sorted_tuple, allele_sort_key
 from .cn import MAX_CN
-from .gene import Allele, Mutation, Gene
+from .gene import MajorAllele, Mutation, Gene
 from .coverage import Coverage
 from .solutions import CNSolution, MajorSolution, SolvedAllele
 
@@ -83,7 +83,7 @@ def estimate_major(
 
 def solve_major_model(
     gene: Gene,
-    allele_dict: Dict[str, Allele],
+    allele_dict: Dict[str, MajorAllele],
     coverage: Coverage,
     cn_solution: CNSolution,
     solver: str,
@@ -97,7 +97,7 @@ def solve_major_model(
     Args:
         gene (:obj:`aldy.gene.Gene`):
             Gene instance.
-        allele_dict (dict[str, :obj:`aldy.gene.Allele`]):
+        allele_dict (dict[str, :obj:`aldy.gene.MajorAllele`]):
             Dictionary of the candidate major star-alleles.
         coverage (:obj:`aldy.coverage.Coverage`):
             Mutation coverage data.
@@ -129,7 +129,9 @@ def solve_major_model(
     # Get the list of _all_ functional mutations present in the sample
     # and the database (intersection)
     func_muts = {
-        M for m, M in gene.mutations.items() if M.is_functional and coverage[M] > 0
+        M
+        for m, M in gene.mutations.items()
+        if gene.is_functional(M) and coverage[M] > 0
     }
     _print_candidates(allele_dict, coverage, cn_solution, func_muts)
 
@@ -258,7 +260,7 @@ def solve_major_model(
         json_print(debug, '    "sol": [', end="")
         for status, opt, sol in model.solutions(gap):
             log.debug(f"Major solver: {status}, opt: {opt:.2f}")
-            # Allele: novel mutations
+            # MajorAllele: novel mutations
             solved_alleles: Any = collections.defaultdict(lambda: [])
             for s in sol:
                 if s not in lookup:
@@ -301,12 +303,12 @@ def solve_major_model(
 
 def _filter_alleles(
     gene: Gene, coverage: Coverage, cn_solution: CNSolution
-) -> Tuple[Dict[str, Allele], Coverage]:
+) -> Tuple[Dict[str, MajorAllele], Coverage]:
     """
     Filter out low-quality mutations and alleles that are not expressed.
 
     Returns:
-        tuple[dict[str, :obj:`aldy.gene.Allele`], :obj:`aldy.coverage.Coverage`]:
+        tuple[dict[str, :obj:`aldy.gene.MajorAllele`], :obj:`aldy.coverage.Coverage`]:
         Tuple of allele dictionary describing the feasible alleles,
         and the coverage description of high-confidence variants.
     """
@@ -334,7 +336,7 @@ def _filter_alleles(
 
 
 def _print_candidates(
-    alleles: Dict[str, Allele],
+    alleles: Dict[str, MajorAllele],
     coverage: Coverage,
     cn_solution: CNSolution,
     func_muts: set,
@@ -350,7 +352,7 @@ def _print_candidates(
             if m in func_muts:
                 func_muts.remove(m)
             log.debug(
-                "    {} {:4} ({:.1f} copies) {} {}",
+                "    {} {:4} ({:.1f} copies) {}",
                 # coverage.region_at(m.pos),
                 m,
                 coverage[m],
@@ -358,18 +360,16 @@ def _print_candidates(
                 if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
                 else 0,
                 "F",
-                m.aux.get("old", ""),
             )
     if len(func_muts) > 0:
         log.debug("  Other mutations:")
         for m in sorted(func_muts, key=lambda m: m.pos):
             log.debug(
-                "    {} {:4} ({:.1f} copies) {} {}",
+                "    {} {:4} ({:.1f} copies) {}",
                 m,
                 coverage[m],
                 coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
                 if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
                 else 0,
                 "F",
-                m.aux.get("old", ""),
             )

@@ -35,6 +35,7 @@ def estimate_minor(
     filter_fn: Optional[Callable] = None,
     max_solutions: int = 1,
     debug: Optional[str] = None,
+    phases: Optional[List[List[Mutation]]] = None,
 ) -> List[MinorSolution]:
     """
     Estimate the optimal minor star-allele.
@@ -76,11 +77,25 @@ def estimate_minor(
             mutations |= set(added)
             for sa in gene.alleles[ma].minors.values():
                 mutations |= set(sa.neutral_muts)
+    # Include novel mutatons from "important" regions
+    # novel_mutations = set()
+    # for pos, c in coverage._coverage.items():
+    #     if gene.region_at(pos)[1][1] in ['e', 'UTR3', 'UTR5', 'upstream']:
+    #         for m in c:
+    #             if m != '_':
+    #                 if m not in mutations:
+    #                     log.info('Considering novel {} in {} (coverage = {}%)',
+    #                         m, gene.region_at(pos)[1],
+    #                         round(coverage.percentage(Mutation(pos, m)), 1))
+    #                 novel_mutations |= set(Mutation(pos, m))
 
     # Filter out low quality mutations
     def default_filter_fn(mut, cov, total, thres):
         # TODO: is this necessary?
-        if mut.op != "_" and mut not in mutations:
+        if mut.op != "_" and not (
+            mut in mutations
+            or gene.region_at(mut.pos)[1][1] in ["e", "UTR3", "UTR5", "upstream"]
+        ):
             return False
         return Coverage.basic_filter(
             mut, cov, total, thres / MAX_CN
@@ -91,12 +106,33 @@ def estimate_minor(
     else:
         cov = coverage.filtered(default_filter_fn)
 
+    for pos, c in cov._coverage.items():
+        for m in c:
+            if m != "_" and Mutation(pos, m) not in mutations:
+                log.info(
+                    "Considering novel {} in {} (coverage = {}%; func = {})",
+                    Mutation(pos, m),
+                    gene.region_at(pos)[1],
+                    round(cov.percentage(Mutation(pos, m)), 1),
+                    gene.is_functional((pos, m)),
+                )
+                mutations.add(Mutation(pos, m))
+
     minor_sols: List[MinorSolution] = []
     for i, major_sol in enumerate(
         sorted(major_sols, key=lambda s: list(s.solution.items()))
     ):
         minor_sols += solve_minor_model(
-            gene, alleles, cov, major_sol, mutations, solver, i, max_solutions, debug
+            gene,
+            alleles,
+            cov,
+            major_sol,
+            mutations,
+            solver,
+            i,
+            max_solutions,
+            debug,
+            phases,
         )
     return minor_sols
 
@@ -111,6 +147,7 @@ def solve_minor_model(
     identifier: int = 0,
     max_solutions: int = 1,
     debug: Optional[str] = None,
+    phases: Optional[List[List[Mutation]]] = None,
 ) -> List[MinorSolution]:
     """
     Solves the minor star-allele detection problem via integer linear programming.
@@ -161,7 +198,7 @@ def solve_minor_model(
         for a in alleles_list
     }
 
-    _print_candidates(gene, alleles, major_sol, coverage)
+    # _print_candidates(gene, alleles, major_sol, coverage)
 
     for a, _ in list(alleles):
         max_cn = major_sol.solution[SolvedAllele(a.major, None, a.added, a.missing)]
@@ -311,7 +348,7 @@ def solve_minor_model(
     # 2) Each allele must express ALL of its functional mutations
     for a in alleles:
         for m in alleles[a]:
-            if m.is_functional:
+            if gene.is_functional(m):
                 assert m in VKEEP[a]
                 model.addConstr(
                     VKEEP[a][m][0] >= VA[a],
@@ -325,11 +362,11 @@ def solve_minor_model(
                     v[0] <= 0,
                     name=f"CZERO_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
                 )
-    # 4) No allele can include an extra functional mutation
+    # 4) No allele can include an extra functional mutation from the database
     #    (that should be done in the major model)
     for a in VNEW:
         for m, v in VNEW[a].items():
-            if m.is_functional:
+            if gene.is_functional(m, infer=False):
                 model.addConstr(
                     v[0] <= 0,
                     name=f"CNEWFUNC_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
@@ -351,7 +388,7 @@ def solve_minor_model(
                     model.quicksum(mp + ma) <= 1,
                     name=f"CSINGLEFULL_{pos}_{a[0].major}_{a[0].minor}_{a[1]}",
                 )
-    # 5) Make sure that each mutation copy has at least one read supporting it
+    # 6) Make sure that each mutation copy has at least one read supporting it
     for m in mutations:
         expr = model.quicksum(VKEEP[a][m][1] for a in alleles if m in VKEEP[a])
         expr += model.quicksum(VNEW[a][m][1] for a in alleles if m in VNEW[a])
@@ -361,7 +398,7 @@ def solve_minor_model(
             model.addConstr(expr <= coverage[m], name=f"CMAXCOV_{m.pos}_{m.op}")
             # Ensure that at least one allele picks an existing non-filtered mutation
             model.addConstr(expr >= 1, name=f"CMINONE_{m.pos}_{m.op}")
-    # 6) Do the same for non-mutations
+    # 7) Do the same for non-mutations
     for pos in set(m.pos for m in constraints):
         expr = 0
         for a in alleles:
@@ -383,6 +420,35 @@ def solve_minor_model(
                 name=f"CMAXCOV_{m.pos}_{m.op}",
             )
 
+    # 8) Respect phasing
+    VPHASEERR = []
+    PHx = {}
+    if phases:
+        log.info("Using phasing information")
+        VPHASE: dict = {
+            pi: {a: model.addVar(vtype="B", name=f"PHASE_{pi}_{a[1]}") for a in alleles}
+            for pi, _ in enumerate(phases)
+        }
+        for p in VPHASE:
+            model.addConstr(model.quicksum(VPHASE[p][a] for a in VPHASE[p]) <= 1)
+            model.addConstr(model.quicksum(VPHASE[p][a] for a in VPHASE[p]) >= 1)
+
+            # p(_l - SUM m) = p _l - SUM p m
+            for a in VPHASE[p]:
+                model.addConstr(VPHASE[p][a] <= VA[a])
+                muts = {}
+                for m in phases[p]:
+                    if m in VKEEP[a]:
+                        muts[m] = VKEEP[a][m][0]
+                    elif m in VNEW[a]:
+                        muts[m] = VNEW[a][m][0]
+                VPHASEERR.append(VPHASE[p][a] * len(muts))
+                for m, v in muts.items():  # do func muts & novel muts!
+                    PHx[p, m] = model.addVar(
+                        vtype="B", name=f"PHASEPROD_{p}_{m.pos}_{m.op}"
+                    )
+                    VPHASEERR.append(-model.prod(PHx[p, m], [VPHASE[p][a], v]))
+
     # Objective: minimize the absolute sum of errors ...
     objective = model.abssum(v for _, v in VERR.items())
     # ... and penalize the misses ...
@@ -401,14 +467,16 @@ def solve_minor_model(
         v[0]
         for a in VKEEP
         for m, v in VKEEP[a].items()
-        if m.is_functional and m not in gene.alleles[a[0].major].func_muts
+        if gene.is_functional(m) and m not in gene.alleles[a[0].major].func_muts
     )
+    PHASE_ERROR = 10
+    objective += PHASE_ERROR * model.quicksum(VPHASEERR)
 
     model.setObjective(objective)
     if debug:
         model.dump(f"{debug}.minor{identifier}.lp")
 
-    # Solve the model
+    # Solve the modelf
     try:
         results = {}
         for status, opt, sol in model.solutions():
@@ -434,6 +502,47 @@ def solve_minor_model(
                         tuple(missing),
                     )
                 )
+
+                print(coverage.sample, allele[0].minor, end=' ')
+                for m in sorted(solution[-1].mutations(gene)):
+                    novel = 0
+                    if m in solution[-1].added:
+                        if m in gene.mutations:
+                            novel = 1
+                        else:
+                            novel = 2
+                    phase = -1
+                    if phases:
+                        phase = next((pi for pi, p in enumerate(phases) if m in p), -1)
+                    print(f'{m.pos+1}:{m.op}:{gene.get_dbsnp(m)}:{gene.region_at(m.pos)[1][1]}:{novel}:{phase} ', end='')
+                print()
+
+            # mutations = sorted(mutations)
+            # print(f'{" ":6}  ', end="")
+            # for m in mutations:
+            #     print(f"{m.pos:<10}", end="")
+            # print(f'\n{" ":6}  ', end="")
+            # for m in mutations:
+            #     print(f'{m.op+("*" if gene.is_functional(m) else ""):10}', end="")
+            # print(f'\n{" ":6}  ', end="")
+            # for m in mutations:
+            #     scopy = coverage.single_copy(m.pos, major_sol.cn_solution)
+            #     s = f"{coverage[m]} ({coverage[m]/scopy if scopy > 0 else 0:.1f})"
+            #     print(f"{s:10}", end="")
+            # print(f'\n{" ":6}  ', end="")
+            # if phases:
+            #     for m in mutations:
+            #         i = next((pi for pi, p in enumerate(phases) if m in p), -1)
+            #         s = str(i) if i != -1 else "?"
+            #         print(f"{s:10}", end="")
+            # print()
+            # for s in solution:
+            #     print(f"{s.minor:6}: ", end="")
+            #     mx = s.mutations(gene)
+            #     for m in mutations:
+            #         print(f'{"#" if m in mx else "":10}', end="")
+            #     print()
+
             json_print(
                 debug,
                 '    "sol": {}, '.format(
@@ -480,7 +589,7 @@ def _print_candidates(gene, alleles, major_sol, coverage):
             m_gene, m_region = gene.region_at(m.pos)
             scopy = coverage.single_copy(m.pos, major_sol.cn_solution)
             log.debug(
-                "    {:26}  {:.2f} ({:4} / {} * {:4.0f}) {}:{:10} {:>20}",
+                "    {:26}  {:.2f} ({:4} / {} * {:4.0f}) {}:{:10}",
                 str(m),
                 coverage[m] / scopy if scopy > 0 else 0,
                 coverage[m],
@@ -488,5 +597,4 @@ def _print_candidates(gene, alleles, major_sol, coverage):
                 coverage.single_copy(m.pos, major_sol.cn_solution),
                 m_gene,
                 str(m_region),
-                m.aux.get("old", ""),
             )

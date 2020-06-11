@@ -110,14 +110,22 @@ class SolvedAllele(
         Has custom printer (``__str__``).
     """
 
-    def major_repr(self):
+    def mutations(self, gene: Gene):
+        m = gene.alleles[self.major].func_muts
+        m |= gene.alleles[self.major].minors[self.minor].neutral_muts
+        m |= set(self.added)
+        m -= set(self.missing)
+        return m
+
+    def major_repr(self, gene):
         """
         Pretty-formats major star-allele name.
         """
         return "*{}{}".format(
             self.major,
             "".join(
-                " +" + str(m) for m in sorted(m for m in self.added if m.is_functional)
+                " +" + str(m)
+                for m in sorted(m for m in self.added if gene.is_functional(m, False))
             ),
         )
 
@@ -127,12 +135,7 @@ class SolvedAllele(
         """
         return "*{}{}{}".format(
             self.minor if self.minor else self.major,
-            "".join(
-                " +" + str(m)
-                for m in sorted(
-                    self.added, key=lambda m: (-m.is_functional, m.pos, m.op)
-                )
-            ),
+            "".join(" +" + str(m) for m in sorted(self.added)),
             "".join(" -" + str(m) for m in sorted(self.missing)),
         )
 

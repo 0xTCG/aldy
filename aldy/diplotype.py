@@ -7,6 +7,7 @@
 from typing import List, Tuple, Dict
 
 import collections
+import natsort
 
 from .common import allele_sort_key, td
 from .gene import Gene, Mutation
@@ -70,9 +71,8 @@ def write_decomposition(
                         m.pos,
                         m.op,
                         -1,
-                        ["NEUTRAL", "DISRUPTING"][bool(m.is_functional)],
-                        m.aux.get("dbsnp", ""),
-                        m.aux.get("old", ""),
+                        ["NEUTRAL", "DISRUPTING"][gene.is_functional(m)],
+                        gene.get_dbsnp(m),
                         "",
                     ]
                 )
@@ -149,8 +149,7 @@ def write_vcf(
             alt = ref + m.op[4:], ref
 
         info = [
-            "ANN={}".format(m.aux.get("old", ".")),
-            "TYPE={}".format(["NEUTRAL", "DISRUPTING"][bool(m.is_functional)]),
+            "TYPE={}".format(["NEUTRAL", "DISRUPTING"][gene.is_functional(m)]),
             "GENE=" + gene.name,
         ]
         data = []
@@ -182,7 +181,7 @@ def write_vcf(
             pattern.format(
                 chrom=gene.region.chr,
                 pos=m.pos + 1,
-                id=m.aux.get("dbsnp", "."),
+                id=gene.get_dbsnp(m),
                 ref=ref,
                 alt=alt,
                 qual=0,
@@ -212,7 +211,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     # solution is the array of (major, minor) tuples
     majors = [
         str(allele_sort_key(a.major)[0])
-        + ("-like" if sum(1 for m in a.added if m.is_functional) > 0 else "")
+        + ("-like" if sum(1 for m in a.added if gene.is_functional(m, infer=False)) > 0 else "")
         for a in solution.solution
     ]
     diplotype: Tuple[List[str], List[str]] = ([], [])
@@ -263,7 +262,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
         diplotype = (diplotype[0][:-1], [diplotype[0][-1]])
 
     # Make sure that the elements are sorted and that the tandems are grouped together
-    result = sorted(diplotype)
+    result = natsort.natsorted(diplotype)
     for i in range(2):
         nd: List[tuple] = []
         for ta, tb in gene.common_tandems:

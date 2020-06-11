@@ -320,7 +320,9 @@ class Sample:
         #: keys are loci in the reference genome, while values are dictionaries
         #: that describe the coverage of each mutation
         # (_ stands for non-mutated nucleotide)
-        self.coverage = Coverage(coverage, threshold, cnv_coverage)
+        self.coverage = Coverage(
+            coverage, threshold, cnv_coverage, os.path.basename(sam_path).split(".")[0]
+        )
         for mut, ins_cov in _indel_sites.items():
             if mut.pos in coverage and mut.op in coverage[mut.pos]:
                 self._correct_ins_coverage(mut, ins_cov)

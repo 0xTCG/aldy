@@ -22,6 +22,7 @@ class Coverage:
         coverage: Dict[int, Dict[str, int]],
         threshold: float,
         cnv_coverage: Dict[int, int],
+        sample: str,
     ) -> None:
         """
         Coverage initialization.
@@ -46,6 +47,7 @@ class Coverage:
         self._coverage = coverage
         self._threshold = threshold
         self._cnv_coverage = cnv_coverage
+        self.sample = sample
 
         self._rescaled: Dict[int, float] = {}
         self._region_coverage: Dict[Tuple[int, GeneRegion], float] = {}
@@ -163,7 +165,7 @@ class Coverage:
             },
         )
 
-        new_cov = Coverage(cov, self._threshold, self._cnv_coverage)  # type: ignore
+        new_cov = Coverage(cov, self._threshold, self._cnv_coverage, self.sample)  # type: ignore
         new_cov._rescaled = self._rescaled
         new_cov._region_coverage = self._region_coverage
         return new_cov
@@ -208,7 +210,7 @@ class Coverage:
         if sam_ref == 0:
             raise AldyException(
                 "CN-neutral region has no reads. "
-                + "Double check your input file for CYP2D8 (are you using hg19), "
+                + "Double check your input file for CYP2D8 (are you using hg19?), "
                 + "or pass an alternative CN-neutral region via -n parameter."
             )
         cn_ratio = float(cnv_ref) / sam_ref
