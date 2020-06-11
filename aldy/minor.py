@@ -503,7 +503,7 @@ def solve_minor_model(
                     )
                 )
 
-                print(coverage.sample, allele[0].minor, end=' ')
+                print(coverage.sample, gene.name, allele[0].minor, end=' ')
                 for m in sorted(solution[-1].mutations(gene)):
                     novel = 0
                     if m in solution[-1].added:

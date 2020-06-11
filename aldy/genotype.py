@@ -314,6 +314,7 @@ def genotype(
             diplotype.write_decomposition(
                 sample_name, gene, i + 1, minor_sol, output_file
             )
+            print(sample.coverage.sample, gene.name, minor_sol.diplotype)
     if is_vcf:
         diplotype.write_vcf(sample_name, gene, sample.coverage, minor_sols, output_file)
     json_print(debug, "},")
