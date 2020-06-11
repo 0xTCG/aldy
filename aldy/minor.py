@@ -429,6 +429,11 @@ def solve_minor_model(
             pi: {a: model.addVar(vtype="B", name=f"PHASE_{pi}_{a[1]}") for a in alleles}
             for pi, _ in enumerate(phases)
         }
+        # same allele cannot have two consecutive phases (as they are complementary)
+        assert len(phases) % 2 == 0
+        for p in range(0, len(phases), 2):
+            for a in alleles:
+                model.addConstr(VPHASE[p][a] + VPHASE[p+1][a] <= 1)
         for p in VPHASE:
             model.addConstr(model.quicksum(VPHASE[p][a] for a in VPHASE[p]) <= 1)
             model.addConstr(model.quicksum(VPHASE[p][a] for a in VPHASE[p]) >= 1)
@@ -476,11 +481,17 @@ def solve_minor_model(
     if debug:
         model.dump(f"{debug}.minor{identifier}.lp")
 
-    # Solve the modelf
+    # Solve the model
     try:
         results = {}
         for status, opt, sol in model.solutions():
             log.debug(f"Minor solver: {status}, opt: {opt:.2f}")
+
+            if phases:
+                assignments = {a: set() for a in alleles}
+                for p, _ in enumerate(phases):
+                    a = next(a for a in VPHASE[p] if model.getValue(VPHASE[p][a]))
+                    assignments[a].add(p)
 
             solution = []
             for allele, value in VA.items():
@@ -513,6 +524,8 @@ def solve_minor_model(
                     phase = -1
                     if phases:
                         phase = next((pi for pi, p in enumerate(phases) if m in p), -1)
+                    if phase != -1 and phase not in assignments[allele]:
+                        phase=f'{phase}?'
                     print(f'{m.pos+1}:{m.op}:{gene.get_dbsnp(m)}:{gene.region_at(m.pos)[1][1]}:{novel}:{phase} ', end='')
                 print()
 
