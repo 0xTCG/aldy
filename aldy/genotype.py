@@ -121,7 +121,7 @@ def genotype(
         profile=profile,
         phase=phase,
         reference=reference,
-        cn_region=cn_region,
+        cn_region=None if cn_solution else cn_region,
         debug=debug,
     )
 
