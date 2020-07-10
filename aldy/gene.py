@@ -15,6 +15,9 @@ import collections
 import textwrap
 import itertools
 
+from natsort import natsorted
+from pprint import pprint
+
 from .common import (
     GeneRegion,
     GRange,
@@ -64,7 +67,7 @@ class MajorAllele(
 
 
 class MinorAllele(
-    collections.namedtuple("MinorAllele", ["name", "alt_names", "neutral_muts"])
+    collections.namedtuple("MinorAllele", ["name", "alt_name", "neutral_muts"])
 ):
     """
     Minor allele description.
@@ -73,7 +76,7 @@ class MinorAllele(
     Attributes:
         name (str):
             Minor allale name.
-        alt_names (list[str]):
+        alt_name (Optional[str]):
             List of alternative names.
         neutral_muts (set[:obj:`Mutation`]):
             Netural mutations that describe the minor allele.
@@ -84,7 +87,7 @@ class MinorAllele(
 
     def __str__(self):
         return "Minor({}; [{}])".format(
-            "|".join([self.name] + self.alt_names),
+            self.name,
             ", ".join(map(str, self.neutral_muts)),
         )
 
@@ -118,7 +121,7 @@ class Mutation(collections.namedtuple("Mutation", ["pos", "op"])):
     """
 
     def __str__(self):
-        return f"{self.pos + 1}:{self.op}"
+        return f"{self.pos}.{self.op}"
 
 
 class CNConfig(
@@ -264,21 +267,59 @@ class Gene:
 
         self._init_basic(gene_name, yml)
         self._init_regions(yml)
+        # pprint(self.regions)
         self._init_alleles(yml)
+        items = []
+        for a, al in self.alleles.items():
+            for mn, mi in natsorted(al.minors.items()):
+                for m in al.func_muts|mi.neutral_muts:
+                    if mi.alt_name: n = mi.alt_name
+                    else:
+                        n = mn.split('.')
+                        if len(n)>1: n = f'{n[0]}_.{n[1]}'
+                        else: n=n[0]
+                    items.append([
+                        n,
+                        m[0],m[1],
+                        self.mutation_info.get(m, [0, '-'])[1]
+                    ])
+        for i in natsorted(items):
+            print(i[0].replace('_', ''), i[1], i[2], i[3])
+
         self._init_partials()
         self._init_structure(yml)
+
+
 
     def _init_basic(self, gene: str, yml) -> None:
         """
         Read basic gene properties (``name``, ``seq`` and ``region``).
         """
         self.name = yml["name"]
-        self.seq = yml["seq"][self.genome].replace("\n", "")
-        self.region = GRange(
-            yml["chromosome"], *yml["coordinates"][self.genome]["region"]
-        )
+        self.seq = yml["seq"].replace("\n", "")
+
+        chr, start, end, strand, cigar = yml["coordinates"]["mappings"][self.genome]
+        self.chr_to_ref = {}
+        self.ref_to_chr = {}
+        self.strand = 1 if strand == '+' else -1
+        pos_ref = 1 if self.strand > 0 else len(self.seq)
+        pos_chr = start
+        for i in cigar.split():
+            op, sz = i[0], int(i[1:])
+            if op == 'M':
+                for idx in range(sz):
+                    self.chr_to_ref[pos_chr + idx] = pos_ref + idx * self.strand
+                    self.ref_to_chr[pos_ref + idx * self.strand] = pos_chr + idx
+                pos_chr += sz; pos_ref += sz * self.strand
+            elif op == 'I':
+                pos_ref += sz * self.strand
+            elif op == 'D':
+                pos_chr += sz
+            else:
+                raise AldyException("Invalid CIGAR string")
+        self.region = GRange(chr, start, end)  # will be updated later
         self.version = yml["version"]
-        self.access_ids = tuple(yml["ensembl"] + [yml["pharmvar"]])
+        self.access_ids = tuple([yml["ensembl"], yml["pharmvar"], yml["refseq"]])
 
     def _init_regions(self, yml) -> None:
         """
@@ -293,39 +334,25 @@ class Gene:
             return a dictionary of all regions.
             """
             regions = {
-                GeneRegion(len(exons) - ei if yml["revcomp"] else ei + 1, EXON): GRange(
-                    self.region.chr, es, ee
-                )
-                for ei, (es, ee) in enumerate(exons)
+                GeneRegion(ei + 1, EXON): GRange(self.region.chr, es, ee)
+                for ei, [es, ee] in enumerate(exons)
             }
             # Fill introns
             for i in range(1, len(regions)):
-                r1, r2 = regions[GeneRegion(i + 1, EXON)], regions[GeneRegion(i, EXON)]
-                if r1 > r2:
-                    r1, r2 = r2, r1
+                r1, r2 = regions[GeneRegion(i, EXON)], regions[GeneRegion(i + 1, EXON)]
                 regions[GeneRegion(i, INTRON)] = GRange(self.region.chr, r1[2], r2[1])
             for ni, (ri, r) in enumerate(special.items()):  # TODO: nice ordering here
                 regions[GeneRegion(ni, ri)] = GRange(self.region.chr, *r)
-            mi = min(r.start for r in regions.values())
-            ma = max(r.end for r in regions.values())
-            if mi > self.region.start:
-                regions[GeneRegion(0, "up5")] = GRange(
-                    self.region.chr, self.region.start, mi
-                )
-            if ma < self.region.end:
-                regions[GeneRegion(len(regions), "ds3")] = GRange(
-                    self.region.chr, ma, self.region.end
-                )
+            for gr, (ch, s, e) in regions.items():
+                if self.strand > 0:
+                    regions[gr] = GRange(ch, self.ref_to_chr[s], self.ref_to_chr[e])
+                else:
+                    regions[gr] = GRange(ch, self.ref_to_chr[e - 1], self.ref_to_chr[s] + 1)
             return regions
-
-        self.exons = [tuple(e) for e in yml["coordinates"][self.genome]["exons"]]
+        self.exons = [(self.ref_to_chr[s], self.ref_to_chr[e]) for [s, e] in yml["coordinates"]["exons"]]
         # Gene 0 is the main gene (key is the gene ID)
         self.regions = {
-            0: calculate_regions(
-                0,
-                yml["coordinates"][self.genome]["exons"],
-                yml["coordinates"][self.genome]["special"],
-            )
+            0: calculate_regions(0, yml["coordinates"]["exons"], yml["coordinates"]["special"])
         }
 
         # Each pseudogene is associated with an index > 0
@@ -350,17 +377,16 @@ class Gene:
         }
 
         def parse_unique(u):
-            u = list(filter(None, re.split(r"^(\d+)", u)))
+            u = list(filter(None, re.split(r"(\d+)$", u)))
             if len(u) > 1:
-                return GeneRegion(int(u[0]), u[1])
+                return GeneRegion(int(u[1]), u[0])
             else:  # find the matching kind number (legacy support)
                 for g in self.regions:
                     for r in self.regions[g]:
                         if u[0] == r.kind:
                             return r
             raise KeyError
-
-        self.unique_regions = [parse_unique(y) for y in yml["unique_regions"]]
+        self.unique_regions = [parse_unique(y) for y in yml["coordinates"]["cn_regions"]]
 
     def _init_alleles(self, yml) -> None:
         """
@@ -388,63 +414,73 @@ class Gene:
 
         self.mutation_info = {}
         for allele_name, allele in yml["alleles"].items():
-            if not re.match(r"^[A-Z0-9]+\*[A-Z0-9]+$", allele_name):
-                raise AldyException(
-                    "Allele names must be in format (alphanum+)*(alphanum+)"
-                    + "(e.g. CYP21*2A, DPYD*NEW)"
-                )
-            major_name = allele_name.split("*")[1]
-            for minor_name, minor in allele["minors"].items():
-                allele_name = major_name + "." + minor_name
-                mutations: List[Mutation] = []
-                if [0, "deletion", "-"] in minor["mutations"][self.genome]:
-                    deletion_allele = allele_name
-                    descriptions[allele_name] = "Gene deletion"
-                    mutations = []
-                else:
-                    for pos, op, rsid in itertools.chain(
-                        allele["mutations"][self.genome],
-                        minor["mutations"][self.genome],
-                    ):
-                        if pos == 0:  # pseudogene; has only one mutation indicator
-                            if "-" in op:
-                                fusions_left[allele_name] = (
-                                    int(op[1:-1]),
-                                    (EXON if op[0] == "e" else INTRON),
-                                )
-                                descriptions[allele_name] = (
-                                    "Fusion: pseudogene until "
-                                    + op[:-1][::-1]
-                                    + " followed by the gene"
-                                )
-                            else:
-                                if op[-1] == "+":
-                                    op = op[:-1]
-                                fusions_right[allele_name] = (
-                                    int(op[1:]),
-                                    (EXON if op[0] == "e" else INTRON),
-                                )
-                                descriptions[allele_name] = (
-                                    f"Conservation: Pseudogene retention after "
-                                    + op[::-1]
-                                    + " within the gene"
-                                )
-                        else:
-                            is_functional = [pos, op, rsid] in allele["mutations"][
-                                self.genome
-                            ]
-                            self.mutation_info.setdefault(
-                                (pos, op), (is_functional, rsid)
+            # if not re.match(r"^[A-Z0-9]+\*[A-Z0-9]+$", allele_name):
+            #     raise AldyException(
+            #         "Allele names must be in format (alphanum+)*(alphanum+)"
+            #         + "(e.g. CYP21*2A, DPYD*NEW)"
+            #     )
+            mutations: List[Mutation] = []
+            if ["deletion"] in allele["mutations"]:
+                deletion_allele = allele_name
+                descriptions[allele_name] = "Gene deletion"
+                mutations = []
+            else:
+                for m in allele["mutations"]:
+                    (pos, op, rsid), function = m[:3], m[3] if len(m) > 3 else None
+                    if pos == "pseudogene":  # has only one mutation indicator
+                        if "-" in op:
+                            fusions_left[allele_name] = (
+                                int(op[1:-1]),
+                                (EXON if op[0] == "e" else INTRON),
                             )
-                            mutations.append(Mutation(pos, op))
-                alleles[allele_name] = MinorAllele(allele_name, [], mutations)
-                allele_metadata[allele_name] = {}
-                for key in ["activity", "pharmvar"]:
-                    if key in allele:
-                        allele_metadata[allele_name][key] = allele[key]
-                for key in ["evidence", "label"]:
-                    if key in minor:
-                        allele_metadata[allele_name][key] = minor[key]
+                            descriptions[allele_name] = (
+                                "Fusion: pseudogene until "
+                                + op[:-1][::-1]
+                                + " followed by the gene"
+                            )
+                        else:
+                            if op[-1] == "+":
+                                op = op[:-1]
+                            fusions_right[allele_name] = (
+                                int(op[1:]),
+                                (EXON if op[0] == "e" else INTRON),
+                            )
+                            descriptions[allele_name] = (
+                                f"Conservation: Pseudogene retention after "
+                                + op[::-1]
+                                + " within the gene"
+                            )
+                    else:
+                        if self.strand < 0:
+                            if op[1] == '>':
+                                op = f'{rev_comp(op[0])}>{rev_comp(op[2])}'
+                            elif op[:3] == 'ins':
+                                ins = op[3:]
+                                # print('___ ->', ins, self.seq[pos - 1 - len(ins):pos + len(ins) - 1])
+                                # print(self.seq[pos - len(ins):pos])
+                                # while self.seq[pos - 1:pos + len(ins) - 1] == ins:
+                                #     # print('___', m, 'yes')
+                                #     pos += len(ins)
+                                # if ins=='GTGCCCACT':
+                                    # GGTGCCCACT
+                                    # CTGGACAGCC
+                                    # print(self.seq[pos - len(ins):pos+1])
+                                    # print(self.seq[pos - 1:pos+len(ins)])
+                                while self.seq[pos - len(ins):pos] == ins:
+                                    # print('___', m, 'yes')
+                                    pos -= len(ins)
+                                pos += 1
+                                op =  f'ins{rev_comp(op[3:])}'
+                            elif op[:3] == 'del':
+                                pos =  pos + len(op) - 4
+                        if op[:3] == 'del':
+                            op = 'del' + 'N' * (len(op) - 3)
+                        if pos not in self.ref_to_chr:
+                            print('___', allele_name, m)
+                        else:
+                            mutations.append(Mutation(self.ref_to_chr[pos], op))
+                            self.mutation_info.setdefault((self.ref_to_chr[pos], op), (function, rsid))
+            alleles[allele_name] = MinorAllele(allele_name, allele.get('label', None), mutations)
 
         # TODO:
         self.common_tandems: List[tuple] = []
@@ -549,15 +585,16 @@ class Gene:
         for key, minors in alleles_inverse.items():
             an = min(minors)
             a = MajorAllele(name="", cn_config=key[0], func_muts=key[1], minors=minors)
-            name = allele_number(an)
+            name = an.split('.')[0] # allele_number(an)
             if name in used_names:  # Append letter
                 log.warn(
                     f"reusing {name} for {name}." + chr(used_names[name] + ord("a"))
                 )
                 used_names[name] += 1
-                name += "." + chr(used_names[name] + ord("a"))
+                name += f":{used_names[name]}"
+                used_names[name] = 1
             else:
-                used_names[name] = -1
+                used_names[name] = 1
             self.alleles[name] = MajorAllele(
                 name=name,
                 cn_config=a.cn_config,
@@ -565,7 +602,7 @@ class Gene:
                 minors={
                     sa: MinorAllele(
                         name=sa,
-                        alt_names=[],
+                        alt_name=alleles[sa].alt_name,
                         neutral_muts=set(alleles[sa].neutral_muts) - set(a.func_muts),
                     )
                     for sa in a.minors
@@ -624,7 +661,7 @@ class Gene:
                         minors={
                             san: MinorAllele(
                                 name=san,
-                                alt_names=[],
+                                alt_name=[],
                                 neutral_muts=preserved_mutations(f, sa.neutral_muts),
                             )
                             for san, sa in a.minors.items()
@@ -637,7 +674,7 @@ class Gene:
 
         for an, a in self.alleles.items():
             # Clean up minor alleles (as many might be identical after a fusion).
-            # Put a reference to the cleaned-up alleles in ``alt_names`` field.
+            # Put a reference to the cleaned-up alleles in ``alt_name`` field.
             minors: Dict[tuple, List[str]] = collections.defaultdict(list)
             for s in a.minors:
                 key = sorted_tuple(a.minors[s].neutral_muts)
@@ -649,7 +686,7 @@ class Gene:
                 {
                     min(sa): MinorAllele(
                         min(sa),
-                        alt_names=sorted(list(set(sa) - {min(sa)})),
+                        alt_name=a.minors[min(sa)].alt_name, #sorted(list(set(sa) - {min(sa)})),
                         neutral_muts=set(nm),
                     )
                     for nm, sa in minors.items()
@@ -677,12 +714,11 @@ class Gene:
         #     if kind == EXON
         #     for i in range(start, end)
         # }
-        o = self.region.start
-        seq = "".join(self.seq[s - o : e - o] for s, e in self.exons)
-        aminoacid = seq_to_amino(rev_comp(seq) if yml["revcomp"] else seq)
+        seq = "".join(self.seq[s - 1:e - 1] for [s, e] in yml["coordinates"]["exons"])
+        aminoacid = seq_to_amino(rev_comp(seq) if self.strand < 0 else seq)
 
         # Set up a coding region structure for aminoacid calculation
-        self.coding_region = Gene.CodingRegion(yml["revcomp"], aminoacid)
+        self.coding_region = Gene.CodingRegion(self.strand < 0, aminoacid)
 
         self.mutations: Dict[Tuple[int, str], Mutation] = {}
         for _, a in self.alleles.items():
@@ -877,8 +913,8 @@ class Gene:
             log.info(f"\nGene {self.name}, minor star-allele {self.name}*{minor}:")
             log.info(f"  Major star-allele: {self.name}*{allele.name}")
             log.info(f"  Copy number configuration: {allele.cn_config}")
-            if len(allele.minors[minor].alt_names) > 0:
-                alt = ", ".join(sorted(allele.minors[minor].alt_names))
+            if len(allele.minors[minor].alt_name) > 0:
+                alt = ", ".join(sorted(allele.minors[minor].alt_name))
                 log.info(f"  Alternative names: {alt}")
 
             text = [

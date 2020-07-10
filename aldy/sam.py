@@ -373,25 +373,13 @@ class Sample:
         start, s_start = read.reference_start, 0
         for op, size in read.cigartuples:
             if op == 2:  # Deletion
-                mut = (
-                    start,
-                    "DEL.{}".format(
-                        gene.seq[
-                            start - gene.region.start : start - gene.region.start + size
-                        ]
-                    ),
-                )
+                mut = (start, "del" + "N" * size)
                 muts[mut] += 1
                 if dump:
                     dump_arr.append(mut)
                 start += size
             elif op == 1:  # Insertion
-                mut = (
-                    start,
-                    "INS.{}".format(
-                        read.query_sequence[s_start : s_start + size].lower()
-                    ),
-                )
+                mut = (start, "ins" + read.query_sequence[s_start : s_start + size])
                 muts[mut] += 1
                 if dump:
                     dump_arr.append(mut)
@@ -401,19 +389,10 @@ class Sample:
                 s_start += size
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
-                    if not 0 <= start + i - gene.region.start < len(gene.seq):
+                    if start + i not in gene:
                         continue
-                    if (
-                        gene.seq[start + i - gene.region.start]
-                        != read.query_sequence[s_start + i]
-                    ):
-                        mut = (
-                            start + i,
-                            "SNP.{}{}".format(
-                                gene.seq[start + i - gene.region.start],
-                                read.query_sequence[s_start + i],
-                            ),
-                        )
+                    if gene[start + i] != read.query_sequence[s_start + i]:
+                        mut = (start + i, f"{gene[start + i]}>{read.query_sequence[s_start + i]}")
                         if dump:
                             dump_arr.append(mut)
                         muts[mut] += 1
@@ -617,6 +596,7 @@ class Sample:
         if regions is None:
             gene_regions = sorted(
                 [  # paper gene coordinates in hg19
+                # TODO: Auto populate
                     ("CYP3A5", GRange("7", 99245000, 99278000)),
                     ("CYP3A4", GRange("7", 99354000, 99465000)),
                     ("CYP2C19", GRange("10", 96445000, 96615000)),

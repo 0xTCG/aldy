@@ -35,3 +35,5 @@ temp
 docs/_*
 *.log
 Untitled*
+new_defs/*
+aldy_old/*
