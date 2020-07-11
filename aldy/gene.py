@@ -231,7 +231,7 @@ class Gene:
         path: Optional[str],
         name: Optional[str] = None,
         yml: Optional[str] = None,
-        genome: str = "hg19",
+        genome: str = "hg38",
     ) -> None:
         """
         Initialize the Gene class with the database description
@@ -267,7 +267,7 @@ class Gene:
 
         self._init_basic(gene_name, yml)
         self._init_regions(yml)
-        # pprint(self.regions)
+        pprint(sorted(self.regions.items()))
         self._init_alleles(yml)
         items = []
         for a, al in self.alleles.items():
@@ -283,13 +283,11 @@ class Gene:
                         m[0],m[1],
                         self.mutation_info.get(m, [0, '-'])[1]
                     ])
-        for i in natsorted(items):
-            print(i[0].replace('_', ''), i[1], i[2], i[3])
+        # for i in natsorted(items):
+            # print(i[0].replace('_', ''), i[1], i[2], i[3])
 
         self._init_partials()
         self._init_structure(yml)
-
-
 
     def _init_basic(self, gene: str, yml) -> None:
         """
@@ -347,9 +345,9 @@ class Gene:
                 if self.strand > 0:
                     regions[gr] = GRange(ch, self.ref_to_chr[s], self.ref_to_chr[e])
                 else:
-                    regions[gr] = GRange(ch, self.ref_to_chr[e - 1], self.ref_to_chr[s] + 1)
+                    regions[gr] = GRange(ch, self.ref_to_chr[e], self.ref_to_chr[s])
             return regions
-        self.exons = [(self.ref_to_chr[s], self.ref_to_chr[e]) for [s, e] in yml["coordinates"]["exons"]]
+        # self.exons = [(self.ref_to_chr[s], self.ref_to_chr[e]) for [s, e] in yml["coordinates"]["exons"]]
         # Gene 0 is the main gene (key is the gene ID)
         self.regions = {
             0: calculate_regions(0, yml["coordinates"]["exons"], yml["coordinates"]["special"])
@@ -363,7 +361,7 @@ class Gene:
                 self.regions[gi + 1] = calculate_regions(
                     gi + 1,
                     yml["pseudogenes"][g]["exons"],
-                    yml["pseudogenes"][g]["special_regions"],
+                    yml["pseudogenes"][g]["special"],
                 )
 
         #: dict[int, (int, `GeneRegion`]):
