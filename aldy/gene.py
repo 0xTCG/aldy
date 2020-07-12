@@ -342,11 +342,10 @@ class Gene:
                     regions[GeneRegion(ri, name)] = GRange(self.region.chr, coord[i * 2], coord[i * 2 + 1])
             for e in range(1, num_exons):  # Fill introns
                 r1, r2 = regions[GeneRegion(e, EXON)], regions[GeneRegion(e + 1, EXON)]
-                regions[GeneRegion(e, INTRON)] = GRange(self.region.chr, r1[2], r2[1])
-            # for gr, (ch, s, e) in regions.items():
-            #     if self.strand < 0:
-            #         s, e = e, s
-            #     regions[gr] = GRange(ch, s, e)
+                if self.strand < 0:
+                    regions[GeneRegion(e, INTRON)] = GRange(self.region.chr, r2[2], r1[1])
+                else:
+                    regions[GeneRegion(e, INTRON)] = GRange(self.region.chr, r1[2], r2[1])
             self.regions[i] = regions
 
         #: dict[int, (int, `GeneRegion`]):
@@ -402,6 +401,8 @@ class Gene:
             #         "Allele names must be in format (alphanum+)*(alphanum+)"
             #         + "(e.g. CYP21*2A, DPYD*NEW)"
             #     )
+            if '*' in allele_name:
+                allele_name = allele_name.split('*')[1]
             mutations: List[Mutation] = []
             if [self.name, "deletion"] in allele["mutations"]:
                 deletion_allele = allele_name
@@ -454,6 +455,11 @@ class Gene:
                         else:
                             mutations.append(Mutation(self.ref_to_chr[pos], op))
                             self.mutation_info.setdefault((self.ref_to_chr[pos], op), (function, rsid))
+                            r = self.region_at(self.ref_to_chr[pos])
+                            if r[1].kind == '':
+                                print(self.ref_to_chr[pos])
+                                print(m)
+                                assert False
             alleles[allele_name] = MinorAllele(allele_name, allele.get('label', None), mutations)
 
         # TODO:
@@ -473,7 +479,6 @@ class Gene:
             )
 
         inverse_cn: Dict[tuple, str] = dict()
-
         # Left fusions are PSEUDOGENE + GENE fusions
         for a, brk in fusions_left.items():
             cn = dict()
