@@ -231,7 +231,7 @@ class Gene:
         path: Optional[str],
         name: Optional[str] = None,
         yml: Optional[str] = None,
-        genome: str = "hg38",
+        genome: str = "hg19",
     ) -> None:
         """
         Initialize the Gene class with the database description
@@ -267,7 +267,7 @@ class Gene:
 
         self._init_basic(gene_name, yml)
         self._init_regions(yml)
-        pprint(sorted(self.regions.items()))
+        # pprint(sorted(self.regions.items()))
         self._init_alleles(yml)
         items = []
         for a, al in self.alleles.items():
@@ -283,8 +283,8 @@ class Gene:
                         m[0],m[1],
                         self.mutation_info.get(m, [0, '-'])[1]
                     ])
-        # for i in natsorted(items):
-            # print(i[0].replace('_', ''), i[1], i[2], i[3])
+        for i in natsorted(items):
+            print(i[0].replace('_', ''), i[1], i[2], i[3])
 
         self._init_partials()
         self._init_structure(yml)
@@ -294,9 +294,9 @@ class Gene:
         Read basic gene properties (``name``, ``seq`` and ``region``).
         """
         self.name = yml["name"]
-        self.seq = yml["seq"].replace("\n", "")
+        self.seq = yml["reference"]["seq"].replace("\n", "")
 
-        chr, start, end, strand, cigar = yml["coordinates"]["mappings"][self.genome]
+        chr, start, end, strand, cigar = yml["reference"]["mappings"][self.genome]
         self.chr_to_ref = {}
         self.ref_to_chr = {}
         self.strand = 1 if strand == '+' else -1
@@ -317,7 +317,7 @@ class Gene:
                 raise AldyException("Invalid CIGAR string")
         self.region = GRange(chr, start, end)  # will be updated later
         self.version = yml["version"]
-        self.access_ids = tuple([yml["ensembl"], yml["pharmvar"], yml["refseq"]])
+        # self.access_ids = tuple([yml["ensembl"], yml["pharmvar"], yml["reference"]["name"]])
 
     def _init_regions(self, yml) -> None:
         """
@@ -326,43 +326,28 @@ class Gene:
         Prepare ``region_at()`` call.
         """
 
-        def calculate_regions(gene, exons, special):
-            """
-            Given the list of exons, calculate intronic regions and
-            return a dictionary of all regions.
-            """
-            regions = {
-                GeneRegion(ei + 1, EXON): GRange(self.region.chr, es, ee)
-                for ei, [es, ee] in enumerate(exons)
-            }
-            # Fill introns
-            for i in range(1, len(regions)):
-                r1, r2 = regions[GeneRegion(i, EXON)], regions[GeneRegion(i + 1, EXON)]
-                regions[GeneRegion(i, INTRON)] = GRange(self.region.chr, r1[2], r2[1])
-            for ni, (ri, r) in enumerate(special.items()):  # TODO: nice ordering here
-                regions[GeneRegion(ni, ri)] = GRange(self.region.chr, *r)
-            for gr, (ch, s, e) in regions.items():
-                if self.strand > 0:
-                    regions[gr] = GRange(ch, self.ref_to_chr[s], self.ref_to_chr[e])
-                else:
-                    regions[gr] = GRange(ch, self.ref_to_chr[e], self.ref_to_chr[s])
-            return regions
-        # self.exons = [(self.ref_to_chr[s], self.ref_to_chr[e]) for [s, e] in yml["coordinates"]["exons"]]
-        # Gene 0 is the main gene (key is the gene ID)
-        self.regions = {
-            0: calculate_regions(0, yml["coordinates"]["exons"], yml["coordinates"]["special"])
-        }
-
+        self.regions = {}
         # Each pseudogene is associated with an index > 0
         self.pseudogenes: List[str] = list()
-        if "pseudogenes" in yml:
-            for gi, g in enumerate(sorted(yml["pseudogenes"])):
+        for i, g in enumerate(yml["structure"]["genes"]):
+            if i > 0:
                 self.pseudogenes.append(g)
-                self.regions[gi + 1] = calculate_regions(
-                    gi + 1,
-                    yml["pseudogenes"][g]["exons"],
-                    yml["pseudogenes"][g]["special"],
-                )
+            regions = {}
+            num_exons = 0
+            for ri, (name, coord) in enumerate(yml["structure"]["regions"][self.genome].items()):
+                if name[0] == 'e' and name[1:].isdigit():  # exon
+                    regions[GeneRegion(int(name[1:]), EXON)] = GRange(self.region.chr, coord[i * 2], coord[i * 2 + 1])
+                    num_exons += 1
+                else:
+                    regions[GeneRegion(ri, name)] = GRange(self.region.chr, coord[i * 2], coord[i * 2 + 1])
+            for e in range(1, num_exons):  # Fill introns
+                r1, r2 = regions[GeneRegion(e, EXON)], regions[GeneRegion(e + 1, EXON)]
+                regions[GeneRegion(e, INTRON)] = GRange(self.region.chr, r1[2], r2[1])
+            # for gr, (ch, s, e) in regions.items():
+            #     if self.strand < 0:
+            #         s, e = e, s
+            #     regions[gr] = GRange(ch, s, e)
+            self.regions[i] = regions
 
         #: dict[int, (int, `GeneRegion`]):
         #: reverse lookup (gene, region) of gene regions given a location
@@ -384,7 +369,7 @@ class Gene:
                         if u[0] == r.kind:
                             return r
             raise KeyError
-        self.unique_regions = [parse_unique(y) for y in yml["coordinates"]["cn_regions"]]
+        self.unique_regions = [parse_unique(y) for y in yml["structure"]["cn_regions"]]
 
     def _init_alleles(self, yml) -> None:
         """
@@ -418,14 +403,15 @@ class Gene:
             #         + "(e.g. CYP21*2A, DPYD*NEW)"
             #     )
             mutations: List[Mutation] = []
-            if ["deletion"] in allele["mutations"]:
+            if [self.name, "deletion"] in allele["mutations"]:
                 deletion_allele = allele_name
                 descriptions[allele_name] = "Gene deletion"
                 mutations = []
             else:
                 for m in allele["mutations"]:
-                    (pos, op, rsid), function = m[:3], m[3] if len(m) > 3 else None
-                    if pos == "pseudogene":  # has only one mutation indicator
+                    if m[0] in self.pseudogenes:  # has only one mutation indicator
+                        assert m[0] == self.pseudogenes[0]  # TODO: relax
+                        op = m[1]
                         if "-" in op:
                             fusions_left[allele_name] = (
                                 int(op[1:-1]),
@@ -449,26 +435,16 @@ class Gene:
                                 + " within the gene"
                             )
                     else:
+                        (pos, op, rsid), function = m[:3], m[3] if len(m) > 3 else None
                         if self.strand < 0:
                             if op[1] == '>':
                                 op = f'{rev_comp(op[0])}>{rev_comp(op[2])}'
                             elif op[:3] == 'ins':
                                 ins = op[3:]
-                                # print('___ ->', ins, self.seq[pos - 1 - len(ins):pos + len(ins) - 1])
-                                # print(self.seq[pos - len(ins):pos])
-                                # while self.seq[pos - 1:pos + len(ins) - 1] == ins:
-                                #     # print('___', m, 'yes')
-                                #     pos += len(ins)
-                                # if ins=='GTGCCCACT':
-                                    # GGTGCCCACT
-                                    # CTGGACAGCC
-                                    # print(self.seq[pos - len(ins):pos+1])
-                                    # print(self.seq[pos - 1:pos+len(ins)])
                                 while self.seq[pos - len(ins):pos] == ins:
-                                    # print('___', m, 'yes')
                                     pos -= len(ins)
                                 pos += 1
-                                op =  f'ins{rev_comp(op[3:])}'
+                                op = f'ins{rev_comp(op[3:])}'
                             elif op[:3] == 'del':
                                 pos =  pos + len(op) - 4
                         if op[:3] == 'del':
@@ -712,7 +688,7 @@ class Gene:
         #     if kind == EXON
         #     for i in range(start, end)
         # }
-        seq = "".join(self.seq[s - 1:e - 1] for [s, e] in yml["coordinates"]["exons"])
+        seq = "".join(self.seq[s - 1:e - 1] for [s, e] in yml["reference"]["exons"])
         aminoacid = seq_to_amino(rev_comp(seq) if self.strand < 0 else seq)
 
         # Set up a coding region structure for aminoacid calculation
