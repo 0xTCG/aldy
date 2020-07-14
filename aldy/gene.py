@@ -252,8 +252,10 @@ class Gene:
         self.genome = genome
         self._parse_yml(name, yml)
 
-        # for i in self.alleles:
-            # print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
+        import sys
+        for i in self.alleles:
+            print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
+        sys.exit(0)
 
     def _parse_yml(self, gene_name: str, yml) -> None:
         """
@@ -415,7 +417,7 @@ class Gene:
                             op = 'del' + 'N' * (len(op) - 3)
                         pos -= 1  # Cast to 0-based index
                         if pos not in self.ref_to_chr:
-                            print('___', allele_name, m)
+                            log.warn('___', allele_name, m)
                         else:
                             mutations.append(Mutation(self.ref_to_chr[pos], op))
                             self.mutation_info.setdefault((self.ref_to_chr[pos], op), (function, rsid))
@@ -465,10 +467,9 @@ class Gene:
 
         # Deletion is a special kind of left fusion
         if deletion_allele is not None:
-            cn = {
-                0: {r: 0 for r in self.regions[0]},
-                1: {r: 1 for r in self.regions[1]},
-            }
+            cn = { 0: {r: 0 for r in self.regions[0]} }
+            if len(self.pseudogenes) > 0:
+                cn[1] = {r: 1 for r in self.regions[1]}
             self.cn_configs[deletion_allele] = CNConfig(
                 cn,
                 CNConfig.CNConfigType.DELETION,
@@ -539,7 +540,7 @@ class Gene:
             name = an.split('.')[0] # allele_number(an)
             if name in used_names:  # Append letter
                 used_names[name] += 1
-                log.warn(f"{name} -> {name}:{used_names[name]}")
+                # log.warn(f"{name} -> {name}:{used_names[name]}")
                 name += f":{used_names[name]}"
                 used_names[name] = 1
             else:

@@ -216,7 +216,7 @@ alleles:
     evidence: L
     mutations:
     - [1624, C>T, rs11188072]
-    - [4220, C>T, rs12248560]
+    - [4220, C>T, rs12248560, downstream effect]
     - [5026, A>G, rs28399504, M1V]
     - [5124, C>T, rs17885098]
     - [85186, A>G, rs3758581, I331V]
@@ -341,7 +341,7 @@ alleles:
     evidence: D
     mutations:
     - [1624, C>T, rs11188072]
-    - [4220, C>T, rs12248560]
+    - [4220, C>T, rs12248560, downstream effect]
     - [5124, C>T, rs17885098]
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*18.001:
@@ -481,6 +481,13 @@ alleles:
     - [5124, C>T, rs17885098]
     - [17687, A>G, rs12769205, splicing defect]
     - [85186, A>G, rs3758581, I331V]
+  CYP2C19*36.001:
+    pharmvar: https://www.pharmvar.org/haplotype/81
+    activity: normal function
+    label: CYP2C19*1A
+    evidence: D
+    mutations:
+    - [CYP2C19, deletion]
   CYP2C19*38.001:
     pharmvar: https://www.pharmvar.org/haplotype/81
     activity: normal function
@@ -491,6 +498,7 @@ structure:
   genes: [CYP2C19]
   regions:
     hg19:
+      up: [96517438, 96522381]
       utr5: [96522381, 96522463]
       e1: [96522463, 96522631]
       e2: [96534815, 96534978]
@@ -503,6 +511,7 @@ structure:
       e9: [96612490, 96612672]
       utr3: [96612672, 96613018]
     hg38:
+      up: [94757681, 94762681]
       utr5: [94762681, 94762706]
       e1: [94762706, 94762874]
       e2: [94775058, 94775221]

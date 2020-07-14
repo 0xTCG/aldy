@@ -100,7 +100,7 @@ alleles:
     - [5359, T>C, '-']
     - [12181, A>G, rs28742185]
     - [11956, insCACTT, rs72549451]
-  CYP2A6*1B.015:
+  CYP2A6*1.015:
     label: CYP2A6*1B15
     mutations:
     - [6402, C>T, rs866618989]
