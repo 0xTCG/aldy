@@ -9,7 +9,7 @@ from typing import Dict, List
 import collections
 
 from .common import allele_sort_key
-from .gene import Gene, GeneRegion
+from .gene import Gene
 
 
 class CNSolution(
@@ -25,7 +25,7 @@ class CNSolution(
         solution (dict[str, int]):
             Copy-number configurations mapped to the corresponding copy number
             (e.g. ``{1: 2}`` means that there are two copies of \*1 configuration).
-        region_cn (dict[:obj:`aldy.common.GeneRegion`, int]):
+        region_cn (dict[str, int]):
             Gene region copy numbers inferred by this solution.
         gene (:obj:`aldy.gene.Gene`):
             Gene instance.
@@ -35,7 +35,7 @@ class CNSolution(
     """
 
     def __new__(self, score: float, solution: List[str], gene: Gene):
-        vec: Dict[int, Dict[GeneRegion, float]] = collections.defaultdict(
+        vec: Dict[int, Dict[str, float]] = collections.defaultdict(
             lambda: collections.defaultdict(int)
         )
         for conf in solution:
@@ -70,17 +70,11 @@ class CNSolution(
         )
 
     def __str__(self):
-        regions = sorted(set(r for g in self.region_cn for r in self.region_cn[g]))
         return "CNSol[{:.2f}; sol=({}); cn={}]".format(
             self.score,
             self._solution_nice(),
             "|".join(
-                "".join(
-                    "{:.0f}".format(self.region_cn[g][r])
-                    if r in self.region_cn[g]
-                    else "_"
-                    for r in regions
-                )
+                "".join( str(self.region_cn[g][r]) for r in self.gene.regions[0] )
                 for g in sorted(self.region_cn)
             ),
         )

@@ -9,7 +9,7 @@ from typing import Dict, Tuple, Callable
 import collections
 
 from .common import log, AldyException
-from .gene import Mutation, GeneRegion, GRange
+from .gene import Mutation, GRange
 
 
 class Coverage:
@@ -50,7 +50,7 @@ class Coverage:
         self.sample = sample
 
         self._rescaled: Dict[int, float] = {}
-        self._region_coverage: Dict[Tuple[int, GeneRegion], float] = {}
+        self._region_coverage: Dict[Tuple[int, str], float] = {}
 
     def __getitem__(self, mut: Mutation) -> float:
         """
@@ -110,7 +110,7 @@ class Coverage:
             return 0
         return max(1, self.total(pos)) / cn_solution.position_cn(pos)
 
-    def region_coverage(self, gene: int, region: GeneRegion) -> float:
+    def region_coverage(self, gene: int, region: str) -> float:
         """
         Returns:
             float: Average coverage of the region ``region`` in ``gene``.
@@ -182,7 +182,7 @@ class Coverage:
     def _normalize_coverage(
         self,
         profile: Dict[str, Dict[int, float]],
-        gene_regions: Dict[int, Dict[GeneRegion, GRange]],
+        gene_regions: Dict[int, Dict[str, GRange]],
         cn_region: GRange,
     ) -> None:
         """
@@ -192,7 +192,7 @@ class Coverage:
             profile (dict[str, dict[int, float]]):
                 Profile coverage in the form `chromosome: (position -> coverage)`.
             gene_regions
-            (dict[int, dict[:obj:`aldy.common.GeneRegion`, :obj:`aldy.common.GRange`]]):
+            (dict[int, dict[str, :obj:`aldy.common.GRange`]]):
                 List of genic regions for each gene.
             cn_region (:obj:`aldy.common.GRange`):
                 Copy-number neutral region.

@@ -19,7 +19,6 @@ from natsort import natsorted
 from pprint import pprint
 
 from .common import (
-    GeneRegion,
     GRange,
     AldyException,
     allele_number,
@@ -121,7 +120,7 @@ class Mutation(collections.namedtuple("Mutation", ["pos", "op"])):
     """
 
     def __str__(self):
-        return f"{self.pos}.{self.op}"
+        return f"{self.pos+1}.{self.op}"
 
 
 class CNConfig(
@@ -132,9 +131,9 @@ class CNConfig(
     Immutable.
 
     Attributes:
-        cn (dict[int, dict[:obj:`aldy.common.GeneRegion`, int]]):
+        cn (dict[int, dict[str, int]]):
             Value of the expected region copy number in each gene.
-            For example, ``cn[0][GeneRegion(0, 1, EXON)] == 1`` means that the exon 1 of
+            For example, ``cn[0]["e1"] == 1`` means that the exon 1 of
             the main gene (ID 0) has one copy (and thus should be present)
             in the configuration `cn`.
         kind (:obj:`CNConfigType`):
@@ -161,17 +160,11 @@ class CNConfig(
     """
 
     def __str__(self):
-        regions = sorted(set(r for g in self.cn for r in self.cn[g]))
         return "CNConfig({}; vector={}; alleles=[{}])".format(
             str(self.kind)[13:],
             "|".join(
-                "".join(
-                    ("{:.0f}".format(self.cn[g][r]) if self.cn[g][r] != 0.5 else "½")
-                    if r in self.cn[g]
-                    else "_"
-                    for r in regions
-                )
-                for g in sorted(self.cn)
+                "".join(str(self.cn[g][r]) for r in self.cn[0])
+                for g in self.cn
             ),
             " ".join(sorted(self.alleles)),
         )
@@ -190,12 +183,11 @@ class Gene:
             aligned to the reference genome).
         region (:obj:`aldy.common.GRange`):
             Wild-type reference sequence coordinates within the reference genome.
-        regions (dict[int, dict[:obj:`aldy.common.GeneRegion`,
-                :obj:`aldy.common.GRange`]]):
+        regions (dict[int, dict[str, :obj:`aldy.common.GRange`]]):
             Exonic, intronic and special (e.g. UTR) regions in a gene.
-            Maps a gene ID to a dictionary that maps :obj:`aldy.common.GeneRegion`
-            (e.g. exon 9) to a :obj:`aldy.common.GRange` (e.g. chr1:10-20) within
-            the reference genome.
+            Maps a gene ID to a dictionary that maps gene region IDs
+            (e.g. "e9" for exon 9) to a :obj:`aldy.common.GRange` (e.g. chr1:10-20)
+            within the reference genome.
             Gene 0 is the main gene.
         pseudogenes (list[str]):
             List of pseudogene names (genes whose ID is greater than 0).
@@ -260,6 +252,9 @@ class Gene:
         self.genome = genome
         self._parse_yml(name, yml)
 
+        # for i in self.alleles:
+            # print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
+
     def _parse_yml(self, gene_name: str, yml) -> None:
         """
         Initialize the gene structure from YML data.
@@ -267,31 +262,16 @@ class Gene:
 
         self._init_basic(gene_name, yml)
         self._init_regions(yml)
-        # pprint(sorted(self.regions.items()))
         self._init_alleles(yml)
-        items = []
-        for a, al in self.alleles.items():
-            for mn, mi in natsorted(al.minors.items()):
-                for m in al.func_muts|mi.neutral_muts:
-                    if mi.alt_name: n = mi.alt_name
-                    else:
-                        n = mn.split('.')
-                        if len(n)>1: n = f'{n[0]}_.{n[1]}'
-                        else: n=n[0]
-                    items.append([
-                        n,
-                        m[0],m[1],
-                        self.mutation_info.get(m, [0, '-'])[1]
-                    ])
-        for i in natsorted(items):
-            print(i[0].replace('_', ''), i[1], i[2], i[3])
-
         self._init_partials()
         self._init_structure(yml)
 
     def _init_basic(self, gene: str, yml) -> None:
         """
         Read basic gene properties (``name``, ``seq`` and ``region``).
+
+        All database YAML coordinates are indexed starting from 1.
+        Aldy internally uses 0-based indexing.
         """
         self.name = yml["name"]
         self.seq = yml["reference"]["seq"].replace("\n", "")
@@ -300,8 +280,8 @@ class Gene:
         self.chr_to_ref = {}
         self.ref_to_chr = {}
         self.strand = 1 if strand == '+' else -1
-        pos_ref = 1 if self.strand > 0 else len(self.seq)
-        pos_chr = start
+        pos_ref = 0 if self.strand > 0 else (len(self.seq) - 1)
+        pos_chr = start - 1
         for i in cigar.split():
             op, sz = i[0], int(i[1:])
             if op == 'M':
@@ -336,19 +316,18 @@ class Gene:
             num_exons = 0
             for ri, (name, coord) in enumerate(yml["structure"]["regions"][self.genome].items()):
                 if name[0] == 'e' and name[1:].isdigit():  # exon
-                    regions[GeneRegion(int(name[1:]), EXON)] = GRange(self.region.chr, coord[i * 2], coord[i * 2 + 1])
                     num_exons += 1
-                else:
-                    regions[GeneRegion(ri, name)] = GRange(self.region.chr, coord[i * 2], coord[i * 2 + 1])
+                regions[name] = GRange(self.region.chr, coord[i * 2] - 1, coord[i * 2 + 1] - 1)
             for e in range(1, num_exons):  # Fill introns
-                r1, r2 = regions[GeneRegion(e, EXON)], regions[GeneRegion(e + 1, EXON)]
+                r1, r2 = regions[f"e{e}"], regions[f"e{e + 1}"]
                 if self.strand < 0:
-                    regions[GeneRegion(e, INTRON)] = GRange(self.region.chr, r2[2], r1[1])
+                    regions[f"i{e}"] = GRange(self.region.chr, r2[2], r1[1])
                 else:
-                    regions[GeneRegion(e, INTRON)] = GRange(self.region.chr, r1[2], r2[1])
-            self.regions[i] = regions
+                    regions[f"i{e}"] = GRange(self.region.chr, r1[2], r2[1])
+            regions = sorted(regions.items(), key=lambda x: (x[1].start, x[1].end))
+            self.regions[i] = dict(regions if self.strand > 0 else regions[::-1])
 
-        #: dict[int, (int, `GeneRegion`]):
+        #: dict[int, (int, str)]:
         #: reverse lookup (gene, region) of gene regions given a location
         #: within the reference genome.
         self._region_at = {
@@ -358,17 +337,7 @@ class Gene:
             for i in range(rng.start, rng.end)
         }
 
-        def parse_unique(u):
-            u = list(filter(None, re.split(r"(\d+)$", u)))
-            if len(u) > 1:
-                return GeneRegion(int(u[1]), u[0])
-            else:  # find the matching kind number (legacy support)
-                for g in self.regions:
-                    for r in self.regions[g]:
-                        if u[0] == r.kind:
-                            return r
-            raise KeyError
-        self.unique_regions = [parse_unique(y) for y in yml["structure"]["cn_regions"]]
+        self.unique_regions = yml["structure"]["cn_regions"]
 
     def _init_alleles(self, yml) -> None:
         """
@@ -413,11 +382,8 @@ class Gene:
                     if m[0] in self.pseudogenes:  # has only one mutation indicator
                         assert m[0] == self.pseudogenes[0]  # TODO: relax
                         op = m[1]
-                        if "-" in op:
-                            fusions_left[allele_name] = (
-                                int(op[1:-1]),
-                                (EXON if op[0] == "e" else INTRON),
-                            )
+                        if op[-1] == '-':
+                            fusions_left[allele_name] = op[:-1]
                             descriptions[allele_name] = (
                                 "Fusion: pseudogene until "
                                 + op[:-1][::-1]
@@ -426,10 +392,7 @@ class Gene:
                         else:
                             if op[-1] == "+":
                                 op = op[:-1]
-                            fusions_right[allele_name] = (
-                                int(op[1:]),
-                                (EXON if op[0] == "e" else INTRON),
-                            )
+                            fusions_right[allele_name] = op
                             descriptions[allele_name] = (
                                 f"Conservation: Pseudogene retention after "
                                 + op[::-1]
@@ -447,16 +410,17 @@ class Gene:
                                 pos += 1
                                 op = f'ins{rev_comp(op[3:])}'
                             elif op[:3] == 'del':
-                                pos =  pos + len(op) - 4
+                                pos = pos + len(op) - 4
                         if op[:3] == 'del':
                             op = 'del' + 'N' * (len(op) - 3)
+                        pos -= 1  # Cast to 0-based index
                         if pos not in self.ref_to_chr:
                             print('___', allele_name, m)
                         else:
                             mutations.append(Mutation(self.ref_to_chr[pos], op))
                             self.mutation_info.setdefault((self.ref_to_chr[pos], op), (function, rsid))
                             r = self.region_at(self.ref_to_chr[pos])
-                            if r[1].kind == '':
+                            if r[1] == '-':
                                 print(self.ref_to_chr[pos])
                                 print(m)
                                 assert False
@@ -478,16 +442,17 @@ class Gene:
                 i[1] for i in sorted(x[1].items())
             )
 
+
+        for i in range(len(self.pseudogenes)):
+            if list(self.regions[i + 1].keys()) != list(self.regions[0].keys()):
+                raise AldyException('Invalid database structure')
+        region_rank = {a: ai for ai, a in enumerate(self.regions[0])}
         inverse_cn: Dict[tuple, str] = dict()
         # Left fusions are PSEUDOGENE + GENE fusions
         for a, brk in fusions_left.items():
             cn = dict()
-            cn[0] = {
-                r: float(0 if (r.number, r.kind) < brk else 1) for r in self.regions[0]
-            }
-            cn[1] = {
-                r: float(1 if (r.number, r.kind) < brk else 0) for r in self.regions[1]
-            }
+            cn[0] = { r: int(region_rank[r] >= region_rank[brk]) for r in self.regions[0] }
+            cn[1] = { r: int(region_rank[r] < region_rank[brk]) for r in self.regions[1] }
 
             key = freezekey(cn)
             if key not in inverse_cn:
@@ -514,8 +479,8 @@ class Gene:
         # Right fusions GENE + PSEUDOGENE + whole copy of PSEUDOGENE fusions
         for a, brk in fusions_right.items():
             cn = dict()
-            cn[0] = {r: (1 if (r.number, r.kind) < brk else 0) for r in self.regions[0]}
-            cn[1] = {r: (1 if (r.number, r.kind) < brk else 2) for r in self.regions[1]}
+            cn[0] = {r: int(region_rank[r] < region_rank[brk]) for r in self.regions[0]}
+            cn[1] = {r: 1 + int(region_rank[r] >= region_rank[brk]) for r in self.regions[1]}
             key = freezekey(cn)
             if key not in inverse_cn:
                 self.cn_configs[a] = CNConfig(
@@ -544,6 +509,13 @@ class Gene:
             descriptions["1"],
         )
 
+        # Remove "empty" regions
+        for c, cn in self.cn_configs.items():
+            for g, r in cn.cn.items():
+                for rg in r:
+                    if self.regions[g][rg].end - self.regions[g][rg].start <= 0:
+                        r[rg] = 0
+
         # Set up major and minor allele structures
         alleles_inverse: Dict[tuple, set] = collections.defaultdict(set)
         for a in alleles:
@@ -566,10 +538,8 @@ class Gene:
             a = MajorAllele(name="", cn_config=key[0], func_muts=key[1], minors=minors)
             name = an.split('.')[0] # allele_number(an)
             if name in used_names:  # Append letter
-                log.warn(
-                    f"reusing {name} for {name}." + chr(used_names[name] + ord("a"))
-                )
                 used_names[name] += 1
+                log.warn(f"{name} -> {name}:{used_names[name]}")
                 name += f":{used_names[name]}"
                 used_names[name] = 1
             else:
@@ -693,7 +663,8 @@ class Gene:
         #     if kind == EXON
         #     for i in range(start, end)
         # }
-        seq = "".join(self.seq[s - 1:e - 1] for [s, e] in yml["reference"]["exons"])
+        self.exons = yml["reference"]["exons"]
+        seq = "".join(self.seq[s - 1:e - 1] for [s, e] in self.exons)
         aminoacid = seq_to_amino(rev_comp(seq) if self.strand < 0 else seq)
 
         # Set up a coding region structure for aminoacid calculation
@@ -707,16 +678,16 @@ class Gene:
 
     # -----------------------------------------------------------------------------------
 
-    def region_at(self, pos: int) -> Tuple[int, GeneRegion]:
+    def region_at(self, pos: int) -> Tuple[int, str]:
         """
         Returns:
-            (int, :obj:`aldy.common.GeneRegion`): Tuple consisting of a gene ID and
+            (int, str): Tuple consisting of a gene ID and
             a region that harbours the given position in the gene.
 
         Args:
             pos (int): Position in the reference genome.
         """
-        return self._region_at.get(pos, (0, GeneRegion(0, "")))
+        return self._region_at.get(pos, (0, "-"))
 
     def is_functional(self, mut, infer=True) -> bool:
         """
@@ -726,21 +697,21 @@ class Gene:
         """
         pos, op = mut
         if (pos, op) in self.mutation_info:
-            return self.mutation_info[pos, op][0]
+            return (self.mutation_info[pos, op][0] is not None)
 
         # Calculate based on aminoacid change
-        if infer and any(s <= pos < e for s, e in self.exons):
+        if infer and any(self.ref_to_chr[s] <= pos < self.ref_to_chr[e] for s, e in self.exons):
             if op[:3] != "SNP":
                 return True
-            o = self.region.start
-            seq = "".join(
-                self.seq[s - o : pos - o] + op[5] + self.seq[pos - o + 1 : e - o]
-                if s <= pos < e
-                else self.seq[s - o : e - o]
-                for s, e in self.exons
-            )
-            amino = seq_to_amino(rev_comp(seq) if self.coding_region.rev_comp else seq)
-            return amino != self.coding_region.aminoacid
+            # o = self.region.start
+            # seq = "".join(
+            #     self.seq[s: pos] + op[5] + self.seq[pos - o + 1 : e - o]
+            #     if self.ref_to_chr[s] <= pos < self.ref_to_chr[e]
+            #     else self.seq[s - o : e - o]
+            #     for s, e in self.exons
+            # )
+            # amino = seq_to_amino(rev_comp(seq) if self.coding_region.rev_comp else seq)
+            # return amino != self.coding_region.aminoacid
         return False
 
     def get_dbsnp(self, *args) -> bool:
@@ -780,6 +751,18 @@ class Gene:
         m_gene, m_region = self.region_at(pos)
         return self.cn_configs[self.alleles[a].cn_config].cn[m_gene][m_region] > 0
 
+    def get_wide_region(self):
+        mi = min(r.start for g in self.regions.values() for r in g.values())
+        ma = max(r.end for g in self.regions.values() for r in g.values())
+        return GRange(self.region.chr, mi, ma)
+
+    def __contains__(self, i: int):
+        return i in self.chr_to_ref
+
+    def __getitem__(self, i: int):
+        s = self.seq[self.chr_to_ref[i]]
+        return rev_comp(s) if self.strand < 0 else s
+
     def print_summary(self, full=True):
         log.info(f"Gene {self.name}")
         log.info(f"  {self.genome} genome locus: {self.region}")
@@ -797,13 +780,7 @@ class Gene:
         ):
             lg = str(self.regions[0].get(r, "-"))
             lp = str(self.regions.get(1, {}).get(r, "-"))
-            if r.kind == EXON:
-                name = f"exon {r.number}"
-            elif r.kind == INTRON:
-                name = f"intron {r.number}"
-            else:
-                name = r.kind
-            log.info(f"    {name:>10}: {lg:>25} {lp:>25}")
+            log.info(f"    {r:>10}: {lg:>25} {lp:>25}")
 
         log.info(f"  Copy number configurations:")
         a = "\n    ".join(

@@ -259,6 +259,11 @@ alleles:
     evidence: L
     mutations:
     - [17736, T>C, rs41291556, W120R]
+  CYP2C19*8.1001:
+    label: CYP2C19*8ALDY
+    mutations:
+    - [17736, T>C, rs41291556, W120R]
+    - [85186, A>G, rs3758581, I331V]
   CYP2C19*9.001:
     pharmvar: https://www.pharmvar.org/haplotype/86
     activity: decreased function

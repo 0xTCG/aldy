@@ -77,24 +77,14 @@ def estimate_minor(
             mutations |= set(added)
             for sa in gene.alleles[ma].minors.values():
                 mutations |= set(sa.neutral_muts)
-    # Include novel mutatons from "important" regions
-    # novel_mutations = set()
-    # for pos, c in coverage._coverage.items():
-    #     if gene.region_at(pos)[1][1] in ['e', 'UTR3', 'UTR5', 'upstream']:
-    #         for m in c:
-    #             if m != '_':
-    #                 if m not in mutations:
-    #                     log.info('Considering novel {} in {} (coverage = {}%)',
-    #                         m, gene.region_at(pos)[1],
-    #                         round(coverage.percentage(Mutation(pos, m)), 1))
-    #                 novel_mutations |= set(Mutation(pos, m))
 
     # Filter out low quality mutations
     def default_filter_fn(mut, cov, total, thres):
         # TODO: is this necessary?
         if mut.op != "_" and not (
             mut in mutations
-            or gene.region_at(mut.pos)[1][1] in ["e", "UTR3", "UTR5", "upstream"]
+            or gene.region_at(mut.pos)[1][0] == 'e'
+            or gene.region_at(mut.pos)[1] in ["utr3", "utr5", "up"]
         ):
             return False
         return Coverage.basic_filter(
@@ -116,12 +106,14 @@ def estimate_minor(
                     round(cov.percentage(Mutation(pos, m)), 1),
                     gene.is_functional((pos, m)),
                 )
-                mutations.add(Mutation(pos, m))
+                # mutations.add(Mutation(pos, m))
 
     minor_sols: List[MinorSolution] = []
     for i, major_sol in enumerate(
-        sorted(major_sols, key=lambda s: list(s.solution.items()))
+        sorted(major_sols, key=lambda s: str(s.solution))
     ):
+        # print(str(major_sol))
+        # if '*83' not in str(major_sol) and '*4:10' not in str(major_sol): continue
         minor_sols += solve_minor_model(
             gene,
             alleles,
@@ -189,6 +181,9 @@ def solve_minor_model(
     log.debug("*" * 80)
     log.debug("Minor solver: major = {}", major_sol)
     model = lpinterface.model("AldyMinor", solver)
+
+    # from pprint import pprint
+    # print('; '.join(map(str, sorted(mutations))))
 
     # Establish minor alleles and their mutations
     alleles: Dict[Tuple[SolvedAllele, int], Set[Mutation]] = {
@@ -514,20 +509,20 @@ def solve_minor_model(
                     )
                 )
 
-                print(coverage.sample, gene.name, allele[0].minor, end=' ')
-                for m in sorted(solution[-1].mutations(gene)):
-                    # if m in solution[-1].added:
-                    if m in gene.mutations:
-                        novel = 0
-                    else:
-                        novel = 1
-                    phase = -1
-                    if phases:
-                        phase = next((pi for pi, p in enumerate(phases) if m in p), -1)
-                    if phase != -1 and phase not in assignments[allele]:
-                        phase=f'{phase}?'
-                    print(f'{m.pos+1}:{m.op}:{gene.get_dbsnp(m)}:{gene.region_at(m.pos)[1][1]}:{novel}:{phase} ', end='')
-                print()
+                # print(coverage.sample, gene.name, allele[0].minor, end=' ')
+                # for m in sorted(solution[-1].mutations(gene)):
+                #     # if m in solution[-1].added:
+                #     if m in gene.mutations:
+                #         novel = 0
+                #     else:
+                #         novel = 1
+                #     phase = -1
+                #     if phases:
+                #         phase = next((pi for pi, p in enumerate(phases) if m in p), -1)
+                #     if phase != -1 and phase not in assignments[allele]:
+                #         phase=f'{phase}?'
+                #     print(f'{m.pos+1}:{m.op}:{gene.get_dbsnp(m)}:{gene.region_at(m.pos)[1][1]}:{novel}:{phase} ', end='')
+                # print()
 
             # mutations = sorted(mutations)
             # print(f'{" ":6}  ', end="")
@@ -601,12 +596,12 @@ def _print_candidates(gene, alleles, major_sol, coverage):
             m_gene, m_region = gene.region_at(m.pos)
             scopy = coverage.single_copy(m.pos, major_sol.cn_solution)
             log.debug(
-                "    {:26}  {:.2f} ({:4} / {} * {:4.0f}) {}:{:10}",
+                "    {:26}  {:.2f} ({:4} / {} * {:4.0f}) {:10} {}",
                 str(m),
                 coverage[m] / scopy if scopy > 0 else 0,
                 coverage[m],
                 major_sol.cn_solution.position_cn(m.pos),
                 coverage.single_copy(m.pos, major_sol.cn_solution),
-                m_gene,
                 str(m_region),
+                gene.get_dbsnp(m)
             )

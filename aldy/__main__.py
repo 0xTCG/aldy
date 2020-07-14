@@ -448,6 +448,4 @@ def console():
 
 
 if __name__ == "__main__":
-    # console()
-
-    g = Gene(sys.argv[1])
+    console()

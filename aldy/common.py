@@ -134,25 +134,6 @@ class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
         return self.samtools(0, 0, "")
 
 
-class GeneRegion(collections.namedtuple("GeneRegion", ["number", "kind"])):
-    """
-    A region within a gene.
-
-    Attributes:
-        number (int):
-            Region number (e.g. for exon 9, the number is 9).
-        kind (str):
-            Type of the region. Usually either 'e' (for **e**\ xon) or
-            'i' (for **i**\ ntron), but can be anything else.
-
-    Notes:
-        Has custom printer (``__str__``).
-    """
-
-    def __str__(self):
-        return "GR({}.{})".format(self.number, self.kind)
-
-
 # Aldy auxiliaries
 
 

@@ -256,7 +256,7 @@ class Sample:
                 # Fetch the reads
                 total = 0
                 dump_data = []
-                for read in sam.fetch(region=gene.region.samtools(prefix=self._prefix)):
+                for read in sam.fetch(region=gene.get_wide_region().samtools(prefix=self._prefix)):
                     # If we haven't obtained CN-neutral region so far, do it now
                     if (
                         not is_cn_region_fetched
@@ -358,7 +358,7 @@ class Sample:
         """
 
         if not _in_region(
-            gene.region, read, self._prefix
+            gene.get_wide_region(), read, self._prefix
         ):  # ensure that it is a proper gene read
             return None
         if not read.cigartuples:  # only valid alignments
@@ -389,14 +389,12 @@ class Sample:
                 s_start += size
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
-                    if start + i not in gene:
-                        continue
-                    if gene[start + i] != read.query_sequence[s_start + i]:
+                    if start + i in gene and gene[start + i] != read.query_sequence[s_start + i]:
                         mut = (start + i, f"{gene[start + i]}>{read.query_sequence[s_start + i]}")
                         if dump:
                             dump_arr.append(mut)
                         muts[mut] += 1
-                    else:
+                    else:  # We ignore all mutations outside the RefSeq region
                         norm[start + i] += 1
                 start += size
                 s_start += size

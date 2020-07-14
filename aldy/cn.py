@@ -11,15 +11,11 @@ import copy
 from . import lpinterface
 
 from .common import log, json_print, sorted_tuple, AldyException
-from .gene import GeneRegion, CNConfig, Gene
+from .gene import CNConfig, Gene
 from .coverage import Coverage
 from .solutions import CNSolution
 from .lpinterface import escape_name
 
-
-PCE_REGION = GeneRegion(11, "pce")
-""":obj:`aldy.common.GeneRegion`: *CYP2D7* PCE region that requires special handling
-   (because *CYP2D6* does not have a matching PCE region)."""
 
 MAX_CN = 20.0
 """float: Maximum allowed copy number."""
@@ -122,7 +118,7 @@ def solve_cn_model(
     gene: Gene,
     cn_configs: Dict[str, CNConfig],
     max_cn: int,
-    region_coverage: Dict[GeneRegion, Tuple[float, float]],
+    region_coverage: Dict[str, Tuple[float, float]],
     solver: str,
     gap: float = 0,
     fusion_penalty: float = LEFT_FUSION_PENALTY,
@@ -136,7 +132,7 @@ def solve_cn_model(
             Available copy number configurations (vectors).
         max_cn (int):
             Maximum allowed copy number.
-        region_coverage (dict[:obj:`aldy.common.GeneRegion`, tuple[float, float]]):
+        region_coverage (dict[str, tuple[float, float]]):
             Observed copy number of the main gene and the pseudogene
             for each genic region.
         solver (str):
@@ -214,27 +210,20 @@ def solve_cn_model(
     VERR = {}
     json_print(debug, '    "data": {', end="")
     for r, (exp_cov0, exp_cov1) in region_coverage.items():
-        json_print(debug, f"'{str(r)[3:-1]}': ({exp_cov0}, {exp_cov1}), ", end="")
+        json_print(debug, f"'{r}': ({exp_cov0}, {exp_cov1}), ", end="")
         expr = 0
         for s, structure in structures.items():
             if r in structure.cn[0]:
                 expr += structure.cn[0][r] * VCN[s]
             if len(structure.cn) > 1 and r in structure.cn[1]:
                 expr -= structure.cn[1][r] * VCN[s]
-        VERR[r] = model.addVar(
-            name="E_{}{}".format(*r), lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR
-        )
-        model.addConstr(
-            expr + VERR[r] == exp_cov0 - exp_cov1, name="CCOV_{}{}".format(*r)
-        )
+        VERR[r] = model.addVar( name=f"E_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR )
+        model.addConstr( expr + VERR[r] == exp_cov0 - exp_cov1, name=f"CCOV_{r}" )
     json_print(debug, "},")
     # Objective: minimize the sum of absolute errors.
     # PCE_REGION (in CYP2D7) is penalized with an extra score as it is important
     # fusion marker.
-    objective = model.abssum(
-        VERR.values(),
-        coeffs={escape_name("E_{}{}".format(*PCE_REGION)): PCE_PENALTY_COEFF},
-    )
+    objective = model.abssum( VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF} )
     # Objective: also minimize the total number of present alleles (maximum parsimony)
     # Also penalize left fusions as they are not likely to occur.
     objective += model.quicksum(
@@ -289,61 +278,44 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
     for an in sorted(gene.cn_configs):
         if an not in gene.alleles:
             continue  # This is just a CN configuration w/o any mutations
-        if any(cov[m] <= 0 for m in gene.alleles[an].func_muts):
-            s = (
-                "{} in {}".format(m, gene.region_at(m.pos))
-                for m in gene.alleles[an].func_muts
-                if cov[m] <= 0
-            )
-            log.trace("Removing {} because of {}", an, " and ".join(s))
+        bad_alleles = []
+        for a in gene.cn_configs[an].alleles:
+            if any(cov[m] <= 0 for m in gene.alleles[a].func_muts):
+                bad_alleles.append(a)
+        if len(bad_alleles) == len(gene.cn_configs[an].alleles):
+            log.trace(f"Removing CN {a} due to low support")
             del configs[an]
     return configs
 
 
 def _region_coverage(
     gene: Gene, coverage: Coverage
-) -> Dict[GeneRegion, Tuple[float, float]]:
+) -> Dict[str, Tuple[float, float]]:
     """
     Calculate the coverage  of the main gene and the pseudogene in each genic region.
     Returns dictionary where
 
     Returns:
-        dict[:obj:`aldy.common.GeneRegion, tuple[float, float]]: Region coverage
+        dict[str, tuple[float, float]]: Region coverage
         that links genic regions (e.g. exon 1) to the coverage of the main gene
         and the pseudogene (expressed as a tuple).
     """
 
-    if 1 in gene.regions:  # Check if we have pseudogenes at all
-        cov = {
-            r: (coverage.region_coverage(0, r), coverage.region_coverage(1, r))
-            for r in gene.unique_regions
-            if r != PCE_REGION
-        }
-        # HACK: By default, CYP2D6 does not have a PCE region,
-        # so we insert a dummy PCE region to prevent KeyNotFound errors
-        if PCE_REGION in gene.regions[1] and PCE_REGION not in gene.regions[0]:
-            cov[PCE_REGION] = (0, coverage.region_coverage(1, PCE_REGION))
-    else:
-        cov = {r: (coverage.region_coverage(0, r), 0) for r in gene.unique_regions}
-    return cov
+    return {r: (coverage.region_coverage(0, r), coverage.region_coverage(1, r) if 1 in gene.regions else 0)
+            for r in gene.unique_regions}
 
 
 def _print_coverage(gene: Gene, coverage: Coverage) -> None:
     """
     Pretty-print the region coverage.
     """
-    regions = set(r for g in gene.regions for r in gene.regions[g])
     log.debug("CN solver: coverage map = ")
-    for r in sorted(regions):
-        gc = coverage.region_coverage(0, r) if r in gene.regions[0] else 0.0
-        if 1 in gene.regions:
-            pc = coverage.region_coverage(1, r) if r in gene.regions[1] else 0.0
-        else:
-            pc = -1
+    for r in gene.regions[0]:
+        gc = coverage.region_coverage(0, r)
+        pc = coverage.region_coverage(1, r) if 1 in gene.regions else -1
         log.debug(
-            "  {:5} {:2}: {:5.2f} {} {}",
-            r.kind,
-            r.number,
+            "  {:5}: {:5.2f} {} {}",
+            r,
             gc,
             "" if pc == -1 else f"{pc:5.2f}",
             f"; diff = {gc - pc:5.2f}" if pc != -1 and r in gene.unique_regions else "",

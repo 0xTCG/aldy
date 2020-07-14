@@ -19,6 +19,11 @@ alleles:
     label: CYP4F2*3
     mutations:
     - [23454, G>A, rs2108622, V433M]
+  CYP4F2*4.1001:
+    label: CYP4F2*4ALDY
+    mutations:
+    - [5497, T>G, rs3093105, W12G]
+    - [23454, G>A, rs2108622, V433M]
 structure:
   genes: [CYP4F2]
   regions:
