@@ -106,7 +106,7 @@ def estimate_minor(
                     round(cov.percentage(Mutation(pos, m)), 1),
                     gene.is_functional((pos, m)),
                 )
-                # mutations.add(Mutation(pos, m))
+                mutations.add(Mutation(pos, m))
 
     minor_sols: List[MinorSolution] = []
     for i, major_sol in enumerate(
@@ -509,20 +509,20 @@ def solve_minor_model(
                     )
                 )
 
-                # print(coverage.sample, gene.name, allele[0].minor, end=' ')
-                # for m in sorted(solution[-1].mutations(gene)):
-                #     # if m in solution[-1].added:
-                #     if m in gene.mutations:
-                #         novel = 0
-                #     else:
-                #         novel = 1
-                #     phase = -1
-                #     if phases:
-                #         phase = next((pi for pi, p in enumerate(phases) if m in p), -1)
-                #     if phase != -1 and phase not in assignments[allele]:
-                #         phase=f'{phase}?'
-                #     print(f'{m.pos+1}:{m.op}:{gene.get_dbsnp(m)}:{gene.region_at(m.pos)[1][1]}:{novel}:{phase} ', end='')
-                # print()
+                print(coverage.sample, gene.name, allele[0].minor, end=' ')
+                for m in sorted(solution[-1].mutations(gene)):
+                    if m in missing: continue
+                    if m in gene.mutations:
+                        novel = 0
+                    else:
+                        novel = 1
+                    phase = -1
+                    if phases:
+                        phase = next((pi for pi, p in enumerate(phases) if m in p), -1)
+                    if phase != -1 and phase not in assignments[allele]:
+                        phase=f'{phase}?'
+                    print(f'{m.pos+1}:{m.op}:{gene.get_dbsnp(m)}:{gene.region_at(m.pos)[1]}:{novel}:{phase} ', end='')
+                print()
 
             # mutations = sorted(mutations)
             # print(f'{" ":6}  ', end="")

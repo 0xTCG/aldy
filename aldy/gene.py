@@ -252,10 +252,10 @@ class Gene:
         self.genome = genome
         self._parse_yml(name, yml)
 
-        import sys
-        for i in self.alleles:
-            print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
-        sys.exit(0)
+        # import sys
+        # for i in self.alleles:
+        #     print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
+        # sys.exit(0)
 
     def _parse_yml(self, gene_name: str, yml) -> None:
         """
