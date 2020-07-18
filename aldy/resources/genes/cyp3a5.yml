@@ -75,7 +75,7 @@ alleles:
     activity: Severely decr. (in vitro)
     mutations:
     - [12083, A>G, rs776746, Splicing defect]
-    - [18049, T>C, rs55965422]
+    - [18049, T>C, rs55965422, Splicing defect]
     - [36708, C>T, rs15524]
   CYP3A5*3.008:
     label: CYP3A5*3H
@@ -144,8 +144,8 @@ alleles:
     activity: Decr. (in vitro)
     mutations:
     - [24483, G>A, rs28383479, A337T]
-  CYP3A5*23.101:
-    label: CYP3A5*2+*3
+  CYP3A5*2+3.101:
+    label: CYP3A5*2+*3ALDY
     mutations:
     - [32386, C>A, rs28365083, T398N]
     - [12083, A>G, rs776746, Splicing defect]
@@ -153,6 +153,7 @@ structure:
   genes: [CYP3A5]
   regions:
     hg19:
+      up: [99277620, 99282622]
       utr5: [99277520, 99277620]
       e1: [99277449, 99277520]
       e2: [99273738, 99273832]
@@ -169,6 +170,7 @@ structure:
       e13: [99245928, 99246024]
       utr3: [99245817, 99245928]
     hg38:
+      up: [99679997, 99684999]
       utr5: [99679897, 99679997]
       e1: [99679826, 99679897]
       e2: [99676115, 99676209]

@@ -252,10 +252,11 @@ class Gene:
         self.genome = genome
         self._parse_yml(name, yml)
 
-        # import sys
-        # for i in self.alleles:
-        #     print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
-        # sys.exit(0)
+        import sys
+        for i in self.alleles:
+            if '/' not in i:
+                print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
+        sys.exit(0)
 
     def _parse_yml(self, gene_name: str, yml) -> None:
         """
@@ -413,8 +414,9 @@ class Gene:
                                 op = f'ins{rev_comp(op[3:])}'
                             elif op[:3] == 'del':
                                 pos = pos + len(op) - 4
-                        if op[:3] == 'del':
-                            op = 'del' + 'N' * (len(op) - 3)
+                                op = f'del{rev_comp(op[3:])}'
+                        #if op[:3] == 'del':
+                        #    op = 'del' + 'N' * (len(op) - 3)
                         pos -= 1  # Cast to 0-based index
                         if pos not in self.ref_to_chr:
                             log.warn('___', allele_name, m)

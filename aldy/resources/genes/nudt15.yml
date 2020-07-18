@@ -44,7 +44,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/349
     activity: no function
     mutations:
-    - [5235, insGAGTCG, rs746071566]
+    - [5235, insGAGTCG, rs746071566, V18_V19insGV]
     - [13153, C>T, rs116855232, R139C]
   NUDT15*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/364
@@ -65,7 +65,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/351
     activity: uncertain function
     mutations:
-    - [5235, insGAGTCG, rs746071566]
+    - [5235, insGAGTCG, rs746071566, V18_V19insGV]
   NUDT15*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/360
     activity: uncertain function
@@ -96,11 +96,11 @@ alleles:
   NUDT15*13.001:
     pharmvar: https://www.pharmvar.org/haplotype/347
     mutations:
-    - [8537, insG, rs761191455]
+    - [8537, insG, rs761191455, 115frameshift]
   NUDT15*14.001:
     pharmvar: https://www.pharmvar.org/haplotype/359
     mutations:
-    - [5260, insCGGG, rs777311140]
+    - [5260, insCGGG, rs777311140, 28frameshift]
   NUDT15*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/350
     mutations:
@@ -131,12 +131,14 @@ structure:
   genes: [NUDT15]
   regions:
     hg19:
+      up: [48606703, 48611703]
       utr5: [48611703, 48611883]
       e1: [48611883, 48612041]
       e2: [48615056, 48615253]
       e3: [48619796, 48619936]
       utr3: [48619936, 48621359]
     hg38:
+      up: [48032567, 48037726]
       utr5: [48037726, 48037747]
       e1: [48037747, 48037905]
       e2: [48040920, 48041117]
