@@ -252,11 +252,11 @@ class Gene:
         self.genome = genome
         self._parse_yml(name, yml)
 
-        import sys
-        for i in self.alleles:
-            if '/' not in i:
-                print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
-        sys.exit(0)
+        # import sys
+        # for i in self.alleles:
+        #     # if '/' not in i:
+        #         print(i, '->', natsorted([x.name for x in self.alleles[i].minors.values()]))
+        # sys.exit(0)
 
     def _parse_yml(self, gene_name: str, yml) -> None:
         """
@@ -763,8 +763,10 @@ class Gene:
         return i in self.chr_to_ref
 
     def __getitem__(self, i: int):
-        s = self.seq[self.chr_to_ref[i]]
-        return rev_comp(s) if self.strand < 0 else s
+        if i in self.chr_to_ref:
+            s = self.seq[self.chr_to_ref[i]]
+            return rev_comp(s) if self.strand < 0 else s
+        return 'N'
 
     def print_summary(self, full=True):
         log.info(f"Gene {self.name}")

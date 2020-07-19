@@ -112,7 +112,7 @@ alleles:
     - [12181, A>G, rs28742185]
     - [11981, insGAAAAG, rs72549452]
     - [11956, insCACTT, rs72549451]
-    - [6497, delCTCTCT, rs1379602712]
+    - [6496, delCTCTCT, rs1379602712]
     - [4039, A>C, '-']
   CYP2A6*1.016:
     label: CYP2A6*1B16
@@ -509,7 +509,7 @@ alleles:
     mutations:
     - [3733, G>A, rs7259706]
     - [4009, A>G, rs4803381]
-    - [4531, delCCCCTTCCTGAGACCCTTAACCC, rs1555783362]
+    - [4530, delCCCCTTCCTGAGACCCTTAACCC, rs1555783362]
     - [5037, A>C, rs72549432, F]
     - [6360, C>G, rs72549437]
     - [6641, T>C, rs8192725]
@@ -526,7 +526,7 @@ alleles:
     - [3733, G>A, rs7259706]
     - [4009, A>G, rs4803381]
     - [4047, T>C, rs540814634]
-    - [4531, delCCCCTTCCTGAGACCCTTAACCC, rs1555783362]
+    - [4530, delCCCCTTCCTGAGACCCTTAACCC, rs1555783362]
     - [5037, A>C, rs72549432, F]
     - [5488, C>T, rs72549433]
     - [6360, C>G, rs72549437]

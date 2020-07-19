@@ -430,7 +430,7 @@ alleles:
     evidence: L
     mutations:
     - [2966, A>G, rs28735595]
-    - [3451, delGA, rs536645539]
+    - [3445, delGA, rs536645539]
     - [3461, C>T, rs28624811]
     - [3523, G>A, rs28633410]
     - [4414, G>C, rs1080995]
@@ -2034,8 +2034,7 @@ alleles:
     - [4510, G>T, rs28371699]
     - [4945, C>G, rs28371701]
     - [5042, T>G, rs28371702]
-    - [5530, delG, '-']
-    - [5530, insG, '-']
+    - [5525, delG, '-']
     - [5862, G>C, rs1058164]
     - [7051, C>T, rs16947, R296C]
     - [7585, A>C, rs1985842]
@@ -3779,7 +3778,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/654
     evidence: D
     mutations:
-    - [4264, delC, '-', L22X]
+    - [4263, delC, '-', L22X]
   CYP2D6*121.001:
     pharmvar: https://www.pharmvar.org/haplotype/637
     evidence: D
