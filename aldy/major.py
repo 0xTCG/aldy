@@ -133,7 +133,7 @@ def solve_major_model(
         for m, M in gene.mutations.items()
         if gene.is_functional(M) and coverage[M] > 0
     }
-    _print_candidates(allele_dict, coverage, cn_solution, func_muts)
+    _print_candidates(gene,allele_dict, coverage, cn_solution, func_muts)
 
     # HACK: silence type checker
     a: Any = 0
@@ -336,6 +336,7 @@ def _filter_alleles(
 
 
 def _print_candidates(
+    gene,
     alleles: Dict[str, MajorAllele],
     coverage: Coverage,
     cn_solution: CNSolution,
@@ -359,7 +360,7 @@ def _print_candidates(
                 coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
                 if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
                 else 0,
-                "F",
+                gene.get_dbsnp(m),
             )
     if len(func_muts) > 0:
         log.debug("  Other mutations:")
