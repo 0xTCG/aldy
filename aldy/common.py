@@ -152,7 +152,10 @@ def allele_sort_key(x: str) -> Tuple[int, str]:
         tuple[int, str]: Key for sorting star-alleles (e.g. ``'13a'`` -> ``(13, 'a')``).
     """
     p = re.split(r"(\d+)", x)
-    return (int(p[1]), "".join(p[2:]))
+    if len(p) == 1:
+        return (x, x)
+    else:
+        return (p[1], "".join(p[2:]))
 
 
 def rev_comp(seq: str) -> str:

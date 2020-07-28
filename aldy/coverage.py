@@ -251,4 +251,4 @@ class Coverage:
         cn = cn_solution.position_cn(mut.pos)
         total = total / cn if cn > 0 else total
 
-        return mut.op == "_" or cov > max(1, total * thres)
+        return mut.op == "_" or cov >= max(1, total * thres)

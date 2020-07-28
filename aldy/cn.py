@@ -78,6 +78,9 @@ def estimate_cn(
 
     if user_solution is not None:
         return [_parse_user_solution(gene, user_solution)]
+    elif not gene.do_copy_number:
+        basic = list(gene.cn_configs.keys())[0]
+        return [_parse_user_solution(gene, [basic, basic])]
     else:
         # TODO: filter CN configs with non-present alleles
         max_observed_cn = 1 + max(
@@ -217,13 +220,13 @@ def solve_cn_model(
                 expr += structure.cn[0][r] * VCN[s]
             if len(structure.cn) > 1 and r in structure.cn[1]:
                 expr -= structure.cn[1][r] * VCN[s]
-        VERR[r] = model.addVar( name=f"E_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR )
-        model.addConstr( expr + VERR[r] == exp_cov0 - exp_cov1, name=f"CCOV_{r}" )
+        VERR[r] = model.addVar(name=f"E_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
+        model.addConstr(expr + VERR[r] == exp_cov0 - exp_cov1, name=f"CCOV_{r}")
     json_print(debug, "},")
     # Objective: minimize the sum of absolute errors.
     # PCE_REGION (in CYP2D7) is penalized with an extra score as it is important
     # fusion marker.
-    objective = model.abssum( VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF} )
+    objective = model.abssum(VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF})
     # Objective: also minimize the total number of present alleles (maximum parsimony)
     # Also penalize left fusions as they are not likely to occur.
     objective += model.quicksum(
@@ -288,9 +291,7 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
     return configs
 
 
-def _region_coverage(
-    gene: Gene, coverage: Coverage
-) -> Dict[str, Tuple[float, float]]:
+def _region_coverage(gene: Gene, coverage: Coverage) -> Dict[str, Tuple[float, float]]:
     """
     Calculate the coverage  of the main gene and the pseudogene in each genic region.
     Returns dictionary where
@@ -301,8 +302,13 @@ def _region_coverage(
         and the pseudogene (expressed as a tuple).
     """
 
-    return {r: (coverage.region_coverage(0, r), coverage.region_coverage(1, r) if 1 in gene.regions else 0)
-            for r in gene.unique_regions}
+    return {
+        r: (
+            coverage.region_coverage(0, r),
+            coverage.region_coverage(1, r) if 1 in gene.regions else 0,
+        )
+        for r in gene.unique_regions
+    }
 
 
 def _print_coverage(gene: Gene, coverage: Coverage) -> None:

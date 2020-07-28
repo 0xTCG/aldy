@@ -256,7 +256,9 @@ class Sample:
                 # Fetch the reads
                 total = 0
                 dump_data = []
-                for read in sam.fetch(region=gene.get_wide_region().samtools(prefix=self._prefix)):
+                for read in sam.fetch(
+                    region=gene.get_wide_region().samtools(prefix=self._prefix)
+                ):
                     # If we haven't obtained CN-neutral region so far, do it now
                     if (
                         not is_cn_region_fetched
@@ -314,32 +316,41 @@ class Sample:
             pos, mut = m
             if pos not in coverage:
                 coverage[pos] = {}
+            if not min(gene.chr_to_ref) <= pos <= max(gene.chr_to_ref):
+                mut = "_"  # ignore mutations outside of the region of interest
             coverage[pos][mut] = cov
 
         # Group ambiguous deletions
         indels = collections.defaultdict(set)
         for m in gene.mutations:
-            if 'del' in m[1]:
+            if "del" in m[1]:
                 indels[m[0]].add(m[1])
         for pos in coverage:
             for mut in coverage[pos]:
-                if mut[:3] != 'del':
+                if mut[:3] != "del" or "N" in mut[3:]:
                     continue
                 potential = [pos]
                 sz = len(mut[3:])
-                deleted = ''.join(gene[i] for i in range(pos, pos + sz))
+                deleted = "".join(gene[i] for i in range(pos, pos + sz))
                 for p in range(pos - sz, -1, -sz):
-                    if ''.join(gene[i] for i in range(p, p + sz)) != deleted:
+                    if "".join(gene[i] for i in range(p, p + sz)) != deleted:
                         break
                     potential.append(p)
                 for p in range(pos + sz, max(coverage), sz):
-                    if ''.join(gene[i] for i in range(p, p + sz)) != deleted:
+                    if "".join(gene[i] for i in range(p, p + sz)) != deleted:
                         break
                     potential.append(p)
-                potential = [p for p in set(potential) & set(indels) for m in indels[p] if m == mut]
+                potential = [
+                    p
+                    for p in set(potential) & set(indels)
+                    for m in indels[p]
+                    if m == mut
+                ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.debug(f'Relocate {coverage[pos][mut]} from {pos}:{mut} to {new_pos}:{mut}')
+                    log.debug(
+                        f"Relocate {coverage[pos][mut]} from {pos}:{mut} to {new_pos}:{mut}"
+                    )
                     if mut not in coverage[new_pos]:
                         coverage[new_pos][mut] = 0
                     coverage[new_pos][mut] += coverage[pos][mut]
@@ -347,26 +358,33 @@ class Sample:
         # Group ambiguous insertions
         indels = collections.defaultdict(set)
         for m in gene.mutations:
-            if 'ins' in m[1]:
+            if "ins" in m[1]:
                 indels[m[0]].add(m[1])
         for pos in coverage:
             for mut in coverage[pos]:
-                if mut[:3] != 'ins':
+                if mut[:3] != "ins":
                     continue
                 inserted, sz = mut[3:], len(mut[3:])
                 potential = []
                 for p in range(pos, -1, -sz):
                     potential.append(p)
-                    if ''.join(gene[i] for i in range(p, p + sz)) != inserted:
+                    if "".join(gene[i] for i in range(p, p + sz)) != inserted:
                         break
                 for p in range(pos, max(coverage), sz):
                     potential.append(p)
-                    if ''.join(gene[i] for i in range(p, p + sz)) != inserted:
+                    if "".join(gene[i] for i in range(p, p + sz)) != inserted:
                         break
-                potential = [p for p in set(potential) & set(indels) for m in indels[p] if m == mut]
+                potential = [
+                    p
+                    for p in set(potential) & set(indels)
+                    for m in indels[p]
+                    if m == mut
+                ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.debug(f'Relocate {coverage[pos][mut]} from {pos}:{mut} to {new_pos}:{mut}')
+                    log.debug(
+                        f"Relocate {coverage[pos][mut]} from {pos}:{mut} to {new_pos}:{mut}"
+                    )
                     if mut not in coverage[new_pos]:
                         coverage[new_pos][mut] = 0
                     coverage[new_pos][mut] += coverage[pos][mut]
@@ -377,7 +395,10 @@ class Sample:
         #: that describe the coverage of each mutation
         # (_ stands for non-mutated nucleotide)
         self.coverage = Coverage(
-            {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage}, threshold, cnv_coverage, os.path.basename(sam_path).split(".")[0]
+            {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
+            threshold,
+            cnv_coverage,
+            os.path.basename(sam_path).split(".")[0],
         )
         for mut, ins_cov in _indel_sites.items():
             if mut.pos in coverage and mut.op in coverage[mut.pos]:
@@ -429,7 +450,10 @@ class Sample:
         start, s_start = read.reference_start, 0
         for op, size in read.cigartuples:
             if op == 2:  # Deletion
-                mut = (start, "del" + ''.join(gene[i] for i in range(start, start + size)))
+                mut = (
+                    start,
+                    "del" + "".join(gene[i] for i in range(start, start + size)),
+                )
                 muts[mut] += 1
                 if dump:
                     dump_arr.append(mut)
@@ -445,8 +469,14 @@ class Sample:
                 s_start += size
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
-                    if start + i in gene and gene[start + i] != read.query_sequence[s_start + i]:
-                        mut = (start + i, f"{gene[start + i]}>{read.query_sequence[s_start + i]}")
+                    if (
+                        start + i in gene
+                        and gene[start + i] != read.query_sequence[s_start + i]
+                    ):
+                        mut = (
+                            start + i,
+                            f"{gene[start + i]}>{read.query_sequence[s_start + i]}",
+                        )
                         if dump:
                             dump_arr.append(mut)
                         muts[mut] += 1
@@ -650,7 +680,7 @@ class Sample:
         if regions is None:
             gene_regions = sorted(
                 [  # paper gene coordinates in hg19
-                # TODO: Auto populate
+                    # TODO: Auto populate
                     ("CYP3A5", GRange("7", 99245000, 99278000)),
                     ("CYP3A4", GRange("7", 99354000, 99465000)),
                     ("CYP2C19", GRange("10", 96445000, 96615000)),
