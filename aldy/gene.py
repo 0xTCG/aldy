@@ -255,8 +255,10 @@ class Gene:
 
         self.seq = yml["reference"]["seq"].replace("\n", "")
         if "patches" in yml["reference"]:
+            self.seq = list(self.seq)
             for [pos, nuc] in yml["reference"]["patches"]:
                 self.seq[pos - 1] = nuc
+            self.seq = "".join(self.seq)
 
         self.chr, start, end, strand, cigar = yml["reference"]["mappings"][self.genome]
         self.chr_to_ref = {}
