@@ -74,7 +74,7 @@ alleles:
   TPMT*16.001:
     label: TPMT*16
     mutations:
-    - [21175, G>A;G>A; g.21175G>C, rs144041067, R163H; R163P]
+    - [21175, G>A, rs144041067, R163H]
   TPMT*17.001:
     label: TPMT*17
     mutations:
@@ -98,7 +98,7 @@ alleles:
   TPMT*22.001:
     label: TPMT*22
     mutations:
-    - [21175, G>C;G>A; g.21175G>C, rs144041067, R163H; R163P]
+    - [21175, G>C, rs144041067, R163P]
   TPMT*23.001:
     label: TPMT*23
     mutations:
@@ -174,7 +174,7 @@ alleles:
   TPMT*41.001:
     label: TPMT*41
     mutations:
-    - [29457, A>C;A>G; g.29457A>C, rs1142345, Y240C;Y240S]
+    - [29457, A>C, rs1142345, Y240S]
   TPMT*42.001:
     label: TPMT*42
     mutations:
