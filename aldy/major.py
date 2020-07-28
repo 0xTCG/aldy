@@ -231,7 +231,8 @@ def solve_major_model(
     # Each CN configuration must be satisfied by corresponding alleles
     for cnf, cnt in cn_solution.solution.items():
         expr = sum(VA[a] for a in VA if alleles[a].cn_config == cnf)
-        model.addConstr(expr == cnt, name=f"CSAT_{cnf}")
+        model.addConstr(expr <= cnt, name=f"CSAT_{cnf}")
+        model.addConstr(expr >= cnt, name=f"CSAT_{cnf}")
 
     # Each functional mutation must be chosen by some allele
     for m in func_muts:
@@ -245,9 +246,17 @@ def solve_major_model(
 
     # Objective: minimize the absolute sum of errors and the number of novel mutations
     objective = model.abssum(e for e in VERR.values())
-    objective += NOVEL_MUTATION_PENAL * model.quicksum(
-        VNEW[a][m][0] for a in VNEW for m in VNEW[a]
+
+    z = model.addVar(vtype="B", name="NOVEL")
+    for a in VNEW:
+        for m in VNEW[a]:
+            model.addConstr(z >= VNEW[a][m][0], name=f"NOVEL_UB_{VNEW[a][m][0]}")
+    model.addConstr(
+        z <= model.quicksum(VNEW[a][m][0] for a in VNEW for m in VNEW[a]),
+        name="NOVEL_LB",
     )
+    objective += NOVEL_MUTATION_PENAL * z
+    objective += 0.1 * model.quicksum(VNEW[a][m][0] for a in VNEW for m in VNEW[a])
     model.setObjective(objective)
     if debug:
         model.dump(f"{debug}.major{identifier}.lp")
