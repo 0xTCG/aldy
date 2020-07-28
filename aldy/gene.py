@@ -252,6 +252,9 @@ class Gene:
         self.genome = genome
         self._parse_yml(name, yml)
 
+
+        # s = self.seq[self.exons[0][0]-1:self.exons[-1][1]]
+        # print(self.name, self.region[0], len(s), s)
         # import sys
         # for i in self.alleles:
         #     # if '/' not in i:
