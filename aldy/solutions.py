@@ -25,7 +25,7 @@ class CNSolution(
         solution (dict[str, int]):
             Copy-number configurations mapped to the corresponding copy number
             (e.g. ``{1: 2}`` means that there are two copies of \*1 configuration).
-        region_cn (dict[str, int]):
+        region_cn (list[dict[str, int]]):
             Gene region copy numbers inferred by this solution.
         gene (:obj:`aldy.gene.Gene`):
             Gene instance.
@@ -35,19 +35,13 @@ class CNSolution(
     """
 
     def __new__(self, score: float, solution: List[str], gene: Gene):
-        vec: Dict[int, Dict[str, float]] = collections.defaultdict(
-            lambda: collections.defaultdict(int)
-        )
+        vec = [{r: 0 for r in gene.regions[0]} for _ in gene.cn_configs["1"].cn]
         for conf in solution:
-            for g in gene.cn_configs[conf].cn:
-                for r in gene.cn_configs[conf].cn[g]:
-                    vec[g][r] += gene.cn_configs[conf].cn[g][r]
+            for gi, g in enumerate(gene.cn_configs[conf].cn):
+                for r in g:
+                    vec[gi][r] += g[r]
         return super(CNSolution, self).__new__(  # type:ignore
-            self,
-            score,
-            collections.Counter(solution),
-            gene,
-            {a: dict(b) for a, b in vec.items()},
+            self, score, collections.Counter(solution), gene, vec,
         )
 
     def position_cn(self, pos: int) -> float:
@@ -74,8 +68,8 @@ class CNSolution(
             self.score,
             self._solution_nice(),
             "|".join(
-                "".join( str(self.region_cn[g][r]) for r in self.gene.regions[0] )
-                for g in sorted(self.region_cn)
+                "".join(str(self.region_cn[g][r]) for r in self.gene.regions[0])
+                for g, _ in enumerate(self.region_cn)
             ),
         )
 

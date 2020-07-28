@@ -69,23 +69,19 @@ def main(argv):
         elif args.subparser == "test":
             _run_test()
         elif args.subparser == "show":
-            db_file = script_path(
-                "aldy.resources.genes/{}.yml".format(args.gene.lower())
-            )
+            query = args.gene
+            if "*" in query:
+                gene, query = query.split("*", maxsplit=1)
+            else:
+                gene, query = query, ""
+            db_file = script_path("aldy.resources.genes/{}.yml".format(gene.lower()))
             if os.path.exists(db_file):
                 gene_db = db_file
             else:
                 gene_db = args.gene
             with open(gene_db):  # Check if file exists
                 pass
-            if args.minor:
-                Gene(gene_db).print_minors(args.minor)
-            elif args.major:
-                Gene(gene_db).print_majors(args.major)
-            elif args.cn_config:
-                Gene(gene_db).print_cns(args.cn_config)
-            else:
-                Gene(gene_db).print_summary()
+            Gene(gene_db).print_summary(query)
         elif args.subparser == "profile":
             p = Sample.load_sam_profile(
                 args.file, cn_region=parse_cn_region(args.cn_neutral_region)
@@ -94,7 +90,9 @@ def main(argv):
                 print(*i)
         elif args.subparser == "batch":
             avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
-            avail_genes = [i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"]
+            avail_genes = [
+                i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"
+            ]
             batch(avail_genes, args.profile, args.file)
         elif args.subparser == "genotype":
             # Prepare the list of available genes
@@ -311,18 +309,7 @@ def _get_args(argv):
     show_parser = subparsers.add_parser(
         "show", parents=[base], help="Show database definitions for a given gene."
     )
-    show_parser.add_argument(
-        "--gene", "-g", required=True, help="Gene whose configurations are to be shown."
-    )
-    show_parser.add_argument(
-        "--major", "-m", default=None, help="Show a major star-allele definition."
-    )
-    show_parser.add_argument(
-        "--cn-config", "-c", default=None, help="Show a copy number configuration."
-    )
-    show_parser.add_argument(
-        "--minor", "-M", default=None, help="Show a minor star-allele definition."
-    )
+    show_parser.add_argument("gene", help="Gene or allele to show.")
 
     profile_parser = subparsers.add_parser(
         "profile",
@@ -344,10 +331,7 @@ def _get_args(argv):
         ),
     )
 
-    batch_parser = subparsers.add_parser(
-        "batch",
-        parents=[base]
-    )
+    batch_parser = subparsers.add_parser("batch", parents=[base])
     batch_parser.add_argument("--profile", "-p", required=True)
     batch_parser.add_argument("file", nargs="?", help="SAM/BAM/CRAM file")
 

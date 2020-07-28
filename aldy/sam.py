@@ -8,6 +8,7 @@ from typing import Tuple, Dict, List, Optional, Any
 
 import pysam
 import os
+import os.path
 import re
 import gzip
 import struct
@@ -96,10 +97,10 @@ class Sample:
         self.load_aligned(sam_path, gene, threshold, phase, reference, cn_region, debug)
         if cn_region:
             self.detect_cn(gene, profile, cn_region)
-        log.debug("SAM: avg_coverage = {}", self.coverage.average_coverage())
+        log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
         if cn_region and self.coverage.diploid_avg_coverage() < 2:
             raise AldyException(
-                "The average coverage of the sample is too low ({:1f}).".format(
+                "The average coverage of the sample is too low ({:.1f}).".format(
                     self.coverage.diploid_avg_coverage()
                 )
             )
@@ -148,7 +149,7 @@ class Sample:
         # store paired-end reads (only if phasing is on)
         self.reads: Dict[str, Tuple[pysam.AlignedSegment, pysam.AlignedSegment]] = {}
 
-        log.debug("SAM: path = {}", sam_path)
+        log.debug("[sam] path= {}", os.path.abspath(sam_path))
 
         # dict of int: int: the coverage of the CN-neutral region
         cnv_coverage: Dict[int, int] = collections.defaultdict(int)
@@ -159,7 +160,13 @@ class Sample:
             m: (collections.defaultdict(int), 0)
             for an, a in gene.alleles.items()
             for m in a.func_muts
-            if m.op[:3] == "INS"
+            if m.op[:3] == "ins"
+        }
+        _multi_sites: Dict[Mutation, tuple] = {
+            m.pos: m.op
+            for an, a in gene.alleles.items()
+            for m in a.func_muts
+            if ">" in m.op and len(m.op) > 3
         }
         muts: dict = collections.defaultdict(int)
         norm: dict = collections.defaultdict(int)
@@ -221,7 +228,7 @@ class Sample:
 
                 #: str: Check if we need to append 'chr' or not
                 self._prefix = _chr_prefix(
-                    gene.region.chr, [x["SN"] for x in sam.header["SQ"]]
+                    gene.chr, [x["SN"] for x in sam.header["SQ"]]
                 )
 
                 # Try to read CN-neutral region if there is an index (fast)
@@ -246,7 +253,7 @@ class Sample:
                 # Then read the CN-neutral region.
                 is_cn_region_fetched = cn_region is None
                 if cn_region and sam.has_index():
-                    log.debug("File {} has index", sam_path)
+                    log.debug("[sam] has_index= True")
                     for read in sam.fetch(
                         region=cn_region.samtools(prefix=self._prefix)
                     ):
@@ -268,7 +275,13 @@ class Sample:
                         read_cn_read(read)
 
                     r = self._parse_read(
-                        read, gene, norm, muts, _indel_sites, debug is not None
+                        read,
+                        gene,
+                        norm,
+                        muts,
+                        _indel_sites,
+                        _multi_sites,
+                        debug is not None,
                     )
                     if r:
                         total += 1
@@ -319,7 +332,26 @@ class Sample:
             if not min(gene.chr_to_ref) <= pos <= max(gene.chr_to_ref):
                 mut = "_"  # ignore mutations outside of the region of interest
             coverage[pos][mut] = cov
+        self._group_deletions(gene, coverage)
+        for pos, op in _multi_sites.items():
+            if pos in coverage and op in coverage[pos]:
+                log.debug(f"[sam] multi-SNP {pos}{op} with {coverage[pos][op]} reads")
 
+        #: dict of int: (dict of str: int): coverage dictionary
+        #: keys are loci in the reference genome, while values are dictionaries
+        #: that describe the coverage of each mutation
+        # (_ stands for non-mutated nucleotide)
+        self.coverage = Coverage(
+            {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
+            threshold,
+            cnv_coverage,
+            os.path.basename(sam_path).split(".")[0],
+        )
+        for mut, ins_cov in _indel_sites.items():
+            if mut.pos in coverage and mut.op in coverage[mut.pos]:
+                self._correct_ins_coverage(mut, ins_cov)
+
+    def _group_deletions(self, gene, coverage):
         # Group ambiguous deletions
         indels = collections.defaultdict(set)
         for m in gene.mutations:
@@ -348,9 +380,7 @@ class Sample:
                 ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.debug(
-                        f"Relocate {coverage[pos][mut]} from {pos}:{mut} to {new_pos}:{mut}"
-                    )
+                    log.debug(f"[sam] relocate {pos}{mut} to {new_pos}{mut}")
                     if mut not in coverage[new_pos]:
                         coverage[new_pos][mut] = 0
                     coverage[new_pos][mut] += coverage[pos][mut]
@@ -382,27 +412,11 @@ class Sample:
                 ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.debug(
-                        f"Relocate {coverage[pos][mut]} from {pos}:{mut} to {new_pos}:{mut}"
-                    )
+                    log.debug(f"[sam] relocate {pos}{mut} to {new_pos}{mut}")
                     if mut not in coverage[new_pos]:
                         coverage[new_pos][mut] = 0
                     coverage[new_pos][mut] += coverage[pos][mut]
                     coverage[pos][mut] = 0
-
-        #: dict of int: (dict of str: int): coverage dictionary
-        #: keys are loci in the reference genome, while values are dictionaries
-        #: that describe the coverage of each mutation
-        # (_ stands for non-mutated nucleotide)
-        self.coverage = Coverage(
-            {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
-            threshold,
-            cnv_coverage,
-            os.path.basename(sam_path).split(".")[0],
-        )
-        for mut, ins_cov in _indel_sites.items():
-            if mut.pos in coverage and mut.op in coverage[mut.pos]:
-                self._correct_ins_coverage(mut, ins_cov)
 
     def _parse_read(
         self,
@@ -411,6 +425,7 @@ class Sample:
         norm: dict,
         muts: dict,
         indel_sites=None,
+        multi_sites=None,
         dump=False,
     ) -> Optional[Tuple[Tuple[int, int, int], Any]]:
         """
@@ -446,7 +461,7 @@ class Sample:
             return None
 
         insertions = set()
-        dump_arr = []
+        dump_arr = {}
         start, s_start = read.reference_start, 0
         for op, size in read.cigartuples:
             if op == 2:  # Deletion
@@ -455,14 +470,12 @@ class Sample:
                     "del" + "".join(gene[i] for i in range(start, start + size)),
                 )
                 muts[mut] += 1
-                if dump:
-                    dump_arr.append(mut)
+                dump_arr[start] = mut[1]
                 start += size
             elif op == 1:  # Insertion
                 mut = (start, "ins" + read.query_sequence[s_start : s_start + size])
                 muts[mut] += 1
-                if dump:
-                    dump_arr.append(mut)
+                dump_arr[start] = mut[1]
                 insertions.add((start, size))
                 s_start += size
             elif op == 4:  # Soft-clip
@@ -477,15 +490,28 @@ class Sample:
                             start + i,
                             f"{gene[start + i]}>{read.query_sequence[s_start + i]}",
                         )
-                        if dump:
-                            dump_arr.append(mut)
+                        dump_arr[start + i] = mut[1]
                         muts[mut] += 1
                     else:  # We ignore all mutations outside the RefSeq region
                         norm[start + i] += 1
                 start += size
                 s_start += size
 
-        if indel_sites is not None:
+        if multi_sites and set(multi_sites.keys()) & set(dump_arr.keys()):
+            for pos, op in multi_sites.items():
+                if pos not in dump_arr:
+                    continue
+                l, r = op.split(">")
+                if all(
+                    dump_arr.get(pos + p, "-") == f"{l[p]}>{r[p]}"
+                    for p in range(len(l))
+                    if l[p] != "."
+                ):
+                    for p in range(len(l)):
+                        if l[p] != ".":
+                            muts[pos + p, dump_arr[pos + p]] -= 1
+                    muts[pos, op] += 1
+        if indel_sites:
             for ins in indel_sites:
                 ins_len = len(ins.op) - 4
                 if (ins.pos, ins_len) in insertions:
@@ -494,7 +520,10 @@ class Sample:
                     indel_sites[ins][0][
                         (read.reference_start, start, len(read.query_sequence))
                     ] += 1
-        return (read.reference_start, start, len(read.query_sequence)), dump_arr
+        return (
+            (read.reference_start, start, len(read.query_sequence)),
+            list(dump_arr.items()),
+        )
 
     def _correct_ins_coverage(self, mut: Mutation, j) -> None:
         """
@@ -539,19 +568,12 @@ class Sample:
             j0 += j[0][(orig_start, start, read_len)]
 
         new_ratio = j[1] / float(j0 + j[1])
+        new_coverage = int(self.coverage[mut] * (new_ratio / current_ratio))
         log.debug(
-            "Rescaling indel: {}:{} from {}/{} to {} (indel:total = {}:{})",
-            mut.pos,
-            mut.op,
-            self.coverage[mut],
-            total,
-            int(self.coverage[mut] * (new_ratio / current_ratio)),
-            j[1],
-            j0 + j[1],
+            f"[sam] rescale {mut} from {self.coverage[mut]} to {new_coverage} "
+            + f"(indel:total = {j[1]}:{j0 + j[1]})",
         )
-        self.coverage._coverage[mut.pos][mut.op] = int(
-            self.coverage[mut] * (new_ratio / current_ratio)
-        )
+        self.coverage._coverage[mut.pos][mut.op] = new_coverage
 
     # ----------------------------------------------------------------------------------
     # Coverage-rescaling functions
@@ -648,6 +670,36 @@ class Sample:
         return profile
 
     # ----------------------------------------------------------------------------------
+
+    @staticmethod
+    def detect_genome(sam_path: str):
+        with pysam.AlignmentFile(sam_path) as sam:
+            # Check do we have proper index to speed up the queries
+            try:
+                sam.check_index()
+            except AttributeError:
+                pass  # SAM files do not have an index. BAMs might also lack it
+            except ValueError:
+                raise AldyException(
+                    f"File {sam_path} has no index (it must be indexed)"
+                )
+
+            #: str: Check if we need to append 'chr' or not
+            _prefix = _chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])
+            # Detect the genome
+            hg19_lens = {"1": 249250621, "10": 135534747, "22": 51304566}
+            hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
+            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
+            is_hg19, is_hg38 = True, True
+            for c in "1 10 22".split():
+                is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
+                is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
+            if is_hg19:
+                return "hg19"
+            elif is_hg38:
+                return "hg38"
+            else:
+                return None
 
     @staticmethod
     def load_sam_profile(

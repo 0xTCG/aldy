@@ -7,6 +7,7 @@
 from typing import Dict, List, Tuple, Optional
 
 import copy
+from natsort import natsorted
 
 from . import lpinterface
 
@@ -91,8 +92,7 @@ def estimate_cn(
         region_cov = _region_coverage(gene, coverage)
         total_cov = sum(r0 + r1 for r0, r1 in region_cov.values())
         min_cov = min(
-            sum(sum(v.values()) for _, v in gene.cn_configs[c].cn.items())
-            for c in gene.cn_configs
+            sum(sum(v.values()) for v in gene.cn_configs[c].cn) for c in gene.cn_configs
         )
         if total_cov < min_cov / 2.0:
             raise AldyException(
@@ -100,8 +100,8 @@ def estimate_cn(
             )
 
         configs = _filter_configs(gene, coverage)
-        log.debug("CN solver: configs = {}", ", ".join(sorted(configs)))
-        log.debug("CN solver: max_cn = {}", max_observed_cn)
+        log.debug("[cn] candidates= {}", ", ".join(natsorted(configs)))
+        log.debug("[cn] max_cn= {}", max_observed_cn)
         _print_coverage(gene, coverage)
         sol = solve_cn_model(
             gene,
@@ -172,17 +172,15 @@ def solve_cn_model(
     structures = {(name, 0): structure for name, structure in cn_configs.items()}
     for a, ai in list(structures.keys()):
         structures[a, -1] = copy.deepcopy(structures[a, 0])
-        if cn_configs[a].kind != CNConfig.CNConfigType.DEFAULT_CN:
+        if cn_configs[a].kind != CNConfig.CNConfigType.DEFAULT:
             continue
         for i in range(1, max_cn):
             structures[a, i] = copy.deepcopy(structures[a, 0])
-            for g in structures[a, i].cn:
-                # If this is a pseudogene, remove a copy
-                # (i.e. create a "weak configuration")
-                if g != 0:
-                    structures[a, i].cn[g] = {
-                        r: v - 1 for r, v in structures[a, i].cn[g].items()
-                    }
+            for g in range(1, len(structures[a, i].cn)):
+                # If this is a pseudogene, remove a copy (create a "weak configuration")
+                structures[a, i].cn[g] = {
+                    r: v - 1 for r, v in structures[a, i].cn[g].items()
+                }
 
     # Add a binary variable for each CN structure.
     VCN = {
@@ -246,7 +244,7 @@ def solve_cn_model(
         lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
         result: dict = {}
         for status, opt, sol in model.solutions(gap):
-            log.debug(f"CN solver: {status}, opt: {opt:.2f}")
+            log.debug(f"[cn] status= {status}; opt= {opt:.2f}")
             sol_tuple = sorted_tuple(lookup[v] for v in sol)
             # Because A[1] can be 1 while A[0] is 0, we can have biologically
             # duplicate solutions
@@ -254,13 +252,13 @@ def solve_cn_model(
                 result[sol_tuple] = CNSolution(  # type: ignore
                     opt, solution=list(sol_tuple), gene=gene
                 )
-                log.debug("CN solver: {}", result[sol_tuple])
+                log.debug("[cn] solution= {}", result[sol_tuple])
         json_print(
             debug, '    "sol": ' + str([dict(r.solution) for r in result.values()])
         )
         return list(result.values())
     except lpinterface.NoSolutionsError:
-        log.debug("CN solver: no solutions")
+        log.debug("[cn] solution= []")
         return []
 
 
@@ -315,17 +313,25 @@ def _print_coverage(gene: Gene, coverage: Coverage) -> None:
     """
     Pretty-print the region coverage.
     """
-    log.debug("CN solver: coverage map = ")
-    for r in gene.regions[0]:
-        gc = coverage.region_coverage(0, r)
-        pc = coverage.region_coverage(1, r) if 1 in gene.regions else -1
-        log.debug(
-            "  {:5}: {:5.2f} {} {}",
-            r,
-            gc,
-            "" if pc == -1 else f"{pc:5.2f}",
-            f"; diff = {gc - pc:5.2f}" if pc != -1 and r in gene.unique_regions else "",
-        )
+    for ri in range(0, len(gene.regions[0]), 13):
+        regions = list(gene.regions[0])[ri : ri + 13]
+        log.debug("[cn]          {}", " ".join(f"{r:5}" for r in regions))
+        g = " ".join(f"{coverage.region_coverage(0, r):5.2f}" for r in regions)
+        log.debug(f"[cn] {gene.name:7} {g}")
+        if gene.pseudogenes:
+            g = " ".join(f"{coverage.region_coverage(1, r):5.2f}" for r in regions)
+            log.debug(f"[cn] {gene.pseudogenes[0]:7} {g}")
+            diffs = {
+                r: coverage.region_coverage(0, r) - coverage.region_coverage(1, r)
+                for r in regions
+            }
+            log.debug(
+                "[cn]      =  {}",
+                " ".join(
+                    f"{d:5.2f}" if r in gene.unique_regions else "     "
+                    for r, d in diffs.items()
+                ),
+            )
 
 
 def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
@@ -353,5 +359,5 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
                 + f"valid configurations"
             )
     s = CNSolution(0, solution=sols, gene=gene)  # type: ignore
-    log.debug("CN solver: using user-provided solution: {}", s)
+    log.debug("[cn] result= {} (provided)", s)
     return s

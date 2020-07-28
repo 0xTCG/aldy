@@ -89,6 +89,7 @@ def genotype(
     multiple_warn_level: int = 1,
     phase: Optional[str] = None,
     report: bool = False,
+    genome=None,
 ) -> List[solutions.MinorSolution]:
     """
     Genotype a sample.
@@ -149,17 +150,24 @@ def genotype(
     # Test the existence of LP solver
     _ = lp_model("init", solver)
 
+    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
+    with open(sam_path):  # Check if file exists
+        pass
+    if genome is None:
+        genome = sam.Sample.detect_genome(sam_path)
+        if not genome:
+            log.warn("Cannot detect genome, defaulting to hg19")
+            genome = "hg19"
+        log.debug(f"[genotype] reference= {genome}")
+
     # Load the gene specification
     db_file = script_path("aldy.resources.genes/{}.yml".format(gene_db.lower()))
     if os.path.exists(db_file):
         gene_db = db_file
     with open(gene_db):  # Check if file exists
         pass
-    gene = Gene(gene_db)
+    gene = Gene(gene_db, genome)
 
-    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
-    with open(sam_path):  # Check if file exists
-        pass
     if not cn_region:
         cn_region = sam.DEFAULT_CN_NEUTRAL_REGION
     sample = sam.Sample(
@@ -209,8 +217,8 @@ def genotype(
 
     # Get major solutions and pick the best one
     if multiple_warn_level >= 3 and len(cn_sols) > 1:
-        log.warn("WARNING: multiple copy-number solutions found!")
-    log.info(f"Potential {gene.name} copy number configurations for {sample_name}:")
+        log.warn("WARNING: multiple gene structures found!")
+    log.info(f"Potential {gene.name} gene structures for {sample_name}:")
     major_sols: list = []
     json_print(debug, '  "major": [', end="")
     cn_sols = sorted(cn_sols, key=lambda m: (int(1000 * m.score), m._solution_nice()))
@@ -331,11 +339,13 @@ def genotype(
 
     return minor_sols
 
+
 def batch(genes, profile, sam_path):
     from natsort import natsorted
+
     for gene_db in natsorted(genes):
         gene = Gene(script_path("aldy.resources.genes/{}.yml".format(gene_db.lower())))
-        results = ''
+        results = ""
         try:
             sample_name = os.path.splitext(os.path.basename(sam_path))[0]
             with open(sam_path):  # Check if file exists
@@ -343,17 +353,22 @@ def batch(genes, profile, sam_path):
 
             sample = sam.Sample(sam_path, gene, threshold=0.5, profile=profile)
             if sample.coverage.average_coverage() < 2:
-                results = 'ERR:COV'; continue
+                results = "ERR:COV"
+                continue
 
-            cn_sols = cn.estimate_cn(gene, sample.coverage, solver='cbc')
+            cn_sols = cn.estimate_cn(gene, sample.coverage, solver="cbc")
             if len(cn_sols) == 0:
-                results = 'ERR:CN'; continue
+                results = "ERR:CN"
+                continue
             SLACK = 1
             min_cn_score = min(cn_sols, key=lambda m: m.score).score
             for i, cn_sol in enumerate(cn_sols):
-                major_sols += major.estimate_major(gene, sample.coverage, cn_sol, solver='cbc', identifier=i)
+                major_sols += major.estimate_major(
+                    gene, sample.coverage, cn_sol, solver="cbc", identifier=i
+                )
             if len(major_sols) == 0:
-                results = 'ERR:MAJ'; continue
+                results = "ERR:MAJ"
+                continue
             major_sols = [
                 solutions.MajorSolution(
                     m.score * ((m.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
@@ -364,32 +379,45 @@ def batch(genes, profile, sam_path):
             ]
             min_major_score = min(major_sols, key=lambda m: m.score).score
             major_sols = sorted(
-                [m for m in major_sols if m.score - min_major_score < SOLUTION_PRECISION],
+                [
+                    m
+                    for m in major_sols
+                    if m.score - min_major_score < SOLUTION_PRECISION
+                ],
                 key=lambda m: (int(1000 * m.score), m._solution_nice()),
             )
             minor_sols = []
-            for m in minor.estimate_minor(gene, sample.coverage, major_sols, solver='cbc'):
+            for m in minor.estimate_minor(
+                gene, sample.coverage, major_sols, solver="cbc"
+            ):
                 n = solutions.MinorSolution(
                     m.score
-                    * ((m.major_solution.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
+                    * (
+                        (m.major_solution.cn_solution.score + SLACK)
+                        / (min_cn_score + SLACK)
+                    ),
                     m.solution,
                     m.major_solution,
                 )
                 n.diplotype = m.diplotype
                 minor_sols.append(n)
             if len(minor_sols) == 0:
-                results = 'ERR:MIN'; continue
+                results = "ERR:MIN"
+                continue
             minor_sols = sorted(
-                [m for m in minor_sols if m.score - min_minor_score - gap < SOLUTION_PRECISION],
+                [
+                    m
+                    for m in minor_sols
+                    if m.score - min_minor_score - gap < SOLUTION_PRECISION
+                ],
                 key=lambda m: (int(1000 * m.score), m._solution_nice()),
             )
             sols = []
             for i, minor_sol in enumerate(minor_sols):
                 sols.append(minor_sol.diplotype)
-            results = ';'.join(sols).replace('*', '')
+            results = ";".join(sols).replace("*", "")
         except AldyException as e:
             print(e)
-            results = 'ERR:?'
-        print(f'{sample_name}\t{gene_db}\t{results}')
-
+            results = "ERR:?"
+        print(f"{sample_name}\t{gene_db}\t{results}")
 

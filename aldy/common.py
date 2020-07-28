@@ -137,13 +137,20 @@ class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
 # Aldy auxiliaries
 
 
-def allele_number(x: str) -> str:
+def allele_name(x: str) -> str:
     """
     Returns:
         str: Major allele number of the star-allele name (e.g. ``'12A'`` -> ``12``).
     """
-    p = re.split(r"(\d+)", x)
-    return p[1]
+    if "*" in x:
+        x = x.split("*", maxsplit=1)[1]
+    return x.replace("/", "_")
+
+
+def freezekey(x):  # hashing for dictionaries
+    return tuple(i[1] for i in sorted(x[0].items())) + tuple(
+        i[1] for i in sorted(x[1].items())
+    )
 
 
 def allele_sort_key(x: str) -> Tuple[int, str]:
@@ -164,7 +171,7 @@ def rev_comp(seq: str) -> str:
         str: Reverse-complemented DNA sequence.
     """
 
-    return "".join([REV_COMPLEMENT[x] for x in seq[::-1]])
+    return "".join([REV_COMPLEMENT.get(x, x) for x in seq[::-1]])
 
 
 def seq_to_amino(seq: str) -> str:

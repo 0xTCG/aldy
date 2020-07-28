@@ -5,8 +5,9 @@
 
 from typing import List, Set, Callable, Optional, Tuple, Dict
 
+from natsort import natsorted
 from . import lpinterface
-from .common import log, json_print, allele_sort_key
+from .common import log, json_print
 from .gene import Mutation, Gene
 from .cn import MAX_CN
 from .major import NOVEL_MUTATION_PENAL
@@ -36,6 +37,7 @@ def estimate_minor(
     max_solutions: int = 1,
     debug: Optional[str] = None,
     phases: Optional[List[List[Mutation]]] = None,
+    novel: bool = False,
 ) -> List[MinorSolution]:
     """
     Estimate the optimal minor star-allele.
@@ -83,7 +85,7 @@ def estimate_minor(
         # TODO: is this necessary?
         if mut.op != "_" and not (
             mut in mutations
-            or gene.region_at(mut.pos)[1][0] == 'e'
+            or gene.region_at(mut.pos)[1][0] == "e"
             or gene.region_at(mut.pos)[1] in ["utr3", "utr5", "up"]
         ):
             return False
@@ -96,24 +98,21 @@ def estimate_minor(
     else:
         cov = coverage.filtered(default_filter_fn)
 
-    for pos, c in cov._coverage.items():
-        for m in c:
-            if m != "_" and Mutation(pos, m) not in mutations:
-                log.info(
-                    "Considering novel {} in {} (coverage = {}%; func = {})",
-                    Mutation(pos, m),
-                    gene.region_at(pos)[1],
-                    round(cov.percentage(Mutation(pos, m)), 1),
-                    gene.is_functional((pos, m)),
-                )
-                mutations.add(Mutation(pos, m))
+    if novel:
+        for pos, c in cov._coverage.items():
+            for m in c:
+                if m != "_" and Mutation(pos, m) not in mutations:
+                    log.info(
+                        "[minor] novel {} ({}; coverage= {:.0f}; func= {})",
+                        Mutation(pos, m),
+                        gene.region_at(pos)[1],
+                        cov.percentage(Mutation(pos, m)),
+                        gene.is_functional((pos, m)),
+                    )
+                    mutations.add(Mutation(pos, m))
 
     minor_sols: List[MinorSolution] = []
-    for i, major_sol in enumerate(
-        sorted(major_sols, key=lambda s: str(s.solution))
-    ):
-        # print(str(major_sol))
-        # if '*83' not in str(major_sol) and '*4:10' not in str(major_sol): continue
+    for i, major_sol in enumerate(natsorted(major_sols, key=lambda s: str(s.solution))):
         minor_sols += solve_minor_model(
             gene,
             alleles,
@@ -179,7 +178,7 @@ def solve_minor_model(
     """
 
     log.debug("*" * 80)
-    log.debug("Minor solver: major = {}", major_sol)
+    log.debug("[minor] major= {}", major_sol._solution_nice())
     model = lpinterface.model("AldyMinor", solver)
 
     # from pprint import pprint
@@ -193,7 +192,7 @@ def solve_minor_model(
         for a in alleles_list
     }
 
-    # _print_candidates(gene, alleles, major_sol, coverage)
+    _print_candidates(gene, alleles, major_sol, coverage, mutations)
 
     for a, _ in list(alleles):
         max_cn = major_sol.solution[SolvedAllele(a.major, None, a.added, a.missing)]
@@ -428,7 +427,7 @@ def solve_minor_model(
         assert len(phases) % 2 == 0
         for p in range(0, len(phases), 2):
             for a in alleles:
-                model.addConstr(VPHASE[p][a] + VPHASE[p+1][a] <= 1)
+                model.addConstr(VPHASE[p][a] + VPHASE[p + 1][a] <= 1)
         for p in VPHASE:
             model.addConstr(model.quicksum(VPHASE[p][a] for a in VPHASE[p]) <= 1)
             model.addConstr(model.quicksum(VPHASE[p][a] for a in VPHASE[p]) >= 1)
@@ -480,7 +479,7 @@ def solve_minor_model(
     try:
         results = {}
         for status, opt, sol in model.solutions():
-            log.debug(f"Minor solver: {status}, opt: {opt:.2f}")
+            log.debug(f"[minor] status= {status}; opt= {opt:.2f}")
 
             if phases:
                 assignments = {a: set() for a in alleles}
@@ -567,14 +566,14 @@ def solve_minor_model(
             _ = estimate_diplotype(gene, sol)
             json_print(debug, f'    "diplotype": "{sol.diplotype}"')
             json_print(debug, "  },")
-            log.debug(f"Minor solver: {sol}")
+            log.debug(f"[minor] solution= {sol._solution_nice()}")
             if str(sol) not in results:
                 results[str(sol)] = sol
             if len(results) >= max_solutions:
                 break
         return results.values()
     except lpinterface.NoSolutionsError:
-        log.debug("Minor solver: no solutions")
+        log.debug("[minor] solution= []")
         json_print(debug, '    "sol": []')
         json_print(debug, "  },")
         if debug and False:  # Enable to debug infeasible models
@@ -583,25 +582,46 @@ def solve_minor_model(
         return []
 
 
-def _print_candidates(gene, alleles, major_sol, coverage):
+def _print_candidates(gene, alleles, major_sol, coverage, muts):
     """
     Pretty-prints the list of allele candidates and their mutations.
     """
 
-    log.debug("Minor solver: candidates:")
-    for a in sorted(alleles, key=lambda x: allele_sort_key(x[0].minor)):
+    log.debug("[minor] candidates=")
+    muts = muts.copy()
+    for a in natsorted(alleles):
         (ma, mi, _, _), _ = a
-        log.debug("  *{} (cn=*{})", mi, gene.alleles[ma].cn_config)
-        for m in sorted(alleles[a], key=lambda m: m.pos):
-            m_gene, m_region = gene.region_at(m.pos)
-            scopy = coverage.single_copy(m.pos, major_sol.cn_solution)
+        log.debug("  *{} (major= *{})", mi, ma)
+        for m in sorted(alleles[a]):
+            if m in muts:
+                muts.remove(m)
+            copies = coverage.single_copy(m.pos, major_sol.cn_solution)
+            copies = coverage[m] / copies if copies > 0 else 0
+            f = "*" if gene.is_functional(m) else " "
             log.debug(
-                "    {:26}  {:.2f} ({:4} / {} * {:4.0f}) {:10} {}",
-                str(m),
-                coverage[m] / scopy if scopy > 0 else 0,
-                coverage[m],
-                major_sol.cn_solution.position_cn(m.pos),
-                coverage.single_copy(m.pos, major_sol.cn_solution),
-                str(m_region),
-                gene.get_dbsnp(m)
+                f"    {f} {coverage[m]:4} (cn= {copies:3.1f}) {str(m):20}  "
+                + f"{gene.get_dbsnp(m):10} {gene.get_refseq(m, from_atg=True)}",
             )
+    if len(muts) > 0:
+        log.debug("  Other mutations:")
+        for m in sorted(muts):
+            copies = coverage.single_copy(m.pos, major_sol.cn_solution)
+            copies = coverage[m] / copies if copies > 0 else 0
+            a = (f"*{a}" for a, b in gene.alleles.items() if m in b.func_muts)
+            f = "*" if gene.is_functional(m) else " "
+            log.debug(f"    {f} {coverage[m]:4} (cn= {copies:3.1f}) {str(m):20}  ")
+
+        # log.debug("  *{} (cn=*{})", mi, gene.alleles[ma].cn_config)
+        # for m in sorted(alleles[a], key=lambda m: m.pos):
+        #     m_gene, m_region = gene.region_at(m.pos)
+        #     scopy =
+        #     log.debug(
+        #         "    {:26}  {:.2f} ({:4} / {} * {:4.0f}) {:10} {}",
+        #         str(m),
+        #         coverage[m] / scopy if scopy > 0 else 0,
+        #         coverage[m],
+        #         major_sol.cn_solution.position_cn(m.pos),
+        #         coverage.single_copy(m.pos, major_sol.cn_solution),
+        #         str(m_region),
+        #         gene.get_dbsnp(m),
+        #     )

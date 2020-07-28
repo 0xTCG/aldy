@@ -216,7 +216,7 @@ class Coverage:
         cn_ratio = float(cnv_ref) / sam_ref
         if cn_ratio == 0:
             raise AldyException("Invalid CN-neutral region in the provided profile.")
-        log.debug("CNV factor: {} ({})", cn_ratio, 1.0 / cn_ratio)
+        log.debug("[coverage] scale_ratio: {:.1f}", 1 / cn_ratio)
 
         self._rescaled = {}
         self._region_coverage = {}

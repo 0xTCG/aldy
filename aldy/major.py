@@ -9,6 +9,8 @@ from typing import List, Dict, Tuple, Any, Optional
 import collections
 import copy
 
+from natsort import natsorted
+
 from . import lpinterface
 from .common import log, AldyException, json_print, sorted_tuple, allele_sort_key
 from .cn import MAX_CN
@@ -59,7 +61,7 @@ def estimate_major(
     """
 
     log.debug("*" * 80)
-    log.debug("Major solver: cn = {}", cn_solution)
+    log.debug("[major] cn= {}", cn_solution._solution_nice())
 
     if sum(cn_solution.solution.values()) < 2:
         raise AldyException(
@@ -259,7 +261,7 @@ def solve_major_model(
         result: Dict[Any, MajorSolution] = {}
         json_print(debug, '    "sol": [', end="")
         for status, opt, sol in model.solutions(gap):
-            log.debug(f"Major solver: {status}, opt: {opt:.2f}")
+            log.debug(f"[major] status= {status}; opt= {opt:.2f}")
             # MajorAllele: novel mutations
             solved_alleles: Any = collections.defaultdict(lambda: [])
             for s in sol:
@@ -292,12 +294,12 @@ def solve_major_model(
                 sol = MajorSolution(
                     score=opt, solution=solution, cn_solution=cn_solution
                 )
-                log.debug("Major solver: {}".format(sol))
+                log.debug("[major] solution= {}", sol._solution_nice())
                 result[sol_tuple] = sol
         json_print(debug, "]\n  }, ", end="")
         return list(result.values())
     except lpinterface.NoSolutionsError:
-        log.debug("Major solver: no solutions")
+        log.debug("[major] solution= []")
         return []
 
 
@@ -338,41 +340,41 @@ def _filter_alleles(
 
 def _print_candidates(
     gene,
-    alleles: Dict[str, MajorAllele],
+    alleles: Dict[str, Any],
     coverage: Coverage,
     cn_solution: CNSolution,
-    func_muts: set,
+    muts: set,
 ) -> None:
     """
     Pretty-prints the list of allele candidates and their functional mutations.
     """
-    log.debug("Major solver: candidates:")
-    func_muts = func_muts.copy()
-    for a in sorted(alleles, key=allele_sort_key):
-        log.debug("  *{} (cn=*{})", a, alleles[a].cn_config)
-        for m in sorted(alleles[a].func_muts, key=lambda m: m.pos):
-            if m in func_muts:
-                func_muts.remove(m)
-            log.debug(
-                "    {} {:4} ({:.1f} copies) {}",
-                # coverage.region_at(m.pos),
-                m,
-                coverage[m],
+    log.debug("[major] candidates=")
+    muts = muts.copy()
+    for a in natsorted(alleles):
+        log.debug("  *{} (struct= *{})", a, alleles[a].cn_config)
+        for m in sorted(alleles[a].func_muts):
+            if m in muts:
+                muts.remove(m)
+            copies = (
                 coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
                 if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
-                else 0,
-                gene.get_dbsnp(m),
+                else 0
             )
-    if len(func_muts) > 0:
-        log.debug("  Other mutations:")
-        for m in sorted(func_muts, key=lambda m: m.pos):
             log.debug(
-                "    {} {:4} ({:.1f} copies) {} {}",
-                m,
-                coverage[m],
+                f"    {coverage[m]:4} (cn= {copies:3.1f}) {str(m):20}  "
+                + f"{gene.get_dbsnp(m):10} {gene.get_refseq(m, from_atg=True)}",
+            )
+    if len(muts) > 0:
+        log.debug("  Other mutations:")
+        for m in sorted(muts):
+            copies = (
                 coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
                 if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
-                else 0,
-                "F",
-                gene.get_dbsnp(m),
+                else 0
+            )
+            a = (f"*{a}" for a, b in gene.alleles.items() if m in b.func_muts)
+            log.debug(
+                f"    {coverage[m]:4} (cn= {copies:3.1f}) {str(m):20}  "
+                + f"{gene.get_dbsnp(m):10} {gene.get_refseq(m, from_atg=True):12}"
+                + f" ({', '.join(a)})",
             )
