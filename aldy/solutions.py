@@ -6,6 +6,7 @@
 
 from typing import Dict, List
 
+from natsort import natsorted
 import collections
 
 from .common import allele_sort_key
@@ -56,12 +57,7 @@ class CNSolution(
             return 0
 
     def _solution_nice(self):
-        return ",".join(
-            f"{v}x*{k}"
-            for k, v in sorted(
-                self.solution.items(), key=lambda x: allele_sort_key(x[0])
-            )
-        )
+        return ",".join(f"{v}x*{k}" for k, v in natsorted(self.solution.items()))
 
     def __str__(self):
         return "CNSol[{:.2f}; sol=({}); cn={}]".format(
@@ -151,9 +147,7 @@ class MajorSolution(
     def _solution_nice(self):
         return ", ".join(
             f"{v}x{s}"
-            for s, v in sorted(
-                self.solution.items(), key=lambda x: allele_sort_key(x[0].major)
-            )
+            for s, v in natsorted(self.solution.items(), key=lambda x: x[0].major)
         )
 
     def __str__(self):
@@ -192,8 +186,7 @@ class MinorSolution(
 
     def _solution_nice(self):
         return ", ".join(
-            str(s)
-            for s in sorted(self.solution, key=lambda x: allele_sort_key(x.minor))
+            str(s) for s in natsorted(self.solution, key=lambda x: x.minor)
         )
 
     def __str__(self):

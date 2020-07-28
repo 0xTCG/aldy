@@ -143,7 +143,7 @@ class CNConfig(nt("CNConfig", ["cn", "kind", "alleles", "description"])):
 
     def __str__(self):
         cov = "|".join("".join(str(self.cn[g][r]) for r in self.cn[0]) for g in self.cn)
-        alleles = " ".join(sorted(self.alleles))
+        alleles = " ".join(natsorted(self.alleles))
         return f"CNConfig({str(self.kind)[13:]}; vector={cov}; alleles=[{alleles}])"
 
 

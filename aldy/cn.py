@@ -276,7 +276,7 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
         )
     )
     configs = copy.deepcopy(gene.cn_configs)
-    for an in sorted(gene.cn_configs):
+    for an in natsorted(gene.cn_configs):
         if an not in gene.alleles:
             continue  # This is just a CN configuration w/o any mutations
         bad_alleles = []

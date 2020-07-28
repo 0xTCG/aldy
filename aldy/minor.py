@@ -610,18 +610,3 @@ def _print_candidates(gene, alleles, major_sol, coverage, muts):
             a = (f"*{a}" for a, b in gene.alleles.items() if m in b.func_muts)
             f = "*" if gene.is_functional(m) else " "
             log.debug(f"    {f} {coverage[m]:4} (cn= {copies:3.1f}) {str(m):20}  ")
-
-        # log.debug("  *{} (cn=*{})", mi, gene.alleles[ma].cn_config)
-        # for m in sorted(alleles[a], key=lambda m: m.pos):
-        #     m_gene, m_region = gene.region_at(m.pos)
-        #     scopy =
-        #     log.debug(
-        #         "    {:26}  {:.2f} ({:4} / {} * {:4.0f}) {:10} {}",
-        #         str(m),
-        #         coverage[m] / scopy if scopy > 0 else 0,
-        #         coverage[m],
-        #         major_sol.cn_solution.position_cn(m.pos),
-        #         coverage.single_copy(m.pos, major_sol.cn_solution),
-        #         str(m_region),
-        #         gene.get_dbsnp(m),
-        #     )

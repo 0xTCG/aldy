@@ -332,7 +332,7 @@ def _filter_alleles(
 
     cov = coverage.filtered(filter_fns)
     alleles = copy.deepcopy(gene.alleles)
-    for an, a in sorted(gene.alleles.items()):
+    for an, a in natsorted(gene.alleles.items()):
         if a.cn_config not in cn_solution.solution:
             del alleles[an]
         elif any(cov[m] <= 0 for m in a.func_muts):
@@ -341,7 +341,7 @@ def _filter_alleles(
                 for m in a.func_muts
                 if cov[m] <= 0
             )
-            log.trace("Major solver: removing {} because of {}", an, " and ".join(s))
+            log.trace("[major] removing {} because of {}", an, " and ".join(s))
             del alleles[an]
 
     return alleles, cov

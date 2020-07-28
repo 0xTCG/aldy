@@ -10,6 +10,8 @@ import os
 import sys
 import textwrap
 
+from natsort import natsorted
+
 from . import sam
 from . import cn
 from . import major
@@ -331,7 +333,7 @@ def genotype(
         log.info(colorize(f"{gene.name} results:"))
         reported = set()
         for r in minor_sols:
-            minors = ", ".join(sorted([f.major_repr(gene) for f in r.solution]))
+            minors = ", ".join(natsorted([f.major_repr(gene) for f in r.solution]))
             s = f"  {r.diplotype:30} ({minors})"
             if s not in reported:
                 log.info(colorize(s))

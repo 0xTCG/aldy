@@ -210,8 +210,12 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
 
     # solution is the array of (major, minor) tuples
     majors = [
-        str(allele_sort_key(a.major)[0])
-        + ("-like" if sum(1 for m in a.added if gene.is_functional(m, infer=False)) > 0 else "")
+        str(a.major)
+        + (
+            "-like"
+            if sum(1 for m in a.added if gene.is_functional(m, infer=False)) > 0
+            else ""
+        )
         for a in solution.solution
     ]
     diplotype: Tuple[List[str], List[str]] = ([], [])
