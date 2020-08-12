@@ -15,7 +15,6 @@ from .common import log, json_print, sorted_tuple, AldyException
 from .gene import CNConfig, Gene
 from .coverage import Coverage
 from .solutions import CNSolution
-from .lpinterface import escape_name
 
 
 MAX_CN = 20.0
@@ -313,25 +312,19 @@ def _print_coverage(gene: Gene, coverage: Coverage) -> None:
     """
     Pretty-print the region coverage.
     """
-    for ri in range(0, len(gene.regions[0]), 13):
-        regions = list(gene.regions[0])[ri : ri + 13]
-        log.debug("[cn]          {}", " ".join(f"{r:5}" for r in regions))
-        g = " ".join(f"{coverage.region_coverage(0, r):5.2f}" for r in regions)
-        log.debug(f"[cn] {gene.name:7} {g}")
-        if gene.pseudogenes:
-            g = " ".join(f"{coverage.region_coverage(1, r):5.2f}" for r in regions)
-            log.debug(f"[cn] {gene.pseudogenes[0]:7} {g}")
-            diffs = {
-                r: coverage.region_coverage(0, r) - coverage.region_coverage(1, r)
-                for r in regions
-            }
-            log.debug(
-                "[cn]      =  {}",
-                " ".join(
-                    f"{d:5.2f}" if r in gene.unique_regions else "     "
-                    for r, d in diffs.items()
-                ),
-            )
+    log.debug("[cn] coverage=")
+    pseudogene = gene.pseudogenes[0] if gene.pseudogenes else ""
+    log.debug(f"  {'':5} {gene.name[-4:]:4} {pseudogene[-4:]:4}")
+    for r in gene.regions[0]:
+        g = coverage.region_coverage(0, r)
+        if pseudogene:
+            p = coverage.region_coverage(1, r)
+            if r in gene.unique_regions:
+                log.debug(f"  {r:5} {g:4.1f} {p:4.1f} = {g - p:4.1f}")
+            else:
+                log.debug(f"  {r:5} {g:4.1f} {p:4.1f}")
+        else:
+            log.debug(f"  {r:5}: {g:4.1f}")
 
 
 def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:

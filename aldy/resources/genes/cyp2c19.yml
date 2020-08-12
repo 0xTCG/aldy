@@ -260,7 +260,7 @@ alleles:
     mutations:
     - [17736, T>C, rs41291556, W120R]
   CYP2C19*8.1001:
-    label: CYP2C19*8ALDY
+    label: CYP2C19*8.ALDY
     mutations:
     - [17736, T>C, rs41291556, W120R]
     - [85186, A>G, rs3758581, I331V]

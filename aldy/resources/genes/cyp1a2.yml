@@ -131,7 +131,7 @@ alleles:
     - [8010, G>A, rs56276455, D348N]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*3.1001:
-    label: CYP1A2*3ALDY
+    label: CYP1A2*3.ALDY
     mutations:
     - [8010, G>A, rs56276455, D348N]
   CYP1A2*4.001:
@@ -156,7 +156,7 @@ alleles:
     - [11060, G>A, rs72547517, R456H]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*8.1001:
-    label: CYP1A2*8ALDY
+    label: CYP1A2*8.ALDY
     mutations:
     - [11060, G>A, rs72547517, R456H]
   CYP1A2*9.001:
@@ -189,7 +189,7 @@ alleles:
     - [6019, C>G, rs72547511, P42R]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*15.1001:
-    label: CYP1A2*15ALDY
+    label: CYP1A2*15.ALDY
     mutations:
     - [6019, C>G, rs72547511, P42R]
   CYP1A2*16.001:
@@ -198,7 +198,7 @@ alleles:
     - [8367, G>A, rs72547515, R377Q]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*16.1001:
-    label: CYP1A2*16ALDY
+    label: CYP1A2*16.ALDY
     mutations:
     - [8367, G>A, rs72547515, R377Q]
   CYP1A2*17.001:
@@ -209,13 +209,13 @@ alleles:
     - [9357, C>T, rs149928755, T395M]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*17.1001:
-    label: CYP1A2*17ALDY
+    label: CYP1A2*17.ALDY
     mutations:
     - [8053, G>A, rs2472304]
     - [9357, C>T, rs149928755, T395M]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*17.1002:
-    label: CYP1A2*17ALDY2
+    label: CYP1A2*17.ALDY2
     mutations:
     - [8053, G>A, rs2472304]
     - [9357, C>T, rs149928755, T395M]
@@ -225,7 +225,7 @@ alleles:
     - [9362, A>C, '-', N397H]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*18.1001:
-    label: CYP1A2*18ALDY
+    label: CYP1A2*18.ALDY
     mutations:
     - [9362, A>C, '-', N397H]
   CYP1A2*19.001:
@@ -234,7 +234,7 @@ alleles:
     - [11222, G>A, '-', R510Q]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*19.1001:
-    label: CYP1A2*19ALDY
+    label: CYP1A2*19.ALDY
     mutations:
     - [11222, G>A, '-', R510Q]
   CYP1A2*20.001:
@@ -243,7 +243,7 @@ alleles:
     - [10999, G>A, rs144148965, D436N]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*20.1001:
-    label: CYP1A2*20ALDY
+    label: CYP1A2*20.ALDY
     mutations:
     - [10999, G>A, rs144148965, D436N]
   CYP1A2*21.001:
@@ -254,13 +254,13 @@ alleles:
     - [11178, C>A, rs143193369, Y495X]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*21.1001:
-    label: CYP1A2*21ALDY
+    label: CYP1A2*21.ALDY
     mutations:
     - [7407, C>A, rs17861157, S298R]
     - [11178, C>A, rs143193369, Y495X]
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*21.1002:
-    label: CYP1A2*21ALDY2
+    label: CYP1A2*21.ALDY2
     mutations:
     - [7407, C>A, rs17861157, S298R]
     - [11178, C>A, rs143193369, Y495X]
