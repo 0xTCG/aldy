@@ -163,6 +163,8 @@ def genotype(
             log.warn("WARNING: Cannot detect genome, defaulting to hg19.")
             genome = "hg19"
         log.debug(f"[genotype] reference= {genome}")
+    if genome not in ["hg19", "hg38"]:
+        raise AldyException(f"Unknown genome {genome}")
 
     # Load the gene specification
     db_file = script_path("aldy.resources.genes/{}.yml".format(gene_db.lower()))
@@ -173,7 +175,7 @@ def genotype(
     gene = Gene(gene_db, genome)
 
     if not cn_region:
-        cn_region = sam.DEFAULT_CN_NEUTRAL_REGION
+        cn_region = sam.DEFAULT_CN_NEUTRAL_REGION[genome]
     if profile == "exome":
         log.warn("WARNING: Copy-number calling is not available for exome data.")
         log.warn(
