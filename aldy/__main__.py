@@ -53,7 +53,7 @@ def main(argv):
         __version__,
         platform.python_version(),
         platform.system() if platform.system() != "Darwin" else "macOS",
-        " ".join(platform.dist()[0:2])
+        platform.platform()
         if platform.system() == "Linux"
         else platform.mac_ver()[0]
         if platform.system() == "Darwin"
