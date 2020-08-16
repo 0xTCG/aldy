@@ -252,7 +252,6 @@ def genotype(
         conf = 100 * (min_cn_score + SLACK) / (cn_sol.score + SLACK)
         log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
-    log.info("")
 
     phases = load_phase(gene, phase) if phase else None
 
@@ -291,7 +290,6 @@ def genotype(
         conf = 100 * (min_major_score + SLACK) / (major_sol.score + SLACK)
         log.info(f"  {i + 1:2}: {major_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
-    log.info("")
 
     json_print(debug, '  "minor": [', end="")
     minor_sols = []
