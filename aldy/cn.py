@@ -7,6 +7,7 @@
 from typing import Dict, List, Tuple, Optional
 
 import copy
+import re
 from natsort import natsorted
 
 from . import lpinterface
@@ -243,7 +244,6 @@ def solve_cn_model(
         lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
         result: dict = {}
         for status, opt, sol in model.solutions(gap):
-            log.debug(f"[cn] status= {status}; opt= {opt:.2f}")
             sol_tuple = sorted_tuple(lookup[v] for v in sol)
             # Because A[1] can be 1 while A[0] is 0, we can have biologically
             # duplicate solutions
@@ -251,7 +251,10 @@ def solve_cn_model(
                 result[sol_tuple] = CNSolution(  # type: ignore
                     opt, solution=list(sol_tuple), gene=gene
                 )
-                log.debug("[cn] solution= {}", result[sol_tuple])
+                log.debug(
+                    f"[cn] status= {status}; opt= {opt:.2f}"
+                    + f"[cn] solution= {result[sol_tuple]}"
+                )
         json_print(
             debug, '    "sol": ' + str([dict(r.solution) for r in result.values()])
         )
@@ -313,11 +316,12 @@ def _print_coverage(gene: Gene, coverage: Coverage) -> None:
     Pretty-print the region coverage.
     """
     log.debug("[cn] coverage=")
-    pseudogene = gene.pseudogenes[0] if gene.pseudogenes else ""
-    log.debug(f"  {'':5} {gene.name[-4:]:4} {pseudogene[-4:]:4}")
+    gname = re.split(r"(\d.+)", gene.name)[1]
+    pname = re.split(r"(\d.+)", gene.pseudogenes[0])[1] if gene.pseudogenes else ""
+    log.debug(f"  {'':5} {gname:4} {pname:4}")
     for r in gene.regions[0]:
         g = coverage.region_coverage(0, r)
-        if pseudogene:
+        if pname:
             p = coverage.region_coverage(1, r)
             if r in gene.unique_regions:
                 log.debug(f"  {r:5} {g:4.1f} {p:4.1f} = {g - p:4.1f}")

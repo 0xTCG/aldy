@@ -7,6 +7,7 @@
 from typing import Tuple, Dict, List, Optional
 
 import os
+import sys
 import enum
 import yaml
 import collections
@@ -567,7 +568,7 @@ class Gene:
                 # We only make partial major alleles from non-fused major alleles
                 if a.cn_config != "1":
                     continue
-                new_name = "{}/{}".format(f, an)
+                new_name = "{}#{}".format(f, an)
                 new_muts = preserved_mutations(f, a.func_muts)
                 key = sorted_tuple(new_muts)
                 if key in add:
@@ -602,7 +603,7 @@ class Gene:
                         },
                     )
 
-            # Remove fusion (will be replaced at least by allele "1/{f}")
+            # Remove fusion (will be replaced at least by allele "1#{f}")
             del self.alleles[f]
             self.alleles.update({a.name: a for a in add.values()})
 
@@ -665,7 +666,7 @@ class Gene:
         """
         return self._region_at.get(pos, (0, "-"))
 
-    def is_functional(self, mut, infer=True) -> bool:
+    def get_functional(self, mut, infer=True) -> Optional[str]:
         """
         Returns:
             bool: ``True`` if a mutation is functional
@@ -673,13 +674,13 @@ class Gene:
         """
         pos, op = mut
         if (pos, op) in self.mutation_info:
-            return self.mutation_info[pos, op][0] is not None
+            return self.mutation_info[pos, op][0]
 
         # Calculate based on aminoacid change
         pos = self.chr_to_ref[pos]
         if infer and any(s <= pos < e for s, e in self.exons):
             if ">" not in op:
-                return True
+                return "indel"
             if self.strand < 0:
                 op = self._reverse_op(op)
             seq = "".join(
@@ -688,8 +689,19 @@ class Gene:
                 else self.seq[s:e]
                 for s, e in self.exons
             )
-            return seq_to_amino(seq) != self.aminoacid
-        return False
+            amino = seq_to_amino(seq)
+            if amino != self.aminoacid:
+                pos = next(i for i, a in enumerate(amino) if a != self.aminoacid[i])
+                return f"{self.aminoacid[pos]}{pos}{amino[pos]}"
+        return None
+
+    def is_functional(self, mut, infer=True) -> bool:
+        """
+        Returns:
+            bool: ``True`` if a mutation is functional
+            (i.e. does it affect the underlying aminoacid or not).
+        """
+        return self.get_functional(mut, infer) is not None
 
     def _reverse_op(self, op: str) -> str:
         if ">" in op:
@@ -795,16 +807,21 @@ class Gene:
             if mal.alt_name
         }
         if query:
-            if query in self.cn_configs:
+            if query.lower() in map(str.lower, self.cn_configs):
+                query = next(q for q in self.cn_configs if query.lower() == q.lower())
                 self.print_cn(query)
-            elif query in self.alleles:
+            elif query.lower() in map(str.lower, self.alleles):
+                query = next(q for q in self.alleles if query.lower() == q.lower())
                 self.print_majors(query)
-            elif query in minors:
+            elif query.lower() in map(str.lower, minors):
+                query = next(q for q in minors if query.lower() == q.lower())
                 self.print_minors(minors[query], query)
-            elif query in alts:
+            elif query.lower() in map(str.lower, alts):
+                query = next(q for q in alts if query.lower() == q.lower())
                 self.print_minors(*alts[query])
             else:
-                raise AldyException(f"Cannot parse query '{query}'")
+                log.error(f"Cannot parse query '{query}'")
+                sys.exit(1)
             return
 
         name = [f"Gene {self.name}"]
@@ -840,7 +857,7 @@ class Gene:
 
         log.info("Major star-alleles:")
         for a, allele in natsorted(self.alleles.items()):
-            if "/" in a:  # avoid fusions here
+            if "#" in a:  # avoid fusions here
                 continue
             log.info(f"  *{a}:")
             m = ",\n                   ".join(

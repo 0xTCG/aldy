@@ -20,7 +20,7 @@ def escape_name(s: str, d: collections.defaultdict = None) -> str:
     """
     Escape variable names to conform given names with the various solver requirements.
     """
-    s = s.replace(".", "").replace("-", "m").replace("/", "__")[:200]
+    s = s.replace(".", "").replace("-", "m").replace("#", "__")[:200]
     # Ensure that all names are unique
     if d is not None:
         d[s] += 1

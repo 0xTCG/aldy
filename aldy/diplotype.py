@@ -7,8 +7,9 @@
 from typing import List, Tuple, Dict
 
 import collections
-import natsort
+import re
 
+from natsort import natsorted
 from .common import allele_sort_key, td
 from .gene import Gene, Mutation
 from .coverage import Coverage
@@ -209,74 +210,63 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     del_allele = gene.deletion_allele()
 
     # solution is the array of (major, minor) tuples
-    majors = [
-        str(a.major)
-        + (
-            "-like"
-            if sum(1 for m in a.added if gene.is_functional(m, infer=False)) > 0
-            else ""
-        )
-        for a in solution.solution
-    ]
+    major_dict: Dict[str, List[str]] = collections.defaultdict(list)
+    for a in solution.solution:
+        n = str(a.major).split("#")[0:1]  # chop off fusion suffix
+        for m in a.added:
+            if gene.is_functional(m, infer=False):
+                n.append(gene.get_dbsnp(m))
+        # get "real" name
+        components = re.split(r"(\d+)", n[0])
+        real = components[0] if components[0] != "" else components[1]
+        major_dict[real].append("+".join(n))
+    if len(solution.solution) == 1 and del_allele:
+        major_dict[del_allele].append(del_allele)
+
     diplotype: Tuple[List[str], List[str]] = ([], [])
-
-    if len(majors) == 1 and del_allele:
-        majors.append(del_allele)
-
-    major_dict = collections.Counter(majors)
     dc = 0
 
     # Handle tandems (heuristic that groups common tandems together,
-    #                 e.g. 1, 2, 13 -> 1+13/2 if [1,13] is a common tandem)
-    for ta, tb in gene.common_tandems:
-        while major_dict[ta] > 0 and major_dict[tb] > 0:
-            diplotype[dc % 2].extend([ta, tb])
-            dc += 1
-            major_dict[ta] -= 1
-            major_dict[tb] -= 1
+    #                 e.g. 1, 2, 13 -> 13+1/2 if [13,1] is a common tandem)
+    if len(solution.solution) > 2:
+        for ta, tb in gene.common_tandems:
+            while major_dict[ta] and major_dict[tb]:
+                diplotype[dc % 2].append(f"{major_dict[ta][0]}+{major_dict[tb][0]}")
+                dc += 1
+                del major_dict[ta][0], major_dict[ta][1]
 
     # Handle duplicates (heuristics that groups duplicate alleles together,
     #                    e.g. 1, 1, 2 -> 1+1/2)
     # First check should we split them (e.g. 1, 1, 1, 1 -> 1+1/1+1)?
-    el = list(major_dict.elements())
-    if len(major_dict) == 1 and len(el) % 2 == 0:
-        p, a = len(el) // 2, el[0]
-        diplotype = (p * [a], p * [a])
-        major_dict = collections.Counter()
-    for allele, count in major_dict.items():
-        if count > 1:
+    if len(major_dict) == 1:
+        items = next(iter(major_dict.values()))
+        if len(items) % 2 == 0:
+            diplotype = items[: len(items) // 2], items[len(items) // 2 :]
+            major_dict.clear()
+    for allele, items in major_dict.items():
+        if len(items) > 1:
             if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
                 dc += 1
-            diplotype[dc % 2].extend(count * [str(allele)])
-            major_dict[allele] -= count
+            diplotype[dc % 2].extend(items)
+            items.clear()
             dc += 1
 
     # Handle the rest
-    for allele, count in major_dict.items():
-        if count > 0:
+    for allele, items in major_dict.items():
+        if items:
             if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
                 dc += 1
-            assert count == 1
-            diplotype[dc % 2].append(str(allele))
+            assert len(items) == 1
+            diplotype[dc % 2].extend(items)
             dc += 1
 
     # Each diplotype should have at least one item
     # e.g. 1, 1 -> becomes 1+1/_ due to duplicate heuristic -> fixed to 1/1
     if len(diplotype[1]) == 0:
-        diplotype = (diplotype[0][:-1], [diplotype[0][-1]])
+        diplotype = diplotype[0][:-1], [diplotype[0][-1]]
 
     # Make sure that the elements are sorted and that the tandems are grouped together
-    result = natsort.natsorted(diplotype)
-    for i in range(2):
-        nd: List[tuple] = []
-        for ta, tb in gene.common_tandems:
-            if ta in result[i] and tb in result[i]:
-                nd.append((ta, tb))
-                result[i].remove(ta)
-                result[i].remove(tb)
-        nd += [(x,) for x in result[i]]
-        result[i] = [f for e in sorted(nd) for f in e]
-
-    res = "/".join("+".join("*{}".format(y) for y in x) for x in result)
+    result = natsorted([natsorted(diplotype[0]), natsorted(diplotype[1])])
+    res = " / ".join(" + ".join("*{}".format(y) for y in x) for x in result)
     solution.diplotype = res
     return res

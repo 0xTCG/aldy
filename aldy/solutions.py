@@ -45,6 +45,9 @@ class CNSolution(
             self, score, collections.Counter(solution), gene, vec,
         )
 
+    def __hash__(self):
+        return str(self).__hash__()
+
     def position_cn(self, pos: int) -> float:
         """
         Returns:
@@ -108,7 +111,7 @@ class SolvedAllele(
         return "*{}{}".format(
             self.major,
             "".join(
-                " +" + str(m)
+                " +" + gene.get_dbsnp(m)
                 for m in sorted(m for m in self.added if gene.is_functional(m, False))
             ),
         )
@@ -156,6 +159,9 @@ class MajorSolution(
             + f"sol=({self._solution_nice()}); "
             + f"cn={self.cn_solution}"
         )
+
+    def __hash__(self):
+        return str(self).__hash__()
 
 
 class MinorSolution(

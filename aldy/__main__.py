@@ -19,7 +19,7 @@ import traceback
 import pytest
 
 from . import common
-from .common import log, script_path, AldyException, td, colorize, parse_cn_region
+from .common import log, script_path, AldyException, td, parse_cn_region
 from .gene import Gene
 from .cn import LEFT_FUSION_PENALTY
 from .sam import Sample
@@ -49,17 +49,21 @@ def main(argv):
     sh.push_application()
 
     log.info(
-        "*** Aldy v{} (Python {}, {}) ***",
+        "🐿  Aldy v{} (Python {} on {} {})",
         __version__,
         platform.python_version(),
-        sys.platform,
+        platform.system() if platform.system() != "Darwin" else "macOS",
+        " ".join(platform.dist()[0:2])
+        if platform.system() == "Linux"
+        else platform.mac_ver()[0]
+        if platform.system() == "Darwin"
+        else platform.platform(),
     )
     log.info(
-        "*** (c) 2016-{} Aldy Authors & Indiana University Bloomington. "
-        + "All rights reserved.",
+        "   (c) 2016-{} Aldy Authors. All rights reserved.\n"
+        + "   Free for non-commercial/academic use only.",
         datetime.datetime.now().year,
     )
-    log.info("*** Free for non-commercial/academic use only.")
 
     try:
         if not args.subparser or args.subparser == "help":
@@ -68,7 +72,7 @@ def main(argv):
             _print_licence()
         elif args.subparser == "test":
             _run_test()
-        elif args.subparser == "show":
+        elif args.subparser in ["query", "q"]:
             query = args.gene
             if "*" in query:
                 gene, query = query.split("*", maxsplit=1)
@@ -94,7 +98,7 @@ def main(argv):
                 i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"
             ]
             batch(avail_genes, args.profile, args.file)
-        elif args.subparser == "genotype":
+        elif args.subparser in ["genotype", "g"]:
             # Prepare the list of available genes
             if args.gene.lower() == "all":
                 avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
@@ -111,13 +115,9 @@ def main(argv):
                 output = sys.stdout
             elif output:
                 output = open(output, "w")
-            else:
-                output = "{}.aldy".format(os.path.splitext(args.file)[0])
-                output = open(output, "w")
-
             for gene in avail_genes:
                 _genotype(gene, output, args)
-            if output != sys.stdout:
+            if output and output != sys.stdout:
                 output.close()
         else:
             raise AldyException("Invalid sub-command " + args.subparser)
@@ -194,11 +194,12 @@ def _get_args(argv):
         help=td(
             """Sequencing profile. The following profiles are supported:
                - illumina
+               - wgs (same as illumina)
                - pgrnseq-v1
                - pgrnseq-v2,
-               - pgrnseq-v3 and
-               - [wxs] (coming soon).
-               You can also provide a SAM/BAM file as a profile.
+               - pgrnseq-v3, and
+               - exome.
+               You can also provide a custom SAM/BAM file as a profile.
                Please check documentation for more details."""
         ),
     )
@@ -307,7 +308,10 @@ def _get_args(argv):
     _ = subparsers.add_parser("license", parents=[base], help="Show Aldy license")
 
     show_parser = subparsers.add_parser(
-        "show", parents=[base], help="Show database definitions for a given gene."
+        "query",
+        aliases=["q"],
+        parents=[base],
+        help="Query database definitions for a given gene.",
     )
     show_parser.add_argument("gene", help="Gene or allele to show.")
 
@@ -372,7 +376,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
     threshold = float(args.threshold) / 100
 
     def run(debug):
-        log.debug(
+        log.trace(
             "\nArguments: {}",
             " ".join(k + "=" + str(v) for k, v in vars(args).items() if k is not None),
         )

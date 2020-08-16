@@ -40,10 +40,6 @@ class Sample:
         coverage (:obj:`aldy.coverage.Coverage`):
             The coverage data for the sample.
             Consult the :obj:`aldy.coverage.Coverage`.
-        reads (dict[str, tuple[:obj:`pysam.AlignedSegment`,
-               :obj:`pysam.AlignedSegment`]]):
-            Dictionary that keeps the paired-end reads together in a tuple.
-            Key is the read name. Used only if ``phase`` is set.
 
     Static methods:
         ``load_sam_profile`` (documentation below).
@@ -51,14 +47,14 @@ class Sample:
 
     def __init__(
         self,
-        sam_path: str,
         gene: Gene,
-        threshold: float,
-        profile: str,
-        phase: bool = False,
+        sam_path: Optional[str] = None,
+        threshold: float = 0.5,
+        profile: Optional[str] = None,
         reference: Optional[str] = None,
         cn_region: Optional[GRange] = DEFAULT_CN_NEUTRAL_REGION,
         debug: Optional[str] = None,
+        vcf_path: Optional[str] = None,
     ) -> None:
         """
         Initialize a :obj:`Sample` object.
@@ -73,10 +69,6 @@ class Sample:
                 Check :obj:`aldy.coverage.Coverage` for more information.
             profile (str, optional):
                 Profile specification (e.g. 'prgnseq-v1') or a profile SAM/BAM file.
-            phase (bool):
-                Construct basic rudimentary phasing of the reads to aid the genotyping.
-                DEPRECATED: currently does nothing.
-                Default is ``False``.
             reference (str, optional):
                 Reference genome for reading CRAM files.
                 Default is None.
@@ -94,23 +86,25 @@ class Sample:
             copy-number neutral region is too low (less than 2).
         """
 
-        self.load_aligned(sam_path, gene, threshold, phase, reference, cn_region, debug)
-        if cn_region:
-            self.detect_cn(gene, profile, cn_region)
-        log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
-        if cn_region and self.coverage.diploid_avg_coverage() < 2:
-            raise AldyException(
-                "The average coverage of the sample is too low ({:.1f}).".format(
-                    self.coverage.diploid_avg_coverage()
+        if vcf_path:
+            self.load_vcf(vcf_path, gene, debug)
+        else:
+            self.load_aligned(sam_path, gene, threshold, reference, cn_region, debug)
+            if cn_region:
+                self.detect_cn(gene, profile, cn_region)
+            log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
+            if cn_region and self.coverage.diploid_avg_coverage() < 2:
+                raise AldyException(
+                    "The average coverage of the sample is too low ({:.1f}).".format(
+                        self.coverage.diploid_avg_coverage()
+                    )
                 )
-            )
 
     def load_aligned(
         self,
         sam_path: str,
         gene: Gene,
         threshold: float,
-        phase: bool = False,
         reference: Optional[str] = None,
         cn_region: Optional[GRange] = None,
         debug: Optional[str] = None,
@@ -126,10 +120,6 @@ class Sample:
             threshold (float):
                 Threshold for filtering out low quality mutations. Ranges from 0 to 1.
                 Check :obj:`aldy.coverage.Coverage` for more information.
-            phase (bool):
-                Construct basic rudimentary phasing of the reads to aid the genotyping.
-                DEPRECATED: currently does nothing.
-                Default is False.
             reference (str, optional):
                 Reference genome for reading CRAM files.
                 Default is None.
@@ -146,9 +136,6 @@ class Sample:
             :obj:`aldy.common.AldyException` if a BAM/CRAM file lacks an index.
         """
 
-        # store paired-end reads (only if phasing is on)
-        self.reads: Dict[str, Tuple[pysam.AlignedSegment, pysam.AlignedSegment]] = {}
-
         log.debug("[sam] path= {}", os.path.abspath(sam_path))
 
         # dict of int: int: the coverage of the CN-neutral region
@@ -156,12 +143,13 @@ class Sample:
         # Get the list of indel sites that should be corrected
         # TODO: currently uses only functional indels; other indels should be
         # corrected as well
-        _indel_sites: Dict[Mutation, tuple] = {
-            m: (collections.defaultdict(int), 0)
+        _insertion_sites = {
+            m
             for an, a in gene.alleles.items()
             for m in a.func_muts
             if m.op[:3] == "ins"
         }
+        _insertion_reads: Dict[Tuple, int] = collections.defaultdict(int)
         _multi_sites: Dict[Mutation, tuple] = {
             m.pos: m.op
             for an, a in gene.alleles.items()
@@ -172,8 +160,6 @@ class Sample:
         norm: dict = collections.defaultdict(int)
 
         if sam_path[-5:] == ".dump":
-            if phase:
-                raise AldyException("Debug dumps do not work with --phase parameter")
             with gzip.open(sam_path, "rb") as fd:
                 log.warn("Loading debug dump from {}", sam_path)
                 l, h, i = (
@@ -199,21 +185,21 @@ class Sample:
                         op = fd.read(op_len).decode("ascii")
                         muts[mut_start, op] += 1
                         if op[:3] == "DEL":
-                            for j in range(0, len(op) - 4):
+                            for j in range(0, len(op) - 3):
                                 norm[mut_start + j] -= 1
                         elif op[:3] == "INS":
-                            insertions.add((mut_start, len(op) - 4))
+                            insertions.add((mut_start, len(op) - 3))
                         else:
                             norm[mut_start] -= 1
-                    for ins in _indel_sites:
-                        ins_len = len(ins.op) - 4
+                    for ins in _tandem_sites:
+                        ins_len = len(ins.op) - 3
                         if (ins.pos, ins_len) in insertions:
-                            _indel_sites[ins] = (
-                                _indel_sites[ins][0],
-                                _indel_sites[ins][1] + 1,
+                            _tandem_sites[ins] = (
+                                _tandem_sites[ins][0],
+                                _tandem_sites[ins][1] + 1,
                             )
                         else:
-                            _indel_sites[ins][0][(ref_start, ref_end, read_len)] += 1
+                            _tandem_sites[ins][0][(ref_start, ref_end, read_len)] += 1
         else:
             with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
                 # Check do we have proper index to speed up the queries
@@ -275,33 +261,15 @@ class Sample:
                         read_cn_read(read)
 
                     r = self._parse_read(
-                        read,
-                        gene,
-                        norm,
-                        muts,
-                        _indel_sites,
-                        _multi_sites,
-                        debug is not None,
+                        read, gene, norm, muts, _multi_sites, bool(debug)
                     )
                     if r:
                         total += 1
+                        if _insertion_sites:
+                            _insertion_reads[r[0]] += 1
                         if debug:
                             dump_data.append(r)
-                        if phase:
-                            if read.query_name in self.reads:
-                                assert self.reads[read.query_name][1] is None
-                                read1 = self.reads[read.query_name][0]
-                                if read.reference_start < read1.reference_start:
-                                    read, read1 = read1, read
-                                self.reads[read.query_name] = (read1, read)
-                            else:
-                                self.reads[read.query_name] = (read, None)
-
                 if debug:
-                    if phase:
-                        raise AldyException(
-                            "Debug dumps do not work with --phase parameter"
-                        )
                     with gzip.open(f"{debug}.dump", "wb") as fd:
                         if len(cnv_coverage) == 0:
                             m, M = 0, -1
@@ -336,6 +304,13 @@ class Sample:
         for pos, op in _multi_sites.items():
             if pos in coverage and op in coverage[pos]:
                 log.debug(f"[sam] multi-SNP {pos}{op} with {coverage[pos][op]} reads")
+        for mut in _insertion_sites:
+            if mut.pos in coverage and mut.op in coverage[mut.pos]:
+                total = sum(coverage[mut.pos].values())
+                if total > 0:
+                    coverage[mut.pos][mut.op] = self._correct_ins_coverage(
+                        mut, coverage[mut.pos][mut.op], total, _insertion_reads
+                    )
 
         #: dict of int: (dict of str: int): coverage dictionary
         #: keys are loci in the reference genome, while values are dictionaries
@@ -347,9 +322,6 @@ class Sample:
             cnv_coverage,
             os.path.basename(sam_path).split(".")[0],
         )
-        for mut, ins_cov in _indel_sites.items():
-            if mut.pos in coverage and mut.op in coverage[mut.pos]:
-                self._correct_ins_coverage(mut, ins_cov)
 
     def _group_deletions(self, gene, coverage):
         # Group ambiguous deletions
@@ -380,7 +352,10 @@ class Sample:
                 ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.debug(f"[sam] relocate {pos}{mut} to {new_pos}{mut}")
+                    log.debug(
+                        f"[sam] relocate {coverage[pos][mut]} "
+                        + f"from {pos+1}{mut} to {new_pos+1}{mut}"
+                    )
                     if mut not in coverage[new_pos]:
                         coverage[new_pos][mut] = 0
                     coverage[new_pos][mut] += coverage[pos][mut]
@@ -412,7 +387,10 @@ class Sample:
                 ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.debug(f"[sam] relocate {pos}{mut} to {new_pos}{mut}")
+                    log.debug(
+                        f"[sam] relocate {coverage[pos][mut]} "
+                        + f"from {pos+1}{mut} to {new_pos+1}{mut}"
+                    )
                     if mut not in coverage[new_pos]:
                         coverage[new_pos][mut] = 0
                     coverage[new_pos][mut] += coverage[pos][mut]
@@ -424,7 +402,6 @@ class Sample:
         gene: Gene,
         norm: dict,
         muts: dict,
-        indel_sites=None,
         multi_sites=None,
         dump=False,
     ) -> Optional[Tuple[Tuple[int, int, int], Any]]:
@@ -511,21 +488,12 @@ class Sample:
                         if l[p] != ".":
                             muts[pos + p, dump_arr[pos + p]] -= 1
                     muts[pos, op] += 1
-        if indel_sites:
-            for ins in indel_sites:
-                ins_len = len(ins.op) - 4
-                if (ins.pos, ins_len) in insertions:
-                    indel_sites[ins] = (indel_sites[ins][0], indel_sites[ins][1] + 1)
-                else:
-                    indel_sites[ins][0][
-                        (read.reference_start, start, len(read.query_sequence))
-                    ] += 1
         return (
             (read.reference_start, start, len(read.query_sequence)),
             list(dump_arr.items()),
         )
 
-    def _correct_ins_coverage(self, mut: Mutation, j) -> None:
+    def _correct_ins_coverage(self, mut: Mutation, orig_cov, total, reads) -> int:
         """
         Fix low coverage of large tandem insertions.
 
@@ -548,32 +516,135 @@ class Sample:
         INSERT_LEN_RESCALE = 10.0
         INSERT_LEN_AMPLIFY = 3
 
-        total = self.coverage.total(mut.pos)
-        if total == 0:
-            return
-        current_ratio = float(self.coverage[mut]) / total
-
-        j0 = 0
-        for orig_start, start, read_len in j[0]:
-            ins_len = len(mut.op) - 4
+        new_total = 0.0
+        for (orig_start, orig_end, read_len), cov in reads.items():
+            ins_len = len(mut.op) - 3
             # HACK: This is rather hackish way of detecting *40
             # min 20% on the sides, max ... how much?
             min_margin = MARGIN_RATIO * max(1, ins_len / INSERT_LEN_RESCALE) * read_len
-            if start < mut.pos + max(
+            if orig_end >= mut.pos + max(
                 INSERT_LEN_AMPLIFY * ins_len, min_margin
-            ) or orig_start > mut.pos - max(
+            ) and orig_start <= mut.pos - max(
                 (INSERT_LEN_AMPLIFY - 1) * ins_len, min_margin
             ):
-                continue
-            j0 += j[0][(orig_start, start, read_len)]
+                new_total += cov
+        assert new_total >= orig_cov
+        new_cov = int(total * (orig_cov / new_total))
+        if new_cov > orig_cov:
+            log.debug(f"[sam] rescale {mut} from {orig_cov} to {new_cov} ")
+            return new_cov
+        return orig_cov
 
-        new_ratio = j[1] / float(j0 + j[1])
-        new_coverage = int(self.coverage[mut] * (new_ratio / current_ratio))
-        log.debug(
-            f"[sam] rescale {mut} from {self.coverage[mut]} to {new_coverage} "
-            + f"(indel:total = {j[1]}:{j0 + j[1]})",
+    def load_vcf(self, vcf_path: str, gene: Gene, debug: Optional[str] = None,) -> None:
+        """
+        Load the read, mutation and coverage data from a VCF file.
+        """
+
+        log.debug("[sam] path= {}", os.path.abspath(vcf_path))
+
+        _multi_sites: Dict[Mutation, tuple] = {
+            m.pos: m.op
+            for an, a in gene.alleles.items()
+            for m in a.func_muts
+            if ">" in m.op and len(m.op) > 3
+        }
+        muts: dict = collections.defaultdict(int)
+        norm = {
+            p: 20
+            for p in range(
+                gene.get_wide_region().start - 500, gene.get_wide_region().end + 1
+            )
+        }
+
+        def get_mut(pos, ref, alt):
+            off = 0
+            while off < len(ref) and off < len(alt) and ref[off] == alt[off]:
+                off += 1
+            if len(ref) - off == 1 and len(alt) - off == 1:
+                if alt[off] == gene[off + pos]:
+                    return off + pos, "_"
+                return off + pos, f"{gene[off + pos]}>{alt[off]}"
+            elif len(ref) > len(alt) and len(alt) - off == 0:
+                return (
+                    off + pos,
+                    "del" + "".join(gene[i] for i in range(off + pos, pos + len(ref))),
+                )
+            elif len(ref) < len(alt) and len(ref) - off == 0:
+                return off + pos, f"ins{alt[off:]}"
+            else:
+                log.trace(f"[sam] ignoring {pos}: {ref}->{alt}")
+                return pos, None
+
+        with pysam.VariantFile(vcf_path) as vcf:
+            #: str: Check if we need to append 'chr' or not
+            self._prefix = _chr_prefix(gene.chr, list(vcf.header.contigs))
+
+            samples = list(vcf.header.samples)
+            sample = samples[0]
+            if len(samples) > 1:
+                log.warn(
+                    "WARNING: Multiple VCF samples found; only using the first one."
+                )
+            log.info("Using VCF sample {}", sample)
+            for read in vcf.fetch(
+                region=gene.get_wide_region().samtools(prefix=self._prefix)
+            ):
+                g = sorted(read.samples[sample]["GT"])
+                if len(g) > 2 or None in g or gene[read.pos - 1] == "N":
+                    continue  # ignore polyploid and incomplete cases
+                dump_arr = {}
+                if len(read.ref) == 1 and read.ref != gene[read.pos - 1]:
+                    hgvs = [(read.pos - 1, f"{gene[read.pos - 1]}>{read.ref}")]
+                else:
+                    hgvs = [(read.pos - 1, f"_")]
+                hgvs += [get_mut(read.pos - 1, read.ref, a) for a in read.alleles[1:]]
+                for gt in g:
+                    pos, op = hgvs[gt]
+                    if op == "_":
+                        continue
+                    muts[pos, op] += 10
+                    norm[pos] -= 10
+                    dump_arr[pos] = op
+                if _multi_sites and set(_multi_sites.keys()) & set(dump_arr.keys()):
+                    for pos, op in _multi_sites.items():
+                        if pos not in dump_arr:
+                            continue
+                        l, r = op.split(">")
+                        if all(
+                            dump_arr.get(pos + p, "-") == f"{l[p]}>{r[p]}"
+                            for p in range(len(l))
+                            if l[p] != "."
+                        ):
+                            for p in range(len(l)):
+                                if l[p] != ".":
+                                    muts[pos + p, dump_arr[pos + p]] -= 1
+                            muts[pos, op] += 1
+
+        # Establish the coverage dictionary
+        coverage: Dict[int, Dict[str, int]] = dict()
+        for pos, cov in norm.items():
+            if cov == 0:
+                continue
+            if pos not in coverage:
+                coverage[pos] = {}
+            coverage[pos]["_"] = cov
+        for m, cov in muts.items():
+            pos, mut = m
+            if pos not in coverage:
+                coverage[pos] = {}
+            if not min(gene.chr_to_ref) <= pos <= max(gene.chr_to_ref):
+                mut = "_"  # ignore mutations outside of the region of interest
+            coverage[pos][mut] = cov
+        self._group_deletions(gene, coverage)
+        for pos, op in _multi_sites.items():
+            if pos in coverage and op in coverage[pos]:
+                log.debug(f"[sam] multi-SNP {pos}{op} with {coverage[pos][op]} reads")
+        self.coverage = Coverage(
+            {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
+            0.5,
+            {},
+            sample,
         )
-        self.coverage._coverage[mut.pos][mut.op] = new_coverage
 
     # ----------------------------------------------------------------------------------
     # Coverage-rescaling functions
@@ -673,33 +744,44 @@ class Sample:
 
     @staticmethod
     def detect_genome(sam_path: str):
-        with pysam.AlignmentFile(sam_path) as sam:
-            # Check do we have proper index to speed up the queries
-            try:
-                sam.check_index()
-            except AttributeError:
-                pass  # SAM files do not have an index. BAMs might also lack it
-            except ValueError:
-                raise AldyException(
-                    f"File {sam_path} has no index (it must be indexed)"
-                )
+        def detect_vcf(sam_path):
+            with pysam.VariantFile(sam_path):
+                return True
 
-            #: str: Check if we need to append 'chr' or not
-            _prefix = _chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])
-            # Detect the genome
-            hg19_lens = {"1": 249250621, "10": 135534747, "22": 51304566}
-            hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
-            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
-            is_hg19, is_hg38 = True, True
-            for c in "1 10 22".split():
-                is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
-                is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
-            if is_hg19:
-                return "hg19"
-            elif is_hg38:
-                return "hg38"
-            else:
-                return None
+        def detect_sam(sam_path):
+            with pysam.AlignmentFile(sam_path) as sam:
+                try:
+                    sam.check_index()
+                except AttributeError:
+                    pass  # SAM files do not have an index. BAMs might also lack it
+                except ValueError:
+                    raise AldyException(
+                        f"File {sam_path} has no index (it must be indexed)"
+                    )
+
+                #: str: Check if we need to append 'chr' or not
+                _prefix = _chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])
+                # Detect the genome
+                hg19_lens = {"1": 249250621, "10": 135534747, "22": 51304566}
+                hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
+                chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
+                is_hg19, is_hg38 = True, True
+                for c in "1 10 22".split():
+                    is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
+                    is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
+                if is_hg19:
+                    return "hg19"
+                elif is_hg38:
+                    return "hg38"
+                else:
+                    return None
+
+        try:
+            return "sam", detect_sam(sam_path)
+        except ValueError:
+            if detect_vcf(sam_path):
+                return "vcf", None
+        return "", None
 
     @staticmethod
     def load_sam_profile(

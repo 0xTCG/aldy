@@ -61,7 +61,7 @@ def estimate_major(
     """
 
     log.debug("*" * 80)
-    log.debug("[major] cn= {}", cn_solution._solution_nice())
+    log.debug("[major] struct= {}", cn_solution._solution_nice())
 
     if sum(cn_solution.solution.values()) < 2:
         raise AldyException(
@@ -270,7 +270,6 @@ def solve_major_model(
         result: Dict[Any, MajorSolution] = {}
         json_print(debug, '    "sol": [', end="")
         for status, opt, sol in model.solutions(gap):
-            log.debug(f"[major] status= {status}; opt= {opt:.2f}")
             # MajorAllele: novel mutations
             solved_alleles: Any = collections.defaultdict(lambda: [])
             for s in sol:
@@ -303,7 +302,10 @@ def solve_major_model(
                 sol = MajorSolution(
                     score=opt, solution=solution, cn_solution=cn_solution
                 )
-                log.debug("[major] solution= {}", sol._solution_nice())
+                log.debug(
+                    f"[major] status= {status}; opt= {opt:.2f}; "
+                    + f"solution= {sol._solution_nice()}"
+                )
                 result[sol_tuple] = sol
         json_print(debug, "]\n  }, ", end="")
         return list(result.values())
@@ -357,33 +359,42 @@ def _print_candidates(
     """
     Pretty-prints the list of allele candidates and their functional mutations.
     """
-    log.debug("[major] candidates=")
+
+    def print_mut(m):
+        copies = (
+            coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
+            if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
+            else 0
+        )
+        return (
+            f"  {gene.get_dbsnp(m):12} {str(m):15} "
+            + f"{gene.get_refseq(m, from_atg=True):10} "
+            + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; impact={gene.get_functional(m)})"
+        )
+
+    log.debug("[major] candidate mutations=")
+    muts = set(m for a in alleles for m in alleles[a].func_muts) | set(muts)
+    for m in sorted(muts):
+        log.debug(print_mut(m))
+        als = natsorted(
+            f"*{a:8}"
+            for a, al in gene.alleles.items()
+            if m in al.func_muts and "#" not in a
+        )
+        log.debug(
+            "    {}",
+            "\n    ".join(" ".join(als[i : i + 6]) for i in range(0, len(als), 6)),
+        )
+    log.debug("[major] candidate alleles=")
     muts = muts.copy()
     for a in natsorted(alleles):
         log.debug("  *{} (struct= *{})", a, alleles[a].cn_config)
         for m in sorted(alleles[a].func_muts):
             if m in muts:
                 muts.remove(m)
-            copies = (
-                coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
-                if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
-                else 0
-            )
-            log.debug(
-                f"    {coverage[m]:4} (cn= {copies:3.1f}) {str(m):20}  "
-                + f"{gene.get_dbsnp(m):10} {gene.get_refseq(m, from_atg=True)}",
-            )
+            log.debug("  {}", print_mut(m))
     if len(muts) > 0:
         log.debug("  Other mutations:")
         for m in sorted(muts):
-            copies = (
-                coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
-                if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
-                else 0
-            )
             a = (f"*{a}" for a, b in gene.alleles.items() if m in b.func_muts)
-            log.debug(
-                f"    {coverage[m]:4} (cn= {copies:3.1f}) {str(m):20}  "
-                + f"{gene.get_dbsnp(m):10} {gene.get_refseq(m, from_atg=True):12}"
-                + f" ({', '.join(a)})",
-            )
+            log.debug("  {}, alleles={})", print_mut(m)[:-1], ", ".join(a))

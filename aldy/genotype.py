@@ -155,10 +155,12 @@ def genotype(
     sample_name = os.path.splitext(os.path.basename(sam_path))[0]
     with open(sam_path):  # Check if file exists
         pass
+    kind, g = sam.Sample.detect_genome(sam_path)
+    assert kind in ["vcf", "sam"]
     if genome is None:
-        genome = sam.Sample.detect_genome(sam_path)
+        genome = g
         if not genome:
-            log.warn("Cannot detect genome, defaulting to hg19")
+            log.warn("WARNING: Cannot detect genome, defaulting to hg19.")
             genome = "hg19"
         log.debug(f"[genotype] reference= {genome}")
 
@@ -172,28 +174,46 @@ def genotype(
 
     if not cn_region:
         cn_region = sam.DEFAULT_CN_NEUTRAL_REGION
-    sample = sam.Sample(
-        sam_path=sam_path,
-        gene=gene,
-        threshold=threshold,
-        profile=profile,
-        reference=reference,
-        cn_region=None if cn_solution else cn_region,
-        debug=debug,
-    )
-
-    avg_cov = sample.coverage.average_coverage()
-    if avg_cov < 2:
-        raise AldyException(
-            f"Average coverage of {avg_cov:.2f} for gene {gene.name} is too low; "
-            + f"skipping gene {gene.name}. "
-            + f"Please ensure that {gene.name} is present in the input SAM/BAM."
-        )
-    elif avg_cov < 20:
+    if profile == "exome":
+        log.warn("WARNING: Copy-number calling is not available for exome data.")
         log.warn(
-            f"Average sample coverage is {avg_cov}. "
-            + "We recommend at least 20x coverage for the best results."
+            "WARNING: Aldy will NOT be able to detect gene duplications, deletions and fusions."
         )
+        log.warn(
+            "WARNING: Calling of alleles that are defined by non-exonic mutations is not available."
+        )
+        log.warn("         Results might not be biologically relevant!")
+        cn_region = None
+        cn_solution = ["1", "1"]
+        profile = "illumina"
+
+    if kind == "sam":
+        sample = sam.Sample(
+            gene=gene,
+            sam_path=sam_path,
+            threshold=threshold,
+            profile=profile,
+            reference=reference,
+            cn_region=None if cn_solution else cn_region,
+            debug=debug,
+        )
+        avg_cov = sample.coverage.average_coverage()
+        if avg_cov < 2:
+            raise AldyException(
+                f"Average coverage of {avg_cov:.2f} for gene {gene.name} is too low; "
+                + f"skipping gene {gene.name}. "
+                + f"Please ensure that {gene.name} is present in the input SAM/BAM."
+            )
+        elif avg_cov < 20:
+            log.warn(
+                f"Average sample coverage is {avg_cov}. "
+                + "We recommend at least 20x coverage for the best results."
+            )
+    else:
+        log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
+        cn_region = None
+        cn_solution = ["1", "1"]
+        sample = sam.Sample(gene=gene, vcf_path=sam_path, debug=debug)
 
     json_print(debug, f'"{os.path.basename(sam_path).split(".")[0]}": {{')
 
@@ -208,7 +228,6 @@ def genotype(
         fusion_penalty=fusion_penalty,
         debug=debug,
     )
-    log.debug("*" * 80)
     json_print(debug, "  },")
 
     # Add SLACK to each score to avoid division by zero or other numerical issues
@@ -228,9 +247,9 @@ def genotype(
         raise AldyException("No solutions found!")
     min_cn_score = min(cn_sols, key=lambda m: m.score).score
     for i, cn_sol in enumerate(cn_sols):
-        log.info(f"  {i + 1:2}: {cn_sol._solution_nice()}")
-        conf = (min_cn_score + SLACK) / (cn_sol.score + SLACK)
-        log.info(f"      Confidence: {conf:.2f} (score = {cn_sol.score:.2f})")
+        conf = 100 * (min_cn_score + SLACK) / (cn_sol.score + SLACK)
+        log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
+    log.debug("*" * 80)
     log.info("")
 
     phases = load_phase(gene, phase) if phase else None
@@ -245,7 +264,6 @@ def genotype(
             identifier=i,
             debug=debug,
         )
-    log.debug("*" * 80)
     json_print(debug, "],")
     if len(major_sols) == 0:
         raise AldyException("No major solutions found!")
@@ -268,9 +286,9 @@ def genotype(
         log.warn("WARNING: multiple major solutions found!")
     log.info(f"Potential major {gene.name} star-alleles for {sample_name}:")
     for i, major_sol in enumerate(major_sols):
-        log.info(f"  {i + 1:2}: {major_sol._solution_nice()}")
-        conf = (min_major_score + SLACK) / (major_sol.score + SLACK)
-        log.info(f"      Confidence: {conf:.2f} (score = {major_sol.score:.2f})")
+        conf = 100 * (min_major_score + SLACK) / (major_sol.score + SLACK)
+        log.info(f"  {i + 1:2}: {major_sol._solution_nice()} (confidence: {conf:.0f}%)")
+    log.debug("*" * 80)
     log.info("")
 
     json_print(debug, '  "minor": [', end="")
@@ -306,19 +324,36 @@ def genotype(
     log.debug("*" * 80)
     json_print(debug, "  ],")
 
-    log.info(f"Best {gene.name} star-alleles for {sample_name}:")
+    if multiple_warn_level >= 1 and len(minor_sols) > 1:
+        log.warn("WARNING: multiple optimal solutions found!")
+        added = {
+            gene.get_dbsnp(m)
+            for a in minor_sols
+            for s in a.solution
+            for m in s.added
+            if gene.is_functional(m, infer=False)
+        }
+        if added:
+            log.warn(
+                "Probable cause: novel {} could not be linked to a major star-allele, "
+                + "so Aldy reports all valid combinations.\n"
+                + "Phasing data (provided via --phase) can be useful for "
+                + "breaking the ties.",
+                ", ".join(added),
+            )
+    log.info(
+        f"{{}} {gene.name} star-alleles for {sample_name}:",
+        "Best" if len(minor_sols) == 1 else "Potential",
+    )
     is_vcf = output_file and output_file.name[-4:] == ".vcf"
     if output_file and not is_vcf:
         print("#" + "\t".join(OUTPUT_COLS), file=output_file)
-    if multiple_warn_level >= 1 and len(minor_sols) > 1:
-        log.warn("WARNING: multiple optimal solutions found!")
     for i, minor_sol in enumerate(minor_sols):
-        log.info(f"  {i + 1:2}: {minor_sol.diplotype}")
+        conf = 100 * (min_minor_score + SLACK) / (minor_sol.score + SLACK)
+        log.info(f"  {i + 1:2}: {minor_sol.diplotype} (confidence={conf:.0f}%)")
         tt = textwrap.wrap(minor_sol._solution_nice(), width=60, break_long_words=False)
         t = "\n             ".join(tt)
-        log.info(f"      Minor: {t}")
-        conf = (min_minor_score + SLACK) / (minor_sol.score + SLACK)
-        log.info(f"      Confidence: {conf:.2f} (score = {minor_sol.score:.2f})")
+        log.info(f"      Minor alleles: {t}")
         if output_file and not is_vcf:
             print(f"#Solution {i + 1}: {minor_sol._solution_nice()}", file=output_file)
             diplotype.write_decomposition(
@@ -353,7 +388,7 @@ def batch(genes, profile, sam_path):
             with open(sam_path):  # Check if file exists
                 pass
 
-            sample = sam.Sample(sam_path, gene, threshold=0.5, profile=profile)
+            sample = sam.Sample(gene, sam_path, threshold=0.5, profile=profile)
             if sample.coverage.average_coverage() < 2:
                 results = "ERR:COV"
                 continue
