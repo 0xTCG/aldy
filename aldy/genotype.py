@@ -250,7 +250,6 @@ def genotype(
         conf = 100 * (min_cn_score + SLACK) / (cn_sol.score + SLACK)
         log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
-    log.info("")
 
     phases = load_phase(gene, phase) if phase else None
 
@@ -289,7 +288,6 @@ def genotype(
         conf = 100 * (min_major_score + SLACK) / (major_sol.score + SLACK)
         log.info(f"  {i + 1:2}: {major_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
-    log.info("")
 
     json_print(debug, '  "minor": [', end="")
     minor_sols = []
@@ -308,7 +306,7 @@ def genotype(
             m.solution,
             m.major_solution,
         )
-        n.diplotype = m.diplotype
+        n.set_diplotype(m.get_diplotype())
         minor_sols.append(n)
 
     if len(minor_sols) == 0:
@@ -350,16 +348,21 @@ def genotype(
         print("#" + "\t".join(OUTPUT_COLS), file=output_file)
     for i, minor_sol in enumerate(minor_sols):
         conf = 100 * (min_minor_score + SLACK) / (minor_sol.score + SLACK)
-        log.info(f"  {i + 1:2}: {minor_sol.diplotype} (confidence={conf:.0f}%)")
-        tt = textwrap.wrap(minor_sol._solution_nice(), width=60, break_long_words=False)
-        t = "\n             ".join(tt)
-        log.info(f"      Minor alleles: {t}")
+        log.info(
+            f"  {i + 1:2}: {minor_sol.get_major_diplotype()}"
+            + f" (confidence={conf:.0f}%)"
+        )
+        log.info(f"      Minor alleles: {minor_sol._solution_nice()}")
         if output_file and not is_vcf:
             print(f"#Solution {i + 1}: {minor_sol._solution_nice()}", file=output_file)
             diplotype.write_decomposition(
                 sample_name, gene, i + 1, minor_sol, output_file
             )
-            print(sample.coverage.sample, gene.name, minor_sol.diplotype)
+        print(
+            sample.coverage.sample,
+            gene.name,
+            minor_sol.get_major_diplotype().replace(" ", ""),
+        )
     if is_vcf:
         diplotype.write_vcf(sample_name, gene, sample.coverage, minor_sols, output_file)
     json_print(debug, "},")
@@ -368,8 +371,7 @@ def genotype(
         log.info(colorize(f"{gene.name} results:"))
         reported = set()
         for r in minor_sols:
-            minors = ", ".join(natsorted([f.major_repr(gene) for f in r.solution]))
-            s = f"  {r.diplotype:30} ({minors})"
+            s = f"  {r.get_major_diplotype()}   (minor: {r.get_minor_diplotype()})"
             if s not in reported:
                 log.info(colorize(s))
                 reported.add(s)

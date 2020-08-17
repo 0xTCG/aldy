@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from natsort import natsorted
 import collections
@@ -14,13 +14,15 @@ from .gene import Gene
 
 
 class CNSolution(
-    collections.namedtuple("CNSolution", ["score", "solution", "gene", "region_cn"])
+    collections.namedtuple("CNSolution", ["gene", "score", "solution", "region_cn"])
 ):
     """
     Valid copy-number configuration assignment.
     Immutable.
 
     Attributes:
+        gene (:obj:`aldy.gene.Gene`):
+            Gene instance.
         score (float):
             ILP model objective score (0 for user-provided solutions).
         solution (dict[str, int]):
@@ -28,21 +30,19 @@ class CNSolution(
             (e.g. ``{1: 2}`` means that there are two copies of \*1 configuration).
         region_cn (list[dict[str, int]]):
             Gene region copy numbers inferred by this solution.
-        gene (:obj:`aldy.gene.Gene`):
-            Gene instance.
 
     Notes:
         Has custom printer (``__str__``).
     """
 
-    def __new__(self, score: float, solution: List[str], gene: Gene):
+    def __new__(self, gene: Gene, score: float, solution: List[str]):
         vec = [{r: 0 for r in gene.regions[0]} for _ in gene.cn_configs["1"].cn]
         for conf in solution:
             for gi, g in enumerate(gene.cn_configs[conf].cn):
                 for r in g:
                     vec[gi][r] += g[r]
         return super(CNSolution, self).__new__(  # type:ignore
-            self, score, collections.Counter(solution), gene, vec,
+            self, gene, score, collections.Counter(solution), vec,
         )
 
     def __hash__(self):
@@ -74,13 +74,17 @@ class CNSolution(
 
 
 class SolvedAllele(
-    collections.namedtuple("SolvedAllele", ["major", "minor", "added", "missing"])
+    collections.namedtuple(
+        "SolvedAllele", ["gene", "major", "minor", "added", "missing"]
+    )
 ):
     """
     Solved star-allele assignment.
     Immutable.
 
     Attributes:
+        gene (:obj:`aldy.gene.Gene`):
+            Gene instance.
         major (str):
             Major star-allele identifier.
         minor (str, optional):
@@ -97,22 +101,24 @@ class SolvedAllele(
         Has custom printer (``__str__``).
     """
 
-    def mutations(self, gene: Gene):
-        m = gene.alleles[self.major].func_muts
-        m |= gene.alleles[self.major].minors[self.minor].neutral_muts
+    def mutations(self):
+        m = self.gene.alleles[self.major].func_muts
+        m |= self.gene.alleles[self.major].minors[self.minor].neutral_muts
         m |= set(self.added)
         m -= set(self.missing)
         return m
 
-    def major_repr(self, gene):
+    def major_repr(self):
         """
         Pretty-formats major star-allele name.
         """
         return "*{}{}".format(
             self.major,
             "".join(
-                " +" + gene.get_dbsnp(m)
-                for m in sorted(m for m in self.added if gene.is_functional(m, False))
+                " +" + self.gene.get_dbsnp(m)
+                for m in sorted(
+                    m for m in self.added if self.gene.is_functional(m, False)
+                )
             ),
         )
 
@@ -122,8 +128,8 @@ class SolvedAllele(
         """
         return "*{}{}{}".format(
             self.minor if self.minor else self.major,
-            "".join(" +" + str(m) for m in sorted(self.added)),
-            "".join(" -" + str(m) for m in sorted(self.missing)),
+            "".join(" +" + self.gene.get_dbsnp(m) for m in sorted(self.added)),
+            "".join(" -" + self.gene.get_dbsnp(m) for m in sorted(self.missing)),
         )
 
 
@@ -181,14 +187,12 @@ class MinorSolution(
         major_solution (:obj:`aldy.solutions.MajorSolution`):
             Major star-allele solution used for calculating the
             minor star-allele assignment.
-        diplotype (str):
-            Diplotype assignment (e.g. ``*1/*2``).
+        diplotype (tuple[list[int], list[int]]):
+            Diplotype assignment
 
     Notes:
         Has custom printer (``__str__``).
     """
-
-    diplotype = ""
 
     def _solution_nice(self):
         return ", ".join(
@@ -200,4 +204,46 @@ class MinorSolution(
             f"MinorSol[{self.score:.2f}; "
             + f"sol=({self._solution_nice()}); "
             + f"major={self.major_solution}"
+        )
+
+    def get_diplotype(self):
+        try:
+            return self.diplotype
+        except AttributeError:
+            self.diplotype = ([], [])
+            return self.diplotype
+
+    def set_diplotype(self, d):
+        self.diplotype = d
+
+    def get_major_name(self, i):
+        gene = self.major_solution.cn_solution.gene
+        if i == -1:
+            return gene.deletion_allele()
+        n = str(self.solution[i].major).split("#")[0:1]
+        for m in self.solution[i].added:
+            if gene.is_functional(m, infer=False):
+                n.append(gene.get_dbsnp(m))
+        return "+".join(n)
+
+    def get_minor_name(self, i):
+        gene = self.major_solution.cn_solution.gene
+        if i == -1:
+            return gene.deletion_allele()
+        n = [str(self.solution[i].minor)]
+        for m in self.solution[i].added:
+            n.append("+" + gene.get_dbsnp(m))
+        for m in self.solution[i].missing:
+            n.append("-" + gene.get_dbsnp(m))
+        return " ".join(n)
+
+    def get_major_diplotype(self):
+        return " / ".join(
+            " + ".join(f"*{self.get_major_name(i)}" for i in d) for d in self.diplotype
+        )
+
+    def get_minor_diplotype(self):
+        return " / ".join(
+            " + ".join(f"[*{self.get_minor_name(i)}]" for i in d)
+            for d in self.diplotype
         )

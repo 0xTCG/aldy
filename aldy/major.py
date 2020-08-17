@@ -76,8 +76,6 @@ def estimate_major(
         results = solve_major_model(
             gene, alleles, coverage, cn_solution, solver, gap, identifier, debug
         )
-
-    # TODO: re-implement phasing step from Aldy 1.2
     # TODO: Check for novel functional mutations and do something with them
 
     return results
@@ -284,7 +282,9 @@ def solve_major_model(
             )
             if sol_tuple not in result:
                 solution = collections.Counter(
-                    SolvedAllele(major=a, minor=None, added=tuple(mut), missing=tuple())
+                    SolvedAllele(
+                        gene, major=a, minor=None, added=tuple(mut), missing=tuple()
+                    )
                     for (a, _), mut in solved_alleles.items()
                 )
                 json_print(

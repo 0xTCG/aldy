@@ -455,7 +455,7 @@ def model(name: str, solver: str):
         """
         try:
             model = Gurobi(name)
-            log.trace("Using Gurobi")
+            log.trace("[lp] solver= gurobi")
         except ImportError:
             model = None
         return model
@@ -466,7 +466,7 @@ def model(name: str, solver: str):
         """
         try:
             model = SCIP(name)
-            log.trace("Using SCIP")
+            log.trace("[lp] solver= scip")
         except ImportError:
             model = None
         return model
@@ -477,7 +477,7 @@ def model(name: str, solver: str):
         """
         try:
             model = CBC(name)
-            log.trace("Using CBC")
+            log.trace("[lp] solver= cbc")
         except ImportError:
             model = None
         return model

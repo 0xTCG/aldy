@@ -568,14 +568,14 @@ class Gene:
                 # We only make partial major alleles from non-fused major alleles
                 if a.cn_config != "1":
                     continue
-                new_name = "{}#{}".format(f, an)
+                new_name = f"{f}#{an}"
                 new_muts = preserved_mutations(f, a.func_muts)
                 key = sorted_tuple(new_muts)
                 if key in add:
                     add[key].minors.update(
                         {
-                            san: MinorAllele(
-                                san,
+                            f"{f}#{san}": MinorAllele(
+                                f"{f}#{san}",
                                 [],
                                 preserved_mutations(f, sa.neutral_muts),
                                 sa.activity,
@@ -591,8 +591,8 @@ class Gene:
                         cn_config=f,
                         func_muts=new_muts,
                         minors={
-                            san: MinorAllele(
-                                san,
+                            f"{f}#{san}": MinorAllele(
+                                f"{f}#{san}",
                                 [],
                                 preserved_mutations(f, sa.neutral_muts),
                                 None,

@@ -377,7 +377,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
 
     def run(debug):
         log.trace(
-            "\nArguments: {}",
+            "\n[main] arguments= {}",
             " ".join(k + "=" + str(v) for k, v in vars(args).items() if k is not None),
         )
         log.info("Genotyping sample {}...", os.path.basename(args.file))

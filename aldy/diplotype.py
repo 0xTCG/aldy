@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 
 import collections
 import re
@@ -210,20 +210,16 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     del_allele = gene.deletion_allele()
 
     # solution is the array of (major, minor) tuples
-    major_dict: Dict[str, List[str]] = collections.defaultdict(list)
-    for a in solution.solution:
+    major_dict: Dict[str, List[int]] = collections.defaultdict(list)
+    for ai, a in enumerate(solution.solution):
         n = str(a.major).split("#")[0:1]  # chop off fusion suffix
-        for m in a.added:
-            if gene.is_functional(m, infer=False):
-                n.append(gene.get_dbsnp(m))
-        # get "real" name
         components = re.split(r"(\d+)", n[0])
         real = components[0] if components[0] != "" else components[1]
-        major_dict[real].append("+".join(n))
+        major_dict[real].append(ai)
     if len(solution.solution) == 1 and del_allele:
-        major_dict[del_allele].append(del_allele)
+        major_dict[del_allele].append(-1)
 
-    diplotype: Tuple[List[str], List[str]] = ([], [])
+    diplotype: Any = ([], [])
     dc = 0
 
     # Handle tandems (heuristic that groups common tandems together,
@@ -231,9 +227,9 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     if len(solution.solution) > 2:
         for ta, tb in gene.common_tandems:
             while major_dict[ta] and major_dict[tb]:
-                diplotype[dc % 2].append(f"{major_dict[ta][0]}+{major_dict[tb][0]}")
+                diplotype[dc % 2].append((major_dict[ta][0], major_dict[tb][0]))
                 dc += 1
-                del major_dict[ta][0], major_dict[ta][1]
+                del major_dict[ta][0], major_dict[tb][0]
 
     # Handle duplicates (heuristics that groups duplicate alleles together,
     #                    e.g. 1, 1, 2 -> 1+1/2)
@@ -266,7 +262,12 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
         diplotype = diplotype[0][:-1], [diplotype[0][-1]]
 
     # Make sure that the elements are sorted and that the tandems are grouped together
-    result = natsorted([natsorted(diplotype[0]), natsorted(diplotype[1])])
-    res = " / ".join(" + ".join("*{}".format(y) for y in x) for x in result)
-    solution.diplotype = res
-    return res
+    diplotype = natsorted(
+        [
+            natsorted(diplotype[0], key=solution.get_major_name),
+            natsorted(diplotype[1], key=solution.get_major_name),
+        ],
+        key=lambda x: [solution.get_major_name(y) for y in x],
+    )
+    solution.set_diplotype(diplotype)
+    return diplotype

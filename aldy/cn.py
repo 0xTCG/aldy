@@ -248,9 +248,7 @@ def solve_cn_model(
             # Because A[1] can be 1 while A[0] is 0, we can have biologically
             # duplicate solutions
             if sol_tuple not in result:
-                result[sol_tuple] = CNSolution(  # type: ignore
-                    opt, solution=list(sol_tuple), gene=gene
-                )
+                result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
                 log.debug(
                     f"[cn] status= {status}; opt= {opt:.2f}"
                     + f"[cn] solution= {result[sol_tuple]}"
@@ -286,7 +284,7 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
             if any(cov[m] <= 0 for m in gene.alleles[a].func_muts):
                 bad_alleles.append(a)
         if len(bad_alleles) == len(gene.cn_configs[an].alleles):
-            log.trace(f"Removing CN {a} due to low support")
+            log.trace(f"[cn] removing *{a} due to low support")
             del configs[an]
     return configs
 
@@ -355,6 +353,6 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
                 + f"{sol}. Please run 'aldy show --gene {gene.name}' for the list the"
                 + f"valid configurations"
             )
-    s = CNSolution(0, solution=sols, gene=gene)  # type: ignore
+    s = CNSolution(gene, 0, sols)  # type: ignore
     log.debug("[cn] result= {} (provided)", s)
     return s

@@ -71,9 +71,10 @@ def estimate_minor(
     # *from all available major solutions* together
     mutations: Set[Mutation] = set()
     for major_sol in major_sols:
-        for (ma, _, added, _) in major_sol.solution:
+        for (_, ma, _, added, _) in major_sol.solution:
             alleles += [
-                SolvedAllele(ma, mi, added, tuple()) for mi in gene.alleles[ma].minors
+                SolvedAllele(gene, ma, mi, added, tuple())
+                for mi in gene.alleles[ma].minors
             ]
             mutations |= set(gene.alleles[ma].func_muts)
             mutations |= set(added)
@@ -198,7 +199,9 @@ def solve_minor_model(
     }
 
     for a, _ in list(alleles):
-        max_cn = major_sol.solution[SolvedAllele(a.major, None, a.added, a.missing)]
+        max_cn = major_sol.solution[
+            SolvedAllele(gene, a.major, None, a.added, a.missing)
+        ]
         for cnt in range(1, max_cn):
             alleles[a, cnt] = alleles[a, 0]
 
@@ -215,8 +218,8 @@ def solve_minor_model(
     for sa, cnt in major_sol.solution.items():
         expr = model.quicksum(
             v
-            for ((ma, _, ad, mi), _), v in VA.items()
-            if SolvedAllele(ma, None, ad, mi) == sa
+            for ((_, ma, _, ad, mi), _), v in VA.items()
+            if (ma, ad, mi) == (sa.major, sa.added, sa.missing)
         )
         model.addConstr(expr == cnt, name=f"CCNT_{sa.major}")
 
@@ -502,6 +505,7 @@ def solve_minor_model(
                         added.append(m)
                 solution.append(
                     SolvedAllele(
+                        gene,
                         allele[0].major,
                         allele[0].minor,
                         allele[0].added + tuple(added),
@@ -607,7 +611,7 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
 
     log.trace("[minor] candidate alleles=")
     muts = muts.copy()
-    for ma, mi, add, _ in natsorted(alleles):
+    for _, ma, mi, add, _ in natsorted(alleles, key=lambda x: (x[1], x[2])):
         am = (
             set(gene.alleles[ma].func_muts)
             | set(gene.alleles[ma].minors[mi].neutral_muts)
