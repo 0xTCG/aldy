@@ -188,6 +188,8 @@ def genotype(
         cn_region = None
         cn_solution = ["1", "1"]
         profile = "illumina"
+    elif profile == "wgs":
+        profile = "illumina"
 
     if kind == "sam":
         sample = sam.Sample(
