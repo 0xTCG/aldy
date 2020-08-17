@@ -53,7 +53,7 @@ def main(argv):
         __version__,
         platform.python_version(),
         platform.system() if platform.system() != "Darwin" else "macOS",
-        " ".join(platform.dist()[0:2])
+        platform.platform()[6:]
         if platform.system() == "Linux"
         else platform.mac_ver()[0]
         if platform.system() == "Darwin"
@@ -107,7 +107,7 @@ def main(argv):
                 ]
                 avail_genes = sorted(avail_genes)
             else:
-                avail_genes = [args.gene.lower()]
+                avail_genes = args.gene.lower().split(',')
 
             # Prepare the output file
             output = args.output

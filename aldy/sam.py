@@ -26,7 +26,10 @@ CIGAR_REGEX = re.compile(r"(\d+)([MIDNSHP=XB])")
 """regex: Regex that matches valid CIGAR strings"""
 
 
-DEFAULT_CN_NEUTRAL_REGION = GRange("22", 42547463, 42548249)
+DEFAULT_CN_NEUTRAL_REGION = {
+    "hg19": GRange("22", 42547463, 42548249),
+    "hg38": GRange("22", 42151472, 42152258)
+}
 """obj:`aldy.common.GRange` Default copy-number neutral region
    (exon 4-6 of the CYP2D8 gene)"""
 
@@ -52,7 +55,7 @@ class Sample:
         threshold: float = 0.5,
         profile: Optional[str] = None,
         reference: Optional[str] = None,
-        cn_region: Optional[GRange] = DEFAULT_CN_NEUTRAL_REGION,
+        cn_region: Optional[GRange] = None,
         debug: Optional[str] = None,
         vcf_path: Optional[str] = None,
     ) -> None:
