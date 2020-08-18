@@ -1869,7 +1869,7 @@ alleles:
     evidence: L
     mutations:
     - [5862, G>C, rs1058164]
-    - [6064, insTTTCGCCCC, rs72549356, 174_175insFRP]
+    - [6063, insTTTCGCCCC, rs72549356, 174_175insFRP]
     - [7051, C>T, rs16947, R296C]
     - [8381, G>C, rs1135840, S486T]
   CYP2D6*31.001:
@@ -2281,7 +2281,7 @@ alleles:
     - [5042, T>G, rs28371702]
     - [5222, C>T, rs28371706, T107I]
     - [5862, G>C, rs1058164]
-    - [6055, insTTTCGCCCCTTTCGCCCC, rs72549356, 174_175insFRPx2]  # Manual patch
+    - [6063, insTTTCGCCCCTTTCGCCCC, rs72549356, 174_175insFRPx2]  # Manual patch
     - [7051, C>T, rs16947, R296C]
     - [7585, A>C, rs1985842]
     - [7785, G>A, rs28371730]
@@ -2844,7 +2844,7 @@ alleles:
     - [5042, T>G, rs28371702]
     - [5222, C>T, rs28371706, T107I]
     - [5862, G>C, rs1058164]
-    - [6064, insTTTCGCCCC, rs72549356, 174_175insFRP]
+    - [6063, insTTTCGCCCC, rs72549356, 174_175insFRP]
     - [7051, C>T, rs16947, R296C]
     - [7585, A>C, rs1985842]
     - [7785, G>A, rs28371730]

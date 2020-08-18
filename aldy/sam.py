@@ -287,7 +287,6 @@ class Sample:
                             for p, md in m:
                                 fd.write(struct.pack("<hh", p - s, len(md)))
                                 fd.write(md.encode("ascii"))
-
         # Establish the coverage dictionary
         coverage: Dict[int, Dict[str, int]] = dict()
         for pos, cov in norm.items():
@@ -296,11 +295,12 @@ class Sample:
             if pos not in coverage:
                 coverage[pos] = {}
             coverage[pos]["_"] = cov
+        bounds = min(gene.chr_to_ref), max(gene.chr_to_ref)
         for m, cov in muts.items():
             pos, mut = m
             if pos not in coverage:
                 coverage[pos] = {}
-            if not min(gene.chr_to_ref) <= pos <= max(gene.chr_to_ref):
+            if not bounds[0] <= pos <= bounds[1]:
                 mut = "_"  # ignore mutations outside of the region of interest
             coverage[pos][mut] = cov
         self._group_deletions(gene, coverage)
@@ -338,13 +338,13 @@ class Sample:
                     continue
                 potential = [pos]
                 sz = len(mut[3:])
-                deleted = "".join(gene[i] for i in range(pos, pos + sz))
+                deleted = gene[pos : pos + sz]
                 for p in range(pos - sz, -1, -sz):
-                    if "".join(gene[i] for i in range(p, p + sz)) != deleted:
+                    if gene[p : p + sz] != deleted:
                         break
                     potential.append(p)
                 for p in range(pos + sz, max(coverage), sz):
-                    if "".join(gene[i] for i in range(p, p + sz)) != deleted:
+                    if gene[p : p + sz] != deleted:
                         break
                     potential.append(p)
                 potential = [
@@ -376,11 +376,11 @@ class Sample:
                 potential = []
                 for p in range(pos, -1, -sz):
                     potential.append(p)
-                    if "".join(gene[i] for i in range(p, p + sz)) != inserted:
+                    if gene[p : p + sz] != inserted:
                         break
                 for p in range(pos, max(coverage), sz):
                     potential.append(p)
-                    if "".join(gene[i] for i in range(p, p + sz)) != inserted:
+                    if gene[p : p + sz] != inserted:
                         break
                 potential = [
                     p
@@ -446,7 +446,7 @@ class Sample:
             if op == 2:  # Deletion
                 mut = (
                     start,
-                    "del" + "".join(gene[i] for i in range(start, start + size)),
+                    "del" + gene[start : start + size],
                 )
                 muts[mut] += 1
                 dump_arr[start] = mut[1]
@@ -563,10 +563,7 @@ class Sample:
                     return off + pos, "_"
                 return off + pos, f"{gene[off + pos]}>{alt[off]}"
             elif len(ref) > len(alt) and len(alt) - off == 0:
-                return (
-                    off + pos,
-                    "del" + "".join(gene[i] for i in range(off + pos, pos + len(ref))),
-                )
+                return off + pos, f"del{gene[off + pos : pos + len(ref)]}"
             elif len(ref) < len(alt) and len(ref) - off == 0:
                 return off + pos, f"ins{alt[off:]}"
             else:

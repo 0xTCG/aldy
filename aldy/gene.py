@@ -282,6 +282,14 @@ class Gene:
             else:
                 raise AldyException("Invalid CIGAR string")
 
+        self._lookup_range = (start, end)
+        self._lookup_seq = "".join(
+            self.seq[self.chr_to_ref[i]] if i in self.chr_to_ref else "N"
+            for i in range(start, end)
+        )
+        if self.strand < 0:
+            self._lookup_seq = rev_comp(self._lookup_seq)
+
     def _init_regions(self, yml) -> None:
         """
         Calculate the genic regions and pseudogenes
@@ -780,11 +788,29 @@ class Gene:
     def __contains__(self, i: int):
         return i in self.chr_to_ref
 
-    def __getitem__(self, i: int):
-        if i in self.chr_to_ref:
-            s = self.seq[self.chr_to_ref[i]]
-            return rev_comp(s) if self.strand < 0 else s
-        return "N"
+    def __getitem__(self, i):
+        if isinstance(i, slice):
+            i, j = i.start, i.stop
+            loff = max(0, self._lookup_range[0] - i)
+            roff = max(0, j - self._lookup_range[1])
+            if loff:
+                i = self._lookup_range[0]
+            if roff:
+                j = self._lookup_range[1]
+            i -= self._lookup_range[0]
+            j -= self._lookup_range[1]
+            if self.strand < 0:
+                i = len(self._lookup_seq) - i
+                j = len(self._lookup_seq) - j
+            return self._lookup_seq[i:j]
+        else:
+            assert isinstance(i, int)
+            if not self._lookup_range[0] <= i < self._lookup_range[1]:
+                return "N"
+            i -= self._lookup_range[0]
+            if self.strand < 0:
+                i = len(self._lookup_seq) - i - 1
+            return self._lookup_seq[i]
 
     def _print_mutation(self, m):
         fields = [

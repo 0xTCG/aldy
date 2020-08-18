@@ -251,8 +251,8 @@ def solve_cn_model(
         if sol_tuple not in result:
             result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
             log.debug(
-                f"[cn] status= {status}; opt= {opt:.2f}"
-                + f"[cn] solution= {result[sol_tuple]}"
+                f"[cn] status= {status}; opt= {opt:.2f}; "
+                + f"solution= {result[sol_tuple]}"
             )
     if not result:
         log.debug("[cn] solution= []")
