@@ -313,8 +313,11 @@ def genotype(
 
     if len(minor_sols) == 0:
         raise AldyException(
-            "Aldy could not phase any major solution. "
-            + "Please run with  --debug parameter and notify the authors of Aldy."
+            "Aldy could not phase any major solution.\n"
+            + "Possible solutions:\n"
+            + " - Check the coverage. Extremely low coverage prevents Aldy from "
+            + "calling star-alleles.\n"
+            + " - Run with --debug parameter and notify the authors of Aldy."
         )
     min_minor_score = min(minor_sols, key=lambda m: m.score).score
     minor_sols = sorted(

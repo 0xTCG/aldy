@@ -440,7 +440,6 @@ class Sample:
         if "H" in read.cigarstring:  # avoid hard-clipped reads
             return None
 
-        insertions = set()
         dump_arr = {}
         start, s_start = read.reference_start, 0
         for op, size in read.cigartuples:
@@ -456,7 +455,6 @@ class Sample:
                 mut = (start, "ins" + read.query_sequence[s_start : s_start + size])
                 muts[mut] += 1
                 dump_arr[start] = mut[1]
-                insertions.add((start, size))
                 s_start += size
             elif op == 4:  # Soft-clip
                 s_start += size
@@ -510,9 +508,6 @@ class Sample:
         This results in under-estimation of the insertion abundance will
         (as aligner could not assign `I` CIGAR to the correct insertion).
         This function attempts to correct this bias.
-
-        Notes:
-            This function modifies ``self.coverage``.
         """
 
         MARGIN_RATIO = 0.20
@@ -531,11 +526,11 @@ class Sample:
                 (INSERT_LEN_AMPLIFY - 1) * ins_len, min_margin
             ):
                 new_total += cov
-        assert new_total >= orig_cov
-        new_cov = int(total * (orig_cov / new_total))
-        if new_cov > orig_cov:
-            log.debug(f"[sam] rescale {mut} from {orig_cov} to {new_cov} ")
-            return new_cov
+        if new_total >= orig_cov:
+            new_cov = int(total * (orig_cov / new_total))
+            if new_cov > orig_cov:
+                log.debug(f"[sam] rescale {mut} from {orig_cov} to {new_cov} ")
+                return new_cov
         return orig_cov
 
     def load_vcf(self, vcf_path: str, gene: Gene, debug: Optional[str] = None,) -> None:

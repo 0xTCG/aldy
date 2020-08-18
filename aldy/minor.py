@@ -116,7 +116,7 @@ def estimate_minor(
     # Group by CN solutions
     minor_sols: List[MinorSolution] = []
     cn_sols = {m.cn_solution for m in major_sols}
-    for c in sorted(cn_sols):
+    for c in sorted(cn_sols, key=lambda x: x._solution_nice()):
         log.debug("*" * 80)
         majors = [m for m in major_sols if m.cn_solution == c]
         _print_candidates(gene, alleles, c, cov, mutations)

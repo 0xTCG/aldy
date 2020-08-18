@@ -123,9 +123,9 @@ def main(argv):
             raise AldyException("Invalid sub-command " + args.subparser)
     except IOError as ex:
         if ex.filename is not None:
-            log.critical("File cannot be accessed: {}", ex.filename)
+            log.critical("ERROR: {} cannot be accessed", ex.filename)
         else:
-            log.critical("File cannot be accessed: {}", str(ex))
+            log.critical("ERROR: {} cannot be accessed", str(ex))
         log.debug(ex)
         log.debug(traceback.format_exc())
         exit(1)
@@ -134,11 +134,17 @@ def main(argv):
         log.debug(traceback.format_exc())
         exit(ex.code)
     except Exception as ex:
+        log.critical(
+            f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
+        )
         log.critical(ex)
         log.warn(traceback.format_exc())
         exit(1)
     except:  # noqa
         exc = sys.exc_info()[0]
+        log.critical(
+            f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
+        )
         log.critical("Unrecoverable error: {}", str(exc))
         log.warn(traceback.format_exc())
         exit(1)
@@ -382,7 +388,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
         )
         log.info("Genotyping sample {}...", os.path.basename(args.file))
         try:
-            result = genotype(
+            _ = genotype(
                 gene_db=gene,
                 sam_path=args.file,
                 profile=args.profile,
@@ -401,6 +407,9 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 report=True,
             )
         except AldyException as ex:
+            log.critical(
+                f"ERROR: gene= {gene}, profile= {args.profile}, file= {args.file}"
+            )
             log.error(ex)
 
     if args.log:

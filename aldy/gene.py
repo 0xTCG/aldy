@@ -820,7 +820,7 @@ class Gene:
                 query = next(q for q in alts if query.lower() == q.lower())
                 self.print_minors(*alts[query])
             else:
-                log.error(f"Cannot parse query '{query}'")
+                log.error(f"ERROR: Cannot parse query '{query}'")
                 sys.exit(1)
             return
 
