@@ -153,8 +153,8 @@ class Gurobi:  # pragma: no cover
         Returns ``res``.
         """
         for v in terms:
-            self.addConstr(res <= v)
-        self.addConstr(res >= self.quicksum(terms) - (len(terms) - 1))
+            self.addConstr(res <= v, name="PROD")
+        self.addConstr(res >= self.quicksum(terms) - (len(terms) - 1), name="PROD")
         return res
 
     def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
@@ -267,7 +267,7 @@ class Gurobi:  # pragma: no cover
                 self.addConstr(self.quicksum(vv.values()) <= len(vv) - 1)
                 yield from self.solutions(gap, best_obj, limit, iteration + 1, init)
         except NoSolutionsError:
-            raise
+            return
 
 
 class SCIP(Gurobi):

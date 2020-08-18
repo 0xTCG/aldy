@@ -221,7 +221,8 @@ def solve_minor_model(
             for ((_, ma, _, ad, mi), _), v in VA.items()
             if (ma, ad, mi) == (sa.major, sa.added, sa.missing)
         )
-        model.addConstr(expr == cnt, name=f"CCNT_{sa.major}")
+        model.addConstr(expr <= cnt, name=f"CCNT_{sa.major}")
+        model.addConstr(expr >= cnt, name=f"CCNT_{sa.major}")
 
     # Add a binary variable for each allele/mutation pair, where mutation belongs
     # to that allele, that will indicate whether such mutation will be kept or not.
@@ -317,7 +318,8 @@ def solve_minor_model(
         # If scov = 0, no mutations should be selected at that locus
         # (enforced by other constraints)
         cov = coverage[m] / scov if scov > 0 else 0
-        model.addConstr(expr + VERR[m] == cov, name=f"CCOV_{m.pos}_{m.op}")
+        model.addConstr(expr + VERR[m] >= cov, name=f"CCOV_{m.pos}_{m.op}")
+        model.addConstr(expr + VERR[m] <= cov, name=f"CCOV_{m.pos}_{m.op}")
         if m.pos != prev and prev != 0:
             json_print(debug, "\n             ", end="")
         prev = m.pos
@@ -468,114 +470,69 @@ def solve_minor_model(
         model.dump(f"{debug}.minor{identifier}.lp")
 
     # Solve the model
-    try:
-        results = {}
-        for status, opt, sol in model.solutions():
-            if phases:
-                assignments = {a: set() for a in alleles}
-                for p, _ in enumerate(phases):
-                    a = next(a for a in VPHASE[p] if model.getValue(VPHASE[p][a]))
-                    assignments[a].add(p)
+    results = {}
+    for status, opt, sol in model.solutions():
+        if phases:
+            assignments = {a: set() for a in alleles}
+            for p, _ in enumerate(phases):
+                a = next(a for a in VPHASE[p] if model.getValue(VPHASE[p][a]))
+                assignments[a].add(p)
 
-            solution = []
-            for allele, value in VA.items():
-                if model.getValue(value) <= 0:
-                    continue
-                added: List[Mutation] = []
-                missing: List[Mutation] = []
-                for m, mv in VKEEP[allele].items():
-                    if not model.getValue(mv[0]):
-                        missing.append(m)
-                for m, mv in VNEW[allele].items():
-                    if model.getValue(mv[0]):
-                        added.append(m)
-                solution.append(
-                    SolvedAllele(
-                        gene,
-                        allele[0].major,
-                        allele[0].minor,
-                        allele[0].added + tuple(added),
-                        tuple(missing),
-                    )
+        solution = []
+        for allele, value in VA.items():
+            if model.getValue(value) <= 0:
+                continue
+            added: List[Mutation] = []
+            missing: List[Mutation] = []
+            for m, mv in VKEEP[allele].items():
+                if not model.getValue(mv[0]):
+                    missing.append(m)
+            for m, mv in VNEW[allele].items():
+                if model.getValue(mv[0]):
+                    added.append(m)
+            solution.append(
+                SolvedAllele(
+                    gene,
+                    allele[0].major,
+                    allele[0].minor,
+                    allele[0].added + tuple(added),
+                    tuple(missing),
                 )
-
-                # print(coverage.sample, gene.name, allele[0].minor, end=' ')
-                # for m in sorted(solution[-1].mutations(gene)):
-                #     if m in missing: continue
-                #     if m in gene.mutations:
-                #         novel = 0
-                #     else:
-                #         novel = 1
-                #     phase = -1
-                #     if phases:
-                #         phase = next((pi for pi, p in enumerate(phases) if m in p), -1)
-                #     if phase != -1 and phase not in assignments[allele]:
-                #         phase=f'{phase}?'
-                #     print(f'{m.pos+1}:{m.op}:{gene.get_dbsnp(m)}:{gene.region_at(m.pos)[1]}:{novel}:{phase} ', end='')
-                # print()
-
-            # mutations = sorted(mutations)
-            # print(f'{" ":6}  ', end="")
-            # for m in mutations:
-            #     print(f"{m.pos:<10}", end="")
-            # print(f'\n{" ":6}  ', end="")
-            # for m in mutations:
-            #     print(f'{m.op+("*" if gene.is_functional(m) else ""):10}', end="")
-            # print(f'\n{" ":6}  ', end="")
-            # for m in mutations:
-            #     scopy = coverage.single_copy(m.pos, major_sol.cn_solution)
-            #     s = f"{coverage[m]} ({coverage[m]/scopy if scopy > 0 else 0:.1f})"
-            #     print(f"{s:10}", end="")
-            # print(f'\n{" ":6}  ', end="")
-            # if phases:
-            #     for m in mutations:
-            #         i = next((pi for pi, p in enumerate(phases) if m in p), -1)
-            #         s = str(i) if i != -1 else "?"
-            #         print(f"{s:10}", end="")
-            # print()
-            # for s in solution:
-            #     print(f"{s.minor:6}: ", end="")
-            #     mx = s.mutations(gene)
-            #     for m in mutations:
-            #         print(f'{"#" if m in mx else "":10}', end="")
-            #     print()
-
-            json_print(
-                debug,
-                '    "sol": {}, '.format(
-                    [
-                        (
-                            s.minor,
-                            [(m[0], m[1]) for m in s.added],
-                            [(m[0], m[1]) for m in s.missing],
-                        )
-                        for s in solution
-                    ]
-                ),
             )
-            sol = MinorSolution(score=opt, solution=solution, major_solution=major_sol)
-            _ = estimate_diplotype(gene, sol)
-            json_print(debug, f'    "diplotype": "{sol.diplotype}"')
-            json_print(debug, "  },")
-            log.debug(
-                f"[minor] status= {status}; opt= {opt:.2f} "
-                + f"solution= {sol._solution_nice()}"
-            )
-            if str(sol) not in results:
-                results[str(sol)] = sol
-            if len(results) >= max_solutions:
-                break
-        return results.values()
-    except lpinterface.NoSolutionsError:
+
+        json_print(
+            debug,
+            '    "sol": {}, '.format(
+                [
+                    (
+                        s.minor,
+                        [(m[0], m[1]) for m in s.added],
+                        [(m[0], m[1]) for m in s.missing],
+                    )
+                    for s in solution
+                ]
+            ),
+        )
+        sol = MinorSolution(score=opt, solution=solution, major_solution=major_sol)
+        _ = estimate_diplotype(gene, sol)
+        json_print(debug, f'    "diplotype": "{sol.diplotype}"')
+        json_print(debug, "  },")
+        log.debug(
+            f"[minor] status= {status}; opt= {opt:.2f} "
+            + f"solution= {sol._solution_nice()}"
+        )
+        if str(sol) not in results:
+            results[str(sol)] = sol
+        if len(results) >= max_solutions:
+            break
+    if not results:
         log.debug("[minor] solution= []")
         json_print(debug, '    "sol": []')
         json_print(debug, "  },")
         if debug and False:  # Enable to debug infeasible models
             model.model.computeIIS()
             model.dump(f"{debug}.iis.ilp")
-        model.model.computeIIS()
-        model.dump(f"_.iis.ilp")
-        return []
+    return list(results.values())
 
 
 def _print_candidates(gene, alleles, cn_sol, coverage, muts):

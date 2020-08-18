@@ -190,7 +190,8 @@ def solve_cn_model(
     # We assume diploid genome, so the number of haplotype-inducing configurations
     # must be 2.
     diplo_inducing = model.quicksum(VCN[a] for a in VCN if a[1] <= 0)
-    model.addConstr(diplo_inducing == 2, name="CDIPLO")
+    model.addConstr(diplo_inducing <= 2, name="CDIPLO")
+    model.addConstr(diplo_inducing >= 2, name="CDIPLO")
 
     # Ensure that we cannot link any allele to the whole-gene deletion.
     del_allele = gene.deletion_allele()
@@ -219,7 +220,8 @@ def solve_cn_model(
             if len(structure.cn) > 1 and r in structure.cn[1]:
                 expr -= structure.cn[1][r] * VCN[s]
         VERR[r] = model.addVar(name=f"E_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
-        model.addConstr(expr + VERR[r] == exp_cov0 - exp_cov1, name=f"CCOV_{r}")
+        model.addConstr(expr + VERR[r] <= exp_cov0 - exp_cov1, name=f"CCOV_{r}")
+        model.addConstr(expr + VERR[r] >= exp_cov0 - exp_cov1, name=f"CCOV_{r}")
     json_print(debug, "},")
     # Objective: minimize the sum of absolute errors.
     # PCE_REGION (in CYP2D7) is penalized with an extra score as it is important
@@ -240,26 +242,22 @@ def solve_cn_model(
         model.dump(f"{debug}.cn.lp")
 
     # Solve the model
-    try:
-        lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
-        result: dict = {}
-        for status, opt, sol in model.solutions(gap):
-            sol_tuple = sorted_tuple(lookup[v] for v in sol)
-            # Because A[1] can be 1 while A[0] is 0, we can have biologically
-            # duplicate solutions
-            if sol_tuple not in result:
-                result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
-                log.debug(
-                    f"[cn] status= {status}; opt= {opt:.2f}"
-                    + f"[cn] solution= {result[sol_tuple]}"
-                )
-        json_print(
-            debug, '    "sol": ' + str([dict(r.solution) for r in result.values()])
-        )
-        return list(result.values())
-    except lpinterface.NoSolutionsError:
+    lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
+    result: dict = {}
+    for status, opt, sol in model.solutions(gap):
+        sol_tuple = sorted_tuple(lookup[v] for v in sol)
+        # Because A[1] can be 1 while A[0] is 0, we can have biologically
+        # duplicate solutions
+        if sol_tuple not in result:
+            result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
+            log.debug(
+                f"[cn] status= {status}; opt= {opt:.2f}"
+                + f"[cn] solution= {result[sol_tuple]}"
+            )
+    if not result:
         log.debug("[cn] solution= []")
-        return []
+    json_print(debug, '    "sol": ' + str([dict(r.solution) for r in result.values()]))
+    return list(result.values())
 
 
 def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:

@@ -12,7 +12,7 @@ import copy
 from natsort import natsorted
 
 from . import lpinterface
-from .common import log, AldyException, json_print, sorted_tuple, allele_sort_key
+from .common import log, AldyException, json_print, sorted_tuple
 from .cn import MAX_CN
 from .gene import MajorAllele, Mutation, Gene
 from .coverage import Coverage
@@ -204,7 +204,8 @@ def solve_major_model(
             cov = 0.0
         else:
             cov = coverage[m] / coverage.single_copy(m.pos, cn_solution)
-        model.addConstr(expr + VERR[m] == cov, name=f"CFUNC_{m.pos}_{m.op}")
+        model.addConstr(expr + VERR[m] <= cov, name=f"CFUNC_{m.pos}_{m.op}")
+        model.addConstr(expr + VERR[m] >= cov, name=f"CFUNC_{m.pos}_{m.op}")
         if m.pos != prev and prev != 0:
             json_print(debug, "\n             ", end="")
         prev = m.pos
@@ -246,48 +247,42 @@ def solve_major_model(
         model.dump(f"{debug}.major{identifier}.lp")
 
     # Solve the model
-    try:
-        lookup = {
-            **{model.varName(v): a for a, v in VA.items()},
-            **{model.varName(v): m for m, v in VNEW.items()},
-        }
-        result: Dict[Any, MajorSolution] = {}
-        json_print(debug, '    "sol": [', end="")
-        for status, opt, sol in model.solutions(gap):
-            solved_alleles = sorted_tuple(
-                [lookup[s][0] for s in sol if s in lookup and s.startswith("A_")]
+    lookup = {
+        **{model.varName(v): a for a, v in VA.items()},
+        **{model.varName(v): m for m, v in VNEW.items()},
+    }
+    result: Dict[Any, MajorSolution] = {}
+    json_print(debug, '    "sol": [', end="")
+    for status, opt, sol in model.solutions(gap):
+        solved_alleles = sorted_tuple(
+            [lookup[s][0] for s in sol if s in lookup and s.startswith("A_")]
+        )
+        novel_muts = sorted_tuple(
+            [lookup[s] for s in sol if s in lookup and s.startswith("N_")]
+        )
+        if (solved_alleles, novel_muts) not in result:
+            solution = collections.Counter(
+                SolvedAllele(gene, major=a, minor=None, added=tuple(), missing=tuple())
+                for a in solved_alleles
             )
-            novel_muts = sorted_tuple(
-                [lookup[s] for s in sol if s in lookup and s.startswith("N_")]
+            json_print(
+                debug, dict(collections.Counter(a for a in solved_alleles)), end=", ",
             )
-            if (solved_alleles, novel_muts) not in result:
-                solution = collections.Counter(
-                    SolvedAllele(
-                        gene, major=a, minor=None, added=tuple(), missing=tuple()
-                    )
-                    for a in solved_alleles
-                )
-                json_print(
-                    debug,
-                    dict(collections.Counter(a for a in solved_alleles)),
-                    end=", ",
-                )
-                sol = MajorSolution(
-                    score=opt,
-                    solution=solution,
-                    cn_solution=cn_solution,
-                    added=list(novel_muts),
-                )
-                log.debug(
-                    f"[major] status= {status}; opt= {opt:.2f}; "
-                    + f"solution= {sol._solution_nice()}"
-                )
-                result[solved_alleles, novel_muts] = sol
-        json_print(debug, "]\n  }, ", end="")
-        return list(result.values())
-    except lpinterface.NoSolutionsError:
+            sol = MajorSolution(
+                score=opt,
+                solution=solution,
+                cn_solution=cn_solution,
+                added=list(novel_muts),
+            )
+            log.debug(
+                f"[major] status= {status}; opt= {opt:.2f}; "
+                + f"solution= {sol._solution_nice()}"
+            )
+            result[solved_alleles, novel_muts] = sol
+    json_print(debug, "]\n  }, ", end="")
+    if not result:
         log.debug("[major] solution= []")
-        return []
+    return list(result.values())
 
 
 def _filter_alleles(
