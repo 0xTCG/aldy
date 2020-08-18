@@ -141,13 +141,13 @@ def write_vcf(
     )
     for m in sorted(mutations):
         ref = gene.seq[m.pos - gene.region.start]
-        if m.op[:3] == "SNP":
-            alt = m.op[5]
-        elif m.op[:3] == "INS":
-            alt = ref + m.op[4:]
+        if m.op[1] == ">":
+            alt = m.op[2]
+        elif m.op[:3] == "ins":
+            alt = ref + m.op[3:]
         else:
             ref = gene.seq[m.pos - 1 - gene.region.start]
-            alt = ref + m.op[4:], ref
+            alt = ref + m.op[3:], ref
 
         info = [
             "TYPE={}".format(["NEUTRAL", "DISRUPTING"][gene.is_functional(m)]),

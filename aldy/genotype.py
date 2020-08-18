@@ -4,13 +4,10 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Set
 
 import os
 import sys
-import textwrap
-
-from natsort import natsorted
 
 from . import sam
 from . import cn
@@ -59,13 +56,13 @@ def load_phase(gene: Gene, path: str) -> List[List[Mutation]]:
                 if pos < gene.region.start or pos >= gene.region.end:
                     continue
 
-                if (pos, f"SNP.{al0}{al1}") not in gene.mutations:
-                    if (pos, f"SNP.{al1}{al0}") in gene.mutations:
+                if (pos, f"{al0}>{al1}") not in gene.mutations:
+                    if (pos, f"{al1}>{al0}") in gene.mutations:
                         log.warn(f"reorienting {pos} {al0} {al1}")
                         al1, al0 = al0, al1
                         gt0, gt1 = gt1, gt0
-                h0.append(Mutation(pos, f"SNP.{al0}{al1}" if gt0 else "_"))
-                h1.append(Mutation(pos, f"SNP.{al0}{al1}" if gt1 else "_"))
+                h0.append(Mutation(pos, f"{al0}>{al1}" if gt0 else "_"))
+                h1.append(Mutation(pos, f"{al0}>{al1}" if gt1 else "_"))
     if h0:
         phases += [h0, h1]
     # log.info('Phasing!!!')
@@ -276,6 +273,7 @@ def genotype(
             m.score * ((m.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
             m.solution,
             m.cn_solution,
+            m.added,
         )
         for m in major_sols
     ]
@@ -328,21 +326,6 @@ def genotype(
 
     if multiple_warn_level >= 1 and len(minor_sols) > 1:
         log.warn("WARNING: multiple optimal solutions found!")
-        added = {
-            gene.get_dbsnp(m)
-            for a in minor_sols
-            for s in a.solution
-            for m in s.added
-            if gene.is_functional(m, infer=False)
-        }
-        if added:
-            log.warn(
-                "Probable cause: novel {} could not be linked to a major star-allele, "
-                + "so Aldy reports all valid combinations.\n"
-                + "Phasing data (provided via --phase) can be useful for "
-                + "breaking the ties.",
-                ", ".join(added),
-            )
     log.info(
         f"{{}} {gene.name} star-alleles for {sample_name}:",
         "Best" if len(minor_sols) == 1 else "Potential",
@@ -373,12 +356,26 @@ def genotype(
 
     if report:
         log.info(colorize(f"{gene.name} results:"))
-        reported = set()
+        reported: Set[str] = set()
         for r in minor_sols:
-            s = f"  {r.get_major_diplotype()}   (minor: {r.get_minor_diplotype()})"
+            s = f"  - {r.get_major_diplotype()}"
             if s not in reported:
                 log.info(colorize(s))
+                log.info(f"    Minor: {r.get_minor_diplotype()}")
+                log.info(f"    Legacy notation: {r.get_minor_diplotype(legacy=True)}")
                 reported.add(s)
+    if any(len(m.major_solution.added) > 0 for m in minor_sols) and not phase:
+        novels = {
+            gene.get_dbsnp(mm) for m in minor_sols for mm in m.major_solution.added
+        }
+        log.warn(
+            "WARNING: mutations {} suggest presence of a novel major star-allele."
+            + "\nHowever, such alleles cannot be determined without phasing data."
+            + "\nPlease provide --phase parameter for Aldy to accurately call novel "
+            + "major star-alleles.\nThe above-reported assignments of these mutations "
+            + "are random.",
+            ", ".join(novels),
+        )
 
     return minor_sols
 
@@ -417,6 +414,7 @@ def batch(genes, profile, sam_path):
                     m.score * ((m.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
                     m.solution,
                     m.cn_solution,
+                    m.added,
                 )
                 for m in major_sols
             ]
@@ -463,4 +461,3 @@ def batch(genes, profile, sam_path):
             print(e)
             results = "ERR:?"
         print(f"{sample_name}\t{gene_db}\t{results}")
-

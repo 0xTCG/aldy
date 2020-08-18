@@ -32,7 +32,7 @@ class Coverage:
                 Coverage for each locus within a sample represented as a dictionary
                 that maps mutation (or a reference position indicated by `_`)
                 to the number of reads supporting that mutation.
-                For example, ``coverage[10]['SNP.AG'] = 2`` means that there are 2
+                For example, ``coverage[10]['A>G'] = 2`` means that there are 2
                 reads that have G (instead of A) at the genomic locus 10.
             threshold (float):
                 Threshold `t` used for filtering out low-quality mutations.
@@ -76,7 +76,7 @@ class Coverage:
         """
         if pos not in self._coverage:
             return 0
-        return float(sum(v for p, v in self._coverage[pos].items() if p[:3] != "INS"))
+        return float(sum(v for p, v in self._coverage[pos].items() if p[:3] != "ins"))
 
     def percentage(self, m: Mutation) -> float:
         """

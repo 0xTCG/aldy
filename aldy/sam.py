@@ -28,7 +28,7 @@ CIGAR_REGEX = re.compile(r"(\d+)([MIDNSHP=XB])")
 
 DEFAULT_CN_NEUTRAL_REGION = {
     "hg19": GRange("22", 42547463, 42548249),
-    "hg38": GRange("22", 42151472, 42152258)
+    "hg38": GRange("22", 42151472, 42152258),
 }
 """obj:`aldy.common.GRange` Default copy-number neutral region
    (exon 4-6 of the CYP2D8 gene)"""
@@ -187,10 +187,10 @@ class Sample:
                         mut_start += ref_start
                         op = fd.read(op_len).decode("ascii")
                         muts[mut_start, op] += 1
-                        if op[:3] == "DEL":
+                        if op[:3] == "del":
                             for j in range(0, len(op) - 3):
                                 norm[mut_start + j] -= 1
-                        elif op[:3] == "INS":
+                        elif op[:3] == "ins":
                             insertions.add((mut_start, len(op) - 3))
                         else:
                             norm[mut_start] -= 1
@@ -592,8 +592,8 @@ class Sample:
             for read in vcf.fetch(
                 region=gene.get_wide_region().samtools(prefix=self._prefix)
             ):
-                g = sorted(read.samples[sample]["GT"])
-                if len(g) > 2 or None in g or gene[read.pos - 1] == "N":
+                g = sorted(y for y in read.samples[sample]["GT"] if y is not None)
+                if len(g) != 2 or gene[read.pos - 1] == "N":
                     continue  # ignore polyploid and incomplete cases
                 dump_arr = {}
                 if len(read.ref) == 1 and read.ref != gene[read.pos - 1]:

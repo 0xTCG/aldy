@@ -157,33 +157,19 @@ def solve_major_model(
         for m in func_muts
     }
     constraints = {e: 0 for e in VERR}
-    # Add a binary variable for each allele/novel mutation pair
-    # For each binary variable, add a multiplication variable
-    # MUL = VNEW[a, m] * VA[a] (binary product linearization)
-    del_allele = gene.deletion_allele()
-    VNEW = {
-        a: {
-            m: (
-                model.addVar(vtype="B", name=f"N_{m.pos}_{m.op}_{a[0]}_{a[1]}"),
-                model.addVar(vtype="B", name=f"MUL_N_{m.pos}_{m.op}_{a[0]}_{a[1]}"),
-            )
-            if a[0] != del_allele
-            else (0, 0)  # deletion alleles should not be assigned any mutations
-            for m in constraints
-            if m[0] not in set(mm[0] for mm in alleles[a].func_muts)
-            and gene.has_coverage(a[0], m.pos)
-        }
-        for a in alleles
-    }
+
+    # Add a binary variable for each mutation copy
+    # For each binary variable, add a variable
+    # VNEW[m] = 0 <=> sum(VA[a] if m in a) >= 1
+    # TODO: add N of these for each mutation
+    VNEW = {m: model.addVar(vtype="B", name=f"N_{m}") for m in func_muts}
+
     # Populate the constraints
     for a in alleles:
         for m in alleles[a].func_muts:
             constraints[m] += VA[a]
-    # Add novel mutation constraints
-    # Also ensure that MUL = 1 <=> VA * VNEW = 1
-    for a in VNEW:
-        for m, (vn, vm) in VNEW[a].items():
-            constraints[m] += model.prod(vm, [VA[a], vn])
+    for m, v in VNEW.items():
+        constraints[m] += v
 
     # Populate constraints of non-variations (i.e. matches with the reference genome)
     for pos in set(m.pos for m in constraints):
@@ -195,18 +181,17 @@ def solve_major_model(
                 continue
             # An insertion still contributes to the total coverage at this loci
             if any(
-                ma[0] == pos and not ma[1][:3] == "INS" for ma in alleles[a].func_muts
+                ma[0] == pos and not ma[1][:3] == "ins" for ma in alleles[a].func_muts
             ):
                 continue
             # Make sure that the allele has no novel mutations at this position
             constraints[ref_m] += VA[a]
-            muts = [m for m in VNEW[a] if m[0] == pos and m[1][:3] != "INS"]
+            muts = [m for m in VNEW if m[0] == pos and m[1][:3] != "ins"]
             for m in muts:
-                constraints[ref_m] -= VNEW[a][m][1]
+                constraints[ref_m] -= VNEW[m]
             # We ensure that only one additional mutation can be selected here
             model.addConstr(
-                model.quicksum(VNEW[a][m][0] for m in muts) <= 1,
-                name=f"CONE_{pos}_{a[0]}_{a[1]}",
+                model.quicksum(VNEW[m] for m in muts) <= 1, name=f"CONE_{pos}"
             )
 
     # Each allele must express all of its functional mutations
@@ -232,29 +217,30 @@ def solve_major_model(
         model.addConstr(expr <= cnt, name=f"CSAT_{cnf}")
         model.addConstr(expr >= cnt, name=f"CSAT_{cnf}")
 
-    # Each functional mutation must be chosen by some allele
+    # Each functional mutation must be either chosen by some allele or marked as novel
+    # 1 == (m chosen by allele) XOR (m novel) == OR(VA[a] if m in a) XOR VNEW[m]
     for m in func_muts:
-        expr = model.quicksum(VA[a] for a in alleles if m in alleles[a].func_muts)
-        expr += model.quicksum(
-            VNEW[a][m][1]
-            for a in alleles
-            if m in VNEW[a] and m not in alleles[a].func_muts
-        )
-        model.addConstr(expr >= 1, name=f"CEXP_{m.pos}_{m.op}")
+        VOR = model.addVar(vtype="B", name=f"OR_{m}")
+        m_all = {a for a in alleles if m in alleles[a].func_muts}
+        model.addConstr(VOR <= model.quicksum(VA[a] for a in m_all), name="COR")
+        for a in m_all:
+            model.addConstr(VOR >= VA[a], name="COR")
+        VXOR = model.addVar(vtype="B", name=f"XOR_{m}")
+        model.addConstr(VXOR <= VNEW[m] + VOR, name="CXOR")
+        model.addConstr(VXOR <= 2 - VNEW[m] - VOR, name="CXOR")
+        model.addConstr(VXOR >= VNEW[m] - VOR, name="CXOR")
+        model.addConstr(VXOR >= VOR - VNEW[m], name="CXOR")
+        model.addConstr(VXOR >= 1, name="CXOR")
 
     # Objective: minimize the absolute sum of errors and the number of novel mutations
     objective = model.abssum(e for e in VERR.values())
 
     z = model.addVar(vtype="B", name="NOVEL")
-    for a in VNEW:
-        for m in VNEW[a]:
-            model.addConstr(z >= VNEW[a][m][0], name=f"NOVEL_UB_{VNEW[a][m][0]}")
-    model.addConstr(
-        z <= model.quicksum(VNEW[a][m][0] for a in VNEW for m in VNEW[a]),
-        name="NOVEL_LB",
-    )
+    for m in VNEW:
+        model.addConstr(z >= VNEW[m], name=f"NOVEL_UB_{VNEW[m]}")
+    model.addConstr(z <= model.quicksum(VNEW[m] for m in VNEW), name="NOVEL_LB")
     objective += NOVEL_MUTATION_PENAL * z
-    objective += 0.1 * model.quicksum(VNEW[a][m][0] for a in VNEW for m in VNEW[a])
+    objective += 0.1 * model.quicksum(VNEW[m] for m in VNEW)
     model.setObjective(objective)
     if debug:
         model.dump(f"{debug}.major{identifier}.lp")
@@ -263,50 +249,40 @@ def solve_major_model(
     try:
         lookup = {
             **{model.varName(v): a for a, v in VA.items()},
-            **{model.varName(v): (a, m) for a in VNEW for m, (v, _) in VNEW[a].items()},
+            **{model.varName(v): m for m, v in VNEW.items()},
         }
         result: Dict[Any, MajorSolution] = {}
         json_print(debug, '    "sol": [', end="")
         for status, opt, sol in model.solutions(gap):
-            # MajorAllele: novel mutations
-            solved_alleles: Any = collections.defaultdict(lambda: [])
-            for s in sol:
-                if s not in lookup:
-                    continue
-                elif isinstance(lookup[s][0], tuple):  # Novel mutation
-                    solved_alleles[lookup[s][0]].append(lookup[s][1])
-                elif s not in solved_alleles:
-                    solved_alleles[lookup[s]] = []
-            sol_tuple = sorted_tuple(
-                (a, sorted_tuple(nm)) for (a, _), nm in solved_alleles.items()
+            solved_alleles = sorted_tuple(
+                [lookup[s][0] for s in sol if s in lookup and s.startswith("A_")]
             )
-            if sol_tuple not in result:
+            novel_muts = sorted_tuple(
+                [lookup[s] for s in sol if s in lookup and s.startswith("N_")]
+            )
+            if (solved_alleles, novel_muts) not in result:
                 solution = collections.Counter(
                     SolvedAllele(
-                        gene, major=a, minor=None, added=tuple(mut), missing=tuple()
+                        gene, major=a, minor=None, added=tuple(), missing=tuple()
                     )
-                    for (a, _), mut in solved_alleles.items()
+                    for a in solved_alleles
                 )
                 json_print(
                     debug,
-                    dict(
-                        collections.Counter(
-                            tuple([a] + [(m[0], m[1]) for m in mut])
-                            if len(mut) > 0
-                            else a
-                            for (a, _), mut in solved_alleles.items()
-                        )
-                    ),
+                    dict(collections.Counter(a for a in solved_alleles)),
                     end=", ",
                 )
                 sol = MajorSolution(
-                    score=opt, solution=solution, cn_solution=cn_solution
+                    score=opt,
+                    solution=solution,
+                    cn_solution=cn_solution,
+                    added=list(novel_muts),
                 )
                 log.debug(
                     f"[major] status= {status}; opt= {opt:.2f}; "
                     + f"solution= {sol._solution_nice()}"
                 )
-                result[sol_tuple] = sol
+                result[solved_alleles, novel_muts] = sol
         json_print(debug, "]\n  }, ", end="")
         return list(result.values())
     except lpinterface.NoSolutionsError:

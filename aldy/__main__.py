@@ -107,7 +107,7 @@ def main(argv):
                 ]
                 avail_genes = sorted(avail_genes)
             else:
-                avail_genes = args.gene.lower().split(',')
+                avail_genes = args.gene.lower().split(",")
 
             # Prepare the output file
             output = args.output

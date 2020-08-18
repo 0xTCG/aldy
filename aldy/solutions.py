@@ -4,19 +4,16 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, List, Tuple
-
-from natsort import natsorted
 import collections
-
-from .common import allele_sort_key
+from natsort import natsorted
+from typing import List
 from .gene import Gene
 
 
 class CNSolution(
     collections.namedtuple("CNSolution", ["gene", "score", "solution", "region_cn"])
 ):
-    """
+    r"""
     Valid copy-number configuration assignment.
     Immutable.
 
@@ -134,9 +131,11 @@ class SolvedAllele(
 
 
 class MajorSolution(
-    collections.namedtuple("MajorSolution", ["score", "solution", "cn_solution"])
+    collections.namedtuple(
+        "MajorSolution", ["score", "solution", "cn_solution", "added"]
+    )
 ):
-    """
+    r"""
     Valid major star-allele assignment.
     Immutable.
 
@@ -148,16 +147,21 @@ class MajorSolution(
             (e.g. ``{1: 2}`` means that we have two copies of \*1).
         cn_solution (:obj:`aldy.solutions.CNSolution`):
             Copy-number solution that was used to assign major star-alleles.
+        added (list[:obj:`Mutation`]):
+            List of added mutations. Will be assigned to :obj:`SolvedAllele` in the
+            minor star-allele calling step if phasing is enabled.
 
     Notes:
         Has custom printer (``__str__``).
     """
 
     def _solution_nice(self):
-        return ", ".join(
+        x = ", ".join(
             f"{v}x{s}"
             for s, v in natsorted(self.solution.items(), key=lambda x: x[0].major)
         )
+        y = ", ".join(self.cn_solution.gene.get_dbsnp(m) for m in self.added)
+        return " & ".join([x, y] if y else [x])
 
     def __str__(self):
         return (
@@ -226,11 +230,15 @@ class MinorSolution(
                 n.append(gene.get_dbsnp(m))
         return "+".join(n)
 
-    def get_minor_name(self, i):
+    def get_minor_name(self, i, legacy=False):
         gene = self.major_solution.cn_solution.gene
         if i == -1:
             return gene.deletion_allele()
-        n = [str(self.solution[i].minor)]
+
+        m = gene.alleles[self.solution[i].major]
+        t = [mi for mi in m.minors if mi == self.solution[i].minor]
+        assert len(t) == 1
+        n = [m.minors[t[0]].alt_name if legacy and m.minors[t[0]].alt_name else t[0]]
         for m in self.solution[i].added:
             n.append("+" + gene.get_dbsnp(m))
         for m in self.solution[i].missing:
@@ -242,8 +250,8 @@ class MinorSolution(
             " + ".join(f"*{self.get_major_name(i)}" for i in d) for d in self.diplotype
         )
 
-    def get_minor_diplotype(self):
+    def get_minor_diplotype(self, legacy=False):
         return " / ".join(
-            " + ".join(f"[*{self.get_minor_name(i)}]" for i in d)
+            " + ".join(f"[*{self.get_minor_name(i, legacy)}]" for i in d)
             for d in self.diplotype
         )

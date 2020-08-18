@@ -71,15 +71,16 @@ def estimate_minor(
     # *from all available major solutions* together
     mutations: Set[Mutation] = set()
     for major_sol in major_sols:
-        for (_, ma, _, added, _) in major_sol.solution:
+        for (_, ma, _, _, _) in major_sol.solution:
             alleles += [
-                SolvedAllele(gene, ma, mi, added, tuple())
+                SolvedAllele(gene, ma, mi, tuple(), tuple())
                 for mi in gene.alleles[ma].minors
             ]
             mutations |= set(gene.alleles[ma].func_muts)
-            mutations |= set(added)
             for sa in gene.alleles[ma].minors.values():
                 mutations |= set(sa.neutral_muts)
+        # if phases:
+        mutations |= set(major_sol.added)
 
     # Filter out low quality mutations
     def default_filter_fn(mut, cov, total, thres):
@@ -194,7 +195,6 @@ def solve_minor_model(
     alleles: Dict[Tuple[SolvedAllele, int], Set[Mutation]] = {
         (a, 0): set(gene.alleles[a.major].func_muts)
         | set(gene.alleles[a.major].minors[a.minor].neutral_muts)
-        | set(a.added)
         for a in alleles_list
     }
 
@@ -287,13 +287,13 @@ def solve_minor_model(
                 continue
             # Does this allele contain any mutation at the position `pos`?
             # Insertions are not counted as they always contribute to `_`.
-            present_muts = [m for m in alleles[a] if m.pos == pos and m[1][:3] != "INS"]
+            present_muts = [m for m in alleles[a] if m.pos == pos and m[1][:3] != "ins"]
             assert len(present_muts) < 2
             if len(present_muts) == 1:
                 constraints[ref_m] += VA[a] - VKEEP[a][present_muts[0]][1]
             else:
                 constraints[ref_m] += VA[a]
-                muts = [m for m in VNEW[a] if m.pos == pos and m[1][:3] != "INS"]
+                muts = [m for m in VNEW[a] if m.pos == pos and m[1][:3] != "ins"]
                 for m in muts:
                     constraints[ref_m] -= VNEW[a][m][1]
                 # We ensure that only one additional mutation can be selected here
@@ -307,14 +307,7 @@ def solve_minor_model(
     json_print(debug, f'    "cn": {str(dict(major_sol.cn_solution.solution))}, ')
     json_print(
         debug,
-        '    "major": {}'.format(
-            {
-                tuple([s.major] + [(m[0], m[1]) for m in s.added])
-                if len(s.added) > 0
-                else s.major: v
-                for s, v in major_sol.solution.items()
-            }
-        ),
+        '    "major": {}'.format({s.major: v for s, v in major_sol.solution.items()}),
         end=", ",
     )
     json_print(debug, '    "data": {', end="")
@@ -363,14 +356,7 @@ def solve_minor_model(
                     name=f"CZERO_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
                 )
     # 4) No allele can include an extra functional mutation from the database
-    #    (that should be done in the major model)
-    for a in VNEW:
-        for m, v in VNEW[a].items():
-            if gene.is_functional(m, infer=False):
-                model.addConstr(
-                    v[0] <= 0,
-                    name=f"CNEWFUNC_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
-                )
+    #    (retired with phasing module)
     # 5) Avoid extra mutations if there is an existing mutation at the corresponding
     #    locus (either from the definition or added via VNEW)
     for pos in set(m.pos for m in constraints):
@@ -587,6 +573,8 @@ def solve_minor_model(
         if debug and False:  # Enable to debug infeasible models
             model.model.computeIIS()
             model.dump(f"{debug}.iis.ilp")
+        model.model.computeIIS()
+        model.dump(f"_.iis.ilp")
         return []
 
 
@@ -624,6 +612,6 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
                 muts.remove(m)
             log.trace("  {}", print_mut(m))
     if len(muts) > 0:
-        log.debug("  Other mutations:")
+        log.trace("  Other mutations:")
         for m in sorted(muts):
-            log.debug("  {}", print_mut(m))
+            log.trace("  {}", print_mut(m))
