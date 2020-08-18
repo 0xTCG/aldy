@@ -130,14 +130,14 @@ def main(argv):
         log.debug(traceback.format_exc())
         exit(1)
     except SystemExit as ex:
-        log.debug(ex)
+        log.debug(str(ex))
         log.debug(traceback.format_exc())
         exit(ex.code)
     except Exception as ex:
         log.critical(
             f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
         )
-        log.critical(ex)
+        log.critical(str(ex))
         log.warn(traceback.format_exc())
         exit(1)
     except:  # noqa
@@ -410,7 +410,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             log.critical(
                 f"ERROR: gene= {gene}, profile= {args.profile}, file= {args.file}"
             )
-            log.error(ex)
+            log.error(str(ex))
 
     if args.log:
         fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="DEBUG")
