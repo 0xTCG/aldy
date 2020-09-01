@@ -206,6 +206,12 @@ class Coverage:
         cnv_ref = sum(
             profile[cn_region.chr][i] for i in range(cn_region.start, cn_region.end)
         )
+        # print(
+        #     f"{'CN':5}, {sam_ref:9.1f}, {sam_ref / (cn_region.end - cn_region.start):9.1f}"
+        # )
+        # print(
+        #     f"{'CN':5}, {cnv_ref:9.1f}, {cnv_ref / (cn_region.end - cn_region.start):9.1f}"
+        # )
 
         if sam_ref == 0:
             raise AldyException(
@@ -224,6 +230,9 @@ class Coverage:
             for region, rng in gr.items():
                 s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT
                 p = sum(profile[rng.chr][i] for i in range(rng.start, rng.end))
+                # print(f"{region:5}, {s:9.1f}, {s / (rng.end - rng.start):9.1f}")
+                # print(f"{region:5}, {p:9.1f}, {p / (rng.end - rng.start):9.1f}")
+
                 self._rescaled.update(
                     {
                         i: profile[rng.chr][i] / cn_ratio

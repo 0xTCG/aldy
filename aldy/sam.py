@@ -14,6 +14,7 @@ import gzip
 import struct
 import collections
 
+from natsort import natsorted
 from .common import log, GRange, AldyException, script_path
 from .coverage import Coverage
 from .gene import Gene, Mutation
@@ -727,12 +728,12 @@ class Sample:
             else:
                 raise AldyException("Region parameters must be provided")
         else:
-            with open(profile_path) as f:
+            with gzip.open(profile_path) as f:
                 for line in f:
                     if line[0] == "#":
                         continue  # skip comments
-                    ch, pos, val = line.strip().split()[1:]
-                    profile[ch][int(pos)] = float(val)
+                    _, ch, pos, val = line.strip().split()
+                    profile[ch.decode("utf-8")][int(pos)] = float(val)
         return profile
 
     # ----------------------------------------------------------------------------------
@@ -801,40 +802,36 @@ class Sample:
         Notes:
             Profiles that were used in Aldy paper:
 
-                1. PGRNseq-v1: PGXT104 was used for all genes
+                1. PGRNseq-v1/v3: NA17642 was used for all genes
                    (n.b. PGXT147 with rescale 2.52444127771 was used for CYP2B6 beta).
                 2. PGRNseq-v2: NA19789.bam was used for all genes.
                 3. Illumina: by definition contains all ones (uniform coverage profile).
         """
         if regions is None:
-            gene_regions = sorted(
-                [  # paper gene coordinates in hg19
-                    # TODO: Auto populate
-                    ("CYP3A5", GRange("7", 99245000, 99278000)),
-                    ("CYP3A4", GRange("7", 99354000, 99465000)),
-                    ("CYP2C19", GRange("10", 96445000, 96615000)),
-                    ("CYP2C9", GRange("10", 96691000, 96754000)),
-                    ("CYP2C8", GRange("10", 96796000, 96830000)),
-                    ("CYP4F2", GRange("19", 15619000, 16009500)),
-                    ("CYP2A6", GRange("19", 41347500, 41400000)),
-                    ("CYP2D6", GRange("22", 42518900, 42553000)),
-                    ("TPMT", GRange("6", 18126541, 18157374)),
-                    ("DPYD", GRange("1", 97541298, 98388615)),
-                ],
-                key=lambda x: x[1],
-            )
+            import pkg_resources
+            import yaml
+
+            gene_regions = []
+            for g in pkg_resources.resource_listdir("aldy.resources", "genes"):
+                if g[-4:] != ".yml":
+                    continue
+                with open(script_path(f"aldy.resources.genes/{g}")) as f:
+                    yml = yaml.safe_load(f)
+                    gene_regions.append(
+                        (yml["name"], GRange(*yml["reference"]["mappings"]["hg19"][:3]))
+                    )
+            gene_regions = natsorted(gene_regions, key=lambda x: x[1])
         else:
             gene_regions = [(str(i), r) for i, r in enumerate(sorted(regions))]
-        if cn_region:
-            gene_regions.append(("CN", cn_region))
+        gene_regions.append(
+            ("CN", cn_region if cn_region else DEFAULT_CN_NEUTRAL_REGION["hg19"])
+        )
         result: List[Tuple[str, str, int, float]] = []
         for gene, location in gene_regions:
             with pysam.AlignmentFile(sam_path) as sam:
                 prefix = _chr_prefix(location.chr, sam.header["SQ"])
-                region = location.samtools(pad_left=1, prefix=prefix)
-                cov: dict = collections.defaultdict(
-                    lambda: collections.defaultdict(int)
-                )
+                region = location.samtools(pad_left=1000, pad_right=1000, prefix=prefix)
+                cov: dict = collections.defaultdict(int)
                 log.info("Generating profile for {} ({})", gene, region)
                 try:
                     for read in sam.fetch(region=region):
@@ -845,7 +842,7 @@ class Sample:
                         for op, size in read.cigartuples:
                             if op == 2:
                                 for i in range(size):
-                                    cov[location.chr][start + i] += 1
+                                    cov[start + i] += 1
                                 start += size
                             elif op == 1:
                                 s_start += size
@@ -853,14 +850,12 @@ class Sample:
                                 s_start += size
                             elif op in [0, 7, 8]:
                                 for i in range(size):
-                                    cov[location.chr][start + i] += 1
+                                    cov[start + i] += 1
                                 start += size
                                 s_start += size
                     result += [
-                        (gene, c, p, cov[c][p] * (factor / 2.0))
-                        for c in sorted(cov.keys())
-                        for p in sorted(cov[c].keys())
-                        if location.start - 500 <= p <= location.end + 500
+                        (gene, location.chr, p, cov[p] * (factor / 2.0))
+                        for p in range(location.start, location.end)
                     ]
                 except ValueError:
                     log.warn("Cannot fetch gene {} ({})", gene, region)
