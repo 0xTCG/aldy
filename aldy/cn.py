@@ -247,7 +247,7 @@ def solve_cn_model(
     for status, opt, sol in model.solutions(gap):
         sol_tuple = sorted_tuple(lookup[v] for v in sol)
         # Because A[1] can be 1 while A[0] is 0, we can have biologically
-        # duplicate solutions
+        # homologous solutions
         if sol_tuple not in result:
             result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
             log.debug(

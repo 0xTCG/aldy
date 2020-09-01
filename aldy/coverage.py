@@ -230,9 +230,6 @@ class Coverage:
             for region, rng in gr.items():
                 s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT
                 p = sum(profile[rng.chr][i] for i in range(rng.start, rng.end))
-                # print(f"{region:5}, {s:9.1f}, {s / (rng.end - rng.start):9.1f}")
-                # print(f"{region:5}, {p:9.1f}, {p / (rng.end - rng.start):9.1f}")
-
                 self._rescaled.update(
                     {
                         i: profile[rng.chr][i] / cn_ratio

@@ -301,9 +301,11 @@ class Sample:
             pos, mut = m
             if pos not in coverage:
                 coverage[pos] = {}
-            if not bounds[0] <= pos <= bounds[1]:
+            if not bounds[0] <= pos <= bounds[1] and mut[:3] != "ins":
                 mut = "_"  # ignore mutations outside of the region of interest
-            coverage[pos][mut] = cov
+            if mut not in coverage[pos]:
+                coverage[pos][mut] = 0
+            coverage[pos][mut] += cov
         self._group_deletions(gene, coverage)
         for pos, op in _multi_sites.items():
             if pos in coverage and op in coverage[pos]:
@@ -489,6 +491,8 @@ class Sample:
                     for p in range(len(l)):
                         if l[p] != ".":
                             muts[pos + p, dump_arr[pos + p]] -= 1
+                            if p:
+                                norm[pos + p] += 1
                     muts[pos, op] += 1
         return (
             (read.reference_start, start, len(read.query_sequence)),
@@ -817,9 +821,11 @@ class Sample:
                     continue
                 with open(script_path(f"aldy.resources.genes/{g}")) as f:
                     yml = yaml.safe_load(f)
-                    gene_regions.append(
-                        (yml["name"], GRange(*yml["reference"]["mappings"]["hg19"][:3]))
-                    )
+                    ref = yml["reference"]["mappings"]["hg19"][0]
+                    reg = yml["structure"]["regions"]["hg19"]
+                    rmi = min(min(r) for _, r in reg.items())
+                    rma = max(max(r) for _, r in reg.items())
+                    gene_regions.append((yml["name"], GRange(ref, rmi, rma)))
             gene_regions = natsorted(gene_regions, key=lambda x: x[1])
         else:
             gene_regions = [(str(i), r) for i, r in enumerate(sorted(regions))]
