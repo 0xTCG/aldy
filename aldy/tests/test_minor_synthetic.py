@@ -172,6 +172,6 @@ def test_major_novel(toy_gene, solver):
                 ("3.001", [(100_000_147, "insA")], [(100_000_110, "delAC")]),
                 ("6.001", [], []),
             ],
-            "score": MISS_PENALTY_FACTOR + NOVEL_MUTATION_PENAL,
+            "score": MISS_PENALTY_FACTOR + (ADD_PENALTY_FACTOR + NOVEL_MUTATION_PENAL),
         },
     )

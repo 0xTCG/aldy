@@ -4,6 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
+from os import major
 from typing import List, Tuple, Dict, Any
 
 import collections
@@ -73,7 +74,7 @@ def write_decomposition(
                         m.op,
                         -1,
                         ["NEUTRAL", "DISRUPTING"][gene.is_functional(m)],
-                        gene.get_rsid(m),
+                        gene.get_rsid(m, default=False),
                         "",
                     ]
                 )
@@ -182,7 +183,7 @@ def write_vcf(
             pattern.format(
                 chrom=gene.region.chr,
                 pos=m.pos + 1,
-                id=gene.get_rsid(m),
+                id=gene.get_rsid(m, default=False),
                 ref=ref,
                 alt=alt,
                 qual=0,
@@ -212,8 +213,8 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     # solution is the array of (major, minor) tuples
     major_dict: Dict[str, List[int]] = collections.defaultdict(list)
     for ai, a in enumerate(solution.solution):
-        n = str(a.major).split("#")[0:1]  # chop off fusion suffix
-        components = re.split(r"(\d+)", n[0])
+        n = str(a.major).split("#")[0]  # chop off fusion suffix
+        components = re.split(r"(\d+)", n)
         real = components[0] if components[0] != "" else components[1]
         major_dict[real].append(ai)
     if len(solution.solution) == 1 and del_allele:
@@ -227,9 +228,10 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     if len(solution.solution) > 2:
         for ta, tb in gene.common_tandems:
             while major_dict[ta] and major_dict[tb]:
-                diplotype[dc % 2].append((major_dict[ta][0], major_dict[tb][0]))
+                diplotype[dc % 2].extend([major_dict[ta][0], major_dict[tb][0]])
                 dc += 1
                 del major_dict[ta][0], major_dict[tb][0]
+    print(diplotype)
 
     # Handle duplicates (heuristics that groups duplicate alleles together,
     #                    e.g. 1, 1, 2 -> 1+1/2)
@@ -246,6 +248,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
             diplotype[dc % 2].extend(items)
             items.clear()
             dc += 1
+    print(diplotype)
 
     # Handle the rest
     for allele, items in major_dict.items():
@@ -255,11 +258,13 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
             assert len(items) == 1
             diplotype[dc % 2].extend(items)
             dc += 1
+    print(diplotype)
 
     # Each diplotype should have at least one item
     # e.g. 1, 1 -> becomes 1+1/_ due to duplicate heuristic -> fixed to 1/1
     if len(diplotype[1]) == 0:
         diplotype = diplotype[0][:-1], [diplotype[0][-1]]
+    print(diplotype)
 
     # Make sure that the elements are sorted and that the tandems are grouped together
     diplotype = natsorted(

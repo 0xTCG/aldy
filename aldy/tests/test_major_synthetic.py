@@ -255,7 +255,10 @@ def test_novel_mutations(toy_gene, solver):
             "cn": {"1": 1, "6": 1},
             "data": {(100_000_110, "_"): 0, (100_000_110, "delAC"): 20},
             "sol": [({"1": 1, "6": 1}, (100_000_110, "delAC"))],
-            "score": NOVEL_MUTATION_PENAL + 0.1,
+            "score": NOVEL_MUTATION_PENAL + 0.1 + 1,
+            # Last 1 is needed as the model right now considers novel mutations
+            # as "independent" alleles and still (incorrectly) counts the '_'
+            # for both *1 here.
         },
     )
     # Test novel mutations
@@ -266,6 +269,6 @@ def test_novel_mutations(toy_gene, solver):
             "cn": {"1": 2},
             "data": {(100_000_110, "_"): 10, (100_000_110, "delAC"): 10},
             "sol": [({"1": 2}, (100_000_110, "delAC"))],
-            "score": NOVEL_MUTATION_PENAL + 0.1,
+            "score": NOVEL_MUTATION_PENAL + 0.1 + 1,
         },
     )

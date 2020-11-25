@@ -297,7 +297,7 @@ class Gene:
         """
         return self.get_functional(mut, infer) is not None
 
-    def get_rsid(self, *args) -> str:
+    def get_rsid(self, *args, default=True) -> str:
         """
         :return: rsID if a mutation has it; otherwise "-".
             bool: ``True`` if a mutation is functional
@@ -308,9 +308,10 @@ class Gene:
             pos, op = args
         else:
             pos, op = args[0]
+        res = "-"
         if (pos, op) in self.mutations:
-            return self.mutations[pos, op][1]
-        return "-"
+            res = self.mutations[pos, op][1]
+        return res if res != "-" or not default else f"{pos + 1}.{op}"
 
     def get_refseq(self, *args, from_atg=False) -> str:
         """
@@ -351,7 +352,7 @@ class Gene:
 
     def has_coverage(self, a: str, pos: int):
         """
-        Returns: ``True`` if a major allele `a` covers the mutation `m`.
+        :return: ``True`` if a major allele `a` covers the mutation `m`.
         """
         m_gene, m_region = self.region_at(pos)
         return self.cn_configs[self.alleles[a].cn_config].cn[m_gene][m_region] > 0
@@ -965,7 +966,7 @@ class Gene:
 
     def _print_mutation(self, m):
         fields = [
-            self.get_rsid(m),
+            self.get_rsid(m, default=False),
             self.get_refseq(m, from_atg=True),
             f"{self.refseq}:" + self.get_refseq(m),
         ]

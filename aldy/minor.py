@@ -435,8 +435,8 @@ def solve_minor_model(
     # ... and novel functional mutations from the major model!
     objective += NOVEL_MUTATION_PENAL * model.quicksum(
         v[0]
-        for a in VKEEP
-        for m, v in VKEEP[a].items()
+        for a in VNEW
+        for m, v in VNEW[a].items()
         if gene.is_functional(m) and m not in gene.alleles[a[0].major].func_muts
     )
     PHASE_ERROR = 10

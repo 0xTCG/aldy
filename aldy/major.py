@@ -145,22 +145,16 @@ def solve_major_model(
     }
     constraints = {e: 0 for e in VERR}
 
-    # Add a binary variable for each mutation copy.
-    # VNEW[m, cn] = 0 <=> sum(VA[a] if m in a) >= 1
-    VNEW = {
-        (m, n): model.addVar(vtype="B", name=f"N_{m}_{n}")
-        for m in func_muts
-        for n in range(cn_solution.max_cn())
-    }
-    for m in func_muts:
-        for n in range(1, cn_solution.max_cn()):
-            model.addConstr(VNEW[m, n] <= VNEW[m, n - 1], name=f"CORD_NEW")
+    # Add a binary variable for each mutation copy
+    # For each present functional mutation, add a binary variable VNEW s.t.
+    #   VNEW[m] = 0 <=> sum(VA[a] if m in a) >= 1
+    VNEW = {m: model.addVar(vtype="B", name=f"N_{m}") for m in func_muts}
 
     # Populate the constraints
     for a in alleles:
         for m in alleles[a].func_muts:
             constraints[m] += VA[a]
-    for (m, _), v in VNEW.items():
+    for m, v in VNEW.items():
         constraints[m] += v
 
     # Populate constraints of non-variations (i.e. matches with the reference genome)
@@ -172,17 +166,15 @@ def solve_major_model(
             if not gene.has_coverage(a[0], pos):
                 continue
             # An insertion still contributes to the total coverage at this loci
-            if any(
-                ma[0] == pos and not ma[1][:3] == "ins" for ma in alleles[a].func_muts
-            ):
+            if any(ma[0] == pos and ma[1][:3] != "ins" for ma in alleles[a].func_muts):
                 continue
-            # Make sure that the allele has no novel mutations at this position
-            z = model.quicksum(
-                v for (m, n), v in VNEW.items() if m[0] == pos and m[1][:3] != "ins"
-            )
-            constraints[ref_m] += VA[a] - z
-            # Ensure that only one additional mutation can be selected here
-            # model.addConstr(z <= 1, name=f"CONE_{pos}")
+            constraints[ref_m] += VA[a]
+
+        # We ensure that only one additional mutation can be selected here (HACK)
+        z = model.quicksum(
+            v for m, v in VNEW.items() if m[0] == pos and m[1][:3] != "ins"
+        )
+        model.addConstr(z <= 1, name=f"CONE_{pos}")
 
     # Each allele must express all of its functional mutations
     debug_info["id"] = identifier
@@ -202,38 +194,30 @@ def solve_major_model(
         model.addConstr(expr <= cnt, name=f"CSAT_{cnf}")
         model.addConstr(expr >= cnt, name=f"CSAT_{cnf}")
 
-    # Each functional mutation must be either chosen by some allele or marked as novel
-    # 1 == (m chosen by allele) XOR (m novel)
-    #   == OR(VA[a] for all a if m in a) XOR OR(VNEW[m, n] for all n)
+    # Each functional mutation must be either chosen by some allele or marked as novel:
+    #   1 == (m chosen by allele) XOR (m novel) == OR(VA[a] if m in a) XOR VNEW[m]
     for m in func_muts:
-        VOR_A = model.addVar(vtype="B", name=f"OR_A_{m}")
+        VOR = model.addVar(vtype="B", name=f"OR_{m}")
         m_all = {a for a in alleles if m in alleles[a].func_muts}
-        model.addConstr(VOR_A <= model.quicksum(VA[a] for a in m_all), name="COR_A")
+        model.addConstr(VOR <= model.quicksum(VA[a] for a in m_all), name="COR")
         for a in m_all:
-            model.addConstr(VOR_A >= VA[a], name="COR_A")
-
-        VOR_N = model.addVar(vtype="B", name=f"OR_N_{m}")
-        n_all = [v for (vm, n), v in VNEW.items() if vm == m]
-        model.addConstr(VOR_N <= model.quicksum(n_all), name="COR_N")
-        for v in n_all:
-            model.addConstr(VOR_N >= v, name="COR_N")
-
+            model.addConstr(VOR >= VA[a], name="COR")
         VXOR = model.addVar(vtype="B", name=f"XOR_{m}")
-        model.addConstr(VXOR <= VOR_N + VOR_A, name="CXOR")
-        model.addConstr(VXOR <= 2 - VOR_N - VOR_A, name="CXOR")
-        model.addConstr(VXOR >= VOR_N - VOR_A, name="CXOR")
-        model.addConstr(VXOR >= VOR_A - VOR_N, name="CXOR")
+        model.addConstr(VXOR <= VNEW[m] + VOR, name="CXOR")
+        model.addConstr(VXOR <= 2 - VNEW[m] - VOR, name="CXOR")
+        model.addConstr(VXOR >= VNEW[m] - VOR, name="CXOR")
+        model.addConstr(VXOR >= VOR - VNEW[m], name="CXOR")
         model.addConstr(VXOR >= 1, name="CXOR")
 
     # Objective: minimize the absolute sum of errors and the number of novel mutations
     objective = model.abssum(e for e in VERR.values())
 
     z = model.addVar(vtype="B", name="NOVEL")
-    for m, n in VNEW:
-        model.addConstr(z >= VNEW[m, n], name=f"NOVEL_UB_{VNEW[m, n]}")
+    for m in VNEW:
+        model.addConstr(z >= VNEW[m], name=f"NOVEL_UB_{VNEW[m]}")
     model.addConstr(z <= model.quicksum(VNEW[m] for m in VNEW), name="NOVEL_LB")
     objective += NOVEL_MUTATION_PENAL * z
-    objective += 0.1 * model.quicksum(VNEW.values())
+    objective += 0.1 * model.quicksum(VNEW[m] for m in VNEW)
     model.setObjective(objective)
     if debug:
         model.dump(f"{debug}.major{identifier}.lp")
@@ -250,9 +234,8 @@ def solve_major_model(
             [lookup[s][0] for s in sol if s in lookup and s.startswith("A_")]
         )
         novel_muts = sorted_tuple(
-            [lookup[s][0] for s in sol if s in lookup and s.startswith("N_")]
+            [lookup[s] for s in sol if s in lookup and s.startswith("N_")]
         )
-        print(novel_muts)
         if (solved_alleles, novel_muts) not in result:
             solution = collections.Counter(
                 SolvedAllele(gene, major=a) for a in solved_alleles
