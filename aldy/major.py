@@ -152,6 +152,9 @@ def solve_major_model(
         for m in func_muts
         for n in range(cn_solution.max_cn())
     }
+    for m in func_muts:
+        for n in range(1, cn_solution.max_cn()):
+            model.addConstr(VNEW[m, n] <= VNEW[m, n - 1], name=f"CORD_NEW")
 
     # Populate the constraints
     for a in alleles:
