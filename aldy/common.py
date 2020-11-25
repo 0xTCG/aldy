@@ -281,16 +281,9 @@ def parse_cn_region(cn_region):
     return None
 
 
-_json = None
+class JsonDict(dict):
+    def __missing__(self, key):
+        return JsonDict()
 
 
-def json_print(debug, *args, **kwargs):
-    """
-    Print debug information to `debug`.json.
-    """
-    if not debug:
-        return
-    global _json
-    if not _json:
-        _json = open(f"{debug}.json", "w")
-    print(*args, **kwargs, flush=True, file=_json)
+json = JsonDict()

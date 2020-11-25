@@ -16,23 +16,27 @@ from aldy.common import SOLUTION_PRECISION, sorted_tuple
 
 
 def assert_minor(gene, solver, data, shallow=False):
-    cn_sol = CNSolution(0, list(collections.Counter(data["cn"]).elements()), gene)
+    cn_sol = CNSolution(gene, 0, list(collections.Counter(data["cn"]).elements()))
 
     cov = collections.defaultdict(dict)
     for (pos, op), c in data["data"].items():
         cov[pos][op] = c
     cov = Coverage(cov, 0.5, {})
 
-    major_solved = {
-        SolvedAllele(maj, None, tuple(), tuple())
-        if not isinstance(maj, tuple)
-        else SolvedAllele(
-            maj[0], None, tuple(Mutation(mp, mo, True) for mp, mo in maj[1:]), tuple()
-        ): cnt
-        for maj, cnt in data["major"].items()
-    }
-    major = MajorSolution(0, major_solved, cn_sol)
+    if isinstance(data["major"], tuple):
+        major = MajorSolution(
+            0,
+            {SolvedAllele(gene, m): c for m, c in data["major"][0].items()},
+            cn_sol,
+            [Mutation(*m) for m in data["major"][1:]],
+        )
+    else:
+        major = MajorSolution(
+            0, {SolvedAllele(gene, m): c for m, c in data["major"].items()}, cn_sol, [],
+        )
+
     sols = estimate_minor(gene, cov, [major], solver)
+    print(sols)
 
     if "score" in data:
         for s in sols:
@@ -84,9 +88,9 @@ def test_basic(toy_gene, solver):
         solver,
         {
             "cn": {"1": 2},
-            "data": {(115, "_"): 20},
+            "data": {(100_000_114, "_"): 20},
             "major": {"1": 2},
-            "sol": [("1", [], []), ("1", [], [])],
+            "sol": [("1.001", [], []), ("1.001", [], [])],
             "score": 0,
         },
     )
@@ -98,9 +102,9 @@ def test_minor(toy_gene, solver):
         solver,
         {
             "cn": {"1": 2},
-            "data": {(115, "_"): 9, (115, "SNP.TA"): 11},
+            "data": {(100_000_114, "_"): 9, (100_000_114, "T>A"): 11},
             "major": {"1": 2},
-            "sol": [("1", [], []), ("1B", [], [])],
+            "sol": [("1.001", [], []), ("1.002", [], [])],
             "score": 0.2,
         },
     )
@@ -113,14 +117,14 @@ def test_miss(toy_gene, solver):
         {
             "cn": {"1": 2},
             "data": {
-                (115, "_"): 10,
-                (115, "SNP.TA"): 10,
-                (148, "_"): 20,
-                (151, "_"): 10,
-                (151, "SNP.CT"): 10,
+                (100_000_114, "_"): 10,
+                (100_000_114, "T>A"): 10,
+                (100_000_147, "_"): 20,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 10,
             },
             "major": {"1": 1, "3": 1},
-            "sol": [("1B", [], []), ("3", [(148, "INS.A")], [])],
+            "sol": [("1.002", [], []), ("3.001", [(100_000_147, "insA")], [])],
             "score": MISS_PENALTY_FACTOR,
         },
     )
@@ -133,15 +137,15 @@ def test_add(toy_gene, solver):
         {
             "cn": {"1": 2},
             "data": {
-                (115, "_"): 0,
-                (115, "SNP.TA"): 20,
-                (148, "_"): 20,
-                (148, "INS.A"): 10,
-                (151, "_"): 10,
-                (151, "SNP.CT"): 10,
+                (100_000_114, "_"): 0,
+                (100_000_114, "T>A"): 20,
+                (100_000_147, "_"): 20,
+                (100_000_147, "insA"): 10,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 10,
             },
             "major": {"1": 1, "3": 1},
-            "sol": [("1B", [], []), ("3", [], [(115, "SNP.TA")])],
+            "sol": [("1.002", [], []), ("3.001", [], [(100_000_114, "T>A")])],
             "score": ADD_PENALTY_FACTOR,
         },
     )
@@ -154,19 +158,19 @@ def test_major_novel(toy_gene, solver):
         {
             "cn": {"1": 2, "6": 1},
             "data": {
-                (111, "_"): 10,
-                (111, "DEL.AC"): 10,
-                (115, "_"): 10,
-                (115, "SNP.TA"): 10,
-                (148, "_"): 20,
-                (151, "_"): 10,
-                (151, "SNP.CT"): 10,
+                (100_000_110, "_"): 10,
+                (100_000_110, "delAC"): 10,
+                (100_000_114, "_"): 10,
+                (100_000_114, "T>A"): 10,
+                (100_000_147, "_"): 20,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 10,
             },
-            "major": {("1", (111, "DEL.AC")): 1, "3": 1, "6": 1},
+            "major": ({"1": 1, "3": 1, "6": 1}, (100_000_110, "delAC")),
             "sol": [
-                ("1B", [], [(111, "DEL.AC")]),
-                ("3", [(148, "INS.A")], []),
-                ("6DEL", [], []),
+                ("1.002", [], []),
+                ("3.001", [(100_000_147, "insA")], [(100_000_110, "delAC")]),
+                ("6.001", [], []),
             ],
             "score": MISS_PENALTY_FACTOR + NOVEL_MUTATION_PENAL,
         },

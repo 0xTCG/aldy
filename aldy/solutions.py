@@ -5,51 +5,49 @@
 
 
 import collections
+from dataclasses import dataclass, field
 from natsort import natsorted
-from typing import List
-from .gene import Gene
+from typing import List, Dict, Optional, Tuple
+from .gene import Gene, Mutation
 
 
-class CNSolution(
-    collections.namedtuple("CNSolution", ["gene", "score", "solution", "region_cn"])
-):
+@dataclass
+class CNSolution:
     r"""
     Valid copy-number configuration assignment.
-    Immutable.
 
-    Attributes:
-        gene (:obj:`aldy.gene.Gene`):
-            Gene instance.
-        score (float):
-            ILP model objective score (0 for user-provided solutions).
-        solution (dict[str, int]):
-            Copy-number configurations mapped to the corresponding copy number
-            (e.g. ``{1: 2}`` means that there are two copies of \*1 configuration).
-        region_cn (list[dict[str, int]]):
-            Gene region copy numbers inferred by this solution.
+    :param gene: Gene instance.
+    :param score: ILP model objective score (0 for user-provided solutions).
+    :param solution:
+        Copy-number configurations mapped to the corresponding copy number
+        (e.g. ``{1: 2}`` means that there are two copies of \*1 configuration).
+    :param region_cn: Gene region copy numbers inferred by this solution.
 
-    Notes:
-        Has custom printer (``__str__``).
+    .. note:: Has custom printer (``__str__``).
     """
 
-    def __new__(self, gene: Gene, score: float, solution: List[str]):
-        vec = [{r: 0 for r in gene.regions[0]} for _ in gene.cn_configs["1"].cn]
+    gene: Gene
+    score: float
+    solution: Dict[str, int]
+    region_cn: List[Dict[str, int]]
+
+    def __init__(self, gene: Gene, score: float, solution: List[str]):
+        self.region_cn = [
+            {r: 0 for r in gene.regions[0]} for _ in gene.cn_configs["1"].cn
+        ]
         for conf in solution:
             for gi, g in enumerate(gene.cn_configs[conf].cn):
                 for r in g:
-                    vec[gi][r] += g[r]
-        return super(CNSolution, self).__new__(  # type:ignore
-            self, gene, score, collections.Counter(solution), vec,
-        )
+                    self.region_cn[gi][r] += g[r]
+        self.gene = gene
+        self.score = score
+        self.solution = collections.Counter(solution)
 
     def __hash__(self):
         return str(self).__hash__()
 
     def position_cn(self, pos: int) -> float:
-        """
-        Returns:
-            float: Copy number at the locus ``pos``.
-        """
+        """:return: Copy number at the locus ``pos``."""
         try:
             g, region = self.gene.region_at(pos)
             return self.region_cn[g][region]
@@ -69,34 +67,34 @@ class CNSolution(
             ),
         )
 
+    def max_cn(self):
+        """Maximum copy-number in this solution"""
+        return sum(self.solution.values())
 
-class SolvedAllele(
-    collections.namedtuple(
-        "SolvedAllele", ["gene", "major", "minor", "added", "missing"]
-    )
-):
+
+@dataclass
+class SolvedAllele:
     """
     Solved star-allele assignment.
-    Immutable.
 
-    Attributes:
-        gene (:obj:`aldy.gene.Gene`):
-            Gene instance.
-        major (str):
-            Major star-allele identifier.
-        minor (str, optional):
-            Minor star-allele identifier. Can be None.
-        added (tuple[:obj:`aldy.gene.Mutation`]):
-            Mutations that are added to the star-allele
-            (i.e. these mutations are not present in the allele database definition).
-        missing (tuple[:obj:`aldy.gene.Mutation`]):
-            Mutations that are omitted from the star-allele
-            (i.e. these mutations are present in the allele database definition
-            but not here).
+    :param gene: Gene instance.
+    :param major: Major star-allele identifier.
+    :param minor: Minor star-allele identifier. Can be None.
+    :param added:
+        Mutations that are added to the star-allele
+        (present in the allele database definition).
+    :param missing:
+        Mutations that are omitted from the star-allele
+        (present in the allele database definition but not here).
 
-    Notes:
-        Has custom printer (``__str__``).
+    .. note:: Has custom printer (``__str__``).
     """
+
+    gene: Gene
+    major: str
+    minor: Optional[str] = None
+    added: List[Mutation] = field(default_factory=list)
+    missing: List[Mutation] = field(default_factory=list)
 
     def mutations(self):
         m = self.gene.alleles[self.major].func_muts
@@ -112,7 +110,7 @@ class SolvedAllele(
         return "*{}{}".format(
             self.major,
             "".join(
-                " +" + self.gene.get_dbsnp(m)
+                " +" + self.gene.get_rsid(m)
                 for m in sorted(
                     m for m in self.added if self.gene.is_functional(m, False)
                 )
@@ -125,42 +123,44 @@ class SolvedAllele(
         """
         return "*{}{}{}".format(
             self.minor if self.minor else self.major,
-            "".join(" +" + self.gene.get_dbsnp(m) for m in sorted(self.added)),
-            "".join(" -" + self.gene.get_dbsnp(m) for m in sorted(self.missing)),
+            "".join(" +" + self.gene.get_rsid(m) for m in sorted(self.added)),
+            "".join(" -" + self.gene.get_rsid(m) for m in sorted(self.missing)),
+        )
+
+    def __hash__(self):
+        return hash(
+            (self.gene.name, self.major, self.minor, *self.added, *self.missing)
         )
 
 
-class MajorSolution(
-    collections.namedtuple(
-        "MajorSolution", ["score", "solution", "cn_solution", "added"]
-    )
-):
+@dataclass
+class MajorSolution:
     r"""
     Valid major star-allele assignment.
-    Immutable.
 
-    Attributes:
-        score (float):
-            ILP model objective score.
-        solution (dict[:obj:`SolvedAllele`, int]):
-            Major star-alleles and the corresponding copy numbers
-            (e.g. ``{1: 2}`` means that we have two copies of \*1).
-        cn_solution (:obj:`aldy.solutions.CNSolution`):
-            Copy-number solution that was used to assign major star-alleles.
-        added (list[:obj:`Mutation`]):
-            List of added mutations. Will be assigned to :obj:`SolvedAllele` in the
-            minor star-allele calling step if phasing is enabled.
+    :param score: ILP model objective score.
+    :param solution:
+        Major star-alleles and the corresponding copy numbers
+        (e.g. ``{1: 2}`` means that we have two copies of \*1).
+    :param cn_solution: Copy-number solution that was used to assign major star-alleles.
+    :param added:
+        List of added mutations. Will be assigned to :obj:`SolvedAllele` in the
+        minor star-allele calling step if phasing is enabled.
 
-    Notes:
-        Has custom printer (``__str__``).
+    .. note:: Has custom printer (``__str__``).
     """
+
+    score: float
+    solution: Dict[SolvedAllele, int]
+    cn_solution: CNSolution
+    added: List[Mutation]
 
     def _solution_nice(self):
         x = ", ".join(
             f"{v}x{s}"
             for s, v in natsorted(self.solution.items(), key=lambda x: x[0].major)
         )
-        y = ", ".join(self.cn_solution.gene.get_dbsnp(m) for m in self.added)
+        y = ", ".join(self.cn_solution.gene.get_rsid(m) for m in self.added)
         return " & ".join([x, y] if y else [x])
 
     def __str__(self):
@@ -174,29 +174,24 @@ class MajorSolution(
         return str(self).__hash__()
 
 
-class MinorSolution(
-    collections.namedtuple("MinorSolution", ["score", "solution", "major_solution"])
-):
+@dataclass
+class MinorSolution:
     """
     Valid minor star-allele assignment.
-    Immutable.
 
-    Attributes:
-        score (float):
-            ILP model objective score.
-        solution (list[:obj:`SolvedAllele`]):
-            List of solved minor star-alleles.
-            Modifications to the minor alleles are represented in
-            :obj:`SolvedAllele` format.
-        major_solution (:obj:`aldy.solutions.MajorSolution`):
-            Major star-allele solution used for calculating the
-            minor star-allele assignment.
-        diplotype (tuple[list[int], list[int]]):
-            Diplotype assignment
+    :param score: ILP model objective score.
+    :param solution:
+        List of solved minor star-alleles.
+        Modifications to minor alleles are represented in :obj:`SolvedAllele` format.
+    :param major_solution:
+        Major star-allele solution used for calculating minor star-allele assignments.
 
-    Notes:
-        Has custom printer (``__str__``).
+    .. note:: Has custom printer (``__str__``).
     """
+
+    score: float
+    solution: List[SolvedAllele]
+    major_solution: MajorSolution
 
     def _solution_nice(self):
         return ", ".join(
@@ -227,7 +222,7 @@ class MinorSolution(
         n = str(self.solution[i].major).split("#")[0:1]
         for m in self.solution[i].added:
             if gene.is_functional(m, infer=False):
-                n.append(gene.get_dbsnp(m))
+                n.append(gene.get_rsid(m))
         return "+".join(n)
 
     def get_minor_name(self, i, legacy=False):
@@ -240,9 +235,9 @@ class MinorSolution(
         assert len(t) == 1
         n = [m.minors[t[0]].alt_name if legacy and m.minors[t[0]].alt_name else t[0]]
         for m in self.solution[i].added:
-            n.append("+" + gene.get_dbsnp(m))
+            n.append("+" + gene.get_rsid(m))
         for m in self.solution[i].missing:
-            n.append("-" + gene.get_dbsnp(m))
+            n.append("-" + gene.get_rsid(m))
         return " ".join(n)
 
     def get_major_diplotype(self):

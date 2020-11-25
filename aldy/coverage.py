@@ -22,27 +22,26 @@ class Coverage:
         coverage: Dict[int, Dict[str, int]],
         threshold: float,
         cnv_coverage: Dict[int, int],
-        sample: str,
+        sample: str = "sample",
     ) -> None:
         """
         Coverage initialization.
 
-        Args:
-            coverage (dict[int, dict[str, int]]):
-                Coverage for each locus within a sample represented as a dictionary
-                that maps mutation (or a reference position indicated by `_`)
-                to the number of reads supporting that mutation.
-                For example, ``coverage[10]['A>G'] = 2`` means that there are 2
-                reads that have G (instead of A) at the genomic locus 10.
-            threshold (float):
-                Threshold `t` used for filtering out low-quality mutations.
-                Any mutation with the coverage less than `t`% is filtered out.
-                Ranges from 0 to 1 (normalized percentage).
-            cnv_coverage (dict[int, int]):
-                Coverage of the copy-number neutral region of the sample:
-                each genomic locus within that region points to the corresponsing read
-                coverage.
-                Used for coverage rescaling.
+        :param coverage:
+            Coverage for each locus within a sample represented as a dictionary that
+            maps mutation (or a reference position indicated by `_`) to the number of
+            reads supporting that mutation.
+            For example, ``coverage[10]['A>G'] = 2`` means that there are 2 reads that
+            have G (instead of A) at the genomic locus 10.
+        :param threshold:
+            Threshold `t` used for filtering out low-quality mutations.
+            Any mutation with the coverage less than `t`% is filtered out.
+            Ranges from 0 to 1 (normalized percentage).
+        :param cnv_coverage:
+            Coverage of the copy-number neutral region of the sample: each genomic locus
+            within that region points to the corresponsing read coverage.
+            Used for coverage rescaling.
+        :param sample: Sample name. Default: 'sample'.
         """
         self._coverage = coverage
         self._threshold = threshold
@@ -53,75 +52,51 @@ class Coverage:
         self._region_coverage: Dict[Tuple[int, str], float] = {}
 
     def __getitem__(self, mut: Mutation) -> float:
-        """
-        Returns:
-            float: Coverage of the mutation ``mut``.
-        """
+        """ :return: Coverage of the mutation ``mut``. """
         return self.coverage(mut)
 
     def coverage(self, mut: Mutation) -> float:
-        """
-        Returns:
-            float: Coverage of the mutation ``mut``.
-        """
+        """ :return: Coverage of the mutation ``mut``. """
         if mut.op in self._coverage[mut.pos]:
             return self._coverage[mut.pos][mut.op]
         else:
             return 0
 
     def total(self, pos: int) -> float:
-        """
-        Returns:
-            float: Total coverage at the locus ``pos``.
-        """
+        """ :return: Total coverage at the locus ``pos``. """
         if pos not in self._coverage:
             return 0
         return float(sum(v for p, v in self._coverage[pos].items() if p[:3] != "ins"))
 
     def percentage(self, m: Mutation) -> float:
-        """
-        Returns:
-            float: Coverage of the mutation ``mut`` expressed as a percentage
-            in the range 0-100.
-        """
+        """ :return: Coverage of the mutation ``mut`` as a percentage (0-100%). """
         total = self.total(m.pos)
         if total == 0:
             return 0
         return 100.0 * self.coverage(m) / total
 
     def loci_cn(self, pos: int) -> float:
-        """
-        Returns:
-            float: Copy number of the locus ``pos``.
-        """
+        """ :return: Copy number of the locus ``pos``. """
         if self._rescaled[pos] == 0:
             return 0
         return self.total(pos) * (1 / self._rescaled[pos])
 
     def single_copy(self, pos: int, cn_solution) -> float:
         """
-        Args:
-            pos (int): genomic locus
-            cn_solution (:obj:`aldy.solutions.CNSolution`): copy-number solution
-        Returns:
-            float: Coverage of a single gene copy at the locus ``pos``.
+        :param pos: Genomic locus,
+        :param cn_solution: Copy-number solution.
+        :return: Coverage of a single gene copy at the locus ``pos``.
         """
         if cn_solution.position_cn(pos) == 0:
             return 0
         return max(1, self.total(pos)) / cn_solution.position_cn(pos)
 
     def region_coverage(self, gene: int, region: str) -> float:
-        """
-        Returns:
-            float: Average coverage of the region ``region`` in ``gene``.
-        """
+        """ :return: Average coverage of the region ``region`` in ``gene``. """
         return self._region_coverage[gene, region]
 
     def average_coverage(self) -> float:
-        """
-        Returns:
-            float: Average coverage of the sample.
-        """
+        """ :return: Average coverage of the sample. """
         return sum(self.total(pos) for pos in self._coverage) / float(
             len(self._coverage) + 0.1
         )
@@ -130,19 +105,17 @@ class Coverage:
         self, filter_fn: Callable[[Mutation, float, float, float], bool]
     ):  # -> Coverage
         """
-        Args:
-            filter_fn (callable):
-                Function that performs mutation filtering with the following arguments:
+        :param filter_fn:
+            Function that performs mutation filtering with the following arguments:
 
-                    1. mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
-                    2. cov (float): coverage of the mutation
-                    3. total (float): total coverage of the mutation locus
-                    4. thres (float): filtering threshold
+                1. mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
+                2. cov (float): coverage of the mutation
+                3. total (float): total coverage of the mutation locus
+                4. thres (float): filtering threshold
 
-                ``filter_fn`` returns ``False`` if a mutation is filtered out.
+            ``filter_fn`` returns ``False`` if a mutation is filtered out.
 
-        Returns:
-            :obj:`Coverage`: Filtered coverage.
+        :return: Filtered coverage.
         """
 
         cov = collections.defaultdict(
@@ -165,16 +138,15 @@ class Coverage:
             },
         )
 
-        new_cov = Coverage(cov, self._threshold, self._cnv_coverage, self.sample)  # type: ignore
+        new_cov = Coverage(
+            cov, self._threshold, self._cnv_coverage, self.sample  # type: ignore
+        )
         new_cov._rescaled = self._rescaled
         new_cov._region_coverage = self._region_coverage
         return new_cov
 
     def diploid_avg_coverage(self) -> float:
-        """
-        Returns:
-            float: Average coverage of the copy-number neutral region.
-        """
+        """ :return: Average coverage of the copy-number neutral region. """
         return float(sum(self._cnv_coverage.values())) / abs(
             self._cn_region.end - self._cn_region.start
         )
@@ -188,30 +160,19 @@ class Coverage:
         """
         Normalize the sample coverage to match the profile coverage.
 
-        Args:
-            profile (dict[str, dict[int, float]]):
-                Profile coverage in the form `chromosome: (position -> coverage)`.
-            gene_regions
-            (dict[int, dict[str, :obj:`aldy.common.GRange`]]):
-                List of genic regions for each gene.
-            cn_region (:obj:`aldy.common.GRange`):
-                Copy-number neutral region.
+        :param profile:
+            Profile coverage in the form `chromosome: (position -> coverage)`.
+        :param gene_regions: List of genic regions for each gene.
+        :param cn_region: Copy-number neutral region.
         """
 
-        #: GRange: store the CN-neutral region
-        self._cn_region: GRange = cn_region
+        self._cn_region: GRange = cn_region  #: GRange: store the CN-neutral region
         sam_ref = sum(
             self._cnv_coverage[i] for i in range(cn_region.start, cn_region.end)
         )
         cnv_ref = sum(
             profile[cn_region.chr][i] for i in range(cn_region.start, cn_region.end)
         )
-        # print(
-        #     f"{'CN':5}, {sam_ref:9.1f}, {sam_ref / (cn_region.end - cn_region.start):9.1f}"
-        # )
-        # print(
-        #     f"{'CN':5}, {cnv_ref:9.1f}, {cnv_ref / (cn_region.end - cn_region.start):9.1f}"
-        # )
 
         if sam_ref == 0:
             raise AldyException(

@@ -7,7 +7,7 @@ from typing import List, Set, Callable, Optional, Tuple, Dict
 
 from natsort import natsorted
 from . import lpinterface
-from .common import log, json_print
+from .common import log, json, JsonDict
 from .gene import Mutation, Gene
 from .cn import MAX_CN
 from .major import NOVEL_MUTATION_PENAL
@@ -18,14 +18,18 @@ from .diplotype import estimate_diplotype
 
 # Model parameters
 MISS_PENALTY_FACTOR = 1.5
-"""float: Penalty for each missed minor mutation (0 for no penalty).
-          Ideally larger than `ADD_PENALTY_FACTOR` as additions should be cheaper."""
+"""
+Penalty for each missed minor mutation (0 for no penalty).
+Ideally larger than `ADD_PENALTY_FACTOR` as additions should be cheaper.
+"""
 
 ADD_PENALTY_FACTOR = 1.0
-"""float: Penalty for each novel minor mutation (0 for no penalty).
-          Zero penalty always prefers mutation additions over coverage errors
-          if the normalized SNP slack coverage is >= 50%.
-          Penalty of 1.0 prefers additions if the SNP slack coverage is >= 75%."""
+"""
+Penalty for each novel minor mutation (0 for no penalty).
+Zero penalty always prefers mutation additions over coverage errors if the
+normalized SNP slack coverage is >= 50%.
+Penalty of 1.0 prefers additions if the SNP slack coverage is >= 75%.
+"""
 
 
 def estimate_minor(
@@ -42,27 +46,21 @@ def estimate_minor(
     """
     Estimate the optimal minor star-allele.
 
-    Args:
-        gene (:obj:`aldy.gene.Gene`):
-            Gene instance.
-        coverage (:obj:`aldy.coverage.Coverage`):
-            Read coverage data.
-        major_sol (:obj:`aldy.solutions.MajorSolution`):
-            Major allele solution that will be used for minor star-allele calling.
-        solver (str):
-            ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
-        filter_fn (callable):
-            Custom filtering function.
-            Default is ``None``.
-        max_solutions (int):
-            Maximum number of solutions to report.
-            Default is 1.
-        debug (str, optional):
-            If set, create a "`debug`.minor`identifier`.lp" file for debug purposes.
-            Default is ``None``.
-
-    Returns:
-        list[:obj:`aldy.solutions.MinorSolution`]
+    :param gene: Gene instance.
+    :param coverage: Read coverage data.
+    :param major_sol:
+        Major allele solution that will be used for minor star-allele calling.
+    :param solver:
+        ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
+    :param filter_fn:
+        Custom filtering function.
+        Default is ``None``.
+    :param max_solutions:
+        Maximum number of solutions to report.
+        Default is 1.
+    :param debug:
+        If set, create a "`debug`.minor`identifier`.lp" file for debug purposes.
+        Default is ``None``.
     """
 
     # Get the list of potential alleles and mutations
@@ -71,13 +69,12 @@ def estimate_minor(
     # *from all available major solutions* together
     mutations: Set[Mutation] = set()
     for major_sol in major_sols:
-        for (_, ma, _, _, _) in major_sol.solution:
+        for sa in major_sol.solution:
             alleles += [
-                SolvedAllele(gene, ma, mi, tuple(), tuple())
-                for mi in gene.alleles[ma].minors
+                SolvedAllele(gene, sa.major, mi) for mi in gene.alleles[sa.major].minors
             ]
-            mutations |= set(gene.alleles[ma].func_muts)
-            for sa in gene.alleles[ma].minors.values():
+            mutations |= set(gene.alleles[sa.major].func_muts)
+            for sa in gene.alleles[sa.major].minors.values():
                 mutations |= set(sa.neutral_muts)
         # if phases:
         mutations |= set(major_sol.added)
@@ -151,35 +148,28 @@ def solve_minor_model(
     """
     Solves the minor star-allele detection problem via integer linear programming.
 
-    Args:
-        gene (:obj:`aldy.gene.Gene`):
-            Gene instance.
-        alleles_list (list[:obj:`aldy.major.SolvedAllele`]):
-            List of candidate minor star-alleles.
-        coverage (:obj:`aldy.coverage.Coverage`):
-            Sample coverage used to find out the coverage of each mutation.
-        major_sol (:obj:`aldy.solutions.MajorSolution`):
-            Major star-allele solution to be used for detecting minor star-alleles
-            (check :obj:`aldy.solutions.MajorSolution`).
-        mutations (set[:obj:`aldy.gene.Mutation`]):
-            List of mutations to be considered during the solution build-up
-            (all other mutations are ignored).
-        solver (str):
-            ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
-        identifier (int):
-            Unique solution identifier. Used for generating debug information.
-            Default is 0.
-        max_solutions (int):
-            Maximum number of solutions to report.
-            Default is 1.
-        debug (str, optional):
-            If set, Aldy will create "<debug>.minor.lp" file for debug purposes.
-            Default is ``None``.
+    :param gene: Gene instance.
+    :param alleles_list: List of candidate minor star-alleles.
+    :param coverage: Sample coverage used to find out the coverage of each mutation.
+    :param major_sol:
+        Major star-allele solution to be used for detecting minor star-alleles
+        (check :obj:`aldy.solutions.MajorSolution`).
+    :param mutations:
+        List of mutations to be considered during the solution build-up
+        (all other mutations are ignored).
+    :param solver:
+        ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
+    :param identifier:
+        Unique solution identifier. Used for generating debug information.
+        Default is 0.
+    :param max_solutions:
+        Maximum number of solutions to report.
+        Default is 1.
+    :param debug:
+        If set, Aldy will create "<debug>.minor.lp" file for debug purposes.
+        Default is ``None``.
 
-    Returns:
-        list[:obj:`aldy.solutions.MinorSolution`]
-
-    Notes:
+    .. note::
         Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_
         (section Methods/Genotype refining) for the model explanation.
         Currently returns only the first optimal solution.
@@ -187,9 +177,7 @@ def solve_minor_model(
 
     log.debug("[minor] major= {}", major_sol._solution_nice())
     model = lpinterface.model("AldyMinor", solver)
-
-    # from pprint import pprint
-    # print('; '.join(map(str, sorted(mutations))))
+    debug_info = json["minor"][len(json["minor"])]
 
     # Establish minor alleles and their mutations
     alleles: Dict[Tuple[SolvedAllele, int], Set[Mutation]] = {
@@ -218,8 +206,8 @@ def solve_minor_model(
     for sa, cnt in major_sol.solution.items():
         expr = model.quicksum(
             v
-            for ((_, ma, _, ad, mi), _), v in VA.items()
-            if (ma, ad, mi) == (sa.major, sa.added, sa.missing)
+            for (vs, _), v in VA.items()
+            if (vs.major, vs.added, vs.missing) == (sa.major, sa.added, sa.missing)
         )
         model.addConstr(expr <= cnt, name=f"CCNT_{sa.major}")
         model.addConstr(expr >= cnt, name=f"CCNT_{sa.major}")
@@ -304,15 +292,8 @@ def solve_minor_model(
                 )
 
     # Ensure that each constraint matches the observed coverage
-    json_print(debug, "  {")
-    json_print(debug, f'    "cn": {str(dict(major_sol.cn_solution.solution))}, ')
-    json_print(
-        debug,
-        '    "major": {}'.format({s.major: v for s, v in major_sol.solution.items()}),
-        end=", ",
-    )
-    json_print(debug, '    "data": {', end="")
-    prev = 0
+    debug_info["cn"] = dict(major_sol.cn_solution.solution)
+    debug_info["major"] = {s.major: v for s, v in major_sol.solution.items()}
     for m, expr in sorted(constraints.items()):
         scov = coverage.single_copy(m.pos, major_sol.cn_solution)
         # If scov = 0, no mutations should be selected at that locus
@@ -320,11 +301,7 @@ def solve_minor_model(
         cov = coverage[m] / scov if scov > 0 else 0
         model.addConstr(expr + VERR[m] >= cov, name=f"CCOV_{m.pos}_{m.op}")
         model.addConstr(expr + VERR[m] <= cov, name=f"CCOV_{m.pos}_{m.op}")
-        if m.pos != prev and prev != 0:
-            json_print(debug, "\n             ", end="")
-        prev = m.pos
-        json_print(debug, f"({m.pos}, '{m.op}'): {coverage[m]:4}, ", end="")
-    json_print(debug, "}, ")
+        debug_info["data"][m.pos, m.op] = coverage[m]
 
     # Enforce the following rules:
     # 1) Each mutation is assigned only to alleles that are present in the solution
@@ -495,28 +472,15 @@ def solve_minor_model(
                     gene,
                     allele[0].major,
                     allele[0].minor,
-                    allele[0].added + tuple(added),
-                    tuple(missing),
+                    allele[0].added + added,
+                    missing,
                 )
             )
 
-        json_print(
-            debug,
-            '    "sol": {}, '.format(
-                [
-                    (
-                        s.minor,
-                        [(m[0], m[1]) for m in s.added],
-                        [(m[0], m[1]) for m in s.missing],
-                    )
-                    for s in solution
-                ]
-            ),
-        )
         sol = MinorSolution(score=opt, solution=solution, major_solution=major_sol)
         _ = estimate_diplotype(gene, sol)
-        json_print(debug, f'    "diplotype": "{sol.diplotype}"')
-        json_print(debug, "  },")
+        debug_info["sol"] = [(s.minor, s.added, s.missing) for s in solution]
+        debug_info["diplotype"] = sol.diplotype
         log.debug(
             f"[minor] status= {status}; opt= {opt:.2f} "
             + f"solution= {sol._solution_nice()}"
@@ -527,8 +491,7 @@ def solve_minor_model(
             break
     if not results:
         log.debug("[minor] solution= []")
-        json_print(debug, '    "sol": []')
-        json_print(debug, "  },")
+        debug_info["sol"] = []
         if debug and False:  # Enable to debug infeasible models
             model.model.computeIIS()
             model.dump(f"{debug}.iis.ilp")
@@ -544,9 +507,10 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
         copies = coverage.single_copy(m.pos, cn_sol)
         copies = coverage[m] / copies if copies > 0 else 0
         return (
-            f"  {gene.get_dbsnp(m):12} {str(m):15} "
+            f"  {gene.get_rsid(m):12} {str(m):15} "
             + f"{gene.get_refseq(m, from_atg=True):10} "
-            + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; impact={gene.get_functional(m)})"
+            + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
+            + f"impact={gene.get_functional(m)})"
         )
 
     log.debug("[minor] candidate mutations=")
@@ -556,14 +520,14 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
 
     log.trace("[minor] candidate alleles=")
     muts = muts.copy()
-    for _, ma, mi, add, _ in natsorted(alleles, key=lambda x: (x[1], x[2])):
+    for sa in natsorted(alleles, key=lambda x: (x.major, x.minor)):
         am = (
-            set(gene.alleles[ma].func_muts)
-            | set(gene.alleles[ma].minors[mi].neutral_muts)
-            | set(add)
+            set(gene.alleles[sa.major].func_muts)
+            | set(gene.alleles[sa.major].minors[sa.minor].neutral_muts)
+            | set(sa.added)
         )
         miss = sum(1 for a in am if coverage[m] == 0)
-        log.trace(f"  *{mi} (major= *{ma}; miss= {miss})")
+        log.trace(f"  *{sa.minor} (major= *{sa.major}; miss= {miss})")
         for m in sorted(am):
             if m in muts:
                 muts.remove(m)

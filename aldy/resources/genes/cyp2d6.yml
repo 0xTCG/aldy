@@ -1294,7 +1294,7 @@ alleles:
   CYP2D6*5.001:
     activity: no function
     mutations:
-      - [CYP2D6, deletion]
+    - [CYP2D6, deletion]
   CYP2D6*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/714
     activity: no function

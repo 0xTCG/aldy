@@ -34,7 +34,7 @@ def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0):
 
 def make_coverage(gene, lst):
     cov = {}
-    for r in sorted(gene.unique_regions):
+    for r in gene.unique_regions:
         cov[r] = next(lst)
     return cov
 

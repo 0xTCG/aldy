@@ -73,7 +73,7 @@ def write_decomposition(
                         m.op,
                         -1,
                         ["NEUTRAL", "DISRUPTING"][gene.is_functional(m)],
-                        gene.get_dbsnp(m),
+                        gene.get_rsid(m),
                         "",
                     ]
                 )
@@ -182,7 +182,7 @@ def write_vcf(
             pattern.format(
                 chrom=gene.region.chr,
                 pos=m.pos + 1,
-                id=gene.get_dbsnp(m),
+                id=gene.get_rsid(m),
                 ref=ref,
                 alt=alt,
                 qual=0,

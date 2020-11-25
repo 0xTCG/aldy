@@ -21,7 +21,7 @@ def assert_diplotype(gene, test, majors):
                 )
             )
         else:
-            sols.append(SolvedAllele(ma, None, [], []))
+            sols.append(SolvedAllele(gene, ma))
     minor = MinorSolution(0, sols, MajorSolution(0, sols, None))
     res = estimate_diplotype(gene, minor)
     assert test == res, "Diplotype not equal"

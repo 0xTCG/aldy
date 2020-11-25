@@ -20,7 +20,7 @@ from .common import (
     colorize,
     log,
     script_path,
-    json_print,
+    json,
     AldyException,
     SOLUTION_PRECISION,
 )
@@ -216,10 +216,11 @@ def genotype(
         cn_solution = ["1", "1"]
         sample = sam.Sample(gene=gene, vcf_path=sam_path, debug=debug)
 
-    json_print(debug, f'"{os.path.basename(sam_path).split(".")[0]}": {{')
+    json.update(
+        {"sample": os.path.basename(sam_path).split(".")[0], "gene": gene.name,}
+    )
 
     # Get copy-number solutions
-    json_print(debug, '  "cn": {')
     cn_sols = cn.estimate_cn(
         gene,
         sample.coverage,
@@ -229,7 +230,6 @@ def genotype(
         fusion_penalty=fusion_penalty,
         debug=debug,
     )
-    json_print(debug, "  },")
 
     # Add SLACK to each score to avoid division by zero or other numerical issues
     # when the optimum is close to zero.
@@ -242,7 +242,6 @@ def genotype(
         log.warn("WARNING: multiple gene structures found!")
     log.info(f"Potential {gene.name} gene structures for {sample_name}:")
     major_sols: list = []
-    json_print(debug, '  "major": [', end="")
     cn_sols = sorted(cn_sols, key=lambda m: (int(1000 * m.score), m._solution_nice()))
     if len(cn_sols) == 0:
         raise AldyException("No solutions found!")
@@ -264,7 +263,6 @@ def genotype(
             identifier=i,
             debug=debug,
         )
-    json_print(debug, "],")
     if len(major_sols) == 0:
         raise AldyException("No major solutions found!")
 
@@ -291,7 +289,6 @@ def genotype(
         log.info(f"  {i + 1:2}: {major_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
 
-    json_print(debug, '  "minor": [', end="")
     minor_sols = []
     for m in minor.estimate_minor(
         gene,
@@ -325,7 +322,6 @@ def genotype(
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )
     log.debug("*" * 80)
-    json_print(debug, "  ],")
 
     if multiple_warn_level >= 1 and len(minor_sols) > 1:
         log.warn("WARNING: multiple optimal solutions found!")
@@ -355,7 +351,8 @@ def genotype(
         )
     if is_vcf:
         diplotype.write_vcf(sample_name, gene, sample.coverage, minor_sols, output_file)
-    json_print(debug, "},")
+
+    print(json)
 
     if report:
         log.info(colorize(f"{gene.name} results:"))
@@ -369,7 +366,7 @@ def genotype(
                 reported.add(s)
     if any(len(m.major_solution.added) > 0 for m in minor_sols) and not phase:
         novels = {
-            gene.get_dbsnp(mm) for m in minor_sols for mm in m.major_solution.added
+            gene.get_rsid(mm) for m in minor_sols for mm in m.major_solution.added
         }
         log.warn(
             "WARNING: mutations {} suggest presence of a novel major star-allele."

@@ -15,7 +15,7 @@ from aldy.common import SOLUTION_PRECISION
 
 
 def assert_major(gene, solver, major):
-    cn_sol = CNSolution(0, list(collections.Counter(major["cn"]).elements()), gene)
+    cn_sol = CNSolution(gene, 0, list(collections.Counter(major["cn"]).elements()))
 
     cov = collections.defaultdict(dict)
     for (pos, op), c in major["data"].items():
@@ -26,24 +26,21 @@ def assert_major(gene, solver, major):
     if "score" in major:
         for s in sols:
             assert abs(major["score"] - s.score) < SOLUTION_PRECISION, "Score"
-    sols_expected = [
-        sorted(collections.Counter(c).elements(), key=str) for c in major["sol"]
-    ]
+
+    print(sols)
     sols_parsed = [
-        sorted(
+        dict(
             collections.Counter(
-                {
-                    tuple([k.major] + [(m[0], m[1]) for m in k.added])
-                    if len(k.added) > 0
-                    else k.major: v
-                    for k, v in s.solution.items()
-                }
-            ).elements(),
-            key=str,
+                [i.major for i, v in s.solution.items() for j in range(v)]
+            )
         )
         for s in sols
     ]
-    assert sorted(sols_expected) == sorted(sols_parsed)
+    for si, s in enumerate(sols):
+        if s.added:
+            sols_parsed[si] = (sols_parsed[si], *[tuple(m) for m in s.added])
+    print(sols_parsed)
+    assert major["sol"] == sols_parsed
 
 
 def test_basic(toy_gene, solver):
@@ -60,8 +57,8 @@ def test_deletion(toy_gene, solver):
         solver,
         {
             "cn": {"1": 1, "6": 1},
-            "data": {(105, "_"): 0, (105, "SNP.TA"): 10},
-            "sol": [{"1.a": 1, "6": 1}],
+            "data": {(100_000_114, "_"): 0, (100_000_114, "T>A"): 10},
+            "sol": [{"1": 1, "6": 1}],
             "score": 0,
         },
     )
@@ -75,10 +72,10 @@ def test_two_copies(toy_gene, solver):
         {
             "cn": {"1": 2},
             "data": {
-                (111, "_"): 10,
-                (111, "DEL.AC"): 10,
-                (119, "_"): 20,
-                (119, "INS.TT"): 10,
+                (100_000_110, "_"): 10,
+                (100_000_110, "delAC"): 10,
+                (100_000_118, "_"): 20,
+                (100_000_118, "insTT"): 10,
             },
             "sol": [{"1": 1, "2": 1}],
             "score": 0,
@@ -91,12 +88,12 @@ def test_two_copies(toy_gene, solver):
         {
             "cn": {"1": 2},
             "data": {
-                (111, "_"): 10,
-                (111, "DEL.AC"): 10,
-                (119, "_"): 20,
-                (119, "INS.TT"): 10,
-                (151, "_"): 10,
-                (151, "SNP.CT"): 10,
+                (100_000_110, "_"): 10,
+                (100_000_110, "delAC"): 10,
+                (100_000_118, "_"): 20,
+                (100_000_118, "insTT"): 10,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 10,
             },
             "sol": [{"2": 1, "3": 1}],
             "score": 0,
@@ -109,12 +106,12 @@ def test_two_copies(toy_gene, solver):
         {
             "cn": {"1": 2},
             "data": {
-                (111, "_"): 11,
-                (111, "DEL.AC"): 9,
-                (119, "_"): 22,
-                (119, "INS.TT"): 8,
-                (151, "_"): 10.5,
-                (151, "SNP.CT"): 9.5,
+                (100_000_110, "_"): 11,
+                (100_000_110, "delAC"): 9,
+                (100_000_118, "_"): 22,
+                (100_000_118, "insTT"): 8,
+                (100_000_150, "_"): 10.5,
+                (100_000_150, "C>T"): 9.5,
             },
             "sol": [{"2": 1, "3": 1}],
             "score": 2 / 10 + 3 / 11 + 1 / 10,
@@ -130,10 +127,10 @@ def test_multiple_copies(toy_gene, solver):
         {
             "cn": {"1": 4},
             "data": {
-                (111, "_"): 20,
-                (111, "DEL.AC"): 20,
-                (119, "_"): 40,
-                (119, "INS.TT"): 20,
+                (100_000_110, "_"): 20,
+                (100_000_110, "delAC"): 20,
+                (100_000_118, "_"): 40,
+                (100_000_118, "insTT"): 20,
             },
             "sol": [{"1": 2, "2": 2}],
             "score": 0,
@@ -149,12 +146,12 @@ def test_left_fusion(toy_gene, solver):
         {
             "cn": {"1": 2, "4": 1},
             "data": {
-                (111, "_"): 10,
-                (111, "DEL.AC"): 10,
-                (119, "_"): 20,
-                (119, "INS.TT"): 10,
+                (100_000_110, "_"): 10,
+                (100_000_110, "delAC"): 10,
+                (100_000_118, "_"): 20,
+                (100_000_118, "insTT"): 10,
             },
-            "sol": [{"1": 1, "2": 1, "4/1": 1}],
+            "sol": [{"1": 1, "2": 1, "4#1": 1}],
             "score": 0,
         },
     )
@@ -164,8 +161,8 @@ def test_left_fusion(toy_gene, solver):
         solver,
         {
             "cn": {"1": 2, "4": 1},
-            "data": {(151, "_"): 10, (151, "SNP.CT"): 20},
-            "sol": [{"1": 1, "3": 1, "4/3": 1}, {"3": 2, "4/1": 1}],
+            "data": {(100_000_150, "_"): 10, (100_000_150, "C>T"): 20},
+            "sol": [{"1": 1, "3": 1, "4#3": 1}, {"3": 2, "4#1": 1}],
             "score": 0,
         },
     )
@@ -176,12 +173,12 @@ def test_left_fusion(toy_gene, solver):
         {
             "cn": {"1": 2, "4": 1},
             "data": {
-                (105, "_"): 10,
-                (105, "SNP.TA"): 10,
-                (151, "_"): 10,
-                (151, "SNP.CT"): 20,
+                (100_000_104, "_"): 10,
+                (100_000_104, "T>A"): 10,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 20,
             },
-            "sol": [{"1.a": 1, "3": 1, "4/3": 1}],
+            "sol": [{"1C": 1, "3": 1, "4#3": 1}],
             "score": 0,
         },
     )
@@ -192,12 +189,12 @@ def test_left_fusion(toy_gene, solver):
         {
             "cn": {"1": 1, "4": 2},
             "data": {
-                (105, "_"): 0,
-                (105, "SNP.TA"): 10,
-                (151, "_"): 20,
-                (151, "SNP.CT"): 10,
+                (100_000_104, "_"): 0,
+                (100_000_104, "T>A"): 10,
+                (100_000_150, "_"): 20,
+                (100_000_150, "C>T"): 10,
             },
-            "sol": [{"1.a": 1, "4/3": 1, "4/1": 1}],
+            "sol": [{"1C": 1, "4#3": 1, "4#1": 1}],
             "score": 0,
         },
     )
@@ -210,7 +207,7 @@ def test_right_fusion(toy_gene, solver):
         solver,
         {
             "cn": {"1": 1, "5": 1},
-            "data": {(111, "_"): 10, (111, "DEL.AC"): 10},
+            "data": {(100_000_110, "_"): 10, (100_000_110, "delAC"): 10},
             "sol": [{"1": 1, "5": 1}],
             "score": 0,
         },
@@ -222,10 +219,10 @@ def test_right_fusion(toy_gene, solver):
         {
             "cn": {"1": 1, "5": 1},
             "data": {
-                (111, "_"): 0,
-                (111, "DEL.AC"): 20,
-                (119, "_"): 20,
-                (119, "INS.TT"): 10,
+                (100_000_110, "_"): 0,
+                (100_000_110, "delAC"): 20,
+                (100_000_118, "_"): 20,
+                (100_000_118, "insTT"): 10,
             },
             "sol": [{"2": 1, "5": 1}],
             "score": 0,
@@ -238,10 +235,10 @@ def test_right_fusion(toy_gene, solver):
         {
             "cn": {"1": 1, "5": 1},
             "data": {
-                (111, "_"): 10,
-                (111, "DEL.AC"): 10,
-                (151, "_"): 0,
-                (151, "SNP.CT"): 10,
+                (100_000_110, "_"): 10,
+                (100_000_110, "delAC"): 10,
+                (100_000_150, "_"): 0,
+                (100_000_150, "C>T"): 10,
             },
             "sol": [{"3": 1, "5": 1}],
             "score": 0,
@@ -256,9 +253,9 @@ def test_novel_mutations(toy_gene, solver):
         solver,
         {
             "cn": {"1": 1, "6": 1},
-            "data": {(111, "_"): 0, (111, "DEL.AC"): 20},
-            "sol": [{("1", (111, "DEL.AC")): 1, "6": 1}],
-            "score": NOVEL_MUTATION_PENAL,
+            "data": {(100_000_110, "_"): 0, (100_000_110, "delAC"): 20},
+            "sol": [({"1": 1, "6": 1}, (100_000_110, "delAC"))],
+            "score": NOVEL_MUTATION_PENAL + 0.1,
         },
     )
     # Test novel mutations
@@ -267,8 +264,8 @@ def test_novel_mutations(toy_gene, solver):
         solver,
         {
             "cn": {"1": 2},
-            "data": {(111, "_"): 10, (111, "DEL.AC"): 10},
-            "sol": [{"1": 1, ("1", (111, "DEL.AC")): 1}],
-            "score": NOVEL_MUTATION_PENAL,
+            "data": {(100_000_110, "_"): 10, (100_000_110, "delAC"): 10},
+            "sol": [({"1": 2}, (100_000_110, "delAC"))],
+            "score": NOVEL_MUTATION_PENAL + 0.1,
         },
     )
