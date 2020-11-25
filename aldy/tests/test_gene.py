@@ -213,7 +213,8 @@ def test_get_functional(toy_gene):
 
 def test_get_rsid(toy_gene):
     assert toy_gene.get_rsid(100_000_114, "T>A") == "rs28371732"
-    assert toy_gene.get_rsid(Mutation(100_000_118, "insTT")) == "-"
+    assert toy_gene.get_rsid(Mutation(100_000_118, "insTT"), default=False) == "-"
+    assert toy_gene.get_rsid(Mutation(100_000_118, "insTT")) == "100000119.insTT"
 
 
 def test_get_refseq(toy_gene):
