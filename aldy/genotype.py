@@ -352,8 +352,6 @@ def genotype(
     if is_vcf:
         diplotype.write_vcf(sample_name, gene, sample.coverage, minor_sols, output_file)
 
-    print(json)
-
     if report:
         log.info(colorize(f"{gene.name} results:"))
         reported: Set[str] = set()
