@@ -194,13 +194,11 @@ def test_region_at(toy_gene):
     assert toy_gene.region_at(100_000_105) == (0, "tmp"), "region_at test"
     assert toy_gene.region_at(100_000_127) == (0, "i1"), "region_at test"
     assert toy_gene.region_at(100_000_155) == (0, "e3"), "region_at test"
-    with pytest.raises(KeyError):
-        toy_gene.region_at(100_000_165)
+    assert toy_gene.region_at(100_000_165) is None
     assert toy_gene.region_at(100_000_005) == (1, "tmp"), "region_at test"
     assert toy_gene.region_at(100_000_027) == (1, "i1"), "region_at test"
     assert toy_gene.region_at(100_000_055) == (1, "e3"), "region_at test"
-    with pytest.raises(KeyError):
-        toy_gene.region_at(100_000_080)
+    assert toy_gene.region_at(100_000_080) is None
 
 
 def test_get_functional(toy_gene):

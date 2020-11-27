@@ -82,10 +82,11 @@ def estimate_minor(
     # Filter out low quality mutations
     def default_filter_fn(mut, cov, total, thres):
         # TODO: is this necessary?
+        r = gene.region_at(mut.pos)
         if mut.op != "_" and not (
             mut in mutations
-            or gene.region_at(mut.pos)[1][0] == "e"
-            or gene.region_at(mut.pos)[1] in ["utr3", "utr5", "up"]
+            or (r and r[1][0] == "e")
+            or (r and r[1] in ["utr3", "utr5", "up"])
         ):
             return False
         return Coverage.basic_filter(
@@ -101,10 +102,10 @@ def estimate_minor(
         for pos, c in cov._coverage.items():
             for m in c:
                 if m != "_" and Mutation(pos, m) not in mutations:
+                    r = gene.region_at(pos)
                     log.info(
                         "[minor] novel {} ({}; coverage= {:.0f}; func= {})",
-                        Mutation(pos, m),
-                        gene.region_at(pos)[1],
+                        r[1] if r else "-",
                         cov.percentage(Mutation(pos, m)),
                         gene.is_functional((pos, m)),
                     )

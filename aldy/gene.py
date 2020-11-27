@@ -246,12 +246,12 @@ class Gene:
         self.genome = genome
         self._parse_yml(name, yml)
 
-    def region_at(self, pos: int) -> Tuple[int, str]:
+    def region_at(self, pos: int) -> Optional[Tuple[int, str]]:
         """
         :param pos: Position in the reference genome.
         :return: Gene ID and a region that covers the position.
         """
-        return self._region_at[pos]
+        return self._region_at.get(pos, None)
 
     def get_functional(self, mut, infer=True) -> Optional[str]:
         """
@@ -354,8 +354,10 @@ class Gene:
         """
         :return: ``True`` if a major allele `a` covers the mutation `m`.
         """
-        m_gene, m_region = self.region_at(pos)
-        return self.cn_configs[self.alleles[a].cn_config].cn[m_gene][m_region] > 0
+        m = self.region_at(pos)
+        if m:
+            return self.cn_configs[self.alleles[a].cn_config].cn[m[0]][m[1]] > 0
+        return False
 
     def get_wide_region(self):
         mi = min(r.start for g in self.regions for r in g.values())
@@ -716,7 +718,7 @@ class Gene:
                             log.warn(
                                 f"Ignoring {pos}.{op} in {name} (not in {self.refseq})"
                             )
-                        elif self.region_at(self.ref_to_chr[pos])[1] == "-":
+                        elif self.region_at(self.ref_to_chr[pos]) is None:
                             log.warn(
                                 f"Ignoring {pos}.{op} in {name} (not in named region)"
                             )
@@ -885,8 +887,10 @@ class Gene:
 
         def preserved_mutations(f, m):
             def filter_f(m):
-                gene, region = self.region_at(m.pos)
-                return self.cn_configs[f].cn[gene][region] > 0
+                m = self.region_at(m.pos)
+                if m:
+                    return self.cn_configs[f].cn[m[0]][m[1]] > 0
+                return False
 
             return set(filter(filter_f, m))
 

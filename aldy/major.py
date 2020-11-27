@@ -281,11 +281,7 @@ def _filter_alleles(
         if a.cn_config not in cn_solution.solution:
             del alleles[an]
         elif any(cov[m] <= 0 for m in a.func_muts):
-            s = (
-                "{} in {}".format(m, gene.region_at(m.pos))
-                for m in a.func_muts
-                if cov[m] <= 0
-            )
+            s = (f"{gene.get_rsid(m)}" for m in a.func_muts if cov[m] <= 0)
             log.trace("[major] removing {} because of {}", an, " and ".join(s))
             del alleles[an]
 

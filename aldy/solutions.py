@@ -48,11 +48,8 @@ class CNSolution:
 
     def position_cn(self, pos: int) -> float:
         """:return: Copy number at the locus ``pos``."""
-        try:
-            g, region = self.gene.region_at(pos)
-            return self.region_cn[g][region]
-        except KeyError:
-            return 0
+        r = self.gene.region_at(pos)
+        return self.region_cn[r[0]][r[1]] if r else 0
 
     def _solution_nice(self):
         return ",".join(f"{v}x*{k}" for k, v in natsorted(self.solution.items()))
