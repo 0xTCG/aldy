@@ -667,7 +667,7 @@ class Sample:
             It modifies ``self.coverage``.
         """
 
-        if os.path.exists(profile):
+        if os.path.exists(profile) and os.path.isfile(profile):
             ext = os.path.splitext(profile)
             if ext[-1] in [".bam", ".sam"]:
                 prof = self._load_profile(
@@ -732,12 +732,20 @@ class Sample:
             else:
                 raise AldyException("Region parameters must be provided")
         else:
-            with gzip.open(profile_path) as f:
+
+            def read_file(f, profile):
                 for line in f:
                     if line[0] == "#":
                         continue  # skip comments
                     _, ch, pos, val = line.strip().split()
                     profile[ch.decode("utf-8")][int(pos)] = float(val)
+
+            try:
+                with gzip.open(profile_path) as f:
+                    read_file(f, profile)
+            except OSError:
+                with open(profile_path) as f:
+                    read_file(f, profile)
         return profile
 
     # ----------------------------------------------------------------------------------
