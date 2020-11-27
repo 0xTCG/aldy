@@ -59,6 +59,9 @@ def assert_minor(gene, solver, data, shallow=False):
             )
             for s in sols
         ]
+        from pprint import pprint
+
+        pprint(sols_parsed)
         assert sorted(sols_expected) == sorted(sols_parsed)
     else:
         # As assignments can vary between multiple optimal solutions,

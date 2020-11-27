@@ -27,7 +27,6 @@ def assert_major(gene, solver, major):
         for s in sols:
             assert abs(major["score"] - s.score) < SOLUTION_PRECISION, "Score"
 
-    print(sols)
     sols_parsed = [
         dict(
             collections.Counter(
@@ -39,8 +38,13 @@ def assert_major(gene, solver, major):
     for si, s in enumerate(sols):
         if s.added:
             sols_parsed[si] = (sols_parsed[si], *[tuple(m) for m in s.added])
-    print(sols_parsed)
-    assert major["sol"] == sols_parsed
+
+    def k(x):
+        if isinstance(x, tuple):
+            x = x[0]
+        return tuple(x.keys())
+
+    assert sorted(major["sol"], key=k) == sorted(sols_parsed, key=k)
 
 
 def test_basic(toy_gene, solver):

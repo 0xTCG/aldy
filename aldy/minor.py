@@ -7,7 +7,7 @@ from typing import List, Set, Callable, Optional, Tuple, Dict
 
 from natsort import natsorted
 from . import lpinterface
-from .common import log, json, JsonDict
+from .common import log, json
 from .gene import Mutation, Gene
 from .cn import MAX_CN
 from .major import NOVEL_MUTATION_PENAL

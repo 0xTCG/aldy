@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, Tuple, Callable
+from typing import Dict, Tuple, Callable, List
 
 import collections
 
@@ -154,7 +154,7 @@ class Coverage:
     def _normalize_coverage(
         self,
         profile: Dict[str, Dict[int, float]],
-        gene_regions: Dict[int, Dict[str, GRange]],
+        gene_regions: List[Dict[str, GRange]],
         cn_region: GRange,
     ) -> None:
         """
@@ -187,7 +187,7 @@ class Coverage:
 
         self._rescaled = {}
         self._region_coverage = {}
-        for gene, gr in gene_regions.items():
+        for gene, gr in enumerate(gene_regions):
             for region, rng in gr.items():
                 s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT
                 p = sum(profile[rng.chr][i] for i in range(rng.start, rng.end))

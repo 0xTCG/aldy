@@ -83,7 +83,13 @@ def estimate_cn(
             for gi, g in enumerate(gene.regions)
             for r in g
         )
-        region_cov = _region_coverage(gene, coverage)
+        region_cov = {
+            r: (
+                coverage.region_coverage(0, r),
+                coverage.region_coverage(1, r) if len(gene.regions) > 1 else 0,
+            )
+            for r in gene.unique_regions
+        }
         total_cov = sum(r0 + r1 for r0, r1 in region_cov.values())
         min_cov = min(
             sum(sum(v.values()) for v in gene.cn_configs[c].cn) for c in gene.cn_configs
@@ -185,9 +191,10 @@ def solve_cn_model(
 
     # Ensure that we cannot link any allele to the whole-gene deletion.
     del_allele = gene.deletion_allele()
-    for (a, ai), v in VCN.items():
-        if del_allele and a != del_allele:
-            model.addConstr(v + VCN[del_allele, -1] <= 1, name=f"CDEL_{a}_{ai}")
+    if del_allele:
+        for (a, ai), v in VCN.items():
+            if a != del_allele:
+                model.addConstr(v + VCN[del_allele, -1] <= 1, name=f"CDEL_{a}_{ai}")
 
     # Ensure that binary transformation is properly formed (i.e. A_i <= A_{i-1}).
     for a, ai in structures:
@@ -246,6 +253,7 @@ def solve_cn_model(
             )
     if not result:
         log.debug("[cn] solution= []")
+
     debug_info["sol"] = [dict(r.solution) for r in result.values()]
     return list(result.values())
 
@@ -269,26 +277,9 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
             if any(cov[m] <= 0 for m in gene.alleles[a].func_muts):
                 bad_alleles.append(a)
         if len(bad_alleles) == len(gene.cn_configs[an].alleles):
-            log.trace(f"[cn] removing *{a} due to low support")
+            log.trace(f"[cn] removing *{an} due to low support")
             del configs[an]
     return configs
-
-
-def _region_coverage(gene: Gene, coverage: Coverage) -> Dict[str, Tuple[float, float]]:
-    """
-    Calculate the coverage  of the main gene and the pseudogene in each genic region.
-
-    :return: Region coverage that links genic regions (e.g. exon 1) to the coverage
-             of the main gene and the pseudogene (expressed as a tuple).
-    """
-
-    return {
-        r: (
-            coverage.region_coverage(0, r),
-            coverage.region_coverage(1, r) if 1 in gene.regions else 0,
-        )
-        for r in gene.unique_regions
-    }
 
 
 def _print_coverage(gene: Gene, coverage: Coverage) -> None:
