@@ -628,6 +628,10 @@ class Gene:
             for name, coord in yml["structure"]["regions"][self.genome].items():
                 if name[0] == "e" and name[1:].isdigit():  # this is exon
                     num_exons += 1
+                if not coord[i * 2] <= coord[i * 2 + 1]:
+                    raise AldyException(
+                        f"Malformed YML file (structure:regions:{name})"
+                    )
                 regions[name] = GRange(self.chr, coord[i * 2] - 1, coord[i * 2 + 1] - 1)
             for e in range(1, num_exons):  # fill introns
                 r = [regions[f"e{e}"], regions[f"e{e + 1}"]][:: self.strand]
@@ -652,6 +656,9 @@ class Gene:
             for r, rng in d.items()
             for i in range(rng.start, rng.end)
         }
+        for i in self.chr_to_ref:
+            if i not in self._region_at:
+                raise AldyException(f"Position {i} not within a named region")
         self.unique_regions = yml["structure"]["cn_regions"]
 
     def _init_alleles(self, yml) -> None:

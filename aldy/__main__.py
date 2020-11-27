@@ -130,14 +130,14 @@ def main(argv):
         log.debug(traceback.format_exc())
         exit(1)
     except SystemExit as ex:
-        log.debug(str(ex))
+        log.debug(repr(ex))
         log.debug(traceback.format_exc())
         exit(ex.code)
     except Exception as ex:
         log.critical(
             f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
         )
-        log.critical(str(ex))
+        log.critical(repr(ex))
         log.warn(traceback.format_exc())
         exit(1)
     except:  # noqa
@@ -145,7 +145,7 @@ def main(argv):
         log.critical(
             f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
         )
-        log.critical("Unrecoverable error: {}", str(exc))
+        log.critical("Unrecoverable error: {}", repr(exc))
         log.warn(traceback.format_exc())
         exit(1)
 
