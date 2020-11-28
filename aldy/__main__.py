@@ -25,6 +25,7 @@ from .gene import Gene
 from .cn import LEFT_FUSION_PENALTY
 from .sam import Sample
 from .genotype import genotype, batch
+from .query import query
 from .version import __version__
 
 
@@ -74,11 +75,11 @@ def main(argv):
         elif args.subparser == "test":
             _run_test()
         elif args.subparser in ["query", "q"]:
-            query = args.gene
-            if "*" in query:
-                gene, query = query.split("*", maxsplit=1)
+            q = args.gene
+            if "*" in q:
+                gene, q = q.split("*", maxsplit=1)
             else:
-                gene, query = query, ""
+                gene, q = q, ""
             db_file = script_path("aldy.resources.genes/{}.yml".format(gene.lower()))
             if os.path.exists(db_file):
                 gene_db = db_file
@@ -86,7 +87,7 @@ def main(argv):
                 gene_db = args.gene
             with open(gene_db):  # Check if file exists
                 pass
-            Gene(gene_db).print_summary(query)
+            query(Gene(gene_db), query)
         elif args.subparser == "profile":
             p = Sample.load_sam_profile(
                 args.file, cn_region=parse_cn_region(args.cn_neutral_region)

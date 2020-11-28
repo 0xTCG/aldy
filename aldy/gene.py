@@ -9,11 +9,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 import os
-import sys
 import yaml
 import collections
-import textwrap
-
 from natsort import natsorted
 
 from .common import (
@@ -244,7 +241,10 @@ class Gene:
 
         yml = yaml.safe_load(yml)
         self.genome = genome
-        self._parse_yml(name, yml)
+        self._init_basic(name, yml)
+        self._init_regions(yml)
+        self._init_alleles(yml)
+        self._init_partials()
 
     def region_at(self, pos: int) -> Optional[Tuple[int, str]]:
         """
@@ -386,174 +386,11 @@ class Gene:
                 return "N"
             return self._lookup_seq[i - s]
 
-    def print_summary(self, query, full=True):
-        minors = {m: a for a, al in self.alleles.items() for m in al.minors}
-        alts = {
-            mal.alt_name: (a, m)
-            for a, al in self.alleles.items()
-            for m, mal in al.minors.items()
-            if mal.alt_name
-        }
-        if query:
-            if query.lower() in map(str.lower, self.cn_configs):
-                query = next(q for q in self.cn_configs if query.lower() == q.lower())
-                self.print_cn(query)
-            elif query.lower() in map(str.lower, self.alleles):
-                query = next(q for q in self.alleles if query.lower() == q.lower())
-                self.print_majors(query)
-            elif query.lower() in map(str.lower, minors):
-                query = next(q for q in minors if query.lower() == q.lower())
-                self.print_minors(minors[query], query)
-            elif query.lower() in map(str.lower, alts):
-                query = next(q for q in alts if query.lower() == q.lower())
-                self.print_minors(*alts[query])
-            else:
-                log.error(f"ERROR: Cannot parse query '{query}'")
-                sys.exit(1)
-            return
-
-        name = [f"Gene {self.name}"]
-        if self.ensembl:
-            name.append(f"ENSEMBL: {self.ensembl}")
-        if self.pharmvar:
-            name.append(f"PharmVar ID: {self.pharmvar}")
-        log.info("-" * 80)
-        log.info("{} {}", name[0], "" if len(name) == 1 else f"({', '.join(name[1:])})")
-        log.info("-" * 80)
-
-        st, ed = self.ref_to_chr[0], self.ref_to_chr[len(self.seq) - 1]
-        log.info(f"{self.genome} genome locus: {self.chr}:{st}-{ed} ({self.refseq})")
-        log.info("Strand: " + "3' (reverse)" if self.strand < 0 else "5'")
-        pseudo = ", ".join(f"{p} (ID {i + 1})" for i, p in enumerate(self.pseudogenes))
-        log.info(f"Pseudogenes: {pseudo if pseudo else 'none'}")
-        amino = "\n  ".join(textwrap.wrap(self.aminoacid, width=78))
-        log.info(f"Aminoacid:\n  {amino}")
-
-        log.info("Regions of interest:")
-        s = [f"  {'Region:':>10}  {self.name:>25}"]
-        if self.pseudogenes:
-            s[-1] += f" {self.pseudogenes[0]:>25}"
-        for r in self.regions[0]:
-            lg = str(self.regions[0].get(r, "-"))
-            lp = str((self.regions[1] if len(self.regions) > 1 else {}).get(r, ""))
-            s.append(f"  {r:>10}: {lg:>25} {lp:>25}")
-        log.info("\n".join(s))
-
-        log.info(f"Structural alleles (deletions, conservations and fusions):")
-        for c, cn in self.cn_configs.items():
-            log.info(f"  {'*'+c+':':>8} {cn.description}")
-
-        log.info("Major star-alleles:")
-        for a, allele in natsorted(self.alleles.items()):
-            if "#" in a:  # avoid fusions here
-                continue
-            log.info(f"  *{a}:")
-            m = ",\n                   ".join(
-                self._print_mutation(m) for m in sorted(allele.func_muts)
-            )
-            log.info(f"    Key mutations: {m}")
-
-            minors = ",\n                   ".join(
-                f"*{a}" + (f" (*{mi.alt_name})" if mi.alt_name else "")
-                for a, mi in natsorted(allele.minors.items())
-            )
-            log.info(f"    Minor alleles: {minors}")
-
-    def print_cn(self, major, full=False):
-        if major not in self.cn_configs:
-            raise AldyException(f"Structural allele {major} not found in {self.name}")
-
-        config = self.cn_configs[major]
-        log.info(f"Gene {self.name}, structural allele {self.name}*{major}:")
-
-        lg = " ".join(f"{i:<8}" for i in [self.name] + self.pseudogenes)
-        log.info(f"  Structure: {lg}")
-        for r in self.regions[0]:
-            lg = " ".join(f"{config.cn[i][r]:<8}" for i, _ in enumerate(self.regions))
-            log.info(f"      {r:>5}: {lg}")
-
-        if major in self.alleles:
-            self.print_majors(major)
-
-    def print_majors(self, major, full=False):
-        if major not in self.alleles:
-            raise AldyException(f"Major star-allele {major} not found in {self.name}")
-
-        allele = self.alleles[major]
-        log.info(f"Gene {self.name}, major star-allele {self.name}*{allele.name}:")
-        log.info(f"  Structure: {allele.cn_config}")
-
-        activities = {m.activity for m in allele.minors.values() if m.activity}
-        if len(activities) == 1:
-            log.info(f"  Activity: {activities.pop()}")
-        elif len(activities) > 1:
-            log.info(
-                f"  Activity: {' or '.join(activities)} (please check minor alleles)"
-            )
-
-        ms = ",\n                 ".join(
-            self._print_mutation(m) for m in sorted(allele.func_muts)
-        )
-        log.info(f"  Key mutations: {ms}")
-
-        log.info("  Minor star-alleles:")
-        for a, minor in natsorted(allele.minors.items()):
-            log.info(f"    *{a}:")
-            m = ",\n                        ".join(
-                self._print_mutation(m) for m in sorted(minor.neutral_muts)
-            )
-            if minor.alt_name:
-                log.info(f"      Legacy name: *{minor.alt_name}")
-            log.info(f"      Silent mutations: {m}")
-
-    def print_minors(self, major, minor):
-        allele = self.alleles[major]
-        if minor not in allele.minors:
-            raise AldyException(f"Minor star-allele {minor} not found in {self.name}")
-
-        log.info(f"\nGene {self.name}, minor star-allele {self.name}*{minor}:")
-        log.info(f"  Structure: {allele.cn_config}")
-        log.info(f"  Major star-allele: {self.name}*{allele.name}")
-        minor = allele.minors[minor]
-        if minor.activity:
-            log.info(f"  Activity: {minor.activity}")
-        if minor.evidence:
-            evidence = {"L": "limited", "D": "definitive"}.get(
-                minor.evidence, minor.evidence
-            )
-            log.info(f"  Evidence: {evidence}")
-        if minor.pharmvar:
-            log.info(f"  PharmVar details: {minor.pharmvar}")
-        if minor.alt_name:
-            log.info(f"  Legacy name: *{minor.alt_name}")
-
-        ms = ",\n                 ".join(
-            self._print_mutation(m) for m in allele.func_muts
-        )
-        log.info(f"  Key mutations: {ms}")
-
-        m = ",\n                    ".join(
-            self._print_mutation(m) for m in sorted(minor.neutral_muts)
-        )
-        log.info(f"  Silent mutations: {m}")
-
     def __str__(self):
         return f"Gene({self.name})"
 
     def __repr__(self):
         return f"Gene({self.name})"
-
-    # ----------------------------------------------------------------------------------
-
-    def _parse_yml(self, gene_name: str, yml) -> None:
-        """
-        Initialize the gene structure from YML data.
-        """
-
-        self._init_basic(gene_name, yml)
-        self._init_regions(yml)
-        self._init_alleles(yml)
-        self._init_partials()
 
     def _init_basic(self, gene: str, yml) -> None:
         """
@@ -974,15 +811,3 @@ class Gene:
             v.alleles.clear()
         for a in self.alleles.values():
             self.cn_configs[a.cn_config].alleles.add(a.name)
-
-    def _print_mutation(self, m):
-        fields = [
-            self.get_rsid(m, default=False),
-            self.get_refseq(m, from_atg=True),
-            f"{self.refseq}:" + self.get_refseq(m),
-        ]
-        if m in self.mutations and self.mutations[m][0]:
-            fields.append(self.mutations[m][0])
-        if fields[0] == "-":
-            fields = fields[1:]
-        return f"{self.chr}:{m} ({', '.join(fields)})"

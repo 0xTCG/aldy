@@ -246,10 +246,6 @@ class Sample:
                         mut, coverage[mut.pos][mut.op], total, _insertion_reads
                     )
 
-        #: dict of int: (dict of str: int): coverage dictionary
-        #: keys are loci in the reference genome, while values are dictionaries
-        #: that describe the coverage of each mutation
-        # (_ stands for non-mutated nucleotide)
         self.coverage = Coverage(
             {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
             threshold,
