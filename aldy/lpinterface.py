@@ -126,7 +126,7 @@ class Gurobi:  # pragma: no cover
         return var.varName
 
     def abssum(self, vars: Iterable, coeffs: Optional[Dict[str, float]] = None):
-        """
+        r"""
         Return the absolute sum of ``vars``: e.g.
            :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
         where :math:`c_i` is defined in the ``coeffs`` dictionary.
@@ -146,7 +146,7 @@ class Gurobi:  # pragma: no cover
         return self.quicksum(vv)
 
     def prod(self, res, terms):
-        """
+        r"""
         Ensure that :math:`res = \prod terms`
         (where ``terms`` is a sequence of binary variables)
         by adding the appropriate linear constraints.

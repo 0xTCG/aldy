@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Optional, Any, Set
+from typing import List, Optional, Any, Set, Tuple
 
 import os
 import sys
@@ -29,31 +29,35 @@ from .diplotype import OUTPUT_COLS
 from .lpinterface import model as lp_model
 
 
-def load_phase(gene: Gene, path: str) -> List[List[Mutation]]:
-    h0, h1 = [], []
-    phases = []
+def load_phase(gene: Gene, path: str):
+    """Loads a HapTree-X/HapCUT2 phase file."""
+
+    haplotypes: Tuple[List[Mutation], List[Mutation]] = ([], [])
+    phases: List[List[Mutation]] = []
+
+    g_chr, g_s, g_e = gene.get_wide_region()
     with open(path) as hap:
         for li, line in enumerate(hap):
             if line[:5] == "BLOCK":
-                if h0:
-                    phases += [h0, h1]
-                h0, h1 = [], []
+                if haplotypes[0]:
+                    phases += list(haplotypes)
+                haplotypes = [], []
             elif line[:5] == "*****":
                 continue
             else:
                 ls = line.split("\t")
                 if len(ls) < 7:
                     raise AldyException(
-                        f"Invalid phasing line {li + 1} in {file} (less than 7 columns)"
+                        f"Invalid phasing line {li + 1} in {path} (less than 7 columns)"
                     )
-                _, gt0, gt1, chr, pos, al0, al1, *_ = ls
-                gt0, gt1, pos = int(gt0), int(gt1), int(pos) - 1
+                _, gt0_, gt1_, chr, pos_, al0, al1, *_ = ls
+                gt0, gt1, pos = int(gt0_), int(gt1_), int(pos_) - 1
                 if gt0 + gt1 != 1:
                     continue
                 chr = chr[3:] if chr.startswith("chr") else chr
-                if chr != gene.region.chr:
+                if chr != g_chr:
                     continue
-                if pos < gene.region.start or pos >= gene.region.end:
+                if pos < g_s or pos >= g_e:
                     continue
 
                 if (pos, f"{al0}>{al1}") not in gene.mutations:
@@ -61,13 +65,10 @@ def load_phase(gene: Gene, path: str) -> List[List[Mutation]]:
                         log.warn(f"reorienting {pos} {al0} {al1}")
                         al1, al0 = al0, al1
                         gt0, gt1 = gt1, gt0
-                h0.append(Mutation(pos, f"{al0}>{al1}" if gt0 else "_"))
-                h1.append(Mutation(pos, f"{al0}>{al1}" if gt1 else "_"))
-    if h0:
-        phases += [h0, h1]
-    # log.info('Phasing!!!')
-    # for p in sorted(phases, key=lambda x: x[0]):
-    # print([str(m) for m in sorted(p)])
+                haplotypes[0].append(Mutation(pos, f"{al0}>{al1}" if gt0 else "_"))
+                haplotypes[1].append(Mutation(pos, f"{al0}>{al1}" if gt1 else "_"))
+    if haplotypes[0]:
+        phases += [haplotypes[0], haplotypes[1]]
     return phases
 
 
@@ -176,10 +177,12 @@ def genotype(
     if profile == "exome":
         log.warn("WARNING: Copy-number calling is not available for exome data.")
         log.warn(
-            "WARNING: Aldy will NOT be able to detect gene duplications, deletions and fusions."
+            "WARNING: Aldy will NOT be able to detect gene duplications, "
+            + "deletions and fusions."
         )
         log.warn(
-            "WARNING: Calling of alleles that are defined by non-exonic mutations is not available."
+            "WARNING: Calling of alleles that are defined by non-exonic mutations "
+            + "is not available."
         )
         log.warn("         Results might not be biologically relevant!")
         cn_region = None
@@ -216,9 +219,7 @@ def genotype(
         cn_solution = ["1", "1"]
         sample = sam.Sample(gene=gene, vcf_path=sam_path, debug=debug)
 
-    json.update(
-        {"sample": os.path.basename(sam_path).split(".")[0], "gene": gene.name,}
-    )
+    json.update({"sample": os.path.basename(sam_path).split(".")[0], "gene": gene.name})
 
     # Get copy-number solutions
     cn_sols = cn.estimate_cn(
@@ -378,7 +379,7 @@ def genotype(
     return minor_sols
 
 
-def batch(genes, profile, sam_path):
+def batch(genes, profile, sam_path, gap):
     from natsort import natsorted
 
     for gene_db in natsorted(genes):
@@ -400,6 +401,7 @@ def batch(genes, profile, sam_path):
                 continue
             SLACK = 1
             min_cn_score = min(cn_sols, key=lambda m: m.score).score
+            major_sols = []
             for i, cn_sol in enumerate(cn_sols):
                 major_sols += major.estimate_major(
                     gene, sample.coverage, cn_sol, solver="cbc", identifier=i
@@ -443,6 +445,7 @@ def batch(genes, profile, sam_path):
             if len(minor_sols) == 0:
                 results = "ERR:MIN"
                 continue
+            min_minor_score = min(minor_sols, key=lambda m: m.score).score
             minor_sols = sorted(
                 [
                     m
@@ -455,7 +458,7 @@ def batch(genes, profile, sam_path):
             for i, minor_sol in enumerate(minor_sols):
                 sols.append(minor_sol.diplotype)
             results = ";".join(sols).replace("*", "")
+
+            print(f"{sample_name}\t{gene_db}\t{results}")
         except AldyException as e:
-            print(e)
-            results = "ERR:?"
-        print(f"{sample_name}\t{gene_db}\t{results}")
+            results = f"ERR:{e}"

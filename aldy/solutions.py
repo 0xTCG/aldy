@@ -7,7 +7,7 @@
 import collections
 from dataclasses import dataclass, field
 from natsort import natsorted
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 from .gene import Gene, Mutation
 
 

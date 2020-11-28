@@ -21,32 +21,22 @@ from .gene import Gene, Mutation
 
 
 CIGAR2CODE: Dict[int, int] = {ord(y): x for x, y in enumerate("MIDNSHP=XB")}
-"""str: CIGAR characters for an ASCII ordinal of CIGAR character"""
+"""CIGAR characters for an ASCII ordinal of CIGAR character"""
 
 CIGAR_REGEX = re.compile(r"(\d+)([MIDNSHP=XB])")
-"""regex: Regex that matches valid CIGAR strings"""
+"""Regex that matches valid CIGAR strings"""
 
 
 DEFAULT_CN_NEUTRAL_REGION = {
     "hg19": GRange("22", 42547463, 42548249),
     "hg38": GRange("22", 42151472, 42152258),
 }
-"""obj:`aldy.common.GRange` Default copy-number neutral region
-   (exon 4-6 of the CYP2D8 gene)"""
+"""Default copy-number neutral region (exon 4-6 of the CYP2D8 gene)"""
 
 
 class Sample:
     """
-    Interface for reading SAM/BAM/CRAM files that parses
-    and stores read alignments.
-
-    Attributes:
-        coverage (:obj:`aldy.coverage.Coverage`):
-            The coverage data for the sample.
-            Consult the :obj:`aldy.coverage.Coverage`.
-
-    Static methods:
-        ``load_sam_profile`` (documentation below).
+    Interface for reading SAM/BAM/CRAM files that parses and stores read alignments.
     """
 
     def __init__(
@@ -59,40 +49,37 @@ class Sample:
         cn_region: Optional[GRange] = None,
         debug: Optional[str] = None,
         vcf_path: Optional[str] = None,
-    ) -> None:
+    ):
         """
         Initialize a :obj:`Sample` object.
 
-        Args:
-            sam_path (str):
-                Path to a SAM/BAM/CRAM file.
-            gene (:obj:`aldy.gene.Gene`):
-                Gene instance.
-            threshold (float):
-                Threshold for filtering out low quality mutations. Ranges from 0 to 1.
-                Check :obj:`aldy.coverage.Coverage` for more information.
-            profile (str, optional):
-                Profile specification (e.g. 'prgnseq-v1') or a profile SAM/BAM file.
-            reference (str, optional):
-                Reference genome for reading CRAM files.
-                Default is None.
-            cn_region (:obj:`aldy.common.GRange`, optional):
-                Copy-number neutral region to be used for coverage rescaling.
-                If None, profile loading and coverage rescaling will be skipped
-                (and Aldy will require a ``--cn`` parameter to be user-provided).
-                Default is ``DEFAULT_CN_NEUTRAL_REGION``.
-            debug (str, optional):
-                If set, create a "`debug`.dump" file for debug purposes.
-                Default is None.
+        :param sam_path: Path to a SAM/BAM/CRAM file.
+        :param gene: Gene instance.
+        :param threshold:
+            Threshold for filtering out low quality mutations. Ranges from 0 to 1.
+            Check :obj:`aldy.coverage.Coverage` for more information.
+        :param profile:
+            Profile specification (e.g. 'prgnseq-v1') or a profile SAM/BAM file.
+        :param reference:
+            Reference genome for reading CRAM files.
+            Default is None.
+        :param cn_region:
+            Copy-number neutral region to be used for coverage rescaling.
+            If None, profile loading and coverage rescaling will be skipped
+            (and Aldy will require a ``--cn`` parameter to be user-provided).
+            Default is ``DEFAULT_CN_NEUTRAL_REGION``.
+        :param debug:
+            If set, create a "`debug`.dump" file for debug purposes.
+            Default is None.
 
-        Raises:
-            :obj:`aldy.common.AldyException` if the average coverage of the
-            copy-number neutral region is too low (less than 2).
+        :raise: :obj:`aldy.common.AldyException` if the average coverage of the
+                copy-number neutral region is too low (less than 2).
         """
 
         if vcf_path:
             self.load_vcf(vcf_path, gene, debug)
         else:
+            assert sam_path and profile
             self.load_aligned(sam_path, gene, threshold, reference, cn_region, debug)
             if cn_region:
                 self.detect_cn(gene, profile, cn_region)
@@ -112,32 +99,28 @@ class Sample:
         reference: Optional[str] = None,
         cn_region: Optional[GRange] = None,
         debug: Optional[str] = None,
-    ) -> None:
+    ):
         """
         Load the read, mutation and coverage data from a SAM/BAM/CRAM file.
 
-        Args:
-            sam_path (str):
-                Path to a SAM/BAM/CRAM file.
-            gene (:obj:`aldy.gene.Gene`):
-                Gene instance.
-            threshold (float):
-                Threshold for filtering out low quality mutations. Ranges from 0 to 1.
-                Check :obj:`aldy.coverage.Coverage` for more information.
-            reference (str, optional):
-                Reference genome for reading CRAM files.
-                Default is None.
-            cn_region (:obj:`aldy.common.GRange`, optional):
-                Copy-number neutral region to be used for coverage rescaling.
-                If None, profile loading and coverage rescaling will be skipped
-                (and Aldy will require a ``--cn`` parameter to be user-provided).
-                Default is ``DEFAULT_CN_NEUTRAL_REGION`` (CYP2D8).
-            debug (str, optional):
-                If set, create a "`debug`.dump" file for debug purposes.
-                Default is None.
+        :param sam_path: Path to a SAM/BAM/CRAM file.
+        :param gene: Gene instance.
+        :param threshold:
+            Threshold for filtering out low quality mutations. Ranges from 0 to 1.
+            Check :obj:`aldy.coverage.Coverage` for more information.
+        :param reference:
+            Reference genome for reading CRAM files.
+            Default is None.
+        :param cn_region:
+            Copy-number neutral region to be used for coverage rescaling.
+            If None, profile loading and coverage rescaling will be skipped
+            (and Aldy will require a ``--cn`` parameter to be user-provided).
+            Default is ``DEFAULT_CN_NEUTRAL_REGION`` (CYP2D8).
+        :param debug:
+            If set, create a "`debug`.dump" file for debug purposes.
+            Default is None.
 
-        Raises:
-            :obj:`aldy.common.AldyException` if a BAM/CRAM file lacks an index.
+        :raise: :obj:`aldy.common.AldyException` if a BAM/CRAM file lacks an index.
         """
 
         log.debug("[sam] path= {}", os.path.abspath(sam_path))
@@ -148,15 +131,12 @@ class Sample:
         # TODO: currently uses only functional indels; other indels should be
         # corrected as well
         _insertion_sites = {
-            m
-            for an, a in gene.alleles.items()
-            for m in a.func_muts
-            if m.op[:3] == "ins"
+            m for _, a in gene.alleles.items() for m in a.func_muts if m.op[:3] == "ins"
         }
         _insertion_reads: Dict[Tuple, int] = collections.defaultdict(int)
-        _multi_sites: Dict[Mutation, tuple] = {
+        _multi_sites = {
             m.pos: m.op
-            for an, a in gene.alleles.items()
+            for _, a in gene.alleles.items()
             for m in a.func_muts
             if ">" in m.op and len(m.op) > 3
         }
@@ -164,46 +144,7 @@ class Sample:
         norm: dict = collections.defaultdict(int)
 
         if sam_path[-5:] == ".dump":
-            with gzip.open(sam_path, "rb") as fd:
-                log.warn("Loading debug dump from {}", sam_path)
-                l, h, i = (
-                    struct.calcsize("<l"),
-                    struct.calcsize("<h"),
-                    struct.calcsize("<i"),
-                )
-                m, M = struct.unpack("<ll", fd.read(l + l))
-                for j in range(m, M + 1):
-                    (cnv_coverage[j],) = struct.unpack("<i", fd.read(i))
-                (ld,) = struct.unpack("<l", fd.read(l))
-                for _ in range(ld):
-                    ref_start, ref_end, read_len, num_mutations = struct.unpack(
-                        "<llhh", fd.read(l + l + h + h)
-                    )
-                    ref_end += ref_start
-                    for j in range(ref_start, ref_end):
-                        norm[j] += 1
-                    insertions = set()
-                    for __ in range(num_mutations):
-                        mut_start, op_len = struct.unpack("<hh", fd.read(h + h))
-                        mut_start += ref_start
-                        op = fd.read(op_len).decode("ascii")
-                        muts[mut_start, op] += 1
-                        if op[:3] == "del":
-                            for j in range(0, len(op) - 3):
-                                norm[mut_start + j] -= 1
-                        elif op[:3] == "ins":
-                            insertions.add((mut_start, len(op) - 3))
-                        else:
-                            norm[mut_start] -= 1
-                    for ins in _tandem_sites:
-                        ins_len = len(ins.op) - 3
-                        if (ins.pos, ins_len) in insertions:
-                            _tandem_sites[ins] = (
-                                _tandem_sites[ins][0],
-                                _tandem_sites[ins][1] + 1,
-                            )
-                        else:
-                            _tandem_sites[ins][0][(ref_start, ref_end, read_len)] += 1
+            self._load_dump(sam_path)
         else:
             with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
                 # Check do we have proper index to speed up the queries
@@ -274,20 +215,7 @@ class Sample:
                         if debug:
                             dump_data.append(r)
                 if debug:
-                    with gzip.open(f"{debug}.dump", "wb") as fd:
-                        if len(cnv_coverage) == 0:
-                            m, M = 0, -1
-                        else:
-                            m, M = min(cnv_coverage.keys()), max(cnv_coverage.keys())
-                        fd.write(struct.pack("<ll", m, M))
-                        for i in range(m, M + 1):
-                            fd.write(struct.pack("<i", cnv_coverage[i]))
-                        fd.write(struct.pack("<l", len(dump_data)))
-                        for (s, e, l), m in dump_data:
-                            fd.write(struct.pack("<llhh", s, e - s, l, len(m)))
-                            for p, md in m:
-                                fd.write(struct.pack("<hh", p - s, len(md)))
-                                fd.write(md.encode("ascii"))
+                    self._dump()
         # Establish the coverage dictionary
         coverage: Dict[int, Dict[str, int]] = dict()
         for pos, cov in norm.items():
@@ -403,33 +331,17 @@ class Sample:
                     coverage[pos][mut] = 0
 
     def _parse_read(
-        self,
-        read: pysam.AlignedSegment,
-        gene: Gene,
-        norm: dict,
-        muts: dict,
-        multi_sites=None,
-        dump=False,
+        self, read, gene: Gene, norm, muts, multi_sites=None, dump=False,
     ) -> Optional[Tuple[Tuple[int, int, int], Any]]:
         """
         Parse a :obj:`pysam.AlignedSegment` read.
 
-        Params:
-            read (:obj:`pysam.AlignedSegment`)
-            gene (:obj:`aldy.gene.Gene`)
+        :param read: pysam read.
+        :param gene: Gene instance.
+        :param norm: Positions within the read that have not been mutated.
+        :param muts: Positions within the read that have been mutated.
 
-        Returns:
-            optional: None if parsing was not successful.
-            Otherwise, returns the tuple consisting of:
-
-                - start and end positions of the read, and
-                - the list of mutations found in the read.
-
-        Params that are mutated:
-            norm (:obj:`collections.defaultdict(int)`):
-                dict of positions within the read that have not been mutated.
-            muts (:obj:`collections.defaultdict(int)`):
-                dict of positions within the read that have been mutated.
+        .. note:: `norm` and `muts` are modified.
         """
 
         if not _in_region(
@@ -507,11 +419,12 @@ class Sample:
             ...X...
         and the donor genome looks like
             ...XX... (i.e. X is a tandem insertion).
-        Any read that covers only one tandem (e.g. read X...)
-        will get perfectly aligned (without trigerring an insertion tag)
-        to the tail of the tandem insertion.
-        This results in under-estimation of the insertion abundance will
-        (as aligner could not assign `I` CIGAR to the correct insertion).
+
+        Any read that covers only one tandem (e.g. read X...) will get perfectly aligned
+        (without trigerring an insertion tag) to the tail of the tandem insertion.
+        This results in under-estimation of the insertion abundance will (as aligner
+        could not assign `I` CIGAR to the correct insertion).
+
         This function attempts to correct this bias.
         """
 
@@ -538,14 +451,14 @@ class Sample:
                 return new_cov
         return orig_cov
 
-    def load_vcf(self, vcf_path: str, gene: Gene, debug: Optional[str] = None,) -> None:
+    def load_vcf(self, vcf_path: str, gene: Gene, debug: Optional[str] = None):
         """
         Load the read, mutation and coverage data from a VCF file.
         """
 
-        log.debug("[sam] path= {}", os.path.abspath(vcf_path))
+        log.debug("[vcf] path= {}", os.path.abspath(vcf_path))
 
-        _multi_sites: Dict[Mutation, tuple] = {
+        _multi_sites = {
             m.pos: m.op
             for an, a in gene.alleles.items()
             for m in a.func_muts
@@ -654,24 +567,21 @@ class Sample:
         """
         Rescale the ``self.coverage`` to fit the sequencing profile.
 
-        Params:
-            gene (:obj:`aldy.gene.Gene`):
-                Gene instance.
-            profile (str):
-                Profile identifier (e.g. 'pgrnseq-v1'). Can be a SAM/BAM file as well.
-            cn_region (:obj:`aldy.common.GRange`):
-                Coordinates of the copy-number neutral region.
+        :param gene: Gene instance.
+        :param profile: Profile identifier. Can be a SAM/BAM file as well.
+        :param cn_region: Coordinates of the copy-number neutral region.
 
-        Notes:
-            This function assumes that ``self.coverage`` is set.
-            It modifies ``self.coverage``.
+        .. notes:: This function assumes that ``self.coverage`` is set and modifies it.
         """
 
         if os.path.exists(profile) and os.path.isfile(profile):
             ext = os.path.splitext(profile)
             if ext[-1] in [".bam", ".sam"]:
                 prof = self._load_profile(
-                    profile, is_bam=True, gene_region=gene.region, cn_region=cn_region
+                    profile,
+                    is_bam=True,
+                    gene_region=gene.get_wide_region(),
+                    cn_region=cn_region,
                 )
             else:
                 prof = self._load_profile(profile)
@@ -692,31 +602,22 @@ class Sample:
         """
         Load a coverage profile.
 
-        Returns:
-            defaultdict[str, dict[int, float]]: A profile dictionary where
-            keys are chromosome IDs (e.g. '7' for chr7)
-            and values are dictionaries that map the genomic locus to the
-            corresponding profile coverage.
-            This is a :obj:`collections.defaultdict` that uses 0 as a placeholder
-            for the missing loci.
+        :param profile_path:
+            Path to a profile file.
+            SAM/BAM files are also accepted if `is_bam` is set
+            (profile will be dynamically calculated in that case).
+        :param is_bam: A flag indicating if the `profile_path` is SAM/BAM or not.
+        :param gene_region: Region to be extracted from the profile.
+        :param cn_region: Copy-number neutral region to be extracted from the profile.
 
-        Args:
-            profile_path:
-                Path to a profile file.
-                SAM/BAM files are also accepted if `is_bam` is set
-                (profile will be dynamically calculated in that case).
-            is_bam (bool):
-                A flag indicating if the `profile_path` is SAM/BAM or not.
-            gene_region (:obj:`aldy.common.GRange`, optional):
-                Region to be extracted from the profile.
-                Default is None.
-            cn_region (:obj:`aldy.common.GRange`, optional):
-                Copy-number neutral region to be extracted from the profile.
-                Default is None.
+        :return: A profile dictionary where keys are chromosome IDs (e.g. '7' for chr7)
+                 and values are dictionaries that map the genomic locus to the
+                 corresponding profile coverage.
+                 This is a :obj:`collections.defaultdict` that uses 0 as a placeholder
+                 for the missing loci.
 
-        Raises:
-            :obj:`aldy.common.AldyException` if ``is_bam`` is set but ``gene_region``
-            and ``cn_region`` are not.
+        :raise: :obj:`aldy.common.AldyException` if ``is_bam`` is set
+                but ``gene_region`` and ``cn_region`` are not.
         """
 
         profile: Dict[str, Dict[int, float]] = collections.defaultdict(
@@ -747,6 +648,64 @@ class Sample:
                 with open(profile_path) as f:
                     read_file(f, profile)
         return profile
+
+    def _dump(self):
+        with gzip.open(f"{debug}.dump", "wb") as fd:
+            if len(cnv_coverage) == 0:
+                m, M = 0, -1
+            else:
+                m, M = min(cnv_coverage.keys()), max(cnv_coverage.keys())
+            fd.write(struct.pack("<ll", m, M))
+            for i in range(m, M + 1):
+                fd.write(struct.pack("<i", cnv_coverage[i]))
+            fd.write(struct.pack("<l", len(dump_data)))
+            for (s, e, l), m in dump_data:
+                fd.write(struct.pack("<llhh", s, e - s, l, len(m)))
+                for p, md in m:
+                    fd.write(struct.pack("<hh", p - s, len(md)))
+                    fd.write(md.encode("ascii"))
+
+    def _load_dump(self, path):
+        with gzip.open(path, "rb") as fd:
+            log.warn("Loading debug dump from {}", path)
+            l, h, i = (
+                struct.calcsize("<l"),
+                struct.calcsize("<h"),
+                struct.calcsize("<i"),
+            )
+            m, M = struct.unpack("<ll", fd.read(l + l))
+            for j in range(m, M + 1):
+                (cnv_coverage[j],) = struct.unpack("<i", fd.read(i))
+            (ld,) = struct.unpack("<l", fd.read(l))
+            for _ in range(ld):
+                ref_start, ref_end, read_len, num_mutations = struct.unpack(
+                    "<llhh", fd.read(l + l + h + h)
+                )
+                ref_end += ref_start
+                for j in range(ref_start, ref_end):
+                    norm[j] += 1
+                insertions = set()
+                for _ in range(num_mutations):
+                    mut_start, op_len = struct.unpack("<hh", fd.read(h + h))
+                    mut_start += ref_start
+                    op = fd.read(op_len).decode("ascii")
+                    muts[mut_start, op] += 1
+                    if op[:3] == "del":
+                        for j in range(0, len(op) - 3):
+                            norm[mut_start + j] -= 1
+                    elif op[:3] == "ins":
+                        insertions.add((mut_start, len(op) - 3))
+                    else:
+                        norm[mut_start] -= 1
+                for ins in _tandem_sites:
+                    ins_len = len(ins.op) - 3
+                    if (ins.pos, ins_len) in insertions:
+                        _tandem_sites[ins] = (
+                            _tandem_sites[ins][0],
+                            _tandem_sites[ins][1] + 1,
+                        )
+                    else:
+                        _tandem_sites[ins][0][(ref_start, ref_end, read_len)] += 1
 
     # ----------------------------------------------------------------------------------
 

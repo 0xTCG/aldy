@@ -12,7 +12,7 @@ import copy
 from natsort import natsorted
 
 from . import lpinterface
-from .common import JsonDict, log, AldyException, json, sorted_tuple
+from .common import log, AldyException, json, sorted_tuple
 from .cn import MAX_CN
 from .gene import MajorAllele, Mutation, Gene
 from .coverage import Coverage

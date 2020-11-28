@@ -4,14 +4,13 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from os import major
-from typing import List, Tuple, Dict, Any
+from typing import List, Dict, Any
 
 import collections
 import re
 
 from natsort import natsorted
-from .common import allele_sort_key, td
+from .common import td
 from .gene import Gene, Mutation
 from .coverage import Coverage
 from .solutions import MinorSolution
@@ -53,6 +52,7 @@ def write_decomposition(
     """
 
     for copy, a in enumerate(minor.solution):
+        assert a.minor
         mutations = set(gene.alleles[a.major].func_muts) | set(
             gene.alleles[a.major].minors[a.minor].neutral_muts
         )
@@ -67,7 +67,7 @@ def write_decomposition(
                         gene.name,
                         sol_id,
                         minor.diplotype,
-                        ";".join(ay.minor for ay in minor.solution),
+                        ";".join(ay.minor for ay in minor.solution if ay.minor),
                         copy,
                         a.minor,
                         m.pos,
@@ -85,7 +85,7 @@ def write_decomposition(
                     gene.name,
                     sol_id,
                     minor.diplotype,
-                    ";".join(ay.minor for ay in minor.solution),
+                    ";".join(ay.minor for ay in minor.solution if ay.minor),
                     copy,
                     a.minor,
                     "",
@@ -119,12 +119,14 @@ def write_vcf(
         m: [collections.defaultdict(int)] * len(minors)
         for minor in minors
         for a in minor.solution
+        if a.minor
         for m in set(gene.alleles[a.major].func_muts)
         | set(gene.alleles[a.major].minors[a.minor].neutral_muts)
         | set(a.added)
     }
     for mi, minor in enumerate(minors):
         for ai, a in enumerate(minor.solution):
+            assert a.minor
             mutations = set(gene.alleles[a.major].func_muts) | set(
                 gene.alleles[a.major].minors[a.minor].neutral_muts
             )
@@ -140,15 +142,14 @@ def write_vcf(
         ),
         file=f,
     )
-    for m in sorted(mutations):
-        ref = gene.seq[m.pos - gene.region.start]
+    for m in sorted(all_mutations):
+        ref = m.op[0]  # TODO: should be genome nucleotide, not the RefSeq nucleotide...
         if m.op[1] == ">":
             alt = m.op[2]
         elif m.op[:3] == "ins":
             alt = ref + m.op[3:]
         else:
-            ref = gene.seq[m.pos - 1 - gene.region.start]
-            alt = ref + m.op[3:], ref
+            ref, alt = ".", f"{m.op[3:]}, ."  # TODO: this is wrong...
 
         info = [
             "TYPE={}".format(["NEUTRAL", "DISRUPTING"][gene.is_functional(m)]),
@@ -181,7 +182,7 @@ def write_vcf(
         )
         print(
             pattern.format(
-                chrom=gene.region.chr,
+                chrom=gene.chr,
                 pos=m.pos + 1,
                 id=gene.get_rsid(m, default=False),
                 ref=ref,
@@ -220,7 +221,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     if len(solution.solution) == 1 and del_allele:
         major_dict[del_allele].append(-1)
 
-    diplotype: Any = ([], [])
+    diplotype: Any = [[], []]
     dc = 0
 
     # Handle tandems (heuristic that groups common tandems together,
@@ -228,7 +229,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     if len(solution.solution) > 2:
         for ta, tb in gene.common_tandems:
             while major_dict[ta] and major_dict[tb]:
-                diplotype[dc % 2].extend([major_dict[ta][0], major_dict[tb][0]])
+                diplotype[dc % 2].append((major_dict[ta][0], major_dict[tb][0]))
                 dc += 1
                 del major_dict[ta][0], major_dict[tb][0]
 
@@ -238,36 +239,53 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     if len(major_dict) == 1:
         items = next(iter(major_dict.values()))
         if len(items) % 2 == 0:
-            diplotype = items[: len(items) // 2], items[len(items) // 2 :]
+            diplotype[dc % 2] += items[: len(items) // 2]
+            dc += 1
+            diplotype[dc % 2] += items[len(items) // 2 :]
+            dc += 1
             major_dict.clear()
-    for allele, items in major_dict.items():
+    for _, items in major_dict.items():
         if len(items) > 1:
             if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
                 dc += 1
-            diplotype[dc % 2].extend(items)
+            diplotype[dc % 2] += items
             items.clear()
             dc += 1
 
     # Handle the rest
-    for allele, items in major_dict.items():
+    for _, items in major_dict.items():
         if items:
             if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
                 dc += 1
             assert len(items) == 1
-            diplotype[dc % 2].extend(items)
+            diplotype[dc % 2] += items
             dc += 1
 
     # Each diplotype should have at least one item
     # e.g. 1, 1 -> becomes 1+1/_ due to duplicate heuristic -> fixed to 1/1
     if len(diplotype[1]) == 0:
-        diplotype = diplotype[0][:-1], [diplotype[0][-1]]
+        if len(diplotype[0]) > 1:
+            diplotype = diplotype[0][:-1], [diplotype[0][-1]]
+        elif len(diplotype[0]) == 1 and isinstance(diplotype[0][0], tuple):
+            diplotype = diplotype[0][0]
+        else:
+            assert False
+
+    def key(x):
+        if isinstance(x, tuple):
+            return solution.get_major_name(x[0])
+        return solution.get_major_name(x)
+
+    def flatten(d):
+        for i in natsorted(d, key=key):
+            if isinstance(i, tuple):
+                yield from i
+            else:
+                yield i
 
     # Make sure that the elements are sorted and that the tandems are grouped together
     diplotype = natsorted(
-        [
-            natsorted(diplotype[0], key=solution.get_major_name),
-            natsorted(diplotype[1], key=solution.get_major_name),
-        ],
+        [list(flatten(diplotype[0])), list(flatten(diplotype[1]))],
         key=lambda x: [solution.get_major_name(y) for y in x],
     )
     solution.set_diplotype(diplotype)

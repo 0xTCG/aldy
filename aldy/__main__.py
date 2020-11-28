@@ -12,6 +12,7 @@ import argparse
 import os
 import sys
 import platform
+import json
 import datetime
 import tempfile
 import pkg_resources
@@ -300,7 +301,9 @@ def _get_args(argv):
         "--multiple-warn-level",
         "-W",
         default=1,
-        help="Show warning if multiple solutions are found. Can be 1 (warn after genotyping) or 2 (also warn if there are multiple major solutions)."
+        help="Show warning if multiple solutions are found. "
+        + "Can be 1 (warn after genotyping) or 2 "
+        + "(also warn if there are multiple major solutions)."
         + f"Default is 1 (warn after the genotyping).",
     )
     genotype_parser.add_argument("--phase", help="Use phase file.")
@@ -435,9 +438,8 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 run(prefix)
             finally:
                 log.info("Preparing debug archive...")
-                if common._json:
-                    common._json.close()
-                    common._json = None
+                with open(f"{tmp}/run.json", "w") as f:
+                    json.dump(common.json, f)
                 os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
     else:
         run(None)

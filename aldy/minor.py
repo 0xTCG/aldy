@@ -388,10 +388,11 @@ def solve_minor_model(
 
     # 8) Respect phasing
     VPHASEERR = []
+    VPHASE = {}
     PHx = {}
     if phases:
         log.info("Using phasing information")
-        VPHASE: dict = {
+        VPHASE = {
             pi: {a: model.addVar(vtype="B", name=f"PHASE_{pi}_{a[1]}") for a in alleles}
             for pi, _ in enumerate(phases)
         }
@@ -527,7 +528,7 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
             | set(gene.alleles[sa.major].minors[sa.minor].neutral_muts)
             | set(sa.added)
         )
-        miss = sum(1 for a in am if coverage[m] == 0)
+        miss = sum(1 for a in am if coverage[a] == 0)
         log.trace(f"  *{sa.minor} (major= *{sa.major}; miss= {miss})")
         for m in sorted(am):
             if m in muts:

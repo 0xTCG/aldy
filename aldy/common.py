@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Tuple, Iterable
+from typing import Iterable
 
 import pkg_resources
 import re
@@ -151,18 +151,6 @@ def freezekey(x):  # hashing for dictionaries
     return tuple(i[1] for i in sorted(x[0].items())) + tuple(
         i[1] for i in sorted(x[1].items())
     )
-
-
-def allele_sort_key(x: str) -> Tuple[int, str]:
-    """
-    Returns:
-        tuple[int, str]: Key for sorting star-alleles (e.g. ``'13a'`` -> ``(13, 'a')``).
-    """
-    p = re.split(r"(\d+)", x)
-    if len(p) == 1:
-        return (x, x)
-    else:
-        return (p[1], "".join(p[2:]))
 
 
 def rev_comp(seq: str) -> str:
