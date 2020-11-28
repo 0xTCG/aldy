@@ -487,13 +487,13 @@ alleles:
     - [5124, C>T, rs17885098]
     - [17687, A>G, rs12769205, splicing defect]
     - [85186, A>G, rs3758581, I331V]
-  CYP2C19*36.001:
-    pharmvar: https://www.pharmvar.org/haplotype/81
-    activity: normal function
-    label: CYP2C19*1A
-    evidence: D
-    mutations:
-    - [CYP2C19, deletion]
+  # CYP2C19*36.001:
+  #   pharmvar: https://www.pharmvar.org/haplotype/81
+  #   activity: normal function
+  #   label: CYP2C19*1A
+  #   evidence: D
+  #   mutations:
+  #   - [CYP2C19, deletion]
 structure:
   genes: [CYP2C19]
   regions:

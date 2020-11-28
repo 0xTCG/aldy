@@ -1,154 +1,222 @@
 name: CYP3A5
-version: aldy-karolinska-1.0
-generated: '2020-07-11'
+version: pharmvar-4.2.4
+generated: '2020-11-27'
+pharmvar: 13724
 ensembl: ENSG00000106258
 alleles:
   CYP3A5*1.001:
-    label: CYP3A5*1
-    activity: Normal (in vivo); Normal (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1356
+    activity: normal function
+    label: CYP3A5*1A
+    evidence: D
     mutations: []
   CYP3A5*1.002:
-    label: CYP3A5*1B
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [5017, G>A, rs28365095]
-  CYP3A5*1.003:
-    label: CYP3A5*1C
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [5029, C>T, rs28371764]
-  CYP3A5*1.004:
+    pharmvar: https://www.pharmvar.org/haplotype/1348
+    activity: normal function
     label: CYP3A5*1D
-    activity: Normal (in vivo); Normal (in vitro)
+    evidence: D
     mutations:
-    - [36708, C>T, rs15524]
+    - [36708, T>C, rs15524]
+  CYP3A5*1.003:
+    pharmvar: https://www.pharmvar.org/haplotype/1336
+    activity: normal function
+    evidence: D
+    mutations:
+    - [4552, C>A, rs28365079]
+  CYP3A5*1.004:
+    pharmvar: https://www.pharmvar.org/haplotype/1334
+    activity: normal function
+    evidence: D
+    mutations:
+    - [4394, T>C, rs28365073]
+    - [36708, T>C, rs15524]
   CYP3A5*1.005:
-    label: CYP3A5*1E
-    activity: Normal (in vivo); Normal (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1332
+    activity: normal function
+    evidence: D
     mutations:
-    - [22260, G>T, rs4646453]
+    - [4394, T>C, rs28365073]
+    - [19817, A>G, rs28383472]
+    - [36708, T>C, rs15524]
   CYP3A5*2.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1360
+    activity: unknown function
     label: CYP3A5*2
+    evidence: L
     mutations:
     - [32386, C>A, rs28365083, T398N]
   CYP3A5*3.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1340
+    activity: no function
     label: CYP3A5*3A
-    activity: Decr. (in vivo); Severely decr. (in vitro)
+    evidence: D
     mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [36708, C>T, rs15524]
+    - [12083, A>G, rs776746, splice defect]
   CYP3A5*3.002:
+    pharmvar: https://www.pharmvar.org/haplotype/1338
+    activity: no function
     label: CYP3A5*3B
-    activity: Severely decr. (in vitro)
+    evidence: D
     mutations:
     - [8807, C>T, rs28383468, H30Y]
-    - [8811, insG, rs28383469, Frameshift]
-    - [12083, A>G, rs776746, Splicing defect]
-    - [36708, C>T, rs15524]
+    - [8811, insG, rs28383469, frameshift]
+    - [12083, A>G, rs776746, splice defect]
   CYP3A5*3.003:
-    label: CYP3A5*3C
-    activity: Severely decr. (in vitro)
-    mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-  CYP3A5*3.004:
+    pharmvar: https://www.pharmvar.org/haplotype/1353
+    activity: no function
     label: CYP3A5*3D
-    activity: Severely decr. (in vitro)
+    evidence: M
     mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [12346, T>G, rs56244447, F]
-  CYP3A5*3.005:
-    label: CYP3A5*3E
-    activity: Severely decr. (in vitro)
-    mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [32147, A>G, rs28365094]
-    - [36708, C>T, rs15524]
-  CYP3A5*3.006:
+    - [12083, A>G, rs776746, splice defect]
+    - [12346, T>G, rs56244447, L82R]
+    - [36708, T>C, rs15524]
+  CYP3A5*3.004:
+    pharmvar: https://www.pharmvar.org/haplotype/1358
+    activity: no function
     label: CYP3A5*3F
-    activity: Severely decr. (in vitro)
+    evidence: L
     mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [36648, T>C, SNP.AG, rs28365085, I488T]
-    - [36708, C>T, rs15524]
-  CYP3A5*3.007:
+    - [12083, A>G, rs776746, splice defect]
+    - [36648, T>C, rs28365085, I488T]
+  CYP3A5*3.005:
+    pharmvar: https://www.pharmvar.org/haplotype/1344
+    activity: no function
     label: CYP3A5*3G
-    activity: Severely decr. (in vitro)
+    evidence: L
     mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [18049, T>C, rs55965422, Splicing defect]
-    - [36708, C>T, rs15524]
-  CYP3A5*3.008:
-    label: CYP3A5*3H
-    activity: Severely decr. (in vitro)
-    mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [36708, C>T, rs15524]
-    - [18205, T>C, '-']
-  CYP3A5*3.009:
-    label: CYP3A5*3I
-    activity: Severely decr. (in vitro)
-    mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [22000, A>G, rs72552790]
-    - [36708, C>T, rs15524]
-  CYP3A5*3.010:
+    - [12083, A>G, rs776746, splice defect]
+    - [18049, T>C, rs55965422, splice defect]
+  CYP3A5*3.006:
+    pharmvar: https://www.pharmvar.org/haplotype/1349
+    activity: no function
     label: CYP3A5*3J
-    activity: Severely decr. (in vitro)
+    evidence: L
     mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [34879, A>T, '-', I456V]
-    - [36708, C>T, rs15524]
-  CYP3A5*3.011:
-    label: CYP3A5*3K
-    activity: Decr. (in vitro)
+    - [12083, A>G, rs776746, splice defect]
+    - [34879, A>G, '-', I465V]
+  CYP3A5*3.007:
+    pharmvar: https://www.pharmvar.org/haplotype/1343
+    activity: no function
+    label: CYP3A5*3K, CYP3A5*10
+    evidence: M
     mutations:
-    - [12083, A>G, rs776746, Splicing defect]
+    - [12083, A>G, rs776746, splice defect]
     - [34850, T>C, rs41279854, F446S]
-    - [36708, C>T, rs15524]
-  CYP3A5*3.012:
-    label: CYP3A5*3L
-    activity: Decr. (in vitro)
+  CYP3A5*3.008:
+    pharmvar: https://www.pharmvar.org/haplotype/1335
+    activity: no function
+    label: CYP3A5*3L, CYP3A5*11
+    evidence: L
     mutations:
     - [8877, A>G, rs72552791, Y53C]
-    - [12083, A>G, rs776746, Splicing defect]
+    - [12083, A>G, rs776746, splice defect]
+  CYP3A5*3.009:
+    pharmvar: https://www.pharmvar.org/haplotype/1342
+    activity: no function
+    evidence: L
+    mutations:
+    - [12083, A>G, rs776746, splice defect]
+    - [19762, A>G, rs56411402, Q200R]
+  CYP3A5*3.010:
+    pharmvar: https://www.pharmvar.org/haplotype/1352
+    activity: no function
+    evidence: L
+    mutations:
+    - [12083, A>G, rs776746, splice defect]
+    - [32386, C>A, rs28365083, T398N]
+  CYP3A5*3.011:
+    pharmvar: https://www.pharmvar.org/haplotype/1345
+    activity: no function
+    evidence: L
+    mutations:
+    - [12083, A>G, rs776746, splice defect]
+    - [24483, G>A, rs28383479, A337T]
+  CYP3A5*3.012:
+    pharmvar: https://www.pharmvar.org/haplotype/1347
+    activity: no function
+    evidence: D
+    mutations:
+    - [5029, C>T, rs28371764]
+    - [12083, A>G, rs776746, splice defect]
+  CYP3A5*3.013:
+    pharmvar: https://www.pharmvar.org/haplotype/1333
+    activity: no function
+    evidence: D
+    mutations:
+    - [5017, G>A, rs28365095]
+    - [12083, A>G, rs776746, splice defect]
+  CYP3A5*3.014:
+    pharmvar: https://www.pharmvar.org/haplotype/1346
+    activity: no function
+    evidence: D
+    mutations:
+    - [4792, T>C, '-']
+    - [12083, A>G, rs776746, splice defect]
+  CYP3A5*3.015:
+    pharmvar: https://www.pharmvar.org/haplotype/1354
+    activity: no function
+    evidence: D
+    mutations:
+    - [4693, G>A, rs141797710]
+    - [12083, A>G, rs776746, splice defect]
+  CYP3A5*3.016:
+    pharmvar: https://www.pharmvar.org/haplotype/1357
+    activity: no function
+    evidence: D
+    mutations:
+    - [4662, G>A, '-']
+    - [12083, A>G, rs776746, splice defect]
+  CYP3A5*3.017:
+    pharmvar: https://www.pharmvar.org/haplotype/1350
+    activity: no function
+    evidence: D
+    mutations:
+    - [12083, A>G, rs776746, splice defect]
+    - [19771, T>G, rs147489136]
   CYP3A5*4.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1351
+    activity: unknown function
     label: CYP3A5*4
+    evidence: L
     mutations:
     - [19762, A>G, rs56411402, Q200R]
   CYP3A5*5.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1359
+    activity: unknown function
     label: CYP3A5*5
+    evidence: L
     mutations:
-    - [18049, T>C, rs55965422, Splicing defect]
+    - [18049, T>C, rs55965422, splice defect]
   CYP3A5*6.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1337
+    activity: no function
     label: CYP3A5*6
-    activity: None or severely decr. (in vitro)
+    evidence: D
     mutations:
-    - [19787, G>A, rs10264272, Splicing defect]
+    - [19787, G>A, rs10264272, splice defect]
+    - [36708, T>C, rs15524]
   CYP3A5*7.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1339
+    activity: no function
     label: CYP3A5*7
+    evidence: D
     mutations:
-    - [32228, insT, rs41303343, 346Frameshift]
+    - [32228, insT, rs41303343, 346fs]
+    - [36708, T>C, rs15524]
   CYP3A5*8.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1341
+    activity: unknown function
     label: CYP3A5*8
-    activity: Decr. (in vitro)
+    evidence: M
     mutations:
     - [8801, C>T, rs55817950, R28C]
   CYP3A5*9.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1355
+    activity: unknown function
     label: CYP3A5*9
-    activity: Decr. (in vitro)
-    mutations:
-    - [12083, A>G, rs776746, Splicing defect]
-    - [24483, G>A, rs28383479, A337T]
-  CYP3A5*9.002:
-    label: CYP3A5*9X
-    activity: Decr. (in vitro)
+    evidence: L
     mutations:
     - [24483, G>A, rs28383479, A337T]
-  CYP3A5*2+3.101:
-    label: CYP3A5*10.ALDY
-    mutations:
-    - [32386, C>A, rs28365083, T398N]
-    - [12083, A>G, rs776746, Splicing defect]
 structure:
   genes: [CYP3A5]
   regions:
@@ -190,7 +258,7 @@ structure:
       down: [99646194, 99648194]
   cn_regions: [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13]
 reference:
-  name: NG_007938.1
+  name: NG_007938.2
   mappings:
     hg19: ['7', 99243817, 99282622, '-', M38805]
     hg38: ['7', 99646194, 99684999, '-', M38805]
@@ -208,9 +276,6 @@ reference:
   - [32219, 32446]
   - [34766, 34926]
   - [36598, 36694]
-  patches:
-  - [12083, A]
-  - [36708, C]
   seq: |-
     CATGCACTGAGCTCTCTCCCTGTCTGTGTAGAGTGTTATACTTGGGAATATAAAGGAAGTGACCAAATCAGTGCTT
     GGGAAGTAGATTTGGCTTCTTTGTTTCTCACAGGACAATCTCAGCCACCCCTAGTTAGCACCATTAACTCCTCCTG
@@ -370,7 +435,7 @@ reference:
     GCTGTGGAGCTGGCATGGCCCATACAGGCAACATGACTTAGTAGACAGATGACACAGCTCTAGATGTCCATGGGCC
     CCACACCAACTGCCCTTGCAGCATTTAGTCCTTGTGAGCACTTGATGATTTACCTGCCTTCAATTTTTCACTGACC
     TAATATTCTTTTTGATAATGAAGTATTTTAAACATATAAAACATTATGGAGAGTGGCATAGGAGATACCCACGTAT
-    GTACCACCCAGCTTAACGAATGCTCTACTGTCATTTCTAACCATAATCTCTTTAAAGAGCTCTTTTGTCTTTCAGT
+    GTACCACCCAGCTTAACGAATGCTCTACTGTCATTTCTAACCATAATCTCTTTAAAGAGCTCTTTTGTCTTTCAAT
     ATCTCTTCCCTGTTTGGACCACATTACCCTTCATCATATGAAGCCTTGGGTGGCTCCTGTGTGAGACTCTTGCTGT
     GTGTCACACCCTAATGAACTAGAACCTAAGGTTGCTGTGTGTCGTACAACTAGGGGTATGGATTACATAACATAAT
     GATCAAAGTCTGGCTTCCTGGGTGTGGCTCCAGCTGCAGAATCGGGCTAGTGAAGTTTAATCAGCTCCGTTGTCCC
