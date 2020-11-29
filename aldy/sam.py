@@ -12,10 +12,9 @@ import os.path
 import re
 import gzip
 import struct
-import collections
-import bisect
 
 from natsort import natsorted
+from collections import defaultdict
 from .common import log, GRange, AldyException, script_path
 from .coverage import Coverage
 from .gene import Gene, Mutation
@@ -127,15 +126,16 @@ class Sample:
         log.debug("[sam] path= {}", os.path.abspath(sam_path))
 
         # dict of int: int: the coverage of the CN-neutral region
-        cnv_coverage: Dict[int, int] = collections.defaultdict(int)
+        cnv_coverage: Dict[int, int] = defaultdict(int)
         # Get the list of indel sites that should be corrected
         # TODO: currently uses only functional indels; other indels should be
         # corrected as well
         self._insertion_sites = {
             m for a in gene.alleles.values() for m in a.func_muts if m.op[:3] == "ins"
         }
-        self._insertion_reads = {
-            m: [collections.defaultdict(int), 0] for m in self._insertion_sites
+        self._insertion_counts: Dict[Tuple[int, int], int] = defaultdict(int)
+        self._insertion_reads: Dict[Mutation, Dict[Any, int]] = {
+            m: defaultdict(int) for m in self._insertion_sites
         }
         _multi_sites = {
             m.pos: m.op
@@ -143,8 +143,8 @@ class Sample:
             for m in a.func_muts
             if ">" in m.op and len(m.op) > 3
         }
-        muts: dict = collections.defaultdict(int)
-        norm: dict = collections.defaultdict(int)
+        muts: dict = defaultdict(int)
+        norm: dict = defaultdict(int)
 
         if sam_path[-5:] == ".dump":
             self._load_dump(sam_path)
@@ -254,7 +254,7 @@ class Sample:
 
     def _group_indels(self, gene, coverage):
         # Group ambiguous deletions
-        indels = collections.defaultdict(set)
+        indels = defaultdict(set)
         for m in gene.mutations:
             if "del" in m[1]:
                 indels[m[0]].add(m[1])
@@ -290,7 +290,7 @@ class Sample:
                     coverage[new_pos][mut] += coverage[pos][mut]
                     coverage[pos][mut] = 0
         # Group ambiguous insertions
-        indels = collections.defaultdict(set)
+        indels = defaultdict(set)
         for m in gene.mutations:
             if "ins" in m[1]:
                 indels[m[0]].add(m[1])
@@ -323,6 +323,11 @@ class Sample:
                     if mut not in coverage[new_pos]:
                         coverage[new_pos][mut] = 0
                     coverage[new_pos][mut] += coverage[pos][mut]
+
+                    L = len(mut) - 3
+                    self._insertion_counts[new_pos, L] += self._insertion_counts[pos, L]
+                    self._insertion_counts[pos, L] = 0
+
                     coverage[pos][mut] = 0
 
     def _parse_read(
@@ -351,7 +356,6 @@ class Sample:
             return None
 
         dump_arr = []
-        insertions = set()
         start, s_start = read.reference_start, 0
         for op, size in read.cigartuples:
             if op == 2:  # Deletion
@@ -366,7 +370,7 @@ class Sample:
                 mut = (start, "ins" + read.query_sequence[s_start : s_start + size])
                 muts[mut] += 1
                 # HACK: just store the length due to seq. errors
-                insertions.add((start, len(mut[1]) - 3))
+                self._insertion_counts[start, size] += 1
                 dump_arr.append(mut)
                 s_start += size
             elif op == 4:  # Soft-clip
@@ -406,11 +410,8 @@ class Sample:
                 muts[pos, op] += 1
 
         read_pos = (read.reference_start, start, len(read.query_sequence))
-        for ins, data in self._insertion_reads.items():
-            if (ins.pos, len(ins.op) - 3) in insertions:
-                data[1] += 1  # type: ignore
-            else:
-                data[0][read_pos] += 1  # type: ignore
+        for data in self._insertion_reads.values():
+            data[read_pos] += 1  # type: ignore
         return read_pos, dump_arr
 
     def _correct_ins_coverage(self, mut: Mutation, total) -> int:
@@ -434,10 +435,9 @@ class Sample:
         INSERT_LEN_RESCALE = 10.0
         INSERT_LEN_AMPLIFY = 3
 
-        ir = self._insertion_reads[mut]
-        orig_cov: int = ir[1]  # type: ignore
+        orig_cov = self._insertion_counts[mut.pos, len(mut.op) - 3]
         new_total = 0.0
-        for (orig_start, orig_end, read_len), cov in ir[0].items():  # type: ignore
+        for (orig_start, orig_end, read_len), cov in self._insertion_reads[mut].items():
             ins_len = len(mut.op) - 3
             # HACK: This is horrible way of detecting *40 (min 20% on the sides? max??)
             min_margin = MARGIN_RATIO * max(1, ins_len / INSERT_LEN_RESCALE) * read_len
@@ -467,7 +467,7 @@ class Sample:
             for m in a.func_muts
             if ">" in m.op and len(m.op) > 3
         }
-        muts: dict = collections.defaultdict(int)
+        muts: dict = defaultdict(int)
         norm = {
             p: 20
             for p in range(
@@ -623,9 +623,7 @@ class Sample:
                 but ``gene_region`` and ``cn_region`` are not.
         """
 
-        profile: Dict[str, Dict[int, float]] = collections.defaultdict(
-            lambda: collections.defaultdict(int)
-        )
+        profile: Dict[str, Dict[int, float]] = defaultdict(lambda: defaultdict(int))
         if is_bam:
             if gene_region and cn_region:
                 ptr = Sample.load_sam_profile(
@@ -807,7 +805,7 @@ class Sample:
             with pysam.AlignmentFile(sam_path) as sam:
                 prefix = _chr_prefix(location.chr, sam.header["SQ"])
                 region = location.samtools(pad_left=1000, pad_right=1000, prefix=prefix)
-                cov: dict = collections.defaultdict(int)
+                cov: dict = defaultdict(int)
                 log.info("Generating profile for {} ({})", gene, region)
                 try:
                     for read in sam.fetch(region=region):
