@@ -13,6 +13,7 @@ import re
 import gzip
 import struct
 import collections
+import bisect
 
 from natsort import natsorted
 from .common import log, GRange, AldyException, script_path
@@ -130,10 +131,12 @@ class Sample:
         # Get the list of indel sites that should be corrected
         # TODO: currently uses only functional indels; other indels should be
         # corrected as well
-        _insertion_sites = {
-            m for _, a in gene.alleles.items() for m in a.func_muts if m.op[:3] == "ins"
+        self._insertion_sites = {
+            m for a in gene.alleles.values() for m in a.func_muts if m.op[:3] == "ins"
         }
-        _insertion_reads: Dict[Tuple, int] = collections.defaultdict(int)
+        self._insertion_reads = {
+            m: [collections.defaultdict(int), 0] for m in self._insertion_sites
+        }
         _multi_sites = {
             m.pos: m.op
             for _, a in gene.alleles.items()
@@ -210,8 +213,6 @@ class Sample:
                     )
                     if r:
                         total += 1
-                        if _insertion_sites:
-                            _insertion_reads[r[0]] += 1
                         if debug:
                             dump_data.append(r)
                 if debug:
@@ -234,17 +235,15 @@ class Sample:
             if mut not in coverage[pos]:
                 coverage[pos][mut] = 0
             coverage[pos][mut] += cov
-        self._group_deletions(gene, coverage)
+        self._group_indels(gene, coverage)
         for pos, op in _multi_sites.items():
             if pos in coverage and op in coverage[pos]:
                 log.debug(f"[sam] multi-SNP {pos}{op} with {coverage[pos][op]} reads")
-        for mut in _insertion_sites:
+        for mut in self._insertion_sites:
             if mut.pos in coverage and mut.op in coverage[mut.pos]:
-                total = sum(coverage[mut.pos].values())
+                total = sum(v for o, v in coverage[mut.pos].items() if o[:3] != "ins")
                 if total > 0:
-                    coverage[mut.pos][mut.op] = self._correct_ins_coverage(
-                        mut, coverage[mut.pos][mut.op], total, _insertion_reads
-                    )
+                    coverage[mut.pos][mut.op] = self._correct_ins_coverage(mut, total)
 
         self.coverage = Coverage(
             {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
@@ -253,7 +252,7 @@ class Sample:
             os.path.basename(sam_path).split(".")[0],
         )
 
-    def _group_deletions(self, gene, coverage):
+    def _group_indels(self, gene, coverage):
         # Group ambiguous deletions
         indels = collections.defaultdict(set)
         for m in gene.mutations:
@@ -351,7 +350,8 @@ class Sample:
         if "H" in read.cigarstring:  # avoid hard-clipped reads
             return None
 
-        dump_arr = {}
+        dump_arr = []
+        insertions = set()
         start, s_start = read.reference_start, 0
         for op, size in read.cigartuples:
             if op == 2:  # Deletion
@@ -360,12 +360,14 @@ class Sample:
                     "del" + gene[start : start + size],
                 )
                 muts[mut] += 1
-                dump_arr[start] = mut[1]
+                dump_arr.append(mut)
                 start += size
             elif op == 1:  # Insertion
                 mut = (start, "ins" + read.query_sequence[s_start : s_start + size])
                 muts[mut] += 1
-                dump_arr[start] = mut[1]
+                # HACK: just store the length due to seq. errors
+                insertions.add((start, len(mut[1]) - 3))
+                dump_arr.append(mut)
                 s_start += size
             elif op == 4:  # Soft-clip
                 s_start += size
@@ -379,35 +381,39 @@ class Sample:
                             start + i,
                             f"{gene[start + i]}>{read.query_sequence[s_start + i]}",
                         )
-                        dump_arr[start + i] = mut[1]
+                        dump_arr.append(mut)
                         muts[mut] += 1
                     else:  # We ignore all mutations outside the RefSeq region
                         norm[start + i] += 1
                 start += size
                 s_start += size
 
-        if multi_sites and set(multi_sites.keys()) & set(dump_arr.keys()):
-            for pos, op in multi_sites.items():
-                if pos not in dump_arr:
-                    continue
-                l, r = op.split(">")
-                if all(
-                    dump_arr.get(pos + p, "-") == f"{l[p]}>{r[p]}"
-                    for p in range(len(l))
-                    if l[p] != "."
-                ):
-                    for p in range(len(l)):
-                        if l[p] != ".":
-                            muts[pos + p, dump_arr[pos + p]] -= 1
-                            if p:
-                                norm[pos + p] += 1
-                    muts[pos, op] += 1
-        return (
-            (read.reference_start, start, len(read.query_sequence)),
-            list(dump_arr.items()),
-        )
+        dump_arr_pos = {p for p, _ in dump_arr}
+        for pos, op in multi_sites.items():
+            if pos not in dump_arr_pos:
+                continue
+            l, r = op.split(">")
+            if all(
+                (pos + p, f"{l[p]}>{r[p]}") in dump_arr
+                for p in range(len(l))
+                if l[p] != "."
+            ):
+                for p in range(len(l)):
+                    if l[p] != ".":
+                        muts[pos + p, f"{l[p]}>{r[p]}"] -= 1
+                        if p:
+                            norm[pos + p] += 1
+                muts[pos, op] += 1
 
-    def _correct_ins_coverage(self, mut: Mutation, orig_cov, total, reads) -> int:
+        read_pos = (read.reference_start, start, len(read.query_sequence))
+        for ins, data in self._insertion_reads.items():
+            if (ins.pos, len(ins.op) - 3) in insertions:
+                data[1] += 1  # type: ignore
+            else:
+                data[0][read_pos] += 1  # type: ignore
+        return read_pos, dump_arr
+
+    def _correct_ins_coverage(self, mut: Mutation, total) -> int:
         """
         Fix low coverage of large tandem insertions.
 
@@ -428,11 +434,12 @@ class Sample:
         INSERT_LEN_RESCALE = 10.0
         INSERT_LEN_AMPLIFY = 3
 
+        ir = self._insertion_reads[mut]
+        orig_cov: int = ir[1]  # type: ignore
         new_total = 0.0
-        for (orig_start, orig_end, read_len), cov in reads.items():
+        for (orig_start, orig_end, read_len), cov in ir[0].items():  # type: ignore
             ins_len = len(mut.op) - 3
-            # HACK: This is rather hackish way of detecting *40
-            # min 20% on the sides, max ... how much?
+            # HACK: This is horrible way of detecting *40 (min 20% on the sides? max??)
             min_margin = MARGIN_RATIO * max(1, ins_len / INSERT_LEN_RESCALE) * read_len
             if orig_end >= mut.pos + max(
                 INSERT_LEN_AMPLIFY * ins_len, min_margin
@@ -440,11 +447,11 @@ class Sample:
                 (INSERT_LEN_AMPLIFY - 1) * ins_len, min_margin
             ):
                 new_total += cov
-        if new_total >= orig_cov:
-            new_cov = int(total * (orig_cov / new_total))
-            if new_cov > orig_cov:
-                log.debug(f"[sam] rescale {mut} from {orig_cov} to {new_cov} ")
-                return new_cov
+        new_total += orig_cov
+        new_cov = int(total * (orig_cov / new_total))
+        if new_cov > orig_cov:
+            log.debug(f"[sam] rescale {mut} from {orig_cov} to {new_cov}")
+            return new_cov
         return orig_cov
 
     def load_vcf(self, vcf_path: str, gene: Gene, debug: Optional[str] = None):
