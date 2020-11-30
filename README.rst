@@ -52,7 +52,7 @@ Gene Support
      - ✅
    * - *CYP2B6*
      - PharmVar 4.1.7
-     - ⚠️
+     - ⚠️ (needs more testing)
      - 🚫
    * - *CYP1A1*
      - PharmGKB (Dec 2014)
