@@ -1,6 +1,9 @@
-Aldy
-****
+.. raw:: html
 
+   <h1 align="center">
+   <img src="https://user-images.githubusercontent.com/10132487/100571499-1ee1fd00-3288-11eb-9760-75c4b0b98d2a.png" alt="Aldy" width=100px/>
+   </h1>
+       
 .. image:: https://badge.fury.io/py/aldy.svg
     :target: https://badge.fury.io/py/aldy
 .. image:: https://travis-ci.com/inumanag/aldy.svg?branch=master
@@ -14,10 +17,12 @@ Aldy
     :target: https://github.com/psf/black
 
 
-Aldy is a tool for allelic decomposition (haplotype reconstruction) and exact genotyping
-of highly polymorphic and structurally variant genes.
-More simply, it is a tool which can detect the copy number of a target gene,
-and the structure and genotype of each gene copy present in the sample.
+Aldy is a tool for genotyping and phasing popular pharmacogenes.
+It supports calling genotypes of many highly polymorphic pharmacogenes in star-allele nomenclature.
+It can also call copy number of a given pharmacogene, and genotype each copy present in the sample--- something that standard genotype callers (e.g. GATK) cannot do.
+
+Algorithm details
+=================
 
 Aldy has been published in `Nature Communications <https://www.nature.com/articles/s41467-018-03273-1>`_
 (`doi:10.1038/s41467-018-03273-1 <http://doi.org/10.1038/s41467-018-03273-1>`_).
@@ -26,11 +31,135 @@ Full experimental pipeline `is available here <https://github.com/inumanag/aldy-
 
 Documentation is available `at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
 
+Gene Support
+============
 
+.. list-table::
+   :header-rows: 1
+
+   * - Gene
+     - Version
+     - Status
+     - Copy number & Fusion
+   * - *CYP2D6*
+     - PharmVar 4.1.7
+     - ✅
+     - ✅
+   * - *CYP2A6*
+     - cypalleles.ki.se (Jan 2012)
+     - ✅
+     - ✅
+   * - *CYP2B6*
+     - PharmVar 4.1.7
+     - ⚠️
+     - 🚫
+   * - *CYP1A1*
+     - PharmGKB (Dec 2014)
+     - ✅
+     - 🚫
+   * - *CYP1A2*
+     - PharmGKB (Mar 2014)
+     - ✅
+     - 🚫
+   * - *CYP2A13*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *CYP2C19*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *CYP2C8*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *CYP2C9*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *CYP2E1*
+     - PharmGKB (Nov 2013)
+     - ⚠️ (not tested on real data)
+     - 🚫
+   * - *CYP2F1*
+     - PharmVar 4.1.7
+     - ⚠️ (not tested on real data)
+     - 🚫
+   * - *CYP2J2*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *CYP2R1*
+     - PharmVar 4.1.7
+     - ⚠️ (not tested)
+     - 🚫
+   * - *CYP2S1*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *CYP2W1*
+     - PharmVar 4.1.7
+     - ⚠️ (not tested on real data)
+     - 🚫
+   * - *CYP3A43*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *CYP3A4*
+     - cypalleles.ki.se (2020)
+     - ✅
+     - 🚫
+   * - *CYP3A5*
+     - PharmVar 4.2.4
+     - ✅
+     - 🚫
+   * - *CYP3A7*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *CYP4F2*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *DPYD*
+     - PharmVar 4.1.7
+     - ✅
+     - 🚫
+   * - *G6PD*
+     - PharmGKB (Sep 2018)
+     - ✅
+     - 🚫
+   * - *NUDT15*
+     - PharmVar 4.1.7
+     - ⚠️ (not tested on real data)
+     - 🚫
+   * - *SLCO1B1*
+     - PharmGKB (Oct 2019)
+     - ✅
+     - 🚫
+   * - *TPMT*
+     - PharmGKB (Jun 2020)
+     - ✅
+     - 🚫
+     
+⚠️ Warning
+==========
+
+If you are using Aldy in a clinical or commercial environment, **please read this carefully**.
+
+Aldy is a computational tool whose purpose is to *aid the genotype detection process*. It can be of tremendous help in that process, however it is not perfect, and it can easily make a wrong call if the data is noisy, ambigious or if the target sample contains a previously unknown allele.
+  
+☣️🚨 **Do not use the raw output of Aldy (or any other computational tool for that matter) to diagnose a disease or prescribe a drug!** 
+**It is your responsibility to validate every result manually or (ideally) in a wetlab before doing something that can have major consequences.** 🚨☣️
+
+We really mean it.
+
+Finally, note that the allele databases are still work in progress, and that we still do not know the downstream impact of vast majority of genotypes.
+     
 Installation
 ============
 
-Aldy is written in Python, and requires Python 3.6+.
+Aldy is written in Python, and requires Python 3.7+.
 It is intended to be run on POSIX-based systems
 (so far, only Linux and macOS have been tested).
 
@@ -52,6 +181,10 @@ The following solvers are currently supported:
 * `CBC / Google OR-Tools <https://developers.google.com/optimization/>`_:
   a free, open-source MIP solver that is shipped by default with Google's OR-Tools.
   `pip` installs it by default when installing Aldy.
+  
+       If you have trouble installing `ortools` on a Nix-based Linux distro, try this::
+          
+           pip install --platform=manylinux1_x86_64 --only-binary=:all: --target ~/.local/lib/python3.8/site-packages ortools
 
 * `Gurobi <http://www.gurobi.com>`_:
   a commercial solver which is free for academic purposes.
@@ -122,21 +255,6 @@ An index is needed for BAM files. Get one by running::
 Aldy is invoked as::
 
     aldy genotype -p [profile] -g [gene] file.bam
-
-The ``[gene]`` parameter indicates the name of the gene to be genotyped.
-Currently, Aldy supports:
-
-- *CYP2D6*
-- *CYP2A6*
-- *CYP2C19*
-- *CYP2C8*
-- *CYP2C9*
-- *CYP3A4*
-- *CYP3A5*
-- *CYP4F2*
-- *TPMT* and
-- *DPYD*.
-
 
 Sequencing profile selection
 ----------------------------
