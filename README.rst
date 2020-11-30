@@ -216,14 +216,15 @@ the installation by issuing the following command (this should take a few minute
 
 In case everything is set up properly, you should see something like this::
 
-    *** Aldy v2.0 (Python 3.6.6, darwin) ***
-    *** (c) 2016-2019 Aldy Authors & Indiana University Bloomington. All rights reserved.
-    *** Free for non-commercial/academic use only.
-    ========================================== test session starts ==========================================
-    platform darwin -- Python 3.6.6, pytest-5.1.2, py-1.8.0, pluggy-0.12.0
-    plugins: xdist-1.29.0, forked-1.0.2, cov-2.7.1
-    collected 62 items
-
+    🐿  Aldy v3.0 (Python 3.7.5 on macOS 10.16)
+      (c) 2016-2020 Aldy Authors. All rights reserved.
+       Free for non-commercial/academic use only.
+    =============================================== test session starts ================================================
+    platform darwin -- Python 3.7.5, pytest-5.3.1, py-1.8.0, pluggy-0.13.1
+    rootdir: /Users/inumanag/Projekti/aldy/devel, inifile: setup.cfg
+    plugins: xdist-1.31.0, forked-1.1.3
+    collected 73 items
+    
     tests/test_cn_real.py ........                                                                    [ 12%]
     tests/test_cn_synthetic.py .....                                                                  [ 20%]
     tests/test_diplotype_real.py ....                                                                 [ 27%]
@@ -236,7 +237,7 @@ In case everything is set up properly, you should see something like this::
     tests/test_minor_synthetic.py .....                                                               [ 98%]
     tests/test_paper.py s                                                                             [100%]
 
-    =============================== 61 passed, 1 skipped in 106.83s (0:01:46) ===============================
+    =============================== 73 passed, 1 skipped in 106.83s (0:01:46) ===============================
 
 
 Running
@@ -246,7 +247,7 @@ Aldy needs a SAM, BAM, or a CRAM file for genotyping.
 We will be using BAM as an example.
 
 .. attention::
-  It is assumed that reads are mapped to hg19 or GRCh37. hg38 is not yet supported.
+  It is assumed that reads are mapped to hg19 (GRCh37) or hg38 (GRCh38). Other reference genomes are not yet supported.
 
 An index is needed for BAM files. Get one by running::
 
@@ -262,14 +263,22 @@ Sequencing profile selection
 The ``[profile]`` argument refers to the sequencing profile.
 The following profiles are available:
 
-- ``illumina`` for Illumina WGS (or any uniform-coverage technology).
+- ``illumina`` for Illumina WGS or exome (WXS) data (or any uniform-coverage technology).
 
 .. attention::
   It is highly recommended to use samples with at least 40x coverage.
   Anything lower than 20x will result in tears and agony.
 
-- ``pgrnseq-v1`` for PGRNseq v.1 capture protocol data
-- ``pgrnseq-v2`` for PGRNseq v.2 capture protocol data
+- ``pgx1`` for PGRNseq v.1 capture protocol data
+- ``pgx2`` for PGRNseq v.2 capture protocol data
+- ``pgx3`` for PGRNseq v.3 capture protocol data
+
+- ``wxs`` for whole-exome sequencing data
+
+   .. attention::
+   ⚠️ **Be warned!:** whole-exome data is incomplete *by definition*, and Aldy will not be able to call majoe star-alleles that are
+   defined by their intronic or upstream variants.
+   Aldy also assumes that there are only two (2) gene copies if `wxs` profile is used, as it cannot call copy number changes nor fusions from exome data.
 
 If you are using different technology (e.g. some home-brewed capture kit),
 you can proceed provided that the following requirements are met:
@@ -279,7 +288,7 @@ you can proceed provided that the following requirements are met:
   MUST have similar coverage profiles; please consult us if you are not sure about this)
 - your panel includes a copy-number neutral region
   (currently, Aldy uses *CYP2D8* as a copy-number neutral region,
-  but it can be overridden)
+  but it can be overridden).
 
 Having said that, you can use a sample BAM that is known to have two copies
 of the genes you wish to genotype (without any fusions or copy number alterations)
@@ -303,7 +312,7 @@ Aldy will by default generate the following file: ``file-[gene].aldy``
 Aldy also supports VCF file output: just append `.vcf` to the output file name.
 The summary of results are shown at the end of the output::
 
-    $ aldy -p pgrnseq-v2 -g cyp2d6 NA19788_x.bam
+    $ aldy -p pgrnseq-v2 -g cyp2d6 NA19788.bam
     *** Aldy v2.0 (Python 3.7.4) ***
     *** (c) 2016-2019 Aldy Authors & Indiana University Bloomington. All rights reserved.
     *** Free for non-commercial/academic use only.
@@ -390,7 +399,7 @@ The output will be a VCF file if the output file extension is `.vcf`.
 Aldy will report a VCF sample for each potential solution, and the appropriate genotypes.
 Aldy will also output tags `MA` and `MI` for major and minor solutions.
 
-  **Note:** VCF is not optimal format for star-allele calling. Unless you really need it,
+  **Note:** VCF is not optimal format for star-allele reporting. Unless you really need it,
   we recommend using Aldy's default format.
 
 
@@ -470,7 +479,8 @@ Commands::
     aldy help
     aldy test
     aldy license
-    aldy show [-g/--gene GENE]
+    aldy query
+    aldy q
     aldy profile [FILE]
     aldy genotype [-h]
                   --profile PROFILE
@@ -486,6 +496,8 @@ Commands::
                   [--log LOG]
                   [--fusion-penalty FUSION_PENALTY]
                   [--max-minor-solutions MAX_MINOR_SOLUTIONS]
+                  [--multiple-warn-level MULTIPLE_WARN_LEVEL]
+                  [--phase PHASE]
                   [--cn CN]
                   [FILE]
 
@@ -532,29 +544,11 @@ Commands:
 
   Run Aldy test suite.
 
-* ``show``
+* ``query``, ``q``
 
-  Show a gene description (requires ``--gene``).
+  Query a gene or an allele.
 
-  - ``-g, --gene GENE``
-
-    Gene profile.
-
-
-  Optional parameters:
-
-  - ``-c, --cn-config [CN_CONFIG]``
-
-    Describe the copy number configuration CN_CONFIG.
-
-  - ``-m, --major [MAJOR]``
-
-    Describe the major star-allele MAJOR.
-
-  - ``-M, --minor [MINOR]``
-
-    Describe the minor star-allele MINOR.
-
+  You can specify a gene name (e.g. ``aldy query CYP2D6``) or an allele (e.g. ``aldy query 'CYP2D6*121'`` or ``aldy q 'CYP2D6*4C'``).
 
 * ``profile [FILE]``
 
@@ -583,8 +577,10 @@ Commands:
     Sequencing profile. Supported values are:
 
     + ``illumina``
-    + ``pgrnseq-v1``
-    + ``pgrnseq-v2``.
+    + ``wxs``
+    + ``pgx1``
+    + ``pgx2``
+    + ``pgx3``.
 
     You can also pass a SAM/BAM file
     (please check the documentation quick-start for more details).
@@ -607,7 +603,7 @@ Commands:
     ILP Solver. Currently supported solvers are Gurobi, SCIP and CBC.
     You can also pass ``any`` to let Aldy choose the best (available) solver.
 
-    *Default:* ``any``
+    *Default:* ``any`` (uses CBC if available, then Gurobi, then SCIP).
 
   - ``-c, --cn CN``
 
@@ -615,7 +611,7 @@ Commands:
     Input: a comma-separated list of configurations ``CN1,CN2,...``.
     For a list of supported configurations, please run::
 
-        aldy show --gene [GENE]
+        aldy query [GENE]
 
   - ``-r, --reference REF``
 
@@ -626,7 +622,7 @@ Commands:
     Provide a custom copy-number neutral region.
     Format is ``chr:start-end``.
 
-    *Default:* *CYP2D8* (22:42547463-42548249 in hg19)
+    *Default:* *CYP2D8* (22:42547463-42548249 for hg19)
 
   - ``-G, --gap GAP``
 
@@ -649,7 +645,39 @@ Commands:
     Larger values mean lower likelihood of seeing fusions.
 
     *Default:* 0.1
+    
+  - ``--max-minor-solutions MAX_MINOR_SOLUTIONS``
 
+    Maximum number of minor solutions to report.
+    Default setting is to output only one even if there are multiple minor (non-functional) phases.
+
+    *Default:* 1
+    
+  - ``--multiple-warn-level MULTIPLE_WARN_LEVEL``
+  
+    Warning level when multiple optimal solutions are found. 
+    
+    If set to 1, Aldy will warn if multiple final optimal solutions are found.
+    If set to 2, Aldy will also warn if multiple optimal major star-allele solutions are found.
+    If set to 3, Aldy will even warn if multiple copy-number configurations are found.
+    
+    *Default:* 1
+    
+  - ``--phase PHASE``
+  
+    Path to `HapTree-X_<https://github.com/0xTCG/haptreex>` or `HapCUT2_<https://github.com/vibansal/HapCUT2>` phase file
+    that can be used to properly resolve multiple optimal solutions and generate more accurate phasing.
+
+
+Change log
+==========
+
+- Aldy v3.0 (Nov 30th, 2020)
+   - Support for hg38
+   - Support for 15+ new pharmacogenes
+   - New profile format (**⚠️ WARNING:** Please make sure to re-generate custom profiles if using Aldy v2 profiles.)
+   - Better genotype calling models
+   - Major API changes
 
 Acknowledgements
 ================
@@ -659,6 +687,8 @@ The following people made Aldy much better software:
 - Michael Ford `@michael-ford <https://github.com/michael-ford>`_
 - Farid Rashidi `@faridrashidi <https://github.com/faridrashidi>`_
 - David Twesigomwe `@twesigomwedavid <https://github.com/twesigomwedavid>`_
+- Tyler Shrug `@tshugg <https://github.com/tshugg>`_
+- Reynold C. Ly
 - Lawrence Hon `@lhon <https://github.com/lhon>`_
 - Zach Langley `@zlangley <https://github.com/zlangley>`_
 
