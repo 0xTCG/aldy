@@ -3,26 +3,26 @@
    <h1 align="center">
    <img src="https://user-images.githubusercontent.com/10132487/100571499-1ee1fd00-3288-11eb-9760-75c4b0b98d2a.png" alt="Aldy" width=100px/>
    </h1>
-       
-.. image:: https://badge.fury.io/py/aldy.svg
-    :target: https://badge.fury.io/py/aldy
-.. image:: https://travis-ci.com/inumanag/aldy.svg?branch=master
-    :target: https://travis-ci.com/inumanag/aldy
-.. image:: https://readthedocs.org/projects/aldy/badge/?version=latest
-    :target: https://aldy.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
-.. image:: https://codecov.io/github/inumanag/aldy/coverage.svg?branch=master
-    :target: https://codecov.io/github/inumanag/aldy
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
+   <p align="center">
+   <a href="https://badge.fury.io/py/aldy"><img src="https://badge.fury.io/py/aldy.svg" alt="Version"/></a>
+   <a href="https://travis-ci.com/inumanag/aldy"><img src="https://travis-ci.com/inumanag/aldy.svg?branch=master" alt="CI Status"/></a>
+   <a href="https://aldy.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/aldy/badge/?version=latest" alt="ReadTheDocs"/></a>
+   <a href="https://codecov.io/github/inumanag/aldy"><img src="https://codecov.io/github/inumanag/aldy/coverage.svg?branch=master" alt="Code Coverage"/></a>
+   <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black"/></a>
+   </p>
+    
 
 
-Aldy is a tool for genotyping and phasing popular pharmacogenes.
-It supports calling genotypes of many highly polymorphic pharmacogenes in star-allele nomenclature.
-It can also call copy number of a given pharmacogene, and genotype each copy present in the sample--- something that standard genotype callers (e.g. GATK) cannot do.
+**Aldy is a tool for genotyping and phasing popular pharmacogenes.**
+
+It supports calling genotypes of many highly polymorphic pharmacogenes in a star-allele nomenclature.
+It can also call copy number of a given pharmacogene, and genotype each copy present in the sample—something that standard genotype callers like GATK cannot do.
 
 Algorithm details
 =================
+
+TL;DR: Aldy uses star-allele databases to guide the process of detecting the most likely genotype.
+The optimization is done in three stages via integer linear programming.
 
 Aldy has been published in `Nature Communications <https://www.nature.com/articles/s41467-018-03273-1>`_
 (`doi:10.1038/s41467-018-03273-1 <http://doi.org/10.1038/s41467-018-03273-1>`_).
@@ -30,6 +30,7 @@ Preprint `is available here <https://github.com/inumanag/aldy/blob/master/docs/p
 Full experimental pipeline `is available here <https://github.com/inumanag/aldy-paper-resources>`_.
 
 Documentation is available `at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
+
 
 Gene Support
 ============
