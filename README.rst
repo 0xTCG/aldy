@@ -9,13 +9,12 @@
    <a href="https://aldy.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/aldy/badge/?version=latest" alt="ReadTheDocs"/></a>
    <a href="https://codecov.io/github/inumanag/aldy"><img src="https://codecov.io/github/inumanag/aldy/coverage.svg?branch=master" alt="Code Coverage"/></a>
    <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black"/></a>
-   </p>
+  <br/>
+  <b><i>A quick and nifty tool for genotyping and phasing popular pharmacogenes.</i></b>
+  </p>
     
 
-
-**Aldy is a tool for genotyping and phasing popular pharmacogenes.**
-
-It supports calling genotypes of many highly polymorphic pharmacogenes in a star-allele nomenclature.
+Aldy calls genotypes of many highly polymorphic pharmacogenes and reports them in a phased star-allele nomenclature.
 It can also call copy number of a given pharmacogene, and genotype each copy present in the sample—something that standard genotype callers like GATK cannot do.
 
 Algorithm details
