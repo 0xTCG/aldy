@@ -5,7 +5,7 @@
    </h1>
    <p align="center">
    <a href="https://badge.fury.io/py/aldy"><img src="https://badge.fury.io/py/aldy.svg" alt="Version"/></a>
-   <a href="https://travis-ci.com/inumanag/aldy"><img src="https://travis-ci.com/inumanag/aldy.svg?branch=master" alt="CI Status"/></a>
+   <img src="https://github.com/0xTCG/aldy/workflows/aldy-test/badge.svg" alt="CI Status"/>
    <a href="https://aldy.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/aldy/badge/?version=latest" alt="ReadTheDocs"/></a>
    <a href="https://codecov.io/github/inumanag/aldy"><img src="https://codecov.io/github/inumanag/aldy/coverage.svg?branch=master" alt="Code Coverage"/></a>
    <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black"/></a>
