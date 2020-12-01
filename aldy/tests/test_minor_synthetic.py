@@ -15,7 +15,7 @@ from aldy.minor import estimate_minor, ADD_PENALTY_FACTOR, MISS_PENALTY_FACTOR
 from aldy.common import SOLUTION_PRECISION, sorted_tuple
 
 
-def assert_minor(gene, solver, data, shallow=False):
+def assert_minor(gene, solver, data, shallow=False, skip_check=False):
     cn_sol = CNSolution(gene, 0, list(collections.Counter(data["cn"]).elements()))
 
     cov = collections.defaultdict(dict)
@@ -36,7 +36,8 @@ def assert_minor(gene, solver, data, shallow=False):
         )
 
     sols = estimate_minor(gene, cov, [major], solver)
-    print(sols)
+    if skip_check:
+        return sols
 
     if "score" in data:
         for s in sols:
@@ -59,9 +60,6 @@ def assert_minor(gene, solver, data, shallow=False):
             )
             for s in sols
         ]
-        from pprint import pprint
-
-        pprint(sols_parsed)
         assert sorted(sols_expected) == sorted(sols_parsed)
     else:
         # As assignments can vary between multiple optimal solutions,
@@ -78,6 +76,9 @@ def assert_minor(gene, solver, data, shallow=False):
             pmiss |= set((m.pos, m.op) for m in i.missing)
             pnew |= set((m.pos, m.op) for m in i.added)
 
+        print(eall, pall)
+        print(emiss, pmiss)
+        print(enew, pnew)
         assert eall == pall, "Alleles"
         assert emiss == pmiss, "Missing mutations"
         assert enew == pnew, "Novel mutations"

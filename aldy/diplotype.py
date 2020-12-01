@@ -61,19 +61,20 @@ def write_decomposition(
         items = []
         if len(mutations) > 0:
             for m in sorted(mutations):
+                fn = gene.get_functional(m, False)
                 items.append(
                     [
                         sample,
                         gene.name,
                         sol_id,
-                        minor.diplotype,
+                        minor.get_major_diplotype().replace(" ", ""),
                         ";".join(ay.minor for ay in minor.solution if ay.minor),
                         copy,
                         a.minor,
                         m.pos,
                         m.op,
                         -1,
-                        ["NEUTRAL", "DISRUPTING"][gene.is_functional(m)],
+                        fn if fn else "none",
                         gene.get_rsid(m, default=False),
                         "",
                     ]
@@ -84,7 +85,7 @@ def write_decomposition(
                     sample,
                     gene.name,
                     sol_id,
-                    minor.diplotype,
+                    minor.get_major_diplotype().replace(" ", ""),
                     ";".join(ay.minor for ay in minor.solution if ay.minor),
                     copy,
                     a.minor,
@@ -151,8 +152,10 @@ def write_vcf(
         else:
             ref, alt = ".", f"{m.op[3:]}, ."  # TODO: this is wrong...
 
+        fm = gene.get_functional(m)
+        fm = fm.replace(' ', '_').replace("\t", "_").replace(";", "_") if fm else "none"
         info = [
-            "TYPE={}".format(["NEUTRAL", "DISRUPTING"][gene.is_functional(m)]),
+            f"EFFECT={fm}",
             "GENE=" + gene.name,
         ]
         data = []
@@ -236,6 +239,9 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     # Handle duplicates (heuristics that groups duplicate alleles together,
     #                    e.g. 1, 1, 2 -> 1+1/2)
     # First check should we split them (e.g. 1, 1, 1, 1 -> 1+1/1+1)?
+    def xlen(d):
+        return sum(2 if isinstance(n, tuple) else 1 for n in d)
+
     if len(major_dict) == 1:
         items = next(iter(major_dict.values()))
         if len(items) % 2 == 0:
@@ -246,7 +252,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
             major_dict.clear()
     for _, items in major_dict.items():
         if len(items) > 1:
-            if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
+            if xlen(diplotype[dc % 2]) > xlen(diplotype[(dc + 1) % 2]):
                 dc += 1
             diplotype[dc % 2] += items
             items.clear()
@@ -255,7 +261,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     # Handle the rest
     for _, items in major_dict.items():
         if items:
-            if len(diplotype[dc % 2]) > len(diplotype[(dc + 1) % 2]):
+            if xlen(diplotype[dc % 2]) > xlen(diplotype[(dc + 1) % 2]):
                 dc += 1
             assert len(items) == 1
             diplotype[dc % 2] += items

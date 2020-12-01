@@ -253,6 +253,7 @@ def solve_minor_model(
         }
         for a in alleles
     }
+
     # Add an error variable for each mutation, and populate error constraints
     VERR = {
         m: model.addVar(lb=-model.INF, ub=model.INF, name=f"E_{m.pos}_{m.op}")
@@ -295,6 +296,7 @@ def solve_minor_model(
     # Ensure that each constraint matches the observed coverage
     debug_info["cn"] = dict(major_sol.cn_solution.solution)
     debug_info["major"] = {s.major: v for s, v in major_sol.solution.items()}
+    debug_info["data"] = []
     for m, expr in sorted(constraints.items()):
         scov = coverage.single_copy(m.pos, major_sol.cn_solution)
         # If scov = 0, no mutations should be selected at that locus
@@ -302,7 +304,7 @@ def solve_minor_model(
         cov = coverage[m] / scov if scov > 0 else 0
         model.addConstr(expr + VERR[m] >= cov, name=f"CCOV_{m.pos}_{m.op}")
         model.addConstr(expr + VERR[m] <= cov, name=f"CCOV_{m.pos}_{m.op}")
-        debug_info["data"][m.pos, m.op] = coverage[m]
+        debug_info["data"].append((m.pos, m.op, coverage[m]))
 
     # Enforce the following rules:
     # 1) Each mutation is assigned only to alleles that are present in the solution
@@ -492,12 +494,13 @@ def solve_minor_model(
         if len(results) >= max_solutions:
             break
     if not results:
+        print("whoops...")
         log.debug("[minor] solution= []")
         debug_info["sol"] = []
         if debug and False:  # Enable to debug infeasible models
             model.model.computeIIS()
             model.dump(f"{debug}.iis.ilp")
-    return list(results.values())
+    return sorted(results.values(), key=lambda x: str(x.get_minor_diplotype()))
 
 
 def _print_candidates(gene, alleles, cn_sol, coverage, muts):

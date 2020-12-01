@@ -7,8 +7,8 @@ Aldy gene descriptions are stored in the database filesd in `YAML <https://en.wi
 Caveats
 =======
 
-- All coordinates are zero-indexed.
-- All intervals are closed at the beginning and open at the end (e.g. 1-10 includes position 1 but excludes position 10).
+- All coordinates start from 1.
+- All intervals are closed at the beginning and open at the end (e.g. 1-10 includes 1 but excludes 10).
 - All positions and intervals must be contained within the ``region`` interval.
 
 
@@ -17,9 +17,8 @@ YML specification
 
 Each gene YML must contain the following fields:
 
-- ``name`` (string): 
-  The name of a gene.
-  Example: ``CYP2D6``.
+- ``name`` (string): The name of a gene.
+- ``version`` (string): The gene database version.
 - ``region`` (list): 
   The region where a gene is located. 
   List members are ``[chromosome`` (str), ``start,`` (int), ``end]`` (int). 

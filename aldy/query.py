@@ -44,7 +44,7 @@ def query(gene: Gene, query: str, full=True):
     if gene.pharmvar:
         name.append(f"PharmVar ID: {gene.pharmvar}")
     log.info("-" * 80)
-    log.info("{} {}", name[0], "" if len(name) == 1 else f"({', '.join(name[1:])})")
+    log.info("{}{}", name[0], "" if len(name) == 1 else f" ({', '.join(name[1:])})")
     log.info("-" * 80)
 
     st, ed = gene.ref_to_chr[0], gene.ref_to_chr[len(gene.seq) - 1]
@@ -77,13 +77,13 @@ def query(gene: Gene, query: str, full=True):
         m = ",\n                   ".join(
             _print_mutation(gene, m) for m in sorted(allele.func_muts)
         )
-        log.info(f"    Key mutations: {m}")
+        log.info(f"    Key mutations: {m if m else 'none'}")
 
         mins = ",\n                   ".join(
             f"*{a}" + (f" (*{mi.alt_name})" if mi.alt_name else "")
             for a, mi in natsorted(allele.minors.items())
         )
-        log.info(f"    Minor alleles: {mins}")
+        log.info(f"    Minor alleles: {mins if mins else 'none'}")
 
 
 def print_cn(gene: Gene, major: str, full=False):
@@ -120,7 +120,7 @@ def print_majors(gene: Gene, major: str, full=False):
     ms = ",\n                 ".join(
         _print_mutation(gene, m) for m in sorted(allele.func_muts)
     )
-    log.info(f"  Key mutations: {ms}")
+    log.info(f"  Key mutations: {ms if ms else 'none'}")
 
     log.info("  Minor star-alleles:")
     for a, minor in natsorted(allele.minors.items()):
@@ -130,7 +130,7 @@ def print_majors(gene: Gene, major: str, full=False):
         )
         if minor.alt_name:
             log.info(f"      Legacy name: *{minor.alt_name}")
-        log.info(f"      Silent mutations: {m}")
+        log.info(f"      Silent mutations: {m if m else 'none'}")
 
 
 def print_minors(gene: Gene, major: str, minor: str):
@@ -153,12 +153,12 @@ def print_minors(gene: Gene, major: str, minor: str):
         log.info(f"  Legacy name: *{mn.alt_name}")
 
     ms = ",\n                 ".join(_print_mutation(gene, m) for m in allele.func_muts)
-    log.info(f"  Key mutations: {ms}")
+    log.info(f"  Key mutations: {ms if ms else 'none'}")
 
     m = ",\n                    ".join(
         _print_mutation(gene, m) for m in sorted(mn.neutral_muts)
     )
-    log.info(f"  Silent mutations: {m}")
+    log.info(f"  Silent mutations: {m if m else 'none'}")
 
 
 def _print_mutation(gene: Gene, m):

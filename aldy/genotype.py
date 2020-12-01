@@ -154,7 +154,7 @@ def genotype(
     with open(sam_path):  # Check if file exists
         pass
     kind, g = sam.Sample.detect_genome(sam_path)
-    assert kind in ["vcf", "sam"]
+    # assert kind in ["vcf", "sam", "dump"]
     if genome is None:
         genome = g
         if not genome:
@@ -191,7 +191,12 @@ def genotype(
     elif profile == "wgs":
         profile = "illumina"
 
-    if kind == "sam":
+    if kind == "vcf":
+        log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
+        cn_region = None
+        cn_solution = ["1", "1"]
+        sample = sam.Sample(gene=gene, vcf_path=sam_path, debug=debug)
+    else:
         sample = sam.Sample(
             gene=gene,
             sam_path=sam_path,
@@ -213,11 +218,6 @@ def genotype(
                 f"Average sample coverage is {avg_cov}. "
                 + "We recommend at least 20x coverage for the best results."
             )
-    else:
-        log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
-        cn_region = None
-        cn_solution = ["1", "1"]
-        sample = sam.Sample(gene=gene, vcf_path=sam_path, debug=debug)
 
     json.update({"sample": os.path.basename(sam_path).split(".")[0], "gene": gene.name})
 

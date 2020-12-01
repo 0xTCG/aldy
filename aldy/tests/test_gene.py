@@ -36,6 +36,7 @@ def test_gene_regions(toy_gene):
             "e2": GRange("20", 100_000_130, 100_000_140),
             "i2": GRange("20", 100_000_140, 100_000_150),
             "e3": GRange("20", 100_000_150, 100_000_160),
+            "down": GRange("20", 100_000_160, 100_000_200),
         },
         {
             "tmp": GRange("20", 100_000_000, 100_000_010),
@@ -44,9 +45,10 @@ def test_gene_regions(toy_gene):
             "e2": GRange("20", 100_000_030, 100_000_040),
             "i2": GRange("20", 100_000_040, 100_000_050),
             "e3": GRange("20", 100_000_050, 100_000_060),
+            "down": GRange("20", 100_000_060, 100_000_100),
         },
     ], "Regions"
-    assert toy_gene.get_wide_region() == ("20", 100_000_000, 100_000_160)
+    assert toy_gene.get_wide_region() == ("20", 100_000_000, 100_000_200)
     assert toy_gene.pseudogenes == ["TOYP"], "Pseudogenes"
 
     coding_seq = "".join(toy_gene.seq[s:e] for [s, e] in toy_gene.exons)
@@ -60,7 +62,7 @@ def test_gene_regions(toy_gene):
 
 def test_gene_alleles(toy_gene):
     def cnify(s):
-        s = s.replace(" ", "").replace("|", "").split(",")
+        s = s.replace(" ", "").replace("|", ",").split(",")
         assert len(s) == len(toy_gene.regions[0]) + len(toy_gene.regions[1])
         i = 0
         cn = [{}, {}]
@@ -74,25 +76,25 @@ def test_gene_alleles(toy_gene):
     assert toy_gene.do_copy_number
     assert toy_gene.cn_configs == {
         "1": CNConfig(
-            cnify("1,  1,1,  1,1,  1, | 1,  1,1,  1,1,  1"),
+            cnify("1,  1,1,  1,1,  1,1 | 1,  1,1,  1,1,  1,1"),
             kind=CNConfigType.DEFAULT,
             alleles=set(["1", "1C", "2", "3"]),
             description="Standard copy-number configuration",
         ),
         "4": CNConfig(
-            cnify("0,  0,0,  0,1,  1, | 1,  1,1,  1,0,  0"),
+            cnify("0,  0,0,  0,1,  1,1 | 1,  1,1,  1,0,  0,0"),
             kind=CNConfigType.LEFT_FUSION,
             alleles=set(["4#1", "4#3"]),
             description="TOYP fusion until i2",
         ),
         "5": CNConfig(
-            cnify("1,  1,1,  0,0,  0, | 1,  1,1,  2,2,  2"),
+            cnify("1,  1,1,  0,0,  0,0 | 1,  1,1,  2,2,  2,2"),
             kind=CNConfigType.RIGHT_FUSION,
             alleles=set(["5"]),
             description="TOYP conservation after e2",
         ),
         "6": CNConfig(
-            cnify("0,  0,0,  0,0,  0, | 1,  1,1,  1,1,  1"),
+            cnify("0,  0,0,  0,0,  0,0 | 1,  1,1,  1,1,  1,1"),
             kind=CNConfigType.DELETION,
             alleles=set(["6"]),
             description="TOY deletion",
@@ -194,11 +196,13 @@ def test_region_at(toy_gene):
     assert toy_gene.region_at(100_000_105) == (0, "tmp"), "region_at test"
     assert toy_gene.region_at(100_000_127) == (0, "i1"), "region_at test"
     assert toy_gene.region_at(100_000_155) == (0, "e3"), "region_at test"
-    assert toy_gene.region_at(100_000_165) is None
+    assert toy_gene.region_at(100_000_165) == (0, "down"), "region_at test"
+    assert toy_gene.region_at(100_000_265) is None, "region_at test"
     assert toy_gene.region_at(100_000_005) == (1, "tmp"), "region_at test"
     assert toy_gene.region_at(100_000_027) == (1, "i1"), "region_at test"
     assert toy_gene.region_at(100_000_055) == (1, "e3"), "region_at test"
-    assert toy_gene.region_at(100_000_080) is None
+    assert toy_gene.region_at(100_000_080) == (1, "down"), "region_at test"
+    assert toy_gene.region_at(90_000_000) is None, "region_at test"
 
 
 def test_get_functional(toy_gene):

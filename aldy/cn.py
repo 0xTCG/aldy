@@ -12,7 +12,7 @@ from natsort import natsorted
 
 from . import lpinterface
 
-from .common import log, json, sorted_tuple, AldyException
+from .common import JsonDict, log, json, sorted_tuple, AldyException
 from .gene import CNConfig, CNConfigType, Gene
 from .coverage import Coverage
 from .solutions import CNSolution

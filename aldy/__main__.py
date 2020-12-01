@@ -12,7 +12,7 @@ import argparse
 import os
 import sys
 import platform
-import json
+import yaml
 import datetime
 import tempfile
 import pkg_resources
@@ -27,6 +27,17 @@ from .sam import Sample
 from .genotype import genotype, batch
 from .query import query
 from .version import __version__
+
+
+def get_version():
+    return "{} {}".format(
+        platform.system() if platform.system() != "Darwin" else "macOS",
+        platform.platform()[6:]
+        if platform.system() == "Linux"
+        else platform.mac_ver()[0]
+        if platform.system() == "Darwin"
+        else platform.platform(),
+    )
 
 
 def main(argv):
@@ -51,15 +62,10 @@ def main(argv):
     sh.push_application()
 
     log.info(
-        "🐿  Aldy v{} (Python {} on {} {})",
+        "🐿  Aldy v{} (Python {} on {})",
         __version__,
         platform.python_version(),
-        platform.system() if platform.system() != "Darwin" else "macOS",
-        platform.platform()[6:]
-        if platform.system() == "Linux"
-        else platform.mac_ver()[0]
-        if platform.system() == "Darwin"
-        else platform.platform(),
+        get_version(),
     )
     log.info(
         "   (c) 2016-{} Aldy Authors. All rights reserved.\n"
@@ -84,10 +90,10 @@ def main(argv):
             if os.path.exists(db_file):
                 gene_db = db_file
             else:
-                gene_db = args.gene
+                gene_db = gene
             with open(gene_db):  # Check if file exists
                 pass
-            query(Gene(gene_db), query)
+            query(Gene(gene_db), q)
         elif args.subparser == "profile":
             p = Sample.load_sam_profile(
                 args.file, cn_region=parse_cn_region(args.cn_neutral_region)
@@ -226,7 +232,6 @@ def _get_args(argv):
     genotype_parser.add_argument(
         "--cn-neutral-region",
         "-n",
-        default="22:42547463-42548249",
         help=td(
             """Copy-number neutral region in the format chromosome:start-end
                (e.g. chr1:10000-20000).
@@ -422,6 +427,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
         fh.push_application()
     if args.debug:
         with tempfile.TemporaryDirectory() as tmp:
+            prefix = None
             try:
                 prefix = f"{tmp}/{os.path.splitext(os.path.basename(args.file))[0]}"
                 log_output = f"{prefix}.log"
@@ -438,10 +444,12 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 log.debug(f"Using {tmp} as temporary debug directory")
                 run(prefix)
             finally:
-                log.info("Preparing debug archive...")
-                with open(f"{tmp}/run.json", "w") as f:
-                    json.dump(common.json, f)
-                os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
+                if prefix:
+                    log.info("Preparing debug archive...")
+                    with open(f"{prefix}.yml", "w") as f:
+                        yaml.Dumper.ignore_aliases = lambda *args: True  # type: ignore
+                        yaml.dump(common.json, f, default_flow_style=None)
+                    os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
     else:
         run(None)
 

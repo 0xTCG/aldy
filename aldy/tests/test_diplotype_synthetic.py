@@ -42,13 +42,13 @@ def test_multi(toy_gene):
 
 
 def test_combination(toy_gene):
-    assert_diplotype(toy_gene, "*1 + *4 / *1C + *3 + *4", ["4", "1C", "1", "3", "4"])
+    assert_diplotype(toy_gene, "*1 + *4 / *1C + *4 + *3", ["4", "1C", "1", "3", "4"])
 
 
 def test_novel(toy_gene):
     assert_diplotype(
         toy_gene,
-        "*1 + *4 / *1C+100000151.C>T + *3 + *4",
+        "*1 + *4 / *1C+100000151.C>T + *4 + *3",
         ["4", ("1C", [(100_000_150, "C>T")]), "1", "3", "4"],
     )
 

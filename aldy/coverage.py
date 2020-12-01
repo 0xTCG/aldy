@@ -176,10 +176,11 @@ class Coverage:
 
         if sam_ref == 0:
             raise AldyException(
-                "CN-neutral region has no reads. "
+                f"CN-neutral region {cn_region} has no reads. "
                 + "Double check your input file for CYP2D8 (are you using hg19?), "
                 + "or pass an alternative CN-neutral region via -n parameter."
             )
+        print(cn_region, sam_ref, cnv_ref)
         cn_ratio = float(cnv_ref) / sam_ref
         if cn_ratio == 0:
             raise AldyException("Invalid CN-neutral region in the provided profile.")

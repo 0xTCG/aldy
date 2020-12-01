@@ -270,8 +270,10 @@ def parse_cn_region(cn_region):
 
 
 class JsonDict(dict):
-    def __missing__(self, key):
-        return JsonDict()
+    def __getitem__(self, key):
+        if key not in self:
+            self[key] = JsonDict()
+        return self.get(key)
 
 
 json = JsonDict()

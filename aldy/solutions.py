@@ -231,9 +231,9 @@ class MinorSolution:
         t = [mi for mi in m.minors if mi == self.solution[i].minor]
         assert len(t) == 1
         n = [m.minors[t[0]].alt_name if legacy and m.minors[t[0]].alt_name else t[0]]
-        for m in self.solution[i].added:
+        for m in sorted(self.solution[i].added):
             n.append("+" + gene.get_rsid(m))
-        for m in self.solution[i].missing:
+        for m in sorted(self.solution[i].missing):
             n.append("-" + gene.get_rsid(m))
         return " ".join(n)
 

@@ -179,6 +179,7 @@ def solve_major_model(
     # Each allele must express all of its functional mutations
     debug_info["id"] = identifier
     debug_info["cn"] = str(dict(cn_solution.solution))
+    debug_info["data"] = []
     for m, expr in sorted(constraints.items()):
         if coverage.single_copy(m.pos, cn_solution) == 0:
             cov = 0.0
@@ -186,7 +187,7 @@ def solve_major_model(
             cov = coverage[m] / coverage.single_copy(m.pos, cn_solution)
         model.addConstr(expr + VERR[m] <= cov, name=f"CFUNC_{m.pos}_{m.op}")
         model.addConstr(expr + VERR[m] >= cov, name=f"CFUNC_{m.pos}_{m.op}")
-        debug_info["data"][m[0], m[1]] = cov
+        debug_info["data"].append((m[0], m[1], cov))
 
     # Each CN configuration must be satisfied by corresponding alleles
     for cnf, cnt in cn_solution.solution.items():
