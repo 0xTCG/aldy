@@ -7,38 +7,33 @@
 from typing import Dict, List, Tuple, Optional
 
 import copy
+import re
+from natsort import natsorted
 
 from . import lpinterface
 
-from .common import log, json_print, sorted_tuple, AldyException
-from .gene import GeneRegion, CNConfig, Gene
+from .common import log, json, sorted_tuple, AldyException
+from .gene import CNConfig, CNConfigType, Gene
 from .coverage import Coverage
 from .solutions import CNSolution
-from .lpinterface import escape_name
 
-
-PCE_REGION = GeneRegion(11, "pce")
-""":obj:`aldy.common.GeneRegion`: *CYP2D7* PCE region that requires special handling
-   (because *CYP2D6* does not have a matching PCE region)."""
 
 MAX_CN = 20.0
-"""float: Maximum allowed copy number."""
+"""Maximum allowed copy number."""
 
 # Model parameters
 
 LEFT_FUSION_PENALTY = 0.1
-"""float: Extra penalty applied to left fusions to account for their rarity
-   (0 for no penalty)."""
+"""Penalty for left fusions to account for their rarity (0 for no penalty)."""
 
 PCE_PENALTY_COEFF = 1.5
-"""float: Error penalty applied to the PCE region (1 for no penalty)."""
+"""Error penalty applied to the PCE region (1 for no penalty)."""
 
 MAX_CN_ERROR = MAX_CN
-"""float: Upper bound for absolute error."""
+"""Upper bound for absolute error."""
 
 PARSIMONY_PENALTY = 0.5
-"""float: Extra penalty applied to each present gene copy to account for
-   solution parsimony (0 for no penalty)."""
+"""Penalty for each gene copy to control the parsimony (0 for no penalty)."""
 
 
 def estimate_cn(
@@ -53,47 +48,51 @@ def estimate_cn(
     """
     Estimate optimal copy number configurations given a gene and read data.
 
-    Args:
-        gene (:obj:`aldy.gene.Gene`):
-            Gene instance.
-        coverage (:obj:`aldy.coverage.Coverage`):
-            Read data coverage instance.
-        solver (str):
-            ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
-        gap (float):
-            Relative optimality gap. Use non-zero values to allow non-optimal solutions.
-            Default is 0 (reports only optimal solutions).
-        fusion_penalty (float):
-            Fusion penalty. Use higher values to avoid fusions.
-            Default is 0.1.
-        user_solution (list[str], optional):
-            User-specified list of copy number configurations.
-            ILP solver will not run if this parameter is provided.
-            Default is ``None``.
-        debug (str, optional):
-            If set, create a "`debug`.cn.lp" file for debug purposes.
-            Default is ``None``.
+    :param gene: Gene instance.
+    :param coverage: Read data coverage instance.
+    :param solver:
+        ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
+    :param gap:
+        Relative optimality gap. Use non-zero values to allow non-optimal solutions.
+        Default is 0 (reports only optimal solutions).
+    :param fusion_penalty:
+        Fusion penalty. Use higher values to avoid fusions.
+        Default is 0.1.
+    :param user_solution:
+        User-specified list of copy number configurations.
+        ILP solver will not run if this parameter is provided.
+        Default is ``None``.
+    :param debug:
+        If set, create a "`debug`.cn.lp" file for debug purposes.
+        Default is ``None``.
 
-    Returns:
-        list[:obj:`aldu.solutions.CNSolution`]: Optimal copy number configurations.
+    :return: List of optimal copy number configurations.
     """
 
     log.debug("\n" + "*" * 80)
 
     if user_solution is not None:
         return [_parse_user_solution(gene, user_solution)]
+    elif not gene.do_copy_number:
+        basic = list(gene.cn_configs.keys())[0]
+        return [_parse_user_solution(gene, [basic, basic])]
     else:
         # TODO: filter CN configs with non-present alleles
         max_observed_cn = 1 + max(
-            int(round(coverage.region_coverage(g, r)))
-            for g in gene.regions
-            for r in gene.regions[g]
+            int(round(coverage.region_coverage(gi, r)))
+            for gi, g in enumerate(gene.regions)
+            for r in g
         )
-        region_cov = _region_coverage(gene, coverage)
+        region_cov = {
+            r: (
+                coverage.region_coverage(0, r),
+                coverage.region_coverage(1, r) if len(gene.regions) > 1 else 0,
+            )
+            for r in gene.unique_regions
+        }
         total_cov = sum(r0 + r1 for r0, r1 in region_cov.values())
         min_cov = min(
-            sum(sum(v.values()) for _, v in gene.cn_configs[c].cn.items())
-            for c in gene.cn_configs
+            sum(sum(v.values()) for v in gene.cn_configs[c].cn) for c in gene.cn_configs
         )
         if total_cov < min_cov / 2.0:
             raise AldyException(
@@ -101,8 +100,8 @@ def estimate_cn(
             )
 
         configs = _filter_configs(gene, coverage)
-        log.debug("CN solver: configs = {}", ", ".join(sorted(configs)))
-        log.debug("CN solver: max_cn = {}", max_observed_cn)
+        log.debug("[cn] candidates= {}", ", ".join(natsorted(configs)))
+        log.debug("[cn] max_cn= {}", max_observed_cn)
         _print_coverage(gene, coverage)
         sol = solve_cn_model(
             gene,
@@ -122,7 +121,7 @@ def solve_cn_model(
     gene: Gene,
     cn_configs: Dict[str, CNConfig],
     max_cn: int,
-    region_coverage: Dict[GeneRegion, Tuple[float, float]],
+    region_coverage: Dict[str, Tuple[float, float]],
     solver: str,
     gap: float = 0,
     fusion_penalty: float = LEFT_FUSION_PENALTY,
@@ -131,37 +130,33 @@ def solve_cn_model(
     """
     Solve the copy number estimation problem (an instance of closest vector problem).
 
-    Args:
-        cn_configs (dict[str, :obj:`aldy.gene.CNConfig`]):
-            Available copy number configurations (vectors).
-        max_cn (int):
-            Maximum allowed copy number.
-        region_coverage (dict[:obj:`aldy.common.GeneRegion`, tuple[float, float]]):
-            Observed copy number of the main gene and the pseudogene
-            for each genic region.
-        solver (str):
-            ILP solver to use.
-            Check :obj:`aldy.lpinterface` for the list of supported solvers.
-        gap (float):
-            Relative optimality gap. Use non-zero values to allow non-optimal solutions.
-            Default is 0 (reports only optimal solutions).
-        fusion_penalty (float):
-            Fusion penalty. Use higher values to avoid fusions.
-            Default is 0.1.
-        debug (str, optional):
-            If set, create a "`debug`.cn.lp" file for debug purposes.
-            Default is ``None``.
+    :param cn_configs: Available copy number configurations (vectors).
+    :param max_cn: Maximum allowed copy number.
+    :param region_coverage:
+        Observed copy number of the main gene and the pseudogene for each genic region.
+    :param solver:
+        ILP solver to use.
+        Check :obj:`aldy.lpinterface` for the list of supported solvers.
+    :param gap:
+        Relative optimality gap. Use non-zero values to allow non-optimal solutions.
+        Default is 0 (reports only optimal solutions).
+    :param fusion_penalty:
+        Fusion penalty. Use higher values to avoid fusions.
+        Default is 0.1.
+    :param debug:
+        If set, create a "`debug`.cn.lp" file for debug purposes.
+        Default is ``None``.
 
-    Returns:
-        list[:obj:`aldy.solutions.CNSolution`]: Optimal copy-number solutions.
+    :return: List of optimal copy-number solutions.
 
-    Notes:
+    .. note::
         Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_
         (section Methods/Copy number and structural variation estimation)
         for the detailed description of ILP model.
     """
 
     model = lpinterface.model("AldyCN", solver)
+    debug_info = json["cn"]
 
     # List of CN configurations (a.k.a. structures):
     # dict of (`name`, `number`): structure, where multiple copies of the same `name`
@@ -173,17 +168,15 @@ def solve_cn_model(
     structures = {(name, 0): structure for name, structure in cn_configs.items()}
     for a, ai in list(structures.keys()):
         structures[a, -1] = copy.deepcopy(structures[a, 0])
-        if cn_configs[a].kind != CNConfig.CNConfigType.DEFAULT_CN:
+        if cn_configs[a].kind != CNConfigType.DEFAULT:
             continue
         for i in range(1, max_cn):
             structures[a, i] = copy.deepcopy(structures[a, 0])
-            for g in structures[a, i].cn:
-                # If this is a pseudogene, remove a copy
-                # (i.e. create a "weak configuration")
-                if g != 0:
-                    structures[a, i].cn[g] = {
-                        r: v - 1 for r, v in structures[a, i].cn[g].items()
-                    }
+            for g in range(1, len(structures[a, i].cn)):
+                # If this is a pseudogene, remove a copy (create a "weak configuration")
+                structures[a, i].cn[g] = {
+                    r: v - 1 for r, v in structures[a, i].cn[g].items()
+                }
 
     # Add a binary variable for each CN structure.
     VCN = {
@@ -193,13 +186,15 @@ def solve_cn_model(
     # We assume diploid genome, so the number of haplotype-inducing configurations
     # must be 2.
     diplo_inducing = model.quicksum(VCN[a] for a in VCN if a[1] <= 0)
-    model.addConstr(diplo_inducing == 2, name="CDIPLO")
+    model.addConstr(diplo_inducing <= 2, name="CDIPLO")
+    model.addConstr(diplo_inducing >= 2, name="CDIPLO")
 
     # Ensure that we cannot link any allele to the whole-gene deletion.
     del_allele = gene.deletion_allele()
-    for (a, ai), v in VCN.items():
-        if del_allele and a != del_allele:
-            model.addConstr(v + VCN[del_allele, -1] <= 1, name=f"CDEL_{a}_{ai}")
+    if del_allele:
+        for (a, ai), v in VCN.items():
+            if a != del_allele:
+                model.addConstr(v + VCN[del_allele, -1] <= 1, name=f"CDEL_{a}_{ai}")
 
     # Ensure that binary transformation is properly formed (i.e. A_i <= A_{i-1}).
     for a, ai in structures:
@@ -212,36 +207,30 @@ def solve_cn_model(
 
     # Add error variables
     VERR = {}
-    json_print(debug, '    "data": {', end="")
+
     for r, (exp_cov0, exp_cov1) in region_coverage.items():
-        json_print(debug, f"'{str(r)[3:-1]}': ({exp_cov0}, {exp_cov1}), ", end="")
+        debug_info["data"][r] = (exp_cov0, exp_cov1)
         expr = 0
         for s, structure in structures.items():
             if r in structure.cn[0]:
                 expr += structure.cn[0][r] * VCN[s]
             if len(structure.cn) > 1 and r in structure.cn[1]:
                 expr -= structure.cn[1][r] * VCN[s]
-        VERR[r] = model.addVar(
-            name="E_{}{}".format(*r), lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR
-        )
-        model.addConstr(
-            expr + VERR[r] == exp_cov0 - exp_cov1, name="CCOV_{}{}".format(*r)
-        )
-    json_print(debug, "},")
+        VERR[r] = model.addVar(name=f"E_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
+        model.addConstr(expr + VERR[r] <= exp_cov0 - exp_cov1, name=f"CCOV_{r}")
+        model.addConstr(expr + VERR[r] >= exp_cov0 - exp_cov1, name=f"CCOV_{r}")
+
     # Objective: minimize the sum of absolute errors.
     # PCE_REGION (in CYP2D7) is penalized with an extra score as it is important
     # fusion marker.
-    objective = model.abssum(
-        VERR.values(),
-        coeffs={escape_name("E_{}{}".format(*PCE_REGION)): PCE_PENALTY_COEFF},
-    )
+    objective = model.abssum(VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF})
     # Objective: also minimize the total number of present alleles (maximum parsimony)
     # Also penalize left fusions as they are not likely to occur.
     objective += model.quicksum(
         # MPICL requires only one term for each variable in the objective function,
         # thus this ugly expression:
         (fusion_penalty + PARSIMONY_PENALTY) * v
-        if cn_configs[s].kind == CNConfig.CNConfigType.LEFT_FUSION
+        if cn_configs[s].kind == CNConfigType.LEFT_FUSION
         else PARSIMONY_PENALTY * v
         for (s, k), v in VCN.items()
     )
@@ -250,35 +239,29 @@ def solve_cn_model(
         model.dump(f"{debug}.cn.lp")
 
     # Solve the model
-    try:
-        lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
-        result: dict = {}
-        for status, opt, sol in model.solutions(gap):
-            log.debug(f"CN solver: {status}, opt: {opt:.2f}")
-            sol_tuple = sorted_tuple(lookup[v] for v in sol)
-            # Because A[1] can be 1 while A[0] is 0, we can have biologically
-            # duplicate solutions
-            if sol_tuple not in result:
-                result[sol_tuple] = CNSolution(  # type: ignore
-                    opt, solution=list(sol_tuple), gene=gene
-                )
-                log.debug("CN solver: {}", result[sol_tuple])
-        json_print(
-            debug, '    "sol": ' + str([dict(r.solution) for r in result.values()])
-        )
-        return list(result.values())
-    except lpinterface.NoSolutionsError:
-        log.debug("CN solver: no solutions")
-        return []
+    lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
+    result: dict = {}
+    for status, opt, sol in model.solutions(gap):
+        sol_tuple = sorted_tuple(lookup[v] for v in sol)
+        # Because A[1] can be 1 while A[0] is 0, we can have biologically
+        # homologous solutions
+        if sol_tuple not in result:
+            result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
+            log.debug(
+                f"[cn] status= {status}; opt= {opt:.2f}; "
+                + f"solution= {result[sol_tuple]}"
+            )
+    if not result:
+        log.debug("[cn] solution= []")
+
+    debug_info["sol"] = [dict(r.solution) for r in result.values()]
+    return list(result.values())
 
 
 def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
     """
     Filter out low-quality mutations and copy number configurations
     that are not supported by the remaining mutations.
-
-    Returns:
-        dict[str, :obj:`aldy.gene.CNConfig`]
     """
     cov = coverage.filtered(
         lambda mut, cov, total, thres: Coverage.basic_filter(
@@ -286,86 +269,49 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
         )
     )
     configs = copy.deepcopy(gene.cn_configs)
-    for an in sorted(gene.cn_configs):
+    for an in natsorted(gene.cn_configs):
         if an not in gene.alleles:
             continue  # This is just a CN configuration w/o any mutations
-        if any(cov[m] <= 0 for m in gene.alleles[an].func_muts):
-            s = (
-                "{} in {}".format(m, gene.region_at(m.pos))
-                for m in gene.alleles[an].func_muts
-                if cov[m] <= 0
-            )
-            log.trace("Removing {} because of {}", an, " and ".join(s))
+        bad_alleles = []
+        for a in gene.cn_configs[an].alleles:
+            if any(cov[m] <= 0 for m in gene.alleles[a].func_muts):
+                bad_alleles.append(a)
+        if len(bad_alleles) == len(gene.cn_configs[an].alleles):
+            log.trace(f"[cn] removing *{an} due to low support")
             del configs[an]
     return configs
-
-
-def _region_coverage(
-    gene: Gene, coverage: Coverage
-) -> Dict[GeneRegion, Tuple[float, float]]:
-    """
-    Calculate the coverage  of the main gene and the pseudogene in each genic region.
-    Returns dictionary where
-
-    Returns:
-        dict[:obj:`aldy.common.GeneRegion, tuple[float, float]]: Region coverage
-        that links genic regions (e.g. exon 1) to the coverage of the main gene
-        and the pseudogene (expressed as a tuple).
-    """
-
-    if 1 in gene.regions:  # Check if we have pseudogenes at all
-        cov = {
-            r: (coverage.region_coverage(0, r), coverage.region_coverage(1, r))
-            for r in gene.unique_regions
-            if r != PCE_REGION
-        }
-        # HACK: By default, CYP2D6 does not have a PCE region,
-        # so we insert a dummy PCE region to prevent KeyNotFound errors
-        if PCE_REGION in gene.regions[1] and PCE_REGION not in gene.regions[0]:
-            cov[PCE_REGION] = (0, coverage.region_coverage(1, PCE_REGION))
-    else:
-        cov = {r: (coverage.region_coverage(0, r), 0) for r in gene.unique_regions}
-    return cov
 
 
 def _print_coverage(gene: Gene, coverage: Coverage) -> None:
     """
     Pretty-print the region coverage.
     """
-    regions = set(r for g in gene.regions for r in gene.regions[g])
-    log.debug("CN solver: coverage map = ")
-    for r in sorted(regions):
-        gc = coverage.region_coverage(0, r) if r in gene.regions[0] else 0.0
-        if 1 in gene.regions:
-            pc = coverage.region_coverage(1, r) if r in gene.regions[1] else 0.0
+    log.debug("[cn] coverage=")
+    gname = re.split(r"(\d.+)", gene.name)[1]
+    pname = re.split(r"(\d.+)", gene.pseudogenes[0])[1] if gene.pseudogenes else ""
+    log.debug(f"  {'':5} {gname:4} {pname:4}")
+    for r in gene.regions[0]:
+        g = coverage.region_coverage(0, r)
+        if pname:
+            p = coverage.region_coverage(1, r)
+            if r in gene.unique_regions:
+                log.debug(f"  {r:5} {g:4.1f} {p:4.1f} = {g - p:4.1f}")
+            else:
+                log.debug(f"  {r:5} {g:4.1f} {p:4.1f}")
         else:
-            pc = -1
-        log.debug(
-            "  {:5} {:2}: {:5.2f} {} {}",
-            r.kind,
-            r.number,
-            gc,
-            "" if pc == -1 else f"{pc:5.2f}",
-            f"; diff = {gc - pc:5.2f}" if pc != -1 and r in gene.unique_regions else "",
-        )
+            log.debug(f"  {r:5}: {g:4.1f}")
 
 
 def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
     """
     Parse user-provided copy number solutions.
 
-    Args:
-        gene (:obj:`aldy.gene.Gene`):
-            Gene instance.
-        sols (list[str]):
-            List of valid copy number configurations.
+    :param gene: Gene instance.
+    :param sols: List of valid copy number configurations.
 
-    Returns:
-        :obj:`aldy.solutions.CNSolution`: User-provided copy number solution.
-
-    Raises:
-        :obj:`aldy.common.AldyException` if a user-provided solution does not match
-        the gene database.
+    :return: User-provided copy number solution.
+    :raise: :obj:`aldy.common.AldyException` if a user-provided solution does not match
+            the gene database.
     """
     for sol in sols:
         if sol not in gene.cn_configs:
@@ -374,6 +320,6 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
                 + f"{sol}. Please run 'aldy show --gene {gene.name}' for the list the"
                 + f"valid configurations"
             )
-    s = CNSolution(0, solution=sols, gene=gene)  # type: ignore
-    log.debug("CN solver: using user-provided solution: {}", s)
+    s = CNSolution(gene, 0, sols)  # type: ignore
+    log.debug("[cn] result= {} (provided)", s)
     return s

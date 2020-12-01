@@ -4,258 +4,230 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Tuple, Dict, List, Optional
+from typing import Tuple, Dict, List, Optional, Set, NamedTuple
+from dataclasses import dataclass, field
+from enum import Enum
 
 import os
-import re
-import enum
 import yaml
-import functools
 import collections
-import textwrap
+from natsort import natsorted
 
 from .common import (
-    GeneRegion,
     GRange,
     AldyException,
-    allele_number,
+    allele_name,
     sorted_tuple,
     seq_to_amino,
     rev_comp,
     log,
-    allele_sort_key,
+    freezekey,
 )
 
 
-EXON = "e"
-"""str: Abbreviation for exon."""
+class Mutation(NamedTuple):
+    """
+    Mutation description. Immutable.
 
-INTRON = "i"
-"""str: Abbreviation for intron."""
+    :param pos: Reference genome position (0-based).
+    :param op: Variant operation in HGVS-like format:
+    - ``X>Y``:  a SNP from X to Y
+    - ``insX``:  an insertion of X
+    - ``delX``:  a deletion of X (X, Y are both of format ``[ACGT]+``).
+
+    .. note:: Has custom printer (``__str__``).
+    """
+
+    pos: int
+    op: str
+
+    def __str__(self):
+        return f"{self.pos + 1}.{self.op}"
 
 
-class Allele(
-    collections.namedtuple("Allele", ["name", "cn_config", "func_muts", "minors"])
-):
+@dataclass
+class MinorAllele:
+    """
+    Minor allele description.
+
+    :param name: Minor allale name.
+    :param alt_name: List of alternative names.
+    :param neutral_muts: Netural mutations that describe the minor allele.
+    :param activity: Activity indicator (see PharmVar for details).
+    :param evidence: Evidence indicator (see PharmVar for details).
+    :param pharmvar: PharmVar ID.
+
+    .. note:: Has custom printer (``__str__``).
+    """
+
+    name: str
+    alt_name: Optional[str] = None
+    neutral_muts: Set[Mutation] = field(default_factory=set)
+    activity: Optional[str] = None
+    evidence: Optional[str] = None
+    pharmvar: Optional[str] = None
+
+    def __str__(self):
+        muts = ", ".join(map(str, self.neutral_muts))
+        return f"Minor({self.name}; [{muts}])"
+
+
+@dataclass
+class MajorAllele:
     """
     Major allele description.
-    Immutable.
 
-    Attributes:
-        name (str):
-            Major allele name.
-        cn_config (str):
-            Copy-number configuration.
-        func_muts (set[:obj:`Mutation`]):
-            Functional mutations that describe the major allele.
-        minors (dict[str, :obj:`Suballele`]):
-            Dictionary of minor alleles that are based upon the major allele.
+    :param name: Major allele name.
+    :param cn_config: Copy-number configuration.
+    :param func_muts: Functional mutations that describe the major allele.
+    :param minors: Minor alleles (suballeles) that are derived from this major allele.
     """
 
-    def minor_mutations(self, minor: str):
-        """
-        Sequence of mutations that describe a minor allele.
-        """
+    name: str
+    cn_config: str = "1"
+    func_muts: Set[Mutation] = field(default_factory=set)
+    minors: Dict[str, MinorAllele] = field(default_factory=dict)
+
+    def get_minor_mutations(self, minor: str):
+        """Sequence of mutations that describe a minor allele."""
         for m in self.func_muts:
             yield m
         for m in self.minors[minor].neutral_muts:
             yield m
 
 
-class Suballele(
-    collections.namedtuple("Suballele", ["name", "alt_names", "neutral_muts"])
-):
-    """
-    Minor allele description.
-    Immutable.
+class CNConfigType(Enum):
+    """Enumeration describing the type of a copy-number configuration"""
 
-    Attributes:
-        name (str):
-            Minor allale name.
-        alt_names (list[str]):
-            List of alternative names.
-        neutral_muts (set[:obj:`Mutation`]):
-            Netural mutations that describe the minor allele.
+    DEFAULT = 0
+    LEFT_FUSION = 1
+    RIGHT_FUSION = 2
+    DELETION = 3
 
-    Notes:
-        Has custom printer (``__repr__``).
+
+@dataclass
+class CNConfig:
     """
+    Copy-number (CN) configuration description. Immutable.
+
+    :param cn:
+        Value of the expected region copy number in each gene.
+        For example, ``cn[0]["e1"] == 1`` means that the exon 1 of the main gene (ID 0)
+        has one copy (and thus should be present) in the configuration `cn`.
+    :param kind: Type of the copy-number configuration.
+    :param alleles: Allele IDs that have this CN configuration.
+    :param description: Human-readable description (e.g. "deletion").
+
+    .. note:: Has custom printer (``__str__``)
+    """
+
+    cn: List[Dict[str, int]]
+    kind: CNConfigType
+    alleles: Set[str]
+    description: str = ""
 
     def __str__(self):
-        return "Sub({}; [{}])".format(
-            "|".join([self.name] + self.alt_names),
-            ", ".join(map(str, self.neutral_muts)),
-        )
+        cov = "|".join("".join(str(self.cn[g][r]) for r in self.cn[0]) for g in self.cn)
+        alleles = " ".join(natsorted(self.alleles))
+        return f"CNConfig({str(self.kind)[13:]}; vector={cov}; alleles=[{alleles}])"
 
 
-@functools.total_ordering
-class Mutation(
-    collections.namedtuple("Mutation", ["pos", "op", "is_functional", "aux"])
-):
-    """
-    Mutation description.
-    Immutable.
-
-    Attributes:
-        pos (int): Reference genome position.
-        op (str): Mutation description that can be:
-
-            - ``SNP.AB``:  a SNP from A to B (A, B are in ``[ACGT]``)
-            - ``INS.xx``:  an insertion of xx (xx is ``[acgt]+``)
-            - ``DEL.xx``:  a deletion of xx (xx is ``[ACGT]+``)
-
-        is_functional (int): Functionality of the mutation:
-            - 0 for non-functional (silent) mutations
-            - 1 for functional (gene-disrupting) mutations
-            - 2 for splice-disrupting mutations
-
-        aux (dict[str, str]): Auxiliary information.
-            Currently used for storing dbSNP rsIDs (key: ``dbsnp``)
-            and old Karolinska-style mutation IDs (key: ``old``).
-
-    Notes:
-        Has custom printer (``__str__``).
-        Comparable and hashable via ``(pos, op)`` tuple.
-        Implements ``total_ordering``.
-    """
-
-    def __new__(self, pos: int, op: str, is_functional=0, aux=None):
-        return super(Mutation, self).__new__(
-            self, pos, op, is_functional, aux if aux else dict()
-        )
-
-    def __str__(self):
-        return "{}:{}{}".format(self.pos, self.op, "*" if self.is_functional else "")
-
-    def __eq__(self, other):
-        return (self.pos, self.op) == (other.pos, other.op)
-
-    def __lt__(self, other):
-        return (self.pos, self.op) < (other.pos, other.op)
-
-    def __hash__(self):
-        return (self.pos, self.op).__hash__()
-
-
-class CNConfig(
-    collections.namedtuple("CNConfig", ["cn", "kind", "alleles", "description"])
-):
-    """
-    Copy-number (CN) configuration description.
-    Immutable.
-
-    Attributes:
-        cn (dict[int, dict[:obj:`aldy.common.GeneRegion`, int]]):
-            Value of the expected region copy number in each gene.
-            For example, ``cn[0][GeneRegion(0, 1, EXON)] == 1`` means that the exon 1 of
-            the main gene (ID 0) has one copy (and thus should be present)
-            in the configuration `cn`.
-        kind (:obj:`CNConfigType`):
-            Type of the copy-number configuration. See :obj:`CNConfigType` for details.
-        alleles (set[str]):
-            Allele IDs that have this CN configuration.
-        description (str):
-            Human-readable description of the configuration (e.g. "deletion").
-
-    Notes:
-        Has custom printer (``__str__``).
-    """
-
-    CNConfigType = enum.Enum(
-        "CNConfigType", "DEFAULT_CN LEFT_FUSION RIGHT_FUSION DELETION"
-    )
-    """
-    Enumeration describing the type of a copy-number configuration:
-
-        - ``LEFT_FUSION``
-        - ``RIGHT_FUSION``
-        - ``DELETION``
-        - ``DEFAULT_CN``
-    """
-
-    def __str__(self):
-        regions = sorted(set(r for g in self.cn for r in self.cn[g]))
-        return "CNConfig({}; vector={}; alleles=[{}])".format(
-            str(self.kind)[13:],
-            "|".join(
-                "".join(
-                    ("{:.0f}".format(self.cn[g][r]) if self.cn[g][r] != 0.5 else "½")
-                    if r in self.cn[g]
-                    else "_"
-                    for r in regions
-                )
-                for g in sorted(self.cn)
-            ),
-            " ".join(sorted(self.alleles)),
-        )
-
-
+@dataclass
 class Gene:
-    """
-    Gene (and associated pseudogenes) description.
+    r"""
+    Gene (and associated pseudogenes) description relative to a reference genome.
 
-    Attributes:
-        name (str):
-            Gene name (e.g. CYP2D6).
-        seq (str):
-            Wild-type reference sequence that describes \*1 allele.
-            Should be location-compatible with hg19 (must contain no indels when
-            aligned to the reference genome).
-        region (:obj:`aldy.common.GRange`):
-            Wild-type reference sequence coordinates within the reference genome.
-        regions (dict[int, dict[:obj:`aldy.common.GeneRegion`,
-                :obj:`aldy.common.GRange`]]):
-            Exonic, intronic and special (e.g. UTR) regions in a gene.
-            Maps a gene ID to a dictionary that maps :obj:`aldy.common.GeneRegion`
-            (e.g. exon 9) to a :obj:`aldy.common.GRange` (e.g. chr1:10-20) within
-            the reference genome.
-            Gene 0 is the main gene.
-        pseudogenes (list[str]):
-            List of pseudogene names (genes whose ID is greater than 0).
-        common_tandems (list[tuple[str, str]]):
-            List of common allele tandems. Used in diplotype assignment heuristics.
-            For example, the fact that \*13 is always followed by \*1
-            (encoded as ``('13', '1')``) will be used to group \*13 and \*1 together
-            within the same haplotype (e.g. \*13+\*1).
-        cn_configs (dict[str, :obj:`CNConfig`]):
-            Copy-number configurations associated with the gene.
-            `1` (akin to \*1) is the default CN config
-            (no structural variations of any kind).
-        alleles (dict[str, :obj:`Allele`]):
-            Major star-alleles in the gene.
-            Accessible via major star-allele name (e.g. ``'1'``).
-        coding_region (:obj:`CodingRegion`):
-            Coding region of the gene (includes the protein sequence and
-            the reference genome strand).
-        mutations (dict[tuple[int, str], :obj:`Mutation`]):
-            A hashtable that provides links ``(position, mutation_type)`` to
-            a corresponding :obj:`Mutation`.
-            Useful for querying functional mutations and auxiliary information.
+    :param name: Gene name (e.g. _CYP2D6_).
+    :param version: Database version.
+    :param ensembl: ENSEMBL gene ID.
+    :param pharmvar: PharmVar ID.
+    :param refseq: RefSeq sequence ID.
+    :param seq: RefSeq sequence (typically \*1 allele).
+    :param genome: Reference genome version (e.g. hg19).
+    :param chr: Reference genome chromosome.
+    :param strand: Reference genome strand of RefSeq sequence.
+    :param chr_to_ref: Location mapping from the reference to the RefSeq sequence.
+    :param ref_to_chr: Location mapping from the RefSeq sequence to the reference.
+    :param pseudogenes: Pseudogene names. A pseudogene has ID greater than zero.
+    :param regions:
+        Collection of regions (names and ranges) for each gene in the database.
+        Maps a gene ID to a dictionary that maps a gene region name
+        (e.g. "e9" for exon 9) to its region in the reference genome.
+        Gene 0 is the main gene.
+    :param exons: List of RefSeq exon coordinates.
+    :param aminoacid: Aminoacid sequence of the main gene.
+
+    :param mutations:
+        Maps ``(position, mutation_type)`` to a corresponding :obj:`Mutation`.
+    :param mutation_info:
+        Attributes of each mutation.
+        These attributes currently consist:
+        - function (None if the mutation is not functional),
+        - rsID,
+        - RefSeq position, and
+        - RefSeq opcode.
+    :param do_copy_number: Indicates if the gene is subject to structural variations.
+    :param cn_configs:
+        Copy-number configurations associated with the gene.
+        `1` (akin to \*1) is the default CN config (no structural variations present).
+    :param unique_regions: List of genic regions used for copy-number calling.
+    :param alleles: Major star-alleles in the gene.
+    :param common_tandems:
+        List of common allele tandems. Used in diplotype assignment heuristics.
+        For example, the fact that \*13 is always followed by \*1
+        (encoded as ``('13', '1')``) will be used to group \*13 and \*1 together
+        within the same haplotype (e.g. \*13+\*1).
     """
 
-    CodingRegion = collections.namedtuple(
-        "CodingRegion", ["rev_comp", "aminoacid", "lookup"]
-    )
-    """
-    Immutable class that describes the coding region of a gene.
-    Attributes: aminoacid sequence (``aminoacid``) and reference strand (``rev_comp``).
-    """
+    # Basic information
+    name: str
+    version: str
+    pharmvar: Optional[str]
+    ensembl: Optional[str]
+
+    # Structure
+    refseq: str
+    seq: str
+    genome: str
+    chr: str
+    strand: int
+    chr_to_ref: Dict[int, int]
+    ref_to_chr: Dict[int, int]
+    pseudogenes: List[str]
+    regions: List[Dict[str, GRange]]
+    exons: List[Tuple[int, int]]
+    aminoacid: str
+
+    # Mutations
+    mutations: Dict[Tuple[int, str], Tuple[Optional[str], str, int, str]]
+
+    # Copy number configurations
+    do_copy_number: bool
+    cn_configs: Dict[str, CNConfig]
+    unique_regions: List[str]
+
+    # Alleles
+    alleles: Dict[str, MajorAllele]
+    common_tandems: List[Tuple]
+
+    # _lookup_range / _lookup_seq / _region_at
 
     def __init__(
-        self, path: Optional[str], name: Optional[str] = None, yml: Optional[str] = None
+        self,
+        path: Optional[str],
+        name: Optional[str] = None,
+        yml: Optional[str] = None,
+        genome: str = "hg19",
     ) -> None:
         """
         Initialize the Gene class with the database description
         specified in YML file ``path``.
 
-        Args:
-            path (str, optional):
-                Location of YML file.
-            name (str, optional):
-                Gene name.
-
-        Raises:
-            :obj:`aldy.common.AldyException` if a path is not set.
+        :param path: Location of YML file
+        :param name: Gene name
+        :param yml: YML file contents (used if ``path`` is ``None``).
+        :param genome: Reference genome version
+        :raise :obj:`aldy.common.AldyException`:: if a path is not set.
         """
 
         if path and os.path.exists(path):
@@ -268,92 +240,267 @@ class Gene:
             raise AldyException("Either a path or a name should be given")
 
         yml = yaml.safe_load(yml)
-        self.__parse_yml(name, yml)
+        self.genome = genome
+        self._init_basic(name, yml)
+        self._init_regions(yml)
+        self._init_alleles(yml)
+        self._init_partials()
 
-    def __parse_yml(self, gene_name: str, yml) -> None:
+    def region_at(self, pos: int) -> Optional[Tuple[int, str]]:
         """
-        Initialize the gene structure from YML data.
+        :param pos: Position in the reference genome.
+        :return: Gene ID and a region that covers the position.
         """
+        return self._region_at.get(pos, None)
 
-        self.__init_basic(gene_name, yml)
-        self.__init_regions(yml)
-        self.__init_alleles(yml)
-        self.__init_partials()
-        self.__init_structure(yml)
+    def get_functional(self, mut, infer=True) -> Optional[str]:
+        """
+        :return: String describing the mutation effect if a mutation is functional;
+                 otherwise None.
+        """
+        pos, op = mut
+        if (pos, op) in self.mutations:
+            return self.mutations[pos, op][0]
 
-    def __init_basic(self, gene: str, yml) -> None:
+        def reverse_op(op: str) -> str:
+            if ">" in op:
+                l, r = op.split(">")
+                return f"{rev_comp(l)}>{rev_comp(r)}"
+            elif op[:3] == "ins":
+                return f"ins{rev_comp(op[3:])}"
+            elif op[:3] == "del":
+                return f"del{rev_comp(op[3:])}"
+            return op
+
+        # Calculate based on aminoacid change
+        pos = self.chr_to_ref[pos]
+        if infer and any(s <= pos < e for s, e in self.exons):
+            if ">" not in op:
+                return "indel"
+            if self.strand < 0:
+                op = reverse_op(op)
+            seq = "".join(
+                self.seq[s:pos] + op[2] + self.seq[pos + 1 : e]
+                if s <= pos < e
+                else self.seq[s:e]
+                for s, e in self.exons
+            )
+            amino = seq_to_amino(seq)
+            if amino != self.aminoacid:
+                pos = next(i for i, a in enumerate(amino) if a != self.aminoacid[i])
+                return f"{self.aminoacid[pos]}{pos + 1}{amino[pos]}"
+        return None
+
+    def is_functional(self, mut, infer=True) -> bool:
+        """
+        :return: ``True`` if a mutation is functional.
+        """
+        return self.get_functional(mut, infer) is not None
+
+    def get_rsid(self, *args, default=True) -> str:
+        """
+        :return: rsID if a mutation has it; otherwise "-".
+            bool: ``True`` if a mutation is functional
+            (i.e. does it affect the underlying aminoacid or not).
+        """
+        assert 1 <= len(args) <= 2
+        if len(args) == 2:
+            pos, op = args
+        else:
+            pos, op = args[0]
+        res = "-"
+        if (pos, op) in self.mutations:
+            res = self.mutations[pos, op][1]
+        return res if res != "-" or not default else f"{pos + 1}.{op}"
+
+    def get_refseq(self, *args, from_atg=False) -> str:
+        """
+        Returns:
+            bool: ``True`` if a mutation is functional
+            (i.e. does it affect the underlying aminoacid or not).
+        """
+        assert 1 <= len(args) <= 2
+        atg_start = self.exons[0][0]
+        if len(args) == 2:
+            pos, op = args
+        else:
+            pos, op = args[0]
+        if (pos, op) in self.mutations:
+            pos, op = self.mutations[pos, op][2:4]
+            if from_atg:
+                if pos >= atg_start:
+                    pos = pos - atg_start + 1
+                else:
+                    pos = pos - atg_start
+            return f"{pos}{op}"
+        return "-"
+
+    def deletion_allele(self) -> Optional[str]:
+        """
+        Returns:
+            str, optional: The deletion allele ID. Can be ``None``
+            if gene has no deletion allele.
+        """
+        try:
+            return next(
+                a
+                for a, cn in self.cn_configs.items()
+                if cn.kind == CNConfigType.DELETION
+            )
+        except StopIteration:
+            return None
+
+    def has_coverage(self, a: str, pos: int):
+        """
+        :return: ``True`` if a major allele `a` covers the mutation `m`.
+        """
+        m = self.region_at(pos)
+        if m:
+            return self.cn_configs[self.alleles[a].cn_config].cn[m[0]][m[1]] > 0
+        return False
+
+    def get_wide_region(self):
+        mi = min(r.start for g in self.regions for r in g.values())
+        ma = max(r.end for g in self.regions for r in g.values())
+        return GRange(self.chr, mi, ma)
+
+    def __contains__(self, i: int):
+        return i in self.chr_to_ref
+
+    def __getitem__(self, i):
+        s, e = self._lookup_range
+        if isinstance(i, slice):
+            i, j = i.start, i.stop
+            if j <= s or i >= e:
+                return "N" * (j - i)
+            loff = max(0, s - i)
+            roff = max(0, j - e)
+            if loff:
+                i = s
+            if roff:
+                j = e
+            return ("N" * loff) + self._lookup_seq[i - s : j - s] + ("N" * roff)
+        else:
+            assert isinstance(i, int)
+            if not s <= i < e:
+                return "N"
+            return self._lookup_seq[i - s]
+
+    def __str__(self):
+        return f"Gene({self.name})"
+
+    def __repr__(self):
+        return f"Gene({self.name})"
+
+    def _init_basic(self, gene: str, yml) -> None:
         """
         Read basic gene properties (``name``, ``seq`` and ``region``).
-        """
-        self.name = gene.upper()
-        self.seq = yml["seq"]
-        self.region = GRange(*yml["region"])
 
-    def __init_regions(self, yml) -> None:
+        All database YAML coordinates are indexed starting from 1.
+        Aldy internally uses 0-based indexing.
+        """
+        self.name = yml["name"]
+        self.version = f"{yml['version']} ({yml['generated']})"
+        self.refseq = yml["reference"]["name"]
+        self.pharmvar = yml.get("pharmvar", None)
+        self.ensembl = yml.get("ensembl", None)
+
+        self.seq = yml["reference"]["seq"].replace("\n", "")
+        if "patches" in yml["reference"]:
+            seq = list(self.seq)
+            for [pos, nuc] in yml["reference"]["patches"]:
+                seq[pos - 1] = nuc
+            self.seq = "".join(self.seq)
+
+        self.chr, start, end, strand, cigar = yml["reference"]["mappings"][self.genome]
+        self.chr_to_ref = {}
+        self.ref_to_chr = {}
+        self.strand = 1 if strand == "+" else -1
+        pos_ref = 0 if self.strand > 0 else (len(self.seq) - 1)
+        pos_chr = start - 1
+        for i in cigar.split():
+            op, sz = i[0], int(i[1:])
+            if op == "M":
+                for idx in range(sz):
+                    self.chr_to_ref[pos_chr + idx] = pos_ref + idx * self.strand
+                    self.ref_to_chr[pos_ref + idx * self.strand] = pos_chr + idx
+                pos_chr += sz
+                pos_ref += sz * self.strand
+            elif op == "I":
+                pos_ref += sz * self.strand
+            elif op == "D":
+                pos_chr += sz
+            else:
+                raise AldyException("Invalid CIGAR string")
+
+        self._lookup_range = (start - 1, end - 1)
+        self._lookup_seq = "".join(
+            (
+                rev_comp(self.seq[self.chr_to_ref[i]])
+                if self.strand < 0
+                else self.seq[self.chr_to_ref[i]]
+            )
+            if i in self.chr_to_ref
+            else "N"
+            for i in range(*self._lookup_range)
+        )
+
+        self.exons = sorted((s - 1, e - 1) for [s, e] in yml["reference"]["exons"])
+        self.aminoacid = seq_to_amino("".join(self.seq[s:e] for [s, e] in self.exons))
+
+    def _init_regions(self, yml) -> None:
         """
         Calculate the genic regions and pseudogenes
         (``regions``, ``unique_regions`` and ``pseudogenes``).
         Prepare ``region_at()`` call.
         """
-        assert hasattr(self, "region")
 
-        def calculate_regions(gene, exons, special):
-            """
-            Given the list of exons, calculate intronic regions and
-            return a dictionary of all regions.
-            """
-            regions = {
-                GeneRegion(e, EXON): GRange(self.region.chr, *ex)
-                for e, ex in exons.items()
-            }
-            # Fill introns
-            for i in range(1, len(regions)):
-                r1, r2 = regions[GeneRegion(i + 1, EXON)], regions[GeneRegion(i, EXON)]
-                if r1 > r2:
-                    r1, r2 = r2, r1
-                regions[GeneRegion(i, INTRON)] = GRange(self.region.chr, r1[2], r2[1])
-            for n, r in special.items():
-                regions[GeneRegion(n, r[0])] = GRange(self.region.chr, r[1], r[2])
-            return regions
-
-        # Gene 0 is the main gene (key is the gene ID)
-        self.regions = {0: calculate_regions(0, yml["exons"], yml["special_regions"])}
-
+        self.regions = []
         # Each pseudogene is associated with an index > 0
-        self.pseudogenes: List[str] = list()
-        if "pseudogenes" in yml:
-            for gi, g in enumerate(sorted(yml["pseudogenes"])):
-                self.pseudogenes.append(g)
-                self.regions[gi + 1] = calculate_regions(
-                    gi + 1,
-                    yml["pseudogenes"][g]["exons"],
-                    yml["pseudogenes"][g]["special_regions"],
-                )
+        self.pseudogenes = []
 
-        #: dict[int, (int, `GeneRegion`]):
+        for i, g in enumerate(yml["structure"]["genes"]):
+            if i > 0:
+                self.pseudogenes.append(g)
+            regions = {}
+            num_exons = 0
+            for name, coord in yml["structure"]["regions"][self.genome].items():
+                if name[0] == "e" and name[1:].isdigit():  # this is exon
+                    num_exons += 1
+                if not coord[i * 2] <= coord[i * 2 + 1]:
+                    raise AldyException(
+                        f"Malformed YML file {self.name} (structure:regions:{name})"
+                    )
+                regions[name] = GRange(self.chr, coord[i * 2] - 1, coord[i * 2 + 1] - 1)
+            for e in range(1, num_exons):  # fill introns
+                r = [regions[f"e{e}"], regions[f"e{e + 1}"]][:: self.strand]
+                regions[f"i{e}"] = GRange(self.chr, r[0][2], r[1][1])
+            self.regions.append(
+                dict(sorted(regions.items(), key=lambda x: x[1])[:: self.strand])
+            )
+
+        #: dict[int, (int, str)]:
         #: reverse lookup (gene, region) of gene regions given a location
         #: within the reference genome.
+        for d in self.regions:
+            regs = sorted((r.start, r.end) for r in d.values())
+            for ri in range(1, len(regs)):
+                if regs[ri - 1][1] < regs[ri][0]:
+                    raise AldyException(
+                        "Region {}-{} is not annotated", regs[ri - 1][1], regs[ri][0]
+                    )
         self._region_at = {
             i: (g, r)
-            for g, d in self.regions.items()
+            for g, d in enumerate(self.regions)
             for r, rng in d.items()
             for i in range(rng.start, rng.end)
         }
+        for i in self.chr_to_ref:
+            if i not in self._region_at:
+                raise AldyException(f"Position {i} not within a named region")
+        self.unique_regions = yml["structure"]["cn_regions"]
 
-        def parse_unique(u):
-            u = list(filter(None, re.split(r"^(\d+)", u)))
-            if len(u) > 1:
-                return GeneRegion(int(u[0]), u[1])
-            else:  # find the matching kind number (legacy support)
-                for g in self.regions:
-                    for r in self.regions[g]:
-                        if u[0] == r.kind:
-                            return r
-            raise KeyError
-
-        self.unique_regions = [parse_unique(y) for y in yml["unique_regions"]]
-
-    def __init_alleles(self, yml) -> None:
+    def _init_alleles(self, yml) -> None:
         """
         Initialize allele (``alleles``, ``common_tandems``)
         and copy number configurations (``cn_configs``).
@@ -367,149 +514,151 @@ class Gene:
         fusions_left = {}
         fusions_right = {}
 
-        # Human-readable CN descriptions
-        descriptions = {
-            "1": "Normal allelic configuration: "
-            + "all regions present in both gene and pseudogene"
-        }
-
-        #: dict(:obj:`Mutation`, str):
-        #: old Karolinska notation (e.g. 32C>T) for a :obj:`Mutation`.
-        self._old_notation: Dict[Mutation, str] = collections.defaultdict(str)
-
         # allele ID of the deletion allele (i.e. whole gene is missing).
         deletion_allele = None
 
-        for allele_name, allele in yml["alleles"].items():
-            if not re.match(r"^[A-Z0-9]+\*[0-9]+[A-Z0-9]*$", allele_name):
-                raise AldyException(
-                    "Allele names must be in format (alphanum?)*(number)(alphanum?) "
-                    + "(e.g. CYP21*2A, *3)"
-                )
-            allele_name = allele_name.split("*")[1]
-            mutations: List[Mutation] = []
-            if {"op": "deletion"} in allele["mutations"]:
-                deletion_allele = allele_name
-                descriptions[allele_name] = "Gene deletion"
-                mutations = []
+        self.mutations = {}
+        for name, allele in yml["alleles"].items():
+            name = allele_name(name)
+            mutations: Set[Mutation] = set()
+            if [self.name, "deletion"] in allele["mutations"]:
+                deletion_allele = name
             else:
-                for m in allele["mutations"]:
-                    if m["pos"] == "pseudogene":  # has only one mutation indicator
-                        if "-" in m["op"]:
-                            fusions_left[allele_name] = (
-                                int(m["op"][1:-1]),
-                                (EXON if m["op"][0] == "e" else INTRON),
+                for pos, op, *info in allele["mutations"]:
+                    if pos in self.pseudogenes:
+                        assert pos == self.pseudogenes[0]  # TODO: relax later
+                        if op[-1] == "-":
+                            fusions_left[name] = op[:-1]
+                        else:
+                            if op[-1] == "+":
+                                op = op[:-1]
+                            fusions_right[name] = op
+                    else:
+                        orig_op = op
+                        rsid, function = info[0], info[1] if len(info) > 1 else None
+                        if self.strand < 0:
+                            if ">" in op:
+                                l, r = op.split(">")
+                                op = f"{rev_comp(l)}>{rev_comp(r)}"
+                                pos = pos + len(l) - 1
+                            elif op[:3] == "ins":
+                                ins = op[3:]
+                                while self.seq[pos - len(ins) : pos] == ins:
+                                    pos -= len(ins)
+                                pos += 1
+                                op = f"ins{rev_comp(op[3:])}"
+                            elif op[:3] == "del":
+                                pos = pos + len(op) - 4
+                                op = f"del{rev_comp(op[3:])}"
+                        pos -= 1  # Cast to 0-based index
+                        if pos not in self.ref_to_chr:
+                            log.warn(
+                                f"Ignoring {pos}.{op} in {name} (not in {self.refseq})"
                             )
-                            descriptions[allele_name] = (
-                                "Fusion: pseudogene until "
-                                + m["op"][:-1][::-1]
-                                + " followed by the gene"
+                        elif self.region_at(self.ref_to_chr[pos]) is None:
+                            log.warn(
+                                f"Ignoring {pos}.{op} in {name} (not in named region)"
                             )
                         else:
-                            if m["op"][-1] == "+":
-                                m["op"] = m["op"][:-1]
-                            fusions_right[allele_name] = (
-                                int(m["op"][1:]),
-                                (EXON if m["op"][0] == "e" else INTRON),
+                            mutations.add(Mutation(self.ref_to_chr[pos], op))
+                            self.mutations.setdefault(
+                                (self.ref_to_chr[pos], op),
+                                (function, rsid, pos, orig_op),
                             )
-                            descriptions[allele_name] = (
-                                f"Conservation: Pseudogene retention after "
-                                + m["op"][::-1]
-                                + " within the gene"
-                            )
-                    else:
-                        m["aux"] = {}
-                        if "dbsnp" in m:
-                            m["aux"]["dbsnp"] = " or ".join(m.get("dbsnp", []))
-                        if "old" in m:
-                            m["aux"]["old"] = m.get("old", "")
-                        mut = Mutation(m["pos"], m["op"], m["functional"], m["aux"])
-                        if "old" in m:
-                            self._old_notation[mut] = m["old"]
-                        mutations.append(mut)
-            alleles[allele_name] = Suballele(allele_name, [], mutations)
+            alt_name = allele.get("label", None)
+            if alt_name:
+                alt_name = allele_name(alt_name)
+            alleles[name] = MinorAllele(
+                name,
+                alt_name,
+                mutations,
+                allele.get("activity", None),
+                allele.get("evidence", None),
+                allele.get("pharmvar", None),
+            )
 
+        # TODO:
         self.common_tandems: List[tuple] = []
-        if "common_tandems" in yml:
-            self.common_tandems = [tuple(y) for y in yml["common_tandems"]]
+        if "tandems" in yml["structure"]:
+            self.common_tandems = [tuple(y) for y in yml["structure"]["tandems"]]
 
         # Set copy number configurations
         # TODO: currently fusions only cover the space between the main gene and
         # the first pseudogene. Multi-pseudogene fusions are not supported.
 
+        self.do_copy_number = bool(
+            deletion_allele or len(fusions_left) or len(fusions_right)
+        )
         self.cn_configs: Dict[str, CNConfig] = dict()
 
-        def freezekey(x):  # hashing for dictionaries
-            return tuple(i[1] for i in sorted(x[0].items())) + tuple(
-                i[1] for i in sorted(x[1].items())
-            )
-
+        for i, _ in enumerate(self.pseudogenes):
+            if list(self.regions[i + 1].keys()) != list(self.regions[0].keys()):
+                raise AldyException("Invalid database structure")
+        rank = {a: ai for ai, a in enumerate(self.regions[0])}
         inverse_cn: Dict[tuple, str] = dict()
-
         # Left fusions are PSEUDOGENE + GENE fusions
         for a, brk in fusions_left.items():
-            cn = dict()
-            cn[0] = {
-                r: float(0 if (r.number, r.kind) < brk else 1) for r in self.regions[0]
-            }
-            cn[1] = {
-                r: float(1 if (r.number, r.kind) < brk else 0) for r in self.regions[1]
-            }
-
+            cn = [
+                {r: int(rank[r] >= rank[brk]) for r in self.regions[0]},
+                {r: int(rank[r] < rank[brk]) for r in self.regions[1]},
+            ]
             key = freezekey(cn)
             if key not in inverse_cn:
                 self.cn_configs[a] = CNConfig(
-                    cn, CNConfig.CNConfigType.LEFT_FUSION, {a}, descriptions[a]
+                    cn,
+                    CNConfigType.LEFT_FUSION,
+                    {a},
+                    f"{self.pseudogenes[0]} fusion until {brk}",
                 )
                 inverse_cn[key] = a
             else:
                 self.cn_configs[inverse_cn[key]].alleles.add(a)
-
         # Deletion is a special kind of left fusion
         if deletion_allele is not None:
-            cn = {
-                0: {r: 0 for r in self.regions[0]},
-                1: {r: 1 for r in self.regions[1]},
-            }
+            cn = [{r: 0 for r in self.regions[0]}]
+            if len(self.pseudogenes) > 0:
+                cn.append({r: 1 for r in self.regions[1]})
             self.cn_configs[deletion_allele] = CNConfig(
-                cn,
-                CNConfig.CNConfigType.DELETION,
-                {deletion_allele},
-                descriptions[deletion_allele],
+                cn, CNConfigType.DELETION, {deletion_allele}, f"{self.name} deletion",
             )
-
         # Right fusions GENE + PSEUDOGENE + whole copy of PSEUDOGENE fusions
         for a, brk in fusions_right.items():
-            cn = dict()
-            cn[0] = {r: (1 if (r.number, r.kind) < brk else 0) for r in self.regions[0]}
-            cn[1] = {r: (1 if (r.number, r.kind) < brk else 2) for r in self.regions[1]}
+            cn = [
+                {r: int(rank[r] < rank[brk]) for r in self.regions[0]},
+                {r: 1 + int(rank[r] >= rank[brk]) for r in self.regions[1]},
+            ]
             key = freezekey(cn)
             if key not in inverse_cn:
                 self.cn_configs[a] = CNConfig(
-                    cn, CNConfig.CNConfigType.RIGHT_FUSION, {a}, descriptions[a]
+                    cn,
+                    CNConfigType.RIGHT_FUSION,
+                    {a},
+                    f"{self.pseudogenes[0]} conservation after {brk}",
                 )
                 inverse_cn[key] = a
             else:
                 self.cn_configs[inverse_cn[key]].alleles.add(a)
 
         # Normal CN case
-        used_alleles = {
-            a for _, (_, _, alleles, _) in self.cn_configs.items() for a in alleles
-        }
+        used_alleles = {a for cn in self.cn_configs.values() for a in cn.alleles}
         has_pseudogenes = len(self.pseudogenes) > 0
-        default_cn = {
-            g: {r: 1 for r in self.regions[g]} for g in range(1 + has_pseudogenes)
-        }
-
-        self.cn_configs = {
-            allele_number(min(v.alleles)): v for k, v in self.cn_configs.items()
-        }
+        default_cn = [
+            {r: 1 for r in self.regions[g]} for g in range(1 + has_pseudogenes)
+        ]
+        self.cn_configs = {min(v.alleles): v for k, v in self.cn_configs.items()}
         self.cn_configs["1"] = CNConfig(
             default_cn,
-            CNConfig.CNConfigType.DEFAULT_CN,
+            CNConfigType.DEFAULT,
             set(alleles.keys()) - used_alleles,
-            descriptions["1"],
+            "Standard copy-number configuration",
         )
+
+        # Set CN of "empty" regions to zero (e.g. CYP2D6.pce)
+        for _, conf in self.cn_configs.items():
+            for g, r in enumerate(conf.cn):
+                for rg in r:
+                    if self.regions[g][rg].end - self.regions[g][rg].start <= 0:
+                        r[rg] = 0
 
         # Set up major and minor allele structures
         alleles_inverse: Dict[tuple, set] = collections.defaultdict(set)
@@ -517,39 +666,52 @@ class Gene:
             cn_config = next(
                 cn for cn, conf in self.cn_configs.items() if a in conf.alleles
             )
-            fn_muts = sorted(m for m in alleles[a].neutral_muts if m.is_functional)
-            alleles_inverse[(cn_config, tuple(fn_muts))].add(a)
+            fn_muts = sorted(
+                m for m in alleles[a].neutral_muts if self.is_functional(m)
+            )
+            alleles_inverse[cn_config, tuple(fn_muts)].add(a)
 
-        self.alleles: Dict[str, Allele] = dict()
-        # Karolinska DB has a lot of ambiguities, and two alleles with the same 'number'
-        # can correspond to two different major alleles.
-        # This step fixes this ambiguity by prepending a different letter to each unique
-        # major allele that has number collision.
+        # Ensure that each distinct major allele has unique prefix
         used_names: Dict[str, int] = {}
+        new_names = {}
+        changed_cn_configs = {}
         for key, minors in alleles_inverse.items():
             an = min(minors)
-            a = Allele(name="", cn_config=key[0], func_muts=key[1], minors=minors)
-            name = allele_number(an)
+            name = an.split(".")[0]  # remove ".0XX" suffix
+            if name in used_names:  # special case
+                name = alleles[an].alt_name if alleles[an].alt_name else an
             if name in used_names:  # Append letter
                 used_names[name] += 1
-                name += "." + chr(used_names[name] + ord("a"))
+                log.info(f"Renaming {name} -> {name}:{used_names[name]}")
+                name += f":{used_names[name]}"
+                used_names[name] = 1
             else:
-                used_names[name] = -1
-            self.alleles[name] = Allele(
-                name=name,
-                cn_config=a.cn_config,
-                func_muts=set(a.func_muts),
+                used_names[name] = 1
+            if an in self.cn_configs and an != name:
+                self.cn_configs[name] = self.cn_configs[an]
+                changed_cn_configs[an] = name
+                del self.cn_configs[an]
+            new_names[key] = name
+        self.alleles: Dict[str, MajorAllele] = dict()
+        for key, minors in alleles_inverse.items():
+            self.alleles[new_names[key]] = MajorAllele(
+                name=new_names[key],
+                cn_config=changed_cn_configs.get(key[0], key[0]),
+                func_muts=set(key[1]),
                 minors={
-                    sa: Suballele(
-                        name=sa,
-                        alt_names=[],
-                        neutral_muts=set(alleles[sa].neutral_muts) - set(a.func_muts),
+                    sa: MinorAllele(
+                        sa,
+                        alleles[sa].alt_name,
+                        set(alleles[sa].neutral_muts) - set(key[1]),
+                        alleles[sa].activity,
+                        alleles[sa].evidence,
+                        alleles[sa].pharmvar,
                     )
-                    for sa in a.minors
+                    for sa in natsorted(minors)
                 },
             )
 
-    def __init_partials(self) -> None:
+    def _init_partials(self) -> None:
         """
         Construct "partial" major alleles.
         If a major allele is cut in half by a fusion, we will create a "new" major
@@ -562,13 +724,15 @@ class Gene:
 
         def preserved_mutations(f, m):
             def filter_f(m):
-                gene, region = self.region_at(m.pos)
-                return self.cn_configs[f].cn[gene][region] > 0
+                m = self.region_at(m.pos)
+                if m:
+                    return self.cn_configs[f].cn[m[0]][m[1]] > 0
+                return False
 
             return set(filter(filter_f, m))
 
         for f in filter(
-            lambda x: self.cn_configs[x].kind == CNConfig.CNConfigType.LEFT_FUSION,
+            lambda x: self.cn_configs[x].kind == CNConfigType.LEFT_FUSION,
             self.cn_configs,
         ):
             # Do not extend left fusions that are already defined
@@ -576,58 +740,65 @@ class Gene:
             # HACK: This is hacky but works well for now
             if len(self.alleles[f].func_muts) > 0:
                 continue
-            add: Dict[tuple, Allele] = {}
+            add: Dict[tuple, MajorAllele] = {}
             for an, a in self.alleles.items():
                 # We only make partial major alleles from non-fused major alleles
                 if a.cn_config != "1":
                     continue
-                new_name = "{}/{}".format(f, an)
+                new_name = f"{f}#{an}"
                 new_muts = preserved_mutations(f, a.func_muts)
                 key = sorted_tuple(new_muts)
                 if key in add:
                     add[key].minors.update(
                         {
-                            san: Suballele(
-                                san, [], preserved_mutations(f, sa.neutral_muts)
+                            f"{f}#{san}": MinorAllele(
+                                f"{f}#{san}",
+                                None,
+                                preserved_mutations(f, sa.neutral_muts),
+                                sa.activity,
+                                sa.evidence,
+                                sa.pharmvar,
                             )
                             for san, sa in a.minors.items()
                         }
                     )
                 else:
-                    add[key] = Allele(
+                    add[key] = MajorAllele(
                         name=new_name,
                         cn_config=f,
                         func_muts=new_muts,
                         minors={
-                            san: Suballele(
-                                name=san,
-                                alt_names=[],
+                            f"{f}#{san}": MinorAllele(
+                                f"{f}#{san}",
                                 neutral_muts=preserved_mutations(f, sa.neutral_muts),
                             )
                             for san, sa in a.minors.items()
                         },
                     )
 
-            # Remove fusion (will be replaced at least by allele "1/{f}")
+            # Remove fusion (will be replaced at least by allele "1#{f}")
             del self.alleles[f]
             self.alleles.update({a.name: a for a in add.values()})
 
         for an, a in self.alleles.items():
             # Clean up minor alleles (as many might be identical after a fusion).
-            # Put a reference to the cleaned-up alleles in ``alt_names`` field.
+            # Put a reference to the cleaned-up alleles in ``alt_name`` field.
             minors: Dict[tuple, List[str]] = collections.defaultdict(list)
             for s in a.minors:
                 key = sorted_tuple(a.minors[s].neutral_muts)
                 minors[key].append(s)
-            self.alleles[an] = Allele(
+            self.alleles[an] = MajorAllele(
                 self.alleles[an].name,
                 self.alleles[an].cn_config,
                 self.alleles[an].func_muts,
                 {
-                    min(sa): Suballele(
+                    min(sa): MinorAllele(
                         min(sa),
-                        alt_names=sorted(list(set(sa) - {min(sa)})),
-                        neutral_muts=set(nm),
+                        a.minors[min(sa)].alt_name,
+                        set(nm),
+                        a.minors[min(sa)].activity,
+                        a.minors[min(sa)].evidence,
+                        a.minors[min(sa)].pharmvar,
                     )
                     for nm, sa in minors.items()
                 },
@@ -640,206 +811,3 @@ class Gene:
             v.alleles.clear()
         for a in self.alleles.values():
             self.cn_configs[a.cn_config].alleles.add(a.name)
-
-    def __init_structure(self, yml) -> None:
-        """
-        Initialize ``mutations`` lookup table
-        and coding region structure ``coding_region``.
-        """
-
-        is_rev_comp = True if yml["rev_comp"] == 1 else False
-        lookup = {
-            i: self.seq[i - self.region.start]
-            for (_, kind), (_, start, end) in self.regions[0].items()
-            if kind == EXON
-            for i in range(start, end)
-        }
-        seq = "".join(lookup[i] for i in sorted(lookup.keys()))
-        aminoacid = seq_to_amino(rev_comp(seq) if is_rev_comp else seq)
-
-        # Set up a coding region structure for aminoacid calculation
-        self.coding_region = Gene.CodingRegion(is_rev_comp, aminoacid, lookup)
-
-        self.mutations: Dict[Tuple[int, str], Mutation] = {}
-        for _, a in self.alleles.items():
-            self.mutations.update({(m.pos, m.op): m for m in a.func_muts})
-            for _, sa in a.minors.items():
-                self.mutations.update({(m.pos, m.op): m for m in sa.neutral_muts})
-
-    # -----------------------------------------------------------------------------------
-
-    def region_at(self, pos: int) -> Tuple[int, GeneRegion]:
-        """
-        Returns:
-            (int, :obj:`aldy.common.GeneRegion`): Tuple consisting of a gene ID and
-            a region that harbours the given position in the gene.
-
-        Args:
-            pos (int): Position in the reference genome.
-        """
-        return self._region_at[pos]
-
-    def old_notation(self, mut: Mutation) -> str:
-        """
-        Returns:
-            str: Karolinska-style notation (e.g. ``32C>T``) for a :obj:`Mutation`.
-
-        Args:
-            mut (:obj:`Mutation`)
-        """
-        return self._old_notation[mut]
-
-    def sequence(self, gene: int, pad=0) -> str:
-        """
-        Returns:
-            str: Genomic sequence of a gene.
-
-        Args:
-            id (int): Gene ID (0 for the main gene, 1+ for pseudogenes).
-            pad (int): Extra padding on both sides (measured in bps). Default is 0.
-        """
-        regs = [(st, ed) for _, (_, st, ed) in self.regions[gene].items()]
-        mi, ma = min(r[0] for r in regs), max(r[1] for r in regs)
-        off = self.region.start
-        return self.seq[max(0, mi - off - pad) : min(ma - off + pad, len(self.seq))]
-
-    def is_functional(self, m: Mutation) -> bool:
-        """
-        Returns:
-            bool: ``True`` if a mutation is functional
-            (i.e. does it affect the underlying aminoacid or not).
-        """
-        if m.pos not in self.coding_region.lookup:
-            return False
-        if m.op[:3] != "SNP":
-            return True
-        seq = "".join(
-            self.coding_region.lookup[i] if i != m.pos else m.op[5]
-            for i in sorted(self.coding_region.lookup)
-        )
-        amino = seq_to_amino(rev_comp(seq) if self.coding_region.rev_comp else seq)
-        return amino != self.coding_region.aminoacid
-
-    def deletion_allele(self) -> Optional[str]:
-        """
-        Returns:
-            str, optional: The deletion allele ID. Can be ``None``
-            if gene has no deletion allele.
-        """
-        try:
-            return next(
-                a
-                for a, cn in self.cn_configs.items()
-                if cn.kind == CNConfig.CNConfigType.DELETION
-            )
-        except StopIteration:
-            return None
-
-    def has_coverage(self, a: str, pos: int):
-        """
-        Returns: ``True`` if a major allele `a` covers the mutation `m`.
-        """
-        m_gene, m_region = self.region_at(pos)
-        return self.cn_configs[self.alleles[a].cn_config].cn[m_gene][m_region] > 0
-
-    def print_summary(self):
-        log.info(f"Gene {self.name}")
-        log.info(f"  Reference genome locus: {self.region}")
-        pseudo = ", ".join(f"{p} (ID {i + 1})" for i, p in enumerate(self.pseudogenes))
-        log.info(f"  Pseudogenes: {pseudo}")
-        amino = "\n    ".join(textwrap.wrap(self.coding_region.aminoacid))
-        log.info(f"  Aminoacid:\n    {amino}")
-        log.info("  Genic regions:")
-
-        regions = set(j for _, i in self.regions.items() for j in i)
-        log.info("    {:<7}  {:>25} {:>25}", "Region", "Gene", "Pseudogene")
-        for r in sorted(regions):
-            lg = str(self.regions[0].get(r, "-"))
-            lp = str(self.regions[1].get(r, "-"))
-            log.info(f"    {r.number:2} {r.kind.lower():4}: {lg:>25} {lp:>25}")
-
-        log.info(f"  Copy number configurations:")
-        a = "\n    ".join(
-            textwrap.wrap(", ".join(sorted(self.cn_configs, key=allele_sort_key)))
-        )
-        log.info(f"    {a}")
-
-        log.info("  Major star-alleles:")
-        a = "\n    ".join(
-            textwrap.wrap(
-                ", ".join(f"*{a}" for a in sorted(self.alleles, key=allele_sort_key))
-            )
-        )
-        log.info(f"    {a}")
-
-    def print_cns(self, cn_config):
-        if cn_config not in self.cn_configs:
-            raise AldyException(f"Copy number configuration {cn_config} not found")
-        config = self.cn_configs[cn_config]
-        log.info(f"Gene {self.name}")
-        log.info(f"  Copy number configuration {cn_config}:\n  {config.description}")
-
-        alleles = sorted(config.alleles, key=allele_sort_key)
-        log.info("  Major star-alleles:")
-        a = "\n    ".join(textwrap.wrap(", ".join(f"*{a}" for a in alleles)))
-        log.info(f"    {a}")
-
-        log.info("  Copy number profile:")
-        regions = set(j for i in config.cn for j in config.cn[i])
-        log.info("    {:7}    Gene Pseudo", " ")
-        for r in sorted(regions):
-            lg = config.cn[0].get(r, 0.0)
-            lp = config.cn[1].get(r, 0.0)
-            lg = "-" if lg == 0 else f"{lg:.0f}"
-            lp = "-" if lp == 0 else f"{lp:.0f}"
-            log.info(f"    {r.number:2} {r.kind.lower():4}: {lg:>6} {lp:>6}")
-
-    def print_majors(self, major):
-        if major not in self.alleles:
-            raise AldyException(f"Major star-allele {major} not found")
-        allele = self.alleles[major]
-        # Allele
-        log.info(f"Gene {self.name}")
-        log.info(f"Major star-allele {allele.name}:")
-        log.info(f"  Copy number configuration {allele.cn_config}")
-
-        log.info("  Functional mutations:")
-        for m in sorted(allele.func_muts):
-            dbsnp = m.aux.get("dbsnp", "")
-            kar = m.aux.get("old", "")
-            pos = f"{self.region.chr}:{m.pos}"
-            log.info(f"    {pos:<11} {m.op} {dbsnp:12} {kar}")
-
-        log.info("  Minor star-alleles:")
-        a = "\n    ".join(textwrap.wrap(", ".join(f"*{a}" for a in allele.minors)))
-        log.info(f"    {a}")
-
-    def print_minors(self, minor):
-        log.info(f"Gene {self.name}")
-        found = False
-        for major, allele in sorted(self.alleles.items()):
-            if minor not in allele.minors:
-                continue
-            found = True
-            log.info(f"\nMinor star-allele {minor}:")
-            log.info(f"  Major star-allele: {allele.name}:")
-            log.info(f"  Copy number configuration: {allele.cn_config}")
-            if len(allele.minors[minor].alt_names) > 0:
-                alt = ", ".join(sorted(allele.minors[minor].alt_names))
-                log.info(f"  Alternative names: {alt}")
-
-            log.info("  Functional mutations:")
-            for m in sorted(allele.func_muts):
-                dbsnp = m.aux.get("dbsnp", "")
-                kar = m.aux.get("old", "")
-                pos = f"{self.region.chr}:{m.pos}"
-                log.info(f"    {pos:<11} {m.op} {dbsnp:12} {kar}")
-
-            log.info("  Silent mutations:")
-            for m in sorted(allele.minors[minor].neutral_muts):
-                dbsnp = m.aux.get("dbsnp", "")
-                kar = m.aux.get("old", "")
-                pos = f"{self.region.chr}:{m.pos}"
-                log.info(f"    {pos:<11} {m.op} {dbsnp:12} {kar}")
-        if not found:
-            raise AldyException(f"Minor star-allele {minor} not found")

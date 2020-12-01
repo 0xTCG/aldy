@@ -1,47 +1,71 @@
-{
-"name": "GENE",
-"pseudogenes": {
-   "PSEUDO": {
-      "special_regions": { 0: ["tmp", 0, 10] },
-      "exons": { 1: [10, 20], 2: [30, 40], 3: [50, 60] }
-   } },
-"region": ["1", 0, 200],
-"rev_comp": 0,
-"seq": "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT",
-
-"special_regions": { 0: ["tmp", 100, 110] },
-"exons": { 1: [110, 120], 2: [130, 140], 3: [150, 160] },
-"common_tandems": [ ['1', '4'] ],
-"unique_regions": ["1e", "1i", "2e", "2i", "3e"],
-
-"alleles": {
-   "GENE*1": { # Normal
-      "phenotype": {"invivo": "Normal", "invitro": "Normal"},
-      "mutations": []
-   },
-   "GENE*1B": { # 0-indexed!
-      "mutations": [ {"pos": 115, "op": "SNP.TA", "old": "3828:T>A", "functional": 0, "dbsnp": ["rs28371732", "rs28371741"]} ]
-   },
-   "GENE*1C": {
-      "mutations": [ {"pos": 105, "op": "SNP.TA", "functional": 1} ]
-   },
-   "GENE*2": {
-      "mutations": [ {"pos": 111, "op": "DEL.AC", "functional": 3},
-                     {"pos": 119, "op": "INS.TT", "functional": 3} ]
-   },
-   "GENE*3": {
-      "mutations": [ {"pos": 151, "op": "SNP.CT", "functional": 1},
-                     {"pos": 148, "op": "INS.A", "functional": 0} ]
-   },
-   "GENE*4": { # left fusion
-      "mutations": [ {"pos": "pseudogene", "op": "i2-" } ]
-   },
-   "GENE*5": { # right fusion
-      "mutations": [ {"pos": "pseudogene", "op": "e2+" },
-                     {"pos": 111, "op": "DEL.AC", "functional": 3} ]
-   },
-   "GENE*6DEL": { # deletion fusion
-      "mutations": [ {"op": "deletion" } ]
-   },
-}
-}
+name: TOY
+version: test-2.0
+generated: '2020-11-17'
+alleles:
+   TOY*1.001:
+      label: TOY*1
+      activity: normal function
+      evidence: D
+      mutations: []
+   TOY*1.002:
+      label: TOY*1B
+      mutations: 
+      - [115, T>A, rs28371732]
+   TOY*1.003:
+      label: TOY*1C
+      pharmvar: https://www.pharmvar.org/haplotype/NA
+      mutations: 
+      - [105, T>A, -, functional]
+   TOY*2.001:
+      label: TOY*2
+      mutations: 
+      - [111, delAC, -, frameshift]
+      - [119, insTT, -, frameshift]
+   TOY*3.001:
+      label: TOY*3
+      mutations: 
+      - [151, C>T, -, functional]
+      - [148, insA, -]
+   TOY*4.001:
+      label: TOY*4
+      mutations: 
+      - [TOYP, i2-]
+   TOY*5.001:
+      label: TOY*5
+      mutations: 
+      - [TOYP, e2+]
+      - [111, delAC, -, functional]
+   TOY*6.001:
+      label: TOY*6DEL
+      mutations:
+      - [TOY, deletion]
+structure:
+   genes: [TOY, TOYP]
+   regions:
+      hg19:
+         tmp: [100000101, 100000111, 100000001, 100000011]
+         e1: [100000111, 100000121, 100000011, 100000021]
+         e2: [100000131, 100000141, 100000031, 100000041]
+         e3: [100000151, 100000161, 100000051, 100000061]
+         down: [100000161, 100000201, 100000061, 100000101]
+      hg38:
+         tmp: [200000091, 200000101, 200000191, 200000201]
+         e1: [200000081, 200000091, 200000181, 200000191]
+         e2: [200000061, 200000071, 200000161, 200000171]
+         e3: [200000041, 200000051, 200000141, 200000151]
+         down: [200000001, 200000041, 200000101, 200000141]
+   cn_regions: [e1, i1, e2, i2, e3]
+   tandems: [['1', '4']]
+reference:
+   name: NG_TEST
+   mappings:
+      hg19: ['20', 100000001, 100000201, '+', M200]
+      hg38: ['20', 200000001, 200000201, '-', M200]
+   exons:
+   - [111, 121]
+   - [131, 141]
+   - [151, 161]
+   seq: |-
+      ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT
+      ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT
+      ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT

@@ -12,6 +12,7 @@ import argparse
 import os
 import sys
 import platform
+import yaml
 import datetime
 import tempfile
 import pkg_resources
@@ -19,12 +20,24 @@ import traceback
 import pytest
 
 from . import common
-from .common import log, script_path, AldyException, td, colorize, parse_cn_region
+from .common import log, script_path, AldyException, td, parse_cn_region
 from .gene import Gene
 from .cn import LEFT_FUSION_PENALTY
-from .sam import Sample
-from .genotype import genotype
+from .sam import load_sam_profile
+from .genotype import genotype, batch
+from .query import query
 from .version import __version__
+
+
+def get_version():
+    return "{} {}".format(
+        platform.system() if platform.system() != "Darwin" else "macOS",
+        platform.platform()[6:]
+        if platform.system() == "Linux"
+        else platform.mac_ver()[0]
+        if platform.system() == "Darwin"
+        else platform.platform(),
+    )
 
 
 def main(argv):
@@ -49,17 +62,16 @@ def main(argv):
     sh.push_application()
 
     log.info(
-        "*** Aldy v{} (Python {}, {}) ***",
+        "🐿  Aldy v{} (Python {} on {})",
         __version__,
         platform.python_version(),
-        sys.platform,
+        get_version(),
     )
     log.info(
-        "*** (c) 2016-{} Aldy Authors & Indiana University Bloomington. "
-        + "All rights reserved.",
+        "   (c) 2016-{} Aldy Authors. All rights reserved.\n"
+        + "   Free for non-commercial/academic use only.",
         datetime.datetime.now().year,
     )
-    log.info("*** Free for non-commercial/academic use only.")
 
     try:
         if not args.subparser or args.subparser == "help":
@@ -68,31 +80,32 @@ def main(argv):
             _print_licence()
         elif args.subparser == "test":
             _run_test()
-        elif args.subparser == "show":
-            db_file = script_path(
-                "aldy.resources.genes/{}.yml".format(args.gene.lower())
-            )
+        elif args.subparser in ["query", "q"]:
+            q = args.gene
+            if "*" in q:
+                gene, q = q.split("*", maxsplit=1)
+            else:
+                gene, q = q, ""
+            db_file = script_path("aldy.resources.genes/{}.yml".format(gene.lower()))
             if os.path.exists(db_file):
                 gene_db = db_file
             else:
-                gene_db = args.gene
+                gene_db = gene
             with open(gene_db):  # Check if file exists
                 pass
-            if args.minor:
-                Gene(gene_db).print_minors(args.minor)
-            elif args.major:
-                Gene(gene_db).print_majors(args.major)
-            elif args.cn_config:
-                Gene(gene_db).print_cns(args.cn_config)
-            else:
-                Gene(gene_db).print_summary()
+            query(Gene(gene_db), q)
         elif args.subparser == "profile":
-            p = Sample.load_sam_profile(
+            p = load_sam_profile(
                 args.file, cn_region=parse_cn_region(args.cn_neutral_region)
             )
-            for i in p:
-                print(*i)
-        elif args.subparser == "genotype":
+            print(yaml.dump(p, default_flow_style=None))
+        elif args.subparser == "batch":
+            avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
+            avail_genes = [
+                i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"
+            ]
+            batch(avail_genes, args.profile, args.file)
+        elif args.subparser in ["genotype", "g"]:
             # Prepare the list of available genes
             if args.gene.lower() == "all":
                 avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
@@ -101,7 +114,7 @@ def main(argv):
                 ]
                 avail_genes = sorted(avail_genes)
             else:
-                avail_genes = [args.gene.lower()]
+                avail_genes = args.gene.lower().split(",")
 
             # Prepare the output file
             output = args.output
@@ -109,35 +122,37 @@ def main(argv):
                 output = sys.stdout
             elif output:
                 output = open(output, "w")
-            else:
-                output = "{}.aldy".format(os.path.splitext(args.file)[0])
-                output = open(output, "w")
-
             for gene in avail_genes:
                 _genotype(gene, output, args)
-            if output != sys.stdout:
+            if output and output != sys.stdout:
                 output.close()
         else:
             raise AldyException("Invalid sub-command " + args.subparser)
     except IOError as ex:
         if ex.filename is not None:
-            log.critical("File cannot be accessed: {}", ex.filename)
+            log.critical("ERROR: {} cannot be accessed", ex.filename)
         else:
-            log.critical("File cannot be accessed: {}", str(ex))
+            log.critical("ERROR: {} cannot be accessed", str(ex))
         log.debug(ex)
         log.debug(traceback.format_exc())
         exit(1)
     except SystemExit as ex:
-        log.debug(ex)
+        log.debug(repr(ex))
         log.debug(traceback.format_exc())
         exit(ex.code)
     except Exception as ex:
-        log.critical(ex)
+        log.critical(
+            f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
+        )
+        log.critical(repr(ex))
         log.warn(traceback.format_exc())
         exit(1)
     except:  # noqa
         exc = sys.exc_info()[0]
-        log.critical("Unrecoverable error: {}", str(exc))
+        log.critical(
+            f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
+        )
+        log.critical("Unrecoverable error: {}", repr(exc))
         log.warn(traceback.format_exc())
         exit(1)
 
@@ -192,11 +207,12 @@ def _get_args(argv):
         help=td(
             """Sequencing profile. The following profiles are supported:
                - illumina
+               - wgs (same as illumina)
                - pgrnseq-v1
                - pgrnseq-v2,
-               - pgrnseq-v3 and
-               - [wxs] (coming soon).
-               You can also provide a SAM/BAM file as a profile.
+               - pgrnseq-v3, and
+               - exome.
+               You can also provide a custom SAM/BAM file as a profile.
                Please check documentation for more details."""
         ),
     )
@@ -215,7 +231,6 @@ def _get_args(argv):
     genotype_parser.add_argument(
         "--cn-neutral-region",
         "-n",
-        default="22:42547463-42548249",
         help=td(
             """Copy-number neutral region in the format chromosome:start-end
                (e.g. chr1:10000-20000).
@@ -287,6 +302,16 @@ def _get_args(argv):
                (e.g. two copies of the main gene), use 1,1."""
         ),
     )
+    genotype_parser.add_argument(
+        "--multiple-warn-level",
+        "-W",
+        default=1,
+        help="Show warning if multiple solutions are found. "
+        + "Can be 1 (warn after genotyping) or 2 "
+        + "(also warn if there are multiple major solutions)."
+        + f"Default is 1 (warn after the genotyping).",
+    )
+    genotype_parser.add_argument("--phase", help="Use phase file.")
 
     _ = subparsers.add_parser(
         "test",
@@ -297,20 +322,12 @@ def _get_args(argv):
     _ = subparsers.add_parser("license", parents=[base], help="Show Aldy license")
 
     show_parser = subparsers.add_parser(
-        "show", parents=[base], help="Show database definitions for a given gene."
+        "query",
+        aliases=["q"],
+        parents=[base],
+        help="Query database definitions for a given gene.",
     )
-    show_parser.add_argument(
-        "--gene", "-g", required=True, help="Gene whose configurations are to be shown."
-    )
-    show_parser.add_argument(
-        "--major", "-m", default=None, help="Show a major star-allele definition."
-    )
-    show_parser.add_argument(
-        "--cn-config", "-c", default=None, help="Show a copy number configuration."
-    )
-    show_parser.add_argument(
-        "--minor", "-M", default=None, help="Show a minor star-allele definition."
-    )
+    show_parser.add_argument("gene", help="Gene or allele to show.")
 
     profile_parser = subparsers.add_parser(
         "profile",
@@ -331,6 +348,10 @@ def _get_args(argv):
                Default is CYP2D8 region within hg19 (22:42547463-42548249)."""
         ),
     )
+
+    batch_parser = subparsers.add_parser("batch", parents=[base])
+    batch_parser.add_argument("--profile", "-p", required=True)
+    batch_parser.add_argument("file", nargs="?", help="SAM/BAM/CRAM file")
 
     _ = subparsers.add_parser(
         "help", parents=[base], help="Show program usage and exit."
@@ -369,13 +390,13 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
     threshold = float(args.threshold) / 100
 
     def run(debug):
-        log.debug(
-            "\nArguments: {}",
+        log.trace(
+            "\n[main] arguments= {}",
             " ".join(k + "=" + str(v) for k, v in vars(args).items() if k is not None),
         )
         log.info("Genotyping sample {}...", os.path.basename(args.file))
         try:
-            result = genotype(
+            _ = genotype(
                 gene_db=gene,
                 sam_path=args.file,
                 profile=args.profile,
@@ -384,23 +405,20 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 cn_solution=cn_solution,
                 threshold=threshold,
                 solver=args.solver,
-                phase=False,
                 fusion_penalty=float(args.fusion_penalty),
                 reference=args.reference,
                 gap=float(args.gap),
                 max_minor_solutions=int(args.max_minor_solutions),
                 debug=debug,
+                multiple_warn_level=args.multiple_warn_level,
+                phase=args.phase,
+                report=True,
             )
-            log.info(colorize(f"{gene.upper()} results:"))
-            reported = set()
-            for r in result:
-                minors = ", ".join(sorted([f.major_repr() for f in r.solution]))
-                s = f"  {r.diplotype:30} ({minors})"
-                if s not in reported:
-                    log.info(colorize(s))
-                    reported.add(s)
         except AldyException as ex:
-            log.error(ex)
+            log.critical(
+                f"ERROR: gene= {gene}, profile= {args.profile}, file= {args.file}"
+            )
+            log.error(str(ex))
 
     if args.log:
         fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="DEBUG")
@@ -408,6 +426,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
         fh.push_application()
     if args.debug:
         with tempfile.TemporaryDirectory() as tmp:
+            prefix = None
             try:
                 prefix = f"{tmp}/{os.path.splitext(os.path.basename(args.file))[0]}"
                 log_output = f"{prefix}.log"
@@ -424,11 +443,12 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 log.debug(f"Using {tmp} as temporary debug directory")
                 run(prefix)
             finally:
-                log.info("Preparing debug archive...")
-                if common._json:
-                    common._json.close()
-                    common._json = None
-                os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
+                if prefix:
+                    log.info("Preparing debug archive...")
+                    with open(f"{prefix}.yml", "w") as f:
+                        yaml.Dumper.ignore_aliases = lambda *args: True  # type: ignore
+                        yaml.dump(common.json, f, default_flow_style=None)
+                    os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
     else:
         run(None)
 
@@ -446,4 +466,6 @@ def console():
 
 
 if __name__ == "__main__":
+    # import cProfile
+    # cProfile.run("console()")
     console()

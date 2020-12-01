@@ -20,7 +20,7 @@ def escape_name(s: str, d: collections.defaultdict = None) -> str:
     """
     Escape variable names to conform given names with the various solver requirements.
     """
-    s = s.replace(".", "").replace("-", "m").replace("/", "__")[:200]
+    s = s.replace(".", "").replace("-", "m").replace("#", "__").replace(">", "")[:200]
     # Ensure that all names are unique
     if d is not None:
         d[s] += 1
@@ -126,7 +126,7 @@ class Gurobi:  # pragma: no cover
         return var.varName
 
     def abssum(self, vars: Iterable, coeffs: Optional[Dict[str, float]] = None):
-        """
+        r"""
         Return the absolute sum of ``vars``: e.g.
            :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
         where :math:`c_i` is defined in the ``coeffs`` dictionary.
@@ -146,15 +146,15 @@ class Gurobi:  # pragma: no cover
         return self.quicksum(vv)
 
     def prod(self, res, terms):
-        """
+        r"""
         Ensure that :math:`res = \prod terms`
         (where ``terms`` is a sequence of binary variables)
         by adding the appropriate linear constraints.
         Returns ``res``.
         """
         for v in terms:
-            self.addConstr(res <= v)
-        self.addConstr(res >= self.quicksum(terms) - (len(terms) - 1))
+            self.addConstr(res <= v, name="PROD")
+        self.addConstr(res >= self.quicksum(terms) - (len(terms) - 1), name="PROD")
         return res
 
     def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
@@ -455,7 +455,7 @@ def model(name: str, solver: str):
         """
         try:
             model = Gurobi(name)
-            log.trace("Using Gurobi")
+            log.trace("[lp] solver= gurobi")
         except ImportError:
             model = None
         return model
@@ -466,7 +466,7 @@ def model(name: str, solver: str):
         """
         try:
             model = SCIP(name)
-            log.trace("Using SCIP")
+            log.trace("[lp] solver= scip")
         except ImportError:
             model = None
         return model
@@ -477,7 +477,7 @@ def model(name: str, solver: str):
         """
         try:
             model = CBC(name)
-            log.trace("Using CBC")
+            log.trace("[lp] solver= cbc")
         except ImportError:
             model = None
         return model

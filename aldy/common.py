@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Tuple, Iterable
+from typing import Iterable
 
 import pkg_resources
 import re
@@ -134,44 +134,23 @@ class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
         return self.samtools(0, 0, "")
 
 
-class GeneRegion(collections.namedtuple("GeneRegion", ["number", "kind"])):
-    """
-    A region within a gene.
-
-    Attributes:
-        number (int):
-            Region number (e.g. for exon 9, the number is 9).
-        kind (str):
-            Type of the region. Usually either 'e' (for **e**\ xon) or
-            'i' (for **i**\ ntron), but can be anything else.
-
-    Notes:
-        Has custom printer (``__str__``).
-    """
-
-    def __str__(self):
-        return "GR({}.{})".format(self.number, self.kind)
-
-
 # Aldy auxiliaries
 
 
-def allele_number(x: str) -> str:
+def allele_name(x: str) -> str:
     """
     Returns:
         str: Major allele number of the star-allele name (e.g. ``'12A'`` -> ``12``).
     """
-    p = re.split(r"(\d+)", x)
-    return p[1]
+    if "*" in x:
+        x = x.split("*", maxsplit=1)[1]
+    return x.replace("/", "_")
 
 
-def allele_sort_key(x: str) -> Tuple[int, str]:
-    """
-    Returns:
-        tuple[int, str]: Key for sorting star-alleles (e.g. ``'13a'`` -> ``(13, 'a')``).
-    """
-    p = re.split(r"(\d+)", x)
-    return (int(p[1]), "".join(p[2:]))
+def freezekey(x):  # hashing for dictionaries
+    return tuple(i[1] for i in sorted(x[0].items())) + tuple(
+        i[1] for i in sorted(x[1].items())
+    )
 
 
 def rev_comp(seq: str) -> str:
@@ -180,7 +159,7 @@ def rev_comp(seq: str) -> str:
         str: Reverse-complemented DNA sequence.
     """
 
-    return "".join([REV_COMPLEMENT[x] for x in seq[::-1]])
+    return "".join([REV_COMPLEMENT.get(x, x) for x in seq[::-1]])
 
 
 def seq_to_amino(seq: str) -> str:
@@ -290,16 +269,11 @@ def parse_cn_region(cn_region):
     return None
 
 
-_json = None
+class JsonDict(dict):
+    def __getitem__(self, key):
+        if key not in self:
+            self[key] = JsonDict()
+        return self.get(key)
 
 
-def json_print(debug, *args, **kwargs):
-    """
-    Print debug information to `debug`.json.
-    """
-    if not debug:
-        return
-    global _json
-    if not _json:
-        _json = open(f"{debug}.json", "w")
-    print(*args, **kwargs, flush=True, file=_json)
+json = JsonDict()
