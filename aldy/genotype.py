@@ -173,33 +173,12 @@ def genotype(
     gene = Gene(gene_db, genome=genome)
 
     if not cn_region:
-<<<<<<< HEAD
-        cn_region = sam.DEFAULT_CN_NEUTRAL_REGION
-    sample = sam.Sample(
-        sam_path=sam_path,
-        gene=gene,
-        threshold=threshold,
-        profile=profile,
-        phase=phase,
-        reference=reference,
-        cn_region=None if cn_solution else cn_region,
-        debug=debug,
-    )
-
-    avg_cov = sample.coverage.average_coverage()
-    if avg_cov < 2:
-        raise AldyException(
-            f"Average coverage of {avg_cov:.2f} for gene {gene.name} is too low; "
-            + f"skipping gene {gene.name}. "
-            + f"Please ensure that {gene.name} is present in the input SAM/BAM."
-=======
         cn_region = sam.DEFAULT_CN_NEUTRAL_REGION[genome]
     if profile in ["exome", "wxs"]:
         log.warn("WARNING: Copy-number calling is not available for exome data.")
         log.warn(
             "WARNING: Aldy will NOT be able to detect gene duplications, "
             + "deletions and fusions."
->>>>>>> origin/phase-pharmvar
         )
         log.warn(
             "WARNING: Calling of alleles that are defined by non-exonic mutations "
