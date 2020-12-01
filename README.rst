@@ -51,7 +51,7 @@ Gene Support
      - ✅
    * - *CYP2B6*
      - PharmVar 4.1.7
-     - ⚠️ (needs more testing)
+     - ⚠️ (possible conflicts with *CYP2B7*; needs more validation)
      - 🚫
    * - *CYP1A1*
      - PharmGKB (Dec 2014)
@@ -79,11 +79,11 @@ Gene Support
      - 🚫
    * - *CYP2E1*
      - PharmGKB (Nov 2013)
-     - ⚠️ (not tested on real data)
+     - ⚠️ (not tested on real data yet)
      - 🚫
    * - *CYP2F1*
      - PharmVar 4.1.7
-     - ⚠️ (not tested on real data)
+     - ⚠️ (not tested on real data yet)
      - 🚫
    * - *CYP2J2*
      - PharmVar 4.1.7
@@ -91,7 +91,7 @@ Gene Support
      - 🚫
    * - *CYP2R1*
      - PharmVar 4.1.7
-     - ⚠️ (not tested)
+     - ⚠️ (not tested on real data yet)
      - 🚫
    * - *CYP2S1*
      - PharmVar 4.1.7
@@ -99,7 +99,7 @@ Gene Support
      - 🚫
    * - *CYP2W1*
      - PharmVar 4.1.7
-     - ⚠️ (not tested on real data)
+     - ⚠️ (not tested on real data yet)
      - 🚫
    * - *CYP3A43*
      - PharmVar 4.1.7
@@ -131,7 +131,7 @@ Gene Support
      - 🚫
    * - *NUDT15*
      - PharmVar 4.1.7
-     - ⚠️ (not tested on real data)
+     - ⚠️ (not tested on real data yet)
      - 🚫
    * - *SLCO1B1*
      - PharmGKB (Oct 2019)
