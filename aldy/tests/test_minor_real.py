@@ -4,7 +4,6 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from collections import defaultdict
 import pytest  # noqa
 import collections
 

@@ -5,7 +5,6 @@
 
 
 import pytest  # noqa
-import re
 
 from .test_cn_synthetic import assert_cn
 

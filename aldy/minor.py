@@ -449,7 +449,6 @@ def solve_minor_model(
     )
     PHASE_ERROR = 10
     objective += PHASE_ERROR * model.quicksum(VPHASEERR)
-    # objective += 0.0001 * model.quicksum(v[0] for a in VNEW for _, v in VNEW[a].items())
 
     model.setObjective(objective)
     if debug:
