@@ -316,9 +316,9 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
     for sol in sols:
         if sol not in gene.cn_configs:
             raise AldyException(
-                f"Given copy number solution contains unknown copy number configuration"
+                "Given copy number solution contains unknown copy number configuration"
                 + f"{sol}. Please run 'aldy show --gene {gene.name}' for the list the"
-                + f"valid configurations"
+                + "valid configurations"
             )
     s = CNSolution(gene, 0, sols)  # type: ignore
     log.debug("[cn] result= {} (provided)", s)

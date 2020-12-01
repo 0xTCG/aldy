@@ -65,7 +65,7 @@ def query(gene: Gene, query: str, full=True):
         s.append(f"  {r:>10}: {lg:>25} {lp:>25}")
     log.info("\n".join(s))
 
-    log.info(f"Structural alleles (deletions, conservations and fusions):")
+    log.info("Structural alleles (deletions, conservations and fusions):")
     for c, cn in gene.cn_configs.items():
         log.info(f"  {'*'+c+':':>8} {cn.description}")
 

@@ -619,7 +619,10 @@ class Gene:
             if len(self.pseudogenes) > 0:
                 cn.append({r: 1 for r in self.regions[1]})
             self.cn_configs[deletion_allele] = CNConfig(
-                cn, CNConfigType.DELETION, {deletion_allele}, f"{self.name} deletion",
+                cn,
+                CNConfigType.DELETION,
+                {deletion_allele},
+                f"{self.name} deletion",
             )
         # Right fusions GENE + PSEUDOGENE + whole copy of PSEUDOGENE fusions
         for a, brk in fusions_right.items():

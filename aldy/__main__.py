@@ -288,7 +288,7 @@ def _get_args(argv):
         "--max-minor-solutions",
         default=1,
         help="Maximum number of minor solutions to report for each major solution. "
-        + f"Default is 1.",
+        + "Default is 1.",
     )
     genotype_parser.add_argument(
         "--cn",
@@ -309,7 +309,7 @@ def _get_args(argv):
         help="Show warning if multiple solutions are found. "
         + "Can be 1 (warn after genotyping) or 2 "
         + "(also warn if there are multiple major solutions)."
-        + f"Default is 1 (warn after the genotyping).",
+        + "Default is 1 (warn after the genotyping).",
     )
     genotype_parser.add_argument("--phase", help="Use phase file.")
 
@@ -365,8 +365,8 @@ def _print_licence():
     Print Aldy license.
     """
     with open(script_path("aldy.resources/LICENSE.rst")) as f:
-        for l in f:
-            print(l.strip())
+        for ll in f:
+            print(ll.strip())
 
 
 def _genotype(gene: str, output: Optional[Any], args) -> None:

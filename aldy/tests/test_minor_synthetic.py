@@ -32,7 +32,10 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
         )
     else:
         major = MajorSolution(
-            0, {SolvedAllele(gene, m): c for m, c in data["major"].items()}, cn_sol, [],
+            0,
+            {SolvedAllele(gene, m): c for m, c in data["major"].items()},
+            cn_sol,
+            [],
         )
 
     sols = estimate_minor(gene, cov, [major], solver)

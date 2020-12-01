@@ -153,7 +153,9 @@ def test_gene_alleles(toy_gene):
         },
     )
     assert toy_gene.alleles["4#1"] == MajorAllele(
-        "4#1", cn_config="4", minors={"4#1.001": MinorAllele("4#1.001")},
+        "4#1",
+        cn_config="4",
+        minors={"4#1.001": MinorAllele("4#1.001")},
     )
     assert toy_gene.alleles["4#3"] == MajorAllele(
         "4#3",
@@ -172,7 +174,9 @@ def test_gene_alleles(toy_gene):
         minors={"5.001": MinorAllele("5.001", "5")},
     )
     assert toy_gene.alleles["6"] == MajorAllele(
-        "6", cn_config="6", minors={"6.001": MinorAllele("6.001", "6DEL")},
+        "6",
+        cn_config="6",
+        minors={"6.001": MinorAllele("6.001", "6DEL")},
     )
     assert toy_gene.deletion_allele() == "6"
 

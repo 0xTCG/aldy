@@ -270,7 +270,7 @@ class Sample:
                 if len(read.ref) == 1 and read.ref != gene[read.pos - 1]:
                     hgvs = [(read.pos - 1, f"{gene[read.pos - 1]}>{read.ref}")]
                 else:
-                    hgvs = [(read.pos - 1, f"_")]
+                    hgvs = [(read.pos - 1, "_")]
                 hgvs += [get_mut(read.pos - 1, read.ref, a) for a in read.alleles[1:]]
                 for gt in g:
                     pos, op = hgvs[gt]
@@ -612,7 +612,10 @@ class Sample:
             ext = os.path.splitext(profile)
             if ext[-1] in [".bam", ".sam"]:
                 prof = self._load_profile(
-                    profile, is_bam=True, gene=gene, cn_region=cn_region,
+                    profile,
+                    is_bam=True,
+                    gene=gene,
+                    cn_region=cn_region,
                 )
             else:
                 prof = self._load_profile(profile)
