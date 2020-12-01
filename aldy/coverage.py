@@ -48,7 +48,6 @@ class Coverage:
         self._cnv_coverage = cnv_coverage
         self.sample = sample
 
-        self._rescaled: Dict[int, float] = {}
         self._region_coverage: Dict[Tuple[int, str], float] = {}
 
     def __getitem__(self, mut: Mutation) -> float:
@@ -74,12 +73,6 @@ class Coverage:
         if total == 0:
             return 0
         return 100.0 * self.coverage(m) / total
-
-    def loci_cn(self, pos: int) -> float:
-        """ :return: Copy number of the locus ``pos``. """
-        if self._rescaled[pos] == 0:
-            return 0
-        return self.total(pos) * (1 / self._rescaled[pos])
 
     def single_copy(self, pos: int, cn_solution) -> float:
         """
@@ -141,7 +134,6 @@ class Coverage:
         new_cov = Coverage(
             cov, self._threshold, self._cnv_coverage, self.sample  # type: ignore
         )
-        new_cov._rescaled = self._rescaled
         new_cov._region_coverage = self._region_coverage
         return new_cov
 
@@ -153,9 +145,10 @@ class Coverage:
 
     def _normalize_coverage(
         self,
-        profile: Dict[str, Dict[int, float]],
+        profile: Dict[str, List[float]],
         gene_regions: List[Dict[str, GRange]],
         cn_region: GRange,
+        profile_cn: float,
     ) -> None:
         """
         Normalize the sample coverage to match the profile coverage.
@@ -170,9 +163,6 @@ class Coverage:
         sam_ref = sum(
             self._cnv_coverage[i] for i in range(cn_region.start, cn_region.end)
         )
-        cnv_ref = sum(
-            profile[cn_region.chr][i] for i in range(cn_region.start, cn_region.end)
-        )
 
         if sam_ref == 0:
             raise AldyException(
@@ -180,24 +170,16 @@ class Coverage:
                 + "Double check your input file for CYP2D8 (are you using hg19?), "
                 + "or pass an alternative CN-neutral region via -n parameter."
             )
-        print(cn_region, sam_ref, cnv_ref)
-        cn_ratio = float(cnv_ref) / sam_ref
+        cn_ratio = float(profile_cn) / sam_ref
         if cn_ratio == 0:
             raise AldyException("Invalid CN-neutral region in the provided profile.")
         log.debug("[coverage] scale_ratio: {:.1f}", 1 / cn_ratio)
 
-        self._rescaled = {}
         self._region_coverage = {}
         for gene, gr in enumerate(gene_regions):
             for region, rng in gr.items():
                 s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT
-                p = sum(profile[rng.chr][i] for i in range(rng.start, rng.end))
-                self._rescaled.update(
-                    {
-                        i: profile[rng.chr][i] / cn_ratio
-                        for i in range(rng.start, rng.end)
-                    }
-                )
+                p = profile[region][gene]
                 self._region_coverage[gene, region] = (
                     (cn_ratio * float(s) / p) if p != 0 else 0.0
                 )

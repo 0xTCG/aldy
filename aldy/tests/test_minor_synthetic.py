@@ -76,9 +76,6 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
             pmiss |= set((m.pos, m.op) for m in i.missing)
             pnew |= set((m.pos, m.op) for m in i.added)
 
-        print(eall, pall)
-        print(emiss, pmiss)
-        print(enew, pnew)
         assert eall == pall, "Alleles"
         assert emiss == pmiss, "Missing mutations"
         assert enew == pnew, "Novel mutations"
@@ -172,8 +169,8 @@ def test_major_novel(toy_gene, solver):
             },
             "major": ({"1": 1, "3": 1, "6": 1}, (100_000_110, "delAC")),
             "sol": [
-                ("1.002", [], []),
-                ("3.001", [(100_000_147, "insA")], [(100_000_110, "delAC")]),
+                ("1.002", [], [(100_000_110, "delAC")]),
+                ("3.001", [(100_000_147, "insA")], []),
                 ("6.001", [], []),
             ],
             "score": MISS_PENALTY_FACTOR + (ADD_PENALTY_FACTOR + NOVEL_MUTATION_PENAL),

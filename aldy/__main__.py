@@ -23,7 +23,7 @@ from . import common
 from .common import log, script_path, AldyException, td, parse_cn_region
 from .gene import Gene
 from .cn import LEFT_FUSION_PENALTY
-from .sam import Sample
+from .sam import load_sam_profile
 from .genotype import genotype, batch
 from .query import query
 from .version import __version__
@@ -95,11 +95,10 @@ def main(argv):
                 pass
             query(Gene(gene_db), q)
         elif args.subparser == "profile":
-            p = Sample.load_sam_profile(
+            p = load_sam_profile(
                 args.file, cn_region=parse_cn_region(args.cn_neutral_region)
             )
-            for i in p:
-                print(*i)
+            print(yaml.dump(p, default_flow_style=None))
         elif args.subparser == "batch":
             avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
             avail_genes = [

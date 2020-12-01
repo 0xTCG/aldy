@@ -74,17 +74,13 @@ Potential major CYP2D6 star-alleles for NA10860:
    3: 1x*4.021, 1x*4J, 1x*61 (confidence: 100%)
    4: 1x*4.021, 1x*4J, 1x*83.ALDY (confidence: 100%)
    5: 1x*4.021, 1x*4M, 1x*36.ALDY (confidence: 100%)
-Potential CYP2D6 star-alleles for NA10860:
+Best CYP2D6 star-alleles for NA10860:
    1: *1 / *4.021 + *4N.ALDY (confidence=100%)
-      Minor alleles: *1.018 +rs111564371 +rs113889384, *4.021 +rs28371713, *4.1013 +rs112568578 -rs28371738
-   2: *1 / *4.021 + *4N.ALDY (confidence=100%)
-      Minor alleles: *1.018 +rs111564371, *4.021 +rs112568578, *4.1013 +rs113889384 +rs28371713 -rs28371738
-   3: *1 / *4.021 + *4N.ALDY (confidence=100%)
-      Minor alleles: *1.018 +rs28371713, *4.021 +rs111564371 +rs112568578, *4.1013 +rs113889384 -rs28371738
+      Minor alleles: *1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713, *4.021, *4.1013 -rs28371738
 CYP2D6 results:
   - *1 / *4.021 + *4N.ALDY
-    Minor: [*1.018 +rs111564371 +rs113889384] / [*4.021 +rs28371713] + [*4.1013 +rs112568578 -rs28371738]
-    Legacy notation: [*1.018 +rs111564371 +rs113889384] / [*4.021 +rs28371713] + [*4N.ALDY +rs112568578 -rs28371738]
+    Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.1013 -rs28371738]
+    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4N.ALDY -rs28371738]
 """
 
 
@@ -92,8 +88,12 @@ def test_NA10860(monkeypatch, solver):
     file = script_path("aldy.tests.resources/NA10860.bam")
     assert_file(monkeypatch, file, solver, EXPECTED_NA10860)
 
-    # file = script_path("aldy.tests.resources/NA10860_hg38.bam")
-    # assert_file(monkeypatch, file, solver, EXPECTED_NA10860)
+
+def test_NA10860_hg38(monkeypatch, solver):
+    file = script_path("aldy.tests.resources/NA10860_hg38.bam")
+    assert_file(
+        monkeypatch, file, solver, EXPECTED_NA10860.replace("NA10860", "NA10860_hg38")
+    )
 
 
 EXPECTED_NA10860_GAP = f"""
@@ -117,11 +117,11 @@ Potential major CYP2D6 star-alleles for NA10860:
   10: 1x*4.021, 1x*4M, 1x*5, 1x*36.ALDY (confidence: 96%)
 Best CYP2D6 star-alleles for NA10860:
    1: *1 / *4.021 + *4N.ALDY (confidence=100%)
-      Minor alleles: *1.001 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs29001678, *4.021, *4.1013 -rs28371738
+      Minor alleles: *1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713, *4.021, *4.1013 -rs28371738
 CYP2D6 results:
   - *1 / *4.021 + *4N.ALDY
-    Minor: [*1.001 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs29001678] / [*4.021] + [*4.1013 -rs28371738]
-    Legacy notation: [*1A +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs29001678] / [*4.021] + [*4N.ALDY -rs28371738]
+    Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.1013 -rs28371738]
+    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4N.ALDY -rs28371738]
 """
 
 
@@ -140,11 +140,11 @@ Potential major CYP2D6 star-alleles for HARD:
    2: 2x*2, 1x*4, 1x*68, 1x*80#4 (confidence: 100%)
 Best CYP2D6 star-alleles for HARD:
    1: *2 + *2 / *68 + *4 + *80 (confidence=100%)
-      Minor alleles: *2.001, *2.001, *4.001 -rs28588594, *68.001 -rs28371699 -rs28588594, *80#4.001
+      Minor alleles: *2.001, *2.001, *4.001 +rs4987144 -rs28588594, *68.001 -rs28371699 -rs28588594, *80#4.001
 CYP2D6 results:
   - *2 + *2 / *68 + *4 + *80
-    Minor: [*2.001] + [*2.001] / [*68.001 -rs28371699 -rs28588594] + [*4.001 -rs28588594] + [*80#4.001]
-    Legacy notation: [*2A] + [*2A] / [*68 -rs28371699 -rs28588594] + [*4A -rs28588594] + [*80#4.001]
+    Minor: [*2.001] + [*2.001] / [*68.001 -rs28371699 -rs28588594] + [*4.001 +rs4987144 -rs28588594] + [*80#4.001]
+    Legacy notation: [*2A] + [*2A] / [*68 -rs28371699 -rs28588594] + [*4A +rs4987144 -rs28588594] + [*80#4.001]
 """
 
 
@@ -163,11 +163,11 @@ Potential major CYP2D6 star-alleles for HARD:
    2: 2x*2, 1x*4, 1x*4C (confidence: 100%)
 Best CYP2D6 star-alleles for HARD:
    1: *2 + *2 / *4 + *4C (confidence=100%)
-      Minor alleles: *2.001 +rs28371738 +rs2004511 +rs2267447 +rs1080989, *2.001, *4.001 -rs28588594, *4.011
+      Minor alleles: *2.001 +rs28371738 +rs2004511 +rs2267447 +rs1080989, *2.001, *4.001 +rs4987144 -rs28588594, *4.011 +rs1985842 +rs28371702 +rs28371701 +rs28371699 +rs28735595
 CYP2D6 results:
   - *2 + *2 / *4 + *4C
-    Minor: [*2.001 +rs28371738 +rs2004511 +rs2267447 +rs1080989] + [*2.001] / [*4.001 -rs28588594] + [*4.011]
-    Legacy notation: [*2A +rs28371738 +rs2004511 +rs2267447 +rs1080989] + [*2A] / [*4A -rs28588594] + [*4L]
+    Minor: [*2.001 +rs28371738 +rs2004511 +rs2267447 +rs1080989] + [*2.001] / [*4.001 +rs4987144 -rs28588594] + [*4.011 +rs1985842 +rs28371702 +rs28371701 +rs28371699 +rs28735595]
+    Legacy notation: [*2A +rs28371738 +rs2004511 +rs2267447 +rs1080989] + [*2A] / [*4A +rs4987144 -rs28588594] + [*4L +rs1985842 +rs28371702 +rs28371701 +rs28371699 +rs28735595]
 """
 
 
@@ -238,11 +238,11 @@ Potential major CYP2D6 star-alleles for NA10860:
    2: 1x*4, 1x*139 (confidence: 100%)
 Best CYP2D6 star-alleles for NA10860:
    1: *1 / *4.021 (confidence=100%)
-      Minor alleles: *1.001 +rs28371713 +rs29001678, *4.021
+      Minor alleles: *1.018 +rs28371713, *4.021
 CYP2D6 results:
   - *1 / *4.021
-    Minor: [*1.001 +rs28371713 +rs29001678] / [*4.021]
-    Legacy notation: [*1A +rs28371713 +rs29001678] / [*4.021]
+    Minor: [*1.018 +rs28371713] / [*4.021]
+    Legacy notation: [*1.018 +rs28371713] / [*4.021]
 """
 
 
@@ -291,35 +291,36 @@ def test_fix_insertions(monkeypatch, solver):
     )
 
 
-# EXPECTED_PROFILE = f"""
-# {HEADER}
-# Generating profile for DPYD (1:97541297-98388616)
-# Generating profile for CYP2C19 (10:96444999-96615001)
-# Generating profile for CYP2C9 (10:96690999-96754001)
-# Generating profile for CYP2C8 (10:96795999-96830001)
-# Generating profile for CYP4F2 (19:15618999-16009501)
-# Generating profile for CYP2A6 (19:41347499-41400001)
-# Generating profile for CYP2D6 (22:42518899-42553001)
-# Generating profile for TPMT (6:18126540-18157375)
-# Generating profile for CYP3A5 (7:99244999-99278001)
-# Generating profile for CYP3A4 (7:99353999-99465001)
-# """
+EXPECTED_PROFILE = f"""
+{HEADER}
+Scanning 1:60355979-98392615...
+Scanning 6:18125541-18161374...
+Scanning 7:1016834-99467173...
+Scanning 10:96516437-135355620...
+Scanning 11:14896554-14919751...
+Scanning 12:21278127-21395730...
+Scanning 13:48605702-48629878...
+Scanning 15:75008882-75051948...
+Scanning 19:15985833-41716444...
+Scanning 22:42518175-42549249...
+Scanning X:153756605-153781787...
+"""
 
 
-# def test_profile(monkeypatch, capsys):
-#     lines = []
+def test_profile(monkeypatch, capsys):
+    lines = []
 
-#     def log_info(*args):
-#         s = str.format(*args)
-#         lines.append(s)
+    def log_info(*args):
+        s = str.format(*args)
+        lines.append(s)
 
-#     monkeypatch.setattr(log, "info", log_info)
+    monkeypatch.setattr(log, "info", log_info)
 
-#     main(["profile", script_path("aldy.tests.resources/NA10860.bam")])
-#     lines = escape_ansi("\n".join(lines)).strip()
-#     assert lines == EXPECTED_PROFILE.strip()
+    main(["profile", script_path("aldy.tests.resources/NA10860.bam")])
+    lines = escape_ansi("\n".join(lines)).strip()
+    assert lines == EXPECTED_PROFILE.strip()
 
-#     captured = capsys.readouterr()
-#     with open(script_path("aldy.tests.resources/NA10860.profile")) as f:
-#         expected = f.read()
-#     assert captured.out == expected
+    captured = capsys.readouterr()
+    with open(script_path("aldy.tests.resources/NA10860.profile")) as f:
+        expected = f.read()
+    assert captured.out == expected

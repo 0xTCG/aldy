@@ -474,7 +474,6 @@ def test_comparison(real_gene, solver):  # NA10846/v1
         for major in [{"1": 1, "4": 1}, {"10": 1, "4M": 1}, {"39": 1, "4J": 1}]
     ]
     sols = estimate_minor(real_gene, Coverage(cov, 0.5, {}), majors, solver)
-    print(sols)
     assert len(sols) == 3
     sols.sort(key=lambda x: x.score)
 
@@ -489,9 +488,7 @@ def test_comparison(real_gene, solver):  # NA10846/v1
             pall.add(i.minor)
             pmiss |= set((m.pos, m.op) for m in i.missing)
             pnew |= set((m.pos, m.op) for m in i.added)
-        print(eall, pall)
-        print(emiss, pmiss)
-        print(enew, pnew)
+
         assert eall == pall, "Alleles"
         assert emiss == pmiss, "Missing mutations"
         assert enew == pnew, "Novel mutations"

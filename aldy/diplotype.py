@@ -139,7 +139,10 @@ def write_vcf(
         + "\n"
         + "\t".join(
             ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
-            + [f"{sample}:{mi}:{m.diplotype}" for mi, m in enumerate(minors)]
+            + [
+                f"{sample}:{mi}:{m.get_major_diplotype().replace(' ', '')}"
+                for mi, m in enumerate(minors)
+            ]
         ),
         file=f,
     )
@@ -153,7 +156,7 @@ def write_vcf(
             ref, alt = ".", f"{m.op[3:]}, ."  # TODO: this is wrong...
 
         fm = gene.get_functional(m)
-        fm = fm.replace(' ', '_').replace("\t", "_").replace(";", "_") if fm else "none"
+        fm = fm.replace(" ", "_").replace("\t", "_").replace(";", "_") if fm else "none"
         info = [
             f"EFFECT={fm}",
             "GENE=" + gene.name,

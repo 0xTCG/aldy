@@ -433,9 +433,13 @@ def solve_minor_model(
         v[1] for a in VKEEP for _, v in VKEEP[a].items()
     )
     # ... and additions ...
-    objective += ADD_PENALTY_FACTOR * model.quicksum(
-        v[0] for a in VNEW for _, v in VNEW[a].items()
-    )
+    cnt = 0
+    for a in VNEW:
+        for _, v in VNEW[a].items():
+            # HACK:
+            # Add cnt/10000 to select the smallest allele if there is a tie
+            objective += ADD_PENALTY_FACTOR * (1 + cnt / 1000000) * v[0]
+            cnt += 1
     # ... and novel functional mutations from the major model!
     objective += NOVEL_MUTATION_PENAL * model.quicksum(
         v[0]
@@ -445,6 +449,7 @@ def solve_minor_model(
     )
     PHASE_ERROR = 10
     objective += PHASE_ERROR * model.quicksum(VPHASEERR)
+    # objective += 0.0001 * model.quicksum(v[0] for a in VNEW for _, v in VNEW[a].items())
 
     model.setObjective(objective)
     if debug:
@@ -494,7 +499,6 @@ def solve_minor_model(
         if len(results) >= max_solutions:
             break
     if not results:
-        print("whoops...")
         log.debug("[minor] solution= []")
         debug_info["sol"] = []
         if debug and False:  # Enable to debug infeasible models

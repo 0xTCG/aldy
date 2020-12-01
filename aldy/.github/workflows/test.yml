@@ -1,0 +1,45 @@
+# 786
+# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: aldy-test
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install flake8 pytest pytest-cov codecov black mypy
+        python -m pip install .
+    - name: Format with black
+      run: black aldy
+    - name: Lint with flake8
+      run: flake8 aldy
+    - name: Typecheck with mypy
+      run: mypy aldy
+    - name: Run Aldy tests
+      run: |
+        mkdir -p tmp
+        cd tmp
+        aldy test
+        cd ..
+    - name: Run code coverage tests
+      run: |
+        pytest --cov=./ -v aldy --solvers=cbc,any
+        codecov
+
+
+

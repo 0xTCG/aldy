@@ -10,6 +10,7 @@ import pysam
 import os
 import os.path
 import re
+import yaml
 import gzip
 import struct
 
@@ -611,27 +612,30 @@ class Sample:
             ext = os.path.splitext(profile)
             if ext[-1] in [".bam", ".sam"]:
                 prof = self._load_profile(
-                    profile,
-                    is_bam=True,
-                    gene_region=gene.get_wide_region(),
-                    cn_region=cn_region,
+                    profile, is_bam=True, gene=gene, cn_region=cn_region,
                 )
             else:
                 prof = self._load_profile(profile)
         else:
             profile_path = script_path(
-                "aldy.resources.profiles/{}.profile".format(profile.lower())
+                "aldy.resources.profiles/{}.yml".format(profile.lower())
             )
             prof = self._load_profile(profile_path)
-        self.coverage._normalize_coverage(prof, gene.regions, cn_region)
+            if "neutral" not in prof or "cn" not in prof["neutral"]:
+                raise AldyException("Profile missing neutral region")
+            if gene.name not in prof:
+                raise AldyException(f"Profile missing {gene.name}")
+        self.coverage._normalize_coverage(
+            prof[gene.name], gene.regions, cn_region, prof["neutral"]["cn"][0]
+        )
 
     def _load_profile(
         self,
         profile_path: str,
         is_bam: bool = False,
-        gene_region: Optional[GRange] = None,
+        gene: Optional[Gene] = None,
         cn_region: Optional[GRange] = None,
-    ) -> Dict[str, Dict[int, float]]:
+    ) -> Dict[str, Dict[str, List[float]]]:
         """
         Load a coverage profile.
 
@@ -653,32 +657,17 @@ class Sample:
                 but ``gene_region`` and ``cn_region`` are not.
         """
 
-        profile: Dict[str, Dict[int, float]] = defaultdict(lambda: defaultdict(int))
         if is_bam:
-            if gene_region and cn_region:
-                ptr = Sample.load_sam_profile(
-                    profile_path, regions=[gene_region, cn_region]
-                )
-                for _, c, p, v in ptr:
-                    profile[c][p] = v
-            else:
-                raise AldyException("Region parameters must be provided")
+            assert gene and cn_region
+            regions = {}
+            for gi, gr in enumerate(gene.regions):
+                for r, rng in gr.items():
+                    regions[gene.name, r, gi] = rng
+            regions["neutral", "cn", 0] = cn_region
+            return load_sam_profile(profile_path, regions=regions)
         else:
-
-            def read_file(f, profile):
-                for line in f:
-                    if line[0] == "#":
-                        continue  # skip comments
-                    _, ch, pos, val = line.strip().split()
-                    profile[ch.decode("utf-8")][int(pos)] = float(val)
-
-            try:
-                with gzip.open(profile_path) as f:
-                    read_file(f, profile)
-            except OSError:
-                with open(profile_path, "rb") as f:
-                    read_file(f, profile)
-        return profile
+            with open(profile_path) as f:
+                return yaml.safe_load(f)
 
     def _dump_alignments(self, debug: str):
         with gzip.open(f"{debug}.dump", "wb") as fd:
@@ -693,53 +682,13 @@ class Sample:
                     fd.write(struct.pack("<hh", p - s, len(md)))
                     fd.write(md.encode("ascii"))
 
-    # ----------------------------------------------------------------------------------
 
-    @staticmethod
-    def detect_genome(sam_path: str):
-        try:
-            with pysam.AlignmentFile(sam_path) as sam:
-                try:
-                    sam.check_index()
-                except AttributeError:
-                    pass  # SAM files do not have an index. BAMs might also lack it
-                except ValueError:
-                    raise AldyException(
-                        f"File {sam_path} has no index (it must be indexed)"
-                    )
-
-                #: str: Check if we need to append 'chr' or not
-                _prefix = _chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])
-                # Detect the genome
-                hg19_lens = {"1": 249250621, "10": 135534747, "22": 51304566}
-                hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
-                chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
-                is_hg19, is_hg38 = True, True
-                for c in "1 10 22".split():
-                    is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
-                    is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
-                if is_hg19:
-                    return "sam", "hg19"
-                elif is_hg38:
-                    return "sam", "hg38"
-                else:
-                    return "sam", None
-        except (ValueError, OSError):
-            try:
-                with pysam.VariantFile(sam_path):
-                    return "vcf", None
-            except (ValueError, OSError):
-                pass
-        return "", None
-
-
-@staticmethod
 def load_sam_profile(
     sam_path: str,
     factor: float = 2.0,
-    regions: Dict[str, List[GRange]] = None,
+    regions: Dict[Tuple[str, str, int], GRange] = dict(),
     cn_region: Optional[GRange] = None,
-) -> List[Tuple[str, str, int, float]]:
+) -> Dict[str, Dict[str, List[float]]]:
     """
     Load the profile information from a SAM/BAM file.
 
@@ -762,34 +711,39 @@ def load_sam_profile(
             3. Illumina: by definition contains all ones (uniform coverage profile).
     """
 
-    if regions is None:
+    if len(regions) == 0:
         import pkg_resources
-        import yaml
 
-        gene_regions = []
-        for g in pkg_resources.resource_listdir("aldy.resources", "genes"):
+        gene_regions = {}
+        for g in sorted(pkg_resources.resource_listdir("aldy.resources", "genes")):
             if g[-4:] != ".yml":
                 continue
-            with open(script_path(f"aldy.resources.genes/{g}")) as f:
-                yml = yaml.safe_load(f)
-                ref = yml["reference"]["mappings"]["hg19"][0]
-                reg = yml["structure"]["regions"]["hg19"]
-                rmi = min(min(r) for _, r in reg.items())
-                rma = max(max(r) for _, r in reg.items())
-                gene_regions.append((yml["name"], GRange(ref, rmi, rma)))
-        gene_regions = natsorted(gene_regions, key=lambda x: x[1])
+            gg = Gene(script_path(f"aldy.resources.genes/{g}"))
+            for gi, gr in enumerate(gg.regions):
+                for r, rng in gr.items():
+                    gene_regions[gg.name, r, gi] = rng
     else:
-        gene_regions = [(str(i), r) for i, r in enumerate(sorted(regions))]
-    gene_regions.append(
-        ("CN", cn_region if cn_region else DEFAULT_CN_NEUTRAL_REGION["hg19"])
+        gene_regions = regions
+    gene_regions["neutral", "cn", 0] = (
+        cn_region if cn_region else DEFAULT_CN_NEUTRAL_REGION["hg19"]
     )
-    result: List[Tuple[str, str, int, float]] = []
-    for gene, location in gene_regions:
+
+    chr_regions: Dict[str, Tuple[int, int]] = {}
+    for c, s, e in gene_regions.values():
+        if c not in chr_regions:
+            chr_regions[c] = (s, e)
+        else:
+            chr_regions[c] = (min(s, chr_regions[c][0]), max(e, chr_regions[c][1]))
+
+    cov: dict = defaultdict(lambda: defaultdict(int))
+    for c, (s, e) in natsorted(chr_regions.items()):
         with pysam.AlignmentFile(sam_path) as sam:
-            prefix = _chr_prefix(location.chr, sam.header["SQ"])
-            region = location.samtools(pad_left=1000, pad_right=1000, prefix=prefix)
-            cov: dict = defaultdict(int)
-            log.info("Generating profile for {} ({})", gene, region)
+            region = GRange(c, s, e).samtools(
+                pad_left=1000,
+                pad_right=1000,
+                prefix=_chr_prefix(c, [x["SN"] for x in sam.header["SQ"]]),
+            )
+            log.info("Scanning {}...", region)
             try:
                 for read in sam.fetch(region=region):
                     start, s_start = read.reference_start, 0
@@ -799,7 +753,7 @@ def load_sam_profile(
                     for op, size in read.cigartuples:
                         if op == 2:
                             for i in range(size):
-                                cov[start + i] += 1
+                                cov[c][start + i] += 1
                             start += size
                         elif op == 1:
                             s_start += size
@@ -807,16 +761,59 @@ def load_sam_profile(
                             s_start += size
                         elif op in [0, 7, 8]:
                             for i in range(size):
-                                cov[start + i] += 1
+                                cov[c][start + i] += 1
                             start += size
                             s_start += size
-                result += [
-                    (gene, location.chr, p, cov[p] * (factor / 2.0))
-                    for p in range(location.start, location.end)
-                ]
             except ValueError:
-                log.warn("Cannot fetch gene {} ({})", gene, region)
-    return result
+                log.warn("Cannot fetch {}", region)
+
+    d: Any = {}
+    for (g, r, ri), (c, s, e) in gene_regions.items():
+        if g not in d:
+            d[g] = {}
+        if r not in d[g]:
+            d[g][r] = [0]
+        if ri >= len(d[g][r]):
+            d[g][r].append(0)
+        d[g][r][ri] = sum(cov[c][i] * (factor / 2.0) for i in range(s, e))
+    return d
+
+
+def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
+    try:
+        with pysam.AlignmentFile(sam_path) as sam:
+            try:
+                sam.check_index()
+            except AttributeError:
+                pass  # SAM files do not have an index. BAMs might also lack it
+            except ValueError:
+                raise AldyException(
+                    f"File {sam_path} has no index (it must be indexed)"
+                )
+
+            #: str: Check if we need to append 'chr' or not
+            _prefix = _chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])
+            # Detect the genome
+            hg19_lens = {"1": 249250621, "10": 135534747, "22": 51304566}
+            hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
+            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
+            is_hg19, is_hg38 = True, True
+            for c in "1 10 22".split():
+                is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
+                is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
+            if is_hg19:
+                return "sam", "hg19"
+            elif is_hg38:
+                return "sam", "hg38"
+            else:
+                return "sam", None
+    except (ValueError, OSError):
+        try:
+            with pysam.VariantFile(sam_path):
+                return "vcf", None
+        except (ValueError, OSError):
+            pass
+    return "", None
 
 
 def _chr_prefix(ch: str, chrs: List[str]) -> str:  # assumes ch is not prefixed

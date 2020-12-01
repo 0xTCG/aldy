@@ -469,7 +469,7 @@ class Gene:
                     num_exons += 1
                 if not coord[i * 2] <= coord[i * 2 + 1]:
                     raise AldyException(
-                        f"Malformed YML file (structure:regions:{name})"
+                        f"Malformed YML file {self.name} (structure:regions:{name})"
                     )
                 regions[name] = GRange(self.chr, coord[i * 2] - 1, coord[i * 2 + 1] - 1)
             for e in range(1, num_exons):  # fill introns

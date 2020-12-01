@@ -153,7 +153,7 @@ def genotype(
     sample_name = os.path.splitext(os.path.basename(sam_path))[0]
     with open(sam_path):  # Check if file exists
         pass
-    kind, g = sam.Sample.detect_genome(sam_path)
+    kind, g = sam.detect_genome(sam_path)
     # assert kind in ["vcf", "sam", "dump"]
     if genome is None:
         genome = g
@@ -170,11 +170,11 @@ def genotype(
         gene_db = db_file
     with open(gene_db):  # Check if file exists
         pass
-    gene = Gene(gene_db, genome)
+    gene = Gene(gene_db, genome=genome)
 
     if not cn_region:
         cn_region = sam.DEFAULT_CN_NEUTRAL_REGION[genome]
-    if profile == "exome":
+    if profile in ["exome", "wxs"]:
         log.warn("WARNING: Copy-number calling is not available for exome data.")
         log.warn(
             "WARNING: Aldy will NOT be able to detect gene duplications, "
@@ -190,6 +190,12 @@ def genotype(
         profile = "illumina"
     elif profile == "wgs":
         profile = "illumina"
+    elif profile == "pgrnseq-v1":
+        profile = "pgx1"
+    elif profile == "pgrnseq-v2":
+        profile = "pgx2"
+    elif profile == "pgrnseq-v3":
+        profile = "pgx3"
 
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
