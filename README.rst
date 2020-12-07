@@ -5,7 +5,7 @@
    </h1>
    <p align="center">
    <a href="https://badge.fury.io/py/aldy"><img src="https://badge.fury.io/py/aldy.svg" alt="Version"/></a>
-   <a href="https://travis-ci.com/inumanag/aldy"><img src="https://travis-ci.com/inumanag/aldy.svg?branch=master" alt="CI Status"/></a>
+   <img src="https://github.com/0xTCG/aldy/workflows/aldy-test/badge.svg" alt="CI Status"/>
    <a href="https://aldy.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/aldy/badge/?version=latest" alt="ReadTheDocs"/></a>
    <a href="https://codecov.io/github/inumanag/aldy"><img src="https://codecov.io/github/inumanag/aldy/coverage.svg?branch=master" alt="Code Coverage"/></a>
    <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black"/></a>
@@ -51,20 +51,20 @@ Gene Support
      - ✅
    * - *CYP2B6*
      - PharmVar 4.1.7
-     - ⚠️ (possible conflicts with *CYP2B7*; needs more validation)
+     - ⚠️ (possible mapping conflicts with *CYP2B7*; needs more validation)
      - 🚫
    * - *CYP1A1*
      - PharmGKB (Dec 2014)
      - ✅
-     - 🚫
+     - ❓ (no reported CN/fusion events in the database)
    * - *CYP1A2*
      - PharmGKB (Mar 2014)
      - ✅
-     - 🚫
+     - ❓
    * - *CYP2A13*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *CYP2C19*
      - PharmVar 4.1.7
      - ✅
@@ -72,75 +72,75 @@ Gene Support
    * - *CYP2C8*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *CYP2C9*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *CYP2E1*
      - PharmGKB (Nov 2013)
      - ⚠️ (not tested on real data yet)
-     - 🚫
+     - ❓
    * - *CYP2F1*
      - PharmVar 4.1.7
      - ⚠️ (not tested on real data yet)
-     - 🚫
+     - ❓
    * - *CYP2J2*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *CYP2R1*
      - PharmVar 4.1.7
      - ⚠️ (not tested on real data yet)
-     - 🚫
+     - ❓
    * - *CYP2S1*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *CYP2W1*
      - PharmVar 4.1.7
      - ⚠️ (not tested on real data yet)
-     - 🚫
+     - ❓
    * - *CYP3A43*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *CYP3A4*
      - cypalleles.ki.se (2020)
      - ✅
-     - 🚫
+     - ❓
    * - *CYP3A5*
      - PharmVar 4.2.4
      - ✅
-     - 🚫
+     - ❓
    * - *CYP3A7*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *CYP4F2*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *DPYD*
      - PharmVar 4.1.7
      - ✅
-     - 🚫
+     - ❓
    * - *G6PD*
      - PharmGKB (Sep 2018)
      - ✅
-     - 🚫
+     - ❓
    * - *NUDT15*
      - PharmVar 4.1.7
      - ⚠️ (not tested on real data yet)
-     - 🚫
+     - ❓
    * - *SLCO1B1*
      - PharmGKB (Oct 2019)
      - ✅
-     - 🚫
+     - ❓
    * - *TPMT*
      - PharmGKB (Jun 2020)
      - ✅
-     - 🚫
+     - ❓
      
 ⚠️ Warning
 ==========
