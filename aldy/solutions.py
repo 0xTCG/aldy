@@ -217,7 +217,7 @@ class MinorSolution:
         if i == -1:
             return gene.deletion_allele()
         n = str(self.solution[i].major).split("#")[0:1]
-        for m in self.solution[i].added:
+        for m in sorted(self.solution[i].added):
             if gene.is_functional(m, infer=False):
                 n.append(gene.get_rsid(m))
         return "+".join(n)
