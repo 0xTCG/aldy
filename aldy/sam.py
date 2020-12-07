@@ -108,7 +108,10 @@ class Sample:
 
         assert vcf_path or (sam_path and profile)
         if vcf_path:
-            norm, muts = self._load_vcf(vcf_path, gene)
+            try:
+                norm, muts = self._load_vcf(vcf_path, gene)
+            except ValueError:
+                raise AldyException(f"VCF {vcf_path} is not indexed")
         elif sam_path and sam_path[-5:] == ".dump":
             norm, muts = self._load_dump(sam_path)
         else:
@@ -848,3 +851,46 @@ def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
         and read.reference_name == prefix + region.chr
         and region.start - 500 <= read.reference_start <= region.end
     )
+
+
+def load_phase(gene: Gene, path: str):
+    """Loads a HapTree-X/HapCUT2 phase file."""
+
+    haplotypes: Tuple[List[Mutation], List[Mutation]] = ([], [])
+    phases: List[List[Mutation]] = []
+
+    g_chr, g_s, g_e = gene.get_wide_region()
+    with open(path) as hap:
+        for li, line in enumerate(hap):
+            if line[:5] == "BLOCK":
+                if haplotypes[0]:
+                    phases += list(haplotypes)
+                haplotypes = [], []
+            elif line[:5] == "*****":
+                continue
+            else:
+                ls = line.strip().split("\t")
+                if len(ls) < 7:
+                    raise AldyException(
+                        f"Invalid phasing line {li + 1} in {path} (less than 7 columns)"
+                    )
+                _, gt0_, gt1_, chr, pos_, al0, al1, *_ = ls
+                gt0, gt1, pos = int(gt0_), int(gt1_), int(pos_) - 1
+                if gt0 + gt1 != 1:
+                    continue
+                chr = chr[3:] if chr.startswith("chr") else chr
+                if chr != g_chr:
+                    continue
+                if pos < g_s or pos >= g_e:
+                    continue
+
+                if (pos, f"{al0}>{al1}") not in gene.mutations:
+                    if (pos, f"{al1}>{al0}") in gene.mutations:
+                        log.warn(f"reorienting {pos} {al0} {al1}")
+                        al1, al0 = al0, al1
+                        gt0, gt1 = gt1, gt0
+                haplotypes[0].append(Mutation(pos, f"{al0}>{al1}" if gt0 else "_"))
+                haplotypes[1].append(Mutation(pos, f"{al0}>{al1}" if gt1 else "_"))
+    if haplotypes[0]:
+        phases += [haplotypes[0], haplotypes[1]]
+    return phases

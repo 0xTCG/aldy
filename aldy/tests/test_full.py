@@ -35,7 +35,7 @@ def escape_ansi(line):
     return re.compile(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]").sub("", line)
 
 
-def assert_file(monkeypatch, file, solver, expected, params=None, output=None):
+def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
     lines = []
 
     def log_info(*args):
@@ -43,6 +43,8 @@ def assert_file(monkeypatch, file, solver, expected, params=None, output=None):
         lines.append(s)
 
     monkeypatch.setattr(log, "info", log_info)
+    if warn:
+        monkeypatch.setattr(log, "warn", log_info)
 
     args = {
         **{
@@ -251,7 +253,7 @@ def test_NA10860_cn(monkeypatch, solver):
     assert_file(monkeypatch, file, solver, EXPECTED_NA10860_CN, {"--cn": "1,1"})
 
 
-def test_NA10860_vcf(monkeypatch, solver):
+def test_NA10860_vcf_out(monkeypatch, solver):
     file = script_path("aldy.tests.resources/NA10860.bam")
     with tmpfile(suffix=".vcf", mode="w") as out:
         out.close()
@@ -261,6 +263,88 @@ def test_NA10860_vcf(monkeypatch, solver):
         with open(out.name) as f:
             produced = f.read()
         assert produced == expected.replace("aldy-v2.2", f"aldy-v{__version__}")
+
+
+EXPECTED_NA07000 = f"""
+{HEADER}
+Genotyping sample NA07000_SLCO1B1.vcf.gz...
+WARNING: Cannot detect genome, defaulting to hg19.
+WARNING: Using VCF file. Copy-number calling is not available.
+Using VCF sample NA07000
+Potential SLCO1B1 gene structures for NA07000_SLCO1B1.vcf:
+   1: 2x*1 (confidence: 100%)
+Potential major SLCO1B1 star-alleles for NA07000_SLCO1B1.vcf:
+   1: 1x*1, 1x*15 & rs4149057, rs2291075 (confidence: 100%)
+   2: 1x*1B, 1x*5 & rs4149057, rs2291075 (confidence: 100%)
+WARNING: multiple optimal solutions found!
+Potential SLCO1B1 star-alleles for NA07000_SLCO1B1.vcf:
+   1: *1+rs4149057+rs2291075 / *15 (confidence=100%)
+      Minor alleles: *1.001 +rs4149057 +rs2291075, *15.001
+   2: *1B+rs4149057+rs2291075 / *5 (confidence=100%)
+      Minor alleles: *1.002 +rs4149057 +rs2291075, *5.001
+SLCO1B1 results:
+  - *1+rs4149057+rs2291075 / *15
+    Minor: [*1.001 +rs4149057 +rs2291075] / [*15.001]
+    Legacy notation: [*1A +rs4149057 +rs2291075] / [*15]
+  - *1B+rs4149057+rs2291075 / *5
+    Minor: [*1.002 +rs4149057 +rs2291075] / [*5.001]
+    Legacy notation: [*1B +rs4149057 +rs2291075] / [*5]
+WARNING: mutations rs2291075, rs4149057 suggest presence of a novel major star-allele.
+However, such alleles cannot be determined without phasing data.
+Please provide --phase parameter for Aldy to accurately call novel major star-alleles.
+The above-reported assignments of these mutations are random.
+"""
+
+
+def test_NA07000_vcf_in(monkeypatch, solver):
+    file = script_path("aldy.tests.resources/NA07000_SLCO1B1.vcf.gz")
+    assert_file(
+        monkeypatch,
+        file,
+        solver,
+        EXPECTED_NA07000,
+        {"--max-minor-solutions": "1", "--gene": "SLCO1B1"},
+        warn=True,
+    )
+
+
+EXPECTED_NA07000_PHASE = f"""
+{HEADER}
+Genotyping sample NA07000_SLCO1B1.vcf.gz...
+WARNING: Cannot detect genome, defaulting to hg19.
+WARNING: Using VCF file. Copy-number calling is not available.
+Using VCF sample NA07000
+Potential SLCO1B1 gene structures for NA07000_SLCO1B1.vcf:
+   1: 2x*1 (confidence: 100%)
+Potential major SLCO1B1 star-alleles for NA07000_SLCO1B1.vcf:
+   1: 1x*1, 1x*15 & rs4149057, rs2291075 (confidence: 100%)
+   2: 1x*1B, 1x*5 & rs4149057, rs2291075 (confidence: 100%)
+Using phasing information
+Using phasing information
+Best SLCO1B1 star-alleles for NA07000_SLCO1B1.vcf:
+   1: *1+rs4149057 / *15+rs2291075 (confidence=100%)
+      Minor alleles: *1.001 +rs4149057, *15.001 +rs2291075
+SLCO1B1 results:
+  - *1+rs4149057 / *15+rs2291075
+    Minor: [*1.001 +rs4149057] / [*15.001 +rs2291075]
+    Legacy notation: [*1A +rs4149057] / [*15 +rs2291075]
+"""
+
+
+def test_NA07000_phase(monkeypatch, solver):
+    file = script_path("aldy.tests.resources/NA07000_SLCO1B1.vcf.gz")
+    assert_file(
+        monkeypatch,
+        file,
+        solver,
+        EXPECTED_NA07000_PHASE,
+        {
+            "--max-minor-solutions": "1",
+            "--gene": "SLCO1B1",
+            "--phase": script_path("aldy.tests.resources/NA07000_SLCO1B1.phase"),
+        },
+        warn=True,
+    )
 
 
 EXPECTED_INS = f"""

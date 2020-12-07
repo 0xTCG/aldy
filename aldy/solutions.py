@@ -157,7 +157,7 @@ class MajorSolution:
             f"{v}x{s}"
             for s, v in natsorted(self.solution.items(), key=lambda x: x[0].major)
         )
-        y = ", ".join(self.cn_solution.gene.get_rsid(m) for m in self.added)
+        y = ", ".join(self.cn_solution.gene.get_rsid(m) for m in sorted(self.added))
         return " & ".join([x, y] if y else [x])
 
     def __str__(self):

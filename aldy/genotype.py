@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Optional, Any, Set, Tuple
+from typing import List, Optional, Any, Set
 
 import os
 import sys
@@ -24,52 +24,9 @@ from .common import (
     AldyException,
     SOLUTION_PRECISION,
 )
-from .gene import Gene, GRange, Mutation
+from .gene import Gene, GRange
 from .diplotype import OUTPUT_COLS
 from .lpinterface import model as lp_model
-
-
-def load_phase(gene: Gene, path: str):
-    """Loads a HapTree-X/HapCUT2 phase file."""
-
-    haplotypes: Tuple[List[Mutation], List[Mutation]] = ([], [])
-    phases: List[List[Mutation]] = []
-
-    g_chr, g_s, g_e = gene.get_wide_region()
-    with open(path) as hap:
-        for li, line in enumerate(hap):
-            if line[:5] == "BLOCK":
-                if haplotypes[0]:
-                    phases += list(haplotypes)
-                haplotypes = [], []
-            elif line[:5] == "*****":
-                continue
-            else:
-                ls = line.split("\t")
-                if len(ls) < 7:
-                    raise AldyException(
-                        f"Invalid phasing line {li + 1} in {path} (less than 7 columns)"
-                    )
-                _, gt0_, gt1_, chr, pos_, al0, al1, *_ = ls
-                gt0, gt1, pos = int(gt0_), int(gt1_), int(pos_) - 1
-                if gt0 + gt1 != 1:
-                    continue
-                chr = chr[3:] if chr.startswith("chr") else chr
-                if chr != g_chr:
-                    continue
-                if pos < g_s or pos >= g_e:
-                    continue
-
-                if (pos, f"{al0}>{al1}") not in gene.mutations:
-                    if (pos, f"{al1}>{al0}") in gene.mutations:
-                        log.warn(f"reorienting {pos} {al0} {al1}")
-                        al1, al0 = al0, al1
-                        gt0, gt1 = gt1, gt0
-                haplotypes[0].append(Mutation(pos, f"{al0}>{al1}" if gt0 else "_"))
-                haplotypes[1].append(Mutation(pos, f"{al0}>{al1}" if gt1 else "_"))
-    if haplotypes[0]:
-        phases += [haplotypes[0], haplotypes[1]]
-    return phases
 
 
 def genotype(
@@ -258,7 +215,7 @@ def genotype(
         log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
 
-    phases = load_phase(gene, phase) if phase else None
+    phases = sam.load_phase(gene, phase) if phase else None
 
     for i, cn_sol in enumerate(cn_sols):
         major_sols += major.estimate_major(
@@ -379,7 +336,7 @@ def genotype(
             + "\nPlease provide --phase parameter for Aldy to accurately call novel "
             + "major star-alleles.\nThe above-reported assignments of these mutations "
             + "are random.",
-            ", ".join(novels),
+            ", ".join(sorted(novels)),
         )
 
     return minor_sols

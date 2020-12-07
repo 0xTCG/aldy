@@ -394,6 +394,11 @@ def solve_minor_model(
     PHx = {}
     if phases:
         log.info("Using phasing information")
+        poss = {m.pos for m in mutations}
+        phases = [
+            [m for m in p if m in mutations or (m.op == "_" and m.pos in poss)]
+            for p in phases
+        ]
         VPHASE = {
             pi: {a: model.addVar(vtype="B", name=f"PHASE_{pi}_{a[1]}") for a in alleles}
             for pi, _ in enumerate(phases)

@@ -38,7 +38,10 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
             [],
         )
 
-    sols = estimate_minor(gene, cov, [major], solver)
+    phase = None
+    if "phase" in data:
+        phase = [[Mutation(*i) for i in ll] for ll in data["phase"]]
+    sols = estimate_minor(gene, cov, [major], solver, phases=phase)
     if skip_check:
         return sols
 
@@ -151,6 +154,88 @@ def test_add(toy_gene, solver):
             "major": {"1": 1, "3": 1},
             "sol": [("1.002", [], []), ("3.001", [], [(100_000_114, "T>A")])],
             "score": ADD_PENALTY_FACTOR,
+        },
+    )
+
+
+def test_phase(toy_gene, solver):
+    assert_minor(
+        toy_gene,
+        solver,
+        {
+            "cn": {"1": 2},
+            "data": {
+                (100_000_114, "_"): 10,
+                (100_000_114, "T>A"): 10,
+                (100_000_147, "_"): 20,
+                (100_000_147, "insA"): 10,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 10,
+            },
+            "major": {"1": 1, "3": 1},
+            "sol": [("1.002", [], []), ("3.001", [], [])],
+            "score": 0,
+        },
+    )
+
+    assert_minor(
+        toy_gene,
+        solver,
+        {
+            "cn": {"1": 2},
+            "data": {
+                (100_000_114, "_"): 10,
+                (100_000_114, "T>A"): 10,
+                (100_000_147, "_"): 20,
+                (100_000_147, "insA"): 10,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 10,
+            },
+            "major": {"1": 1, "3": 1},
+            "sol": [("1.001", [], []), ("3.001", [], [(100_000_114, "T>A")])],
+            "score": ADD_PENALTY_FACTOR,
+            "phase": [[(100_000_114, "T>A"), (100_000_150, "C>T")], []],
+        },
+    )
+
+    assert_minor(
+        toy_gene,
+        solver,
+        {
+            "cn": {"1": 2},
+            "data": {
+                (100_000_104, "_"): 10,
+                (100_000_104, "T>A"): 10,
+                (100_000_147, "_"): 20,
+                (100_000_147, "insA"): 10,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 10,
+            },
+            "major": {"1": 1, "3": 1},
+            "sol": [("1.001", [], []), ("3.001", [], [])],
+            "score": 2,
+            # ignored because 104T>A is not part of major solution
+            "phase": [[(100_000_104, "T>A"), (100_000_150, "C>T")], []],
+        },
+    )
+
+    assert_minor(
+        toy_gene,
+        solver,
+        {
+            "cn": {"1": 2},
+            "data": {
+                (100_000_110, "_"): 10,
+                (100_000_110, "delAC"): 10,
+                (100_000_147, "_"): 20,
+                (100_000_147, "insA"): 10,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 10,
+            },
+            "major": ({"1": 1, "3": 1}, (100_000_110, "delAC")),
+            "sol": [("1.001", [], []), ("3.001", [], [(100_000_110, "delAC")])],
+            "score": NOVEL_MUTATION_PENAL + ADD_PENALTY_FACTOR + 2,
+            "phase": [[(100_000_110, "delAC"), (100_000_150, "C>T")], []],
         },
     )
 
