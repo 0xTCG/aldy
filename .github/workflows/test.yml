@@ -41,12 +41,21 @@ jobs:
     - name: Run code coverage tests
       run: |
         pytest --cov=./ -v aldy --solvers=cbc,any
-    - uses: codecov/codecov-action@v1
+    - name: Upload code coverage data
+      uses: codecov/codecov-action@v1
+    - name: Publish on TestPyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: ${{ secrets.PYPI_USERNAME }}
+        password: ${{ secrets.PYPI_PASSWORD }}
+        packages_dir: aldy
+        repository_url: https://test.pypi.org/legacy/
     - name: Publish package
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.python-version == '3.7'
       uses: pypa/gh-action-pypi-publish@master
       with:
         user: ${{ secrets.PYPI_USERNAME }}
         password: ${{ secrets.PYPI_PASSWORD }}
+        packages_dir: aldy
 
 
