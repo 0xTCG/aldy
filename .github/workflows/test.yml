@@ -30,7 +30,7 @@ jobs:
         export VERSION=6.0.2
         export DEBFILE=SCIPOptSuite-$VERSION-Linux-Ub1604.deb
         wget http://scip.zib.de/download/release/$DEBFILE
-        sudo dpkg -i $DEBFILE
+        sudo dpkg --force-all -i $DEBFILE
         python -m pip install pyscipopt
         python -m pip install .
     - name: Format with black
