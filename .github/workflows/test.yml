@@ -23,7 +23,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt-get install libblas3 libgfortran3 libgmp10 libgsl2 liblapack3 zlib1g libstdc++6 libc6 libgcc1
+        sudo apt-get install libblas3 libgfortran3 libgmp10 libgslcblas0 liblapack3 zlib1g libstdc++6 libc6 libgcc1
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest pytest-cov codecov black mypy
         # SCIP 
