@@ -63,6 +63,6 @@ jobs:
       with:
         user: ${{ secrets.PYPI_USERNAME }}
         password: ${{ secrets.PYPI_PASSWORD }}
-        packages_dir: aldy
+        packages_dir: .
 
 
