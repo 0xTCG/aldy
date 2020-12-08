@@ -23,14 +23,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        apt install libblas3 libgfortran3 libgmp10 libgsl2 liblapack3 zlib1g libstdc++6 libc6 libgcc1
+        sudo apt-get install libblas3 libgfortran3 libgmp10 libgsl2 liblapack3 zlib1g libstdc++6 libc6 libgcc1
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest pytest-cov codecov black mypy
         # SCIP 
         export VERSION=6.0.2
         export DEBFILE=SCIPOptSuite-$VERSION-Linux-Ub1604.deb
         wget http://scip.zib.de/download/release/$DEBFILE
-        dpkg -i $DEBFILE
+        sudo dpkg -i $DEBFILE
         python -m pip install pyscipopt
         python -m pip install .
     - name: Format with black
