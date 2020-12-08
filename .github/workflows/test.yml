@@ -26,6 +26,7 @@ jobs:
         sudo apt-get install libgfortran4
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest pytest-cov codecov black mypy
+        pythom -m pip install setuptools wheel twine
         # SCIP 
         export VERSION=7.0.1
         export DEBFILE=SCIPOptSuite-${VERSION}-Linux.deb
@@ -50,12 +51,14 @@ jobs:
         pytest --cov=./ -v aldy --solvers=scip,any
     - name: Upload code coverage data
       uses: codecov/codecov-action@v1
+    - name: Build package
+      run: |
+        python setup.py sdist bdist_wheel
     - name: Publish on TestPyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
         user: ${{ secrets.PYPI_USERNAME }}
         password: ${{ secrets.PYPI_PASSWORD }}
-        packages_dir: .
         repository_url: https://test.pypi.org/legacy/
     - name: Publish package
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.python-version == '3.7'
@@ -63,6 +66,4 @@ jobs:
       with:
         user: ${{ secrets.PYPI_USERNAME }}
         password: ${{ secrets.PYPI_PASSWORD }}
-        packages_dir: .
-
 
