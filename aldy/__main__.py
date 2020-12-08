@@ -24,7 +24,7 @@ from .common import log, script_path, AldyException, td, parse_cn_region
 from .gene import Gene
 from .cn import LEFT_FUSION_PENALTY
 from .sam import load_sam_profile
-from .genotype import genotype, batch
+from .genotype import genotype
 from .query import query
 from .version import __version__
 
@@ -99,12 +99,6 @@ def main(argv):
                 args.file, cn_region=parse_cn_region(args.cn_neutral_region)
             )
             print(yaml.dump(p, default_flow_style=None))
-        elif args.subparser == "batch":
-            avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
-            avail_genes = [
-                i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"
-            ]
-            batch(avail_genes, args.profile, args.file)
         elif args.subparser in ["genotype", "g"]:
             # Prepare the list of available genes
             if args.gene.lower() == "all":
@@ -348,10 +342,6 @@ def _get_args(argv):
                Default is CYP2D8 region within hg19 (22:42547463-42548249)."""
         ),
     )
-
-    batch_parser = subparsers.add_parser("batch", parents=[base])
-    batch_parser.add_argument("--profile", "-p", required=True)
-    batch_parser.add_argument("file", nargs="?", help="SAM/BAM/CRAM file")
 
     _ = subparsers.add_parser(
         "help", parents=[base], help="Show program usage and exit."

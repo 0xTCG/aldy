@@ -20,7 +20,7 @@ from aldy.version import __version__
 from .test_full import HEADER, escape_ansi
 
 
-def assert_show(monkeypatch, expected, query=None):
+def assert_show(monkeypatch, expected, query=None, gene="aldy.tests.resources/toy.yml"):
     lines = []
 
     def log_info(*args):
@@ -29,7 +29,7 @@ def assert_show(monkeypatch, expected, query=None):
 
     monkeypatch.setattr(log, "info", log_info)
 
-    args = ["q", script_path("aldy.tests.resources/toy.yml")]
+    args = ["q", script_path(gene)]
     if query:
         args[1] += "*" + query
     main(args)
@@ -134,3 +134,37 @@ Gene TOY, minor star-allele TOY*1.002:
 
 def test_show_minor(monkeypatch):
     assert_show(monkeypatch, EXPECTED_SHOW_MINOR, "1B")
+
+
+EXPECTED_SHOW_CN = f"""
+{HEADER}
+Gene CYP2D6, structural allele CYP2D6*13:
+  Structure: CYP2D6   CYP2D7
+         up: 0        1
+       utr5: 0        1
+         e1: 0        1
+         i1: 1        0
+         e2: 1        0
+         i2: 1        0
+         e3: 1        0
+         i3: 1        0
+         e4: 1        0
+         i4: 1        0
+         e5: 1        0
+         i5: 1        0
+         e6: 1        0
+         i6: 1        0
+         e7: 1        0
+         i7: 1        0
+         e8: 1        0
+         i8: 1        0
+         e9: 1        0
+       utr3: 1        0
+        ins: 1        0
+        pce: 0        0
+        rep: 1        0
+"""
+
+
+def test_show_cn(monkeypatch):
+    assert_show(monkeypatch, EXPECTED_SHOW_CN, "13", "aldy.resources.genes/cyp2d6.yml")

@@ -94,10 +94,10 @@ def print_cn(gene: Gene, major: str, full=False):
     log.info(f"Gene {gene.name}, structural allele {gene.name}*{major}:")
 
     lg = " ".join(f"{i:<8}" for i in [gene.name] + gene.pseudogenes)
-    log.info(f"  Structure: {lg}")
+    log.info(f"  Structure: {lg}".rstrip())
     for r in gene.regions[0]:
         lg = " ".join(f"{config.cn[i][r]:<8}" for i, _ in enumerate(gene.regions))
-        log.info(f"      {r:>5}: {lg}")
+        log.info(f"      {r:>5}: {lg}".rstrip())
 
     if major in gene.alleles:
         print_majors(gene, major)
