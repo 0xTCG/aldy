@@ -22,7 +22,7 @@ from aldy.version import __version__
 YEAR = datetime.datetime.now().year
 HEADER = f"""
 🐿  Aldy v{__version__} (Python {platform.python_version()} on {get_version()})
-   (c) 2016-2020 Aldy Authors. All rights reserved.
+   (c) 2016-{datetime.datetime.now().year} Aldy Authors. All rights reserved.
    Free for non-commercial/academic use only.
 """.strip()
 
