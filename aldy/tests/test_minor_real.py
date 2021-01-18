@@ -625,3 +625,19 @@ def test_major_novel(real_gene, solver):
         },
         shallow=True,
     )
+
+
+def test_minor_novel(real_gene, solver):
+    assert_minor(
+        real_gene,
+        solver,
+        {
+            "cn": {"1": 2},
+            "major": ({"1": 2}, (42522957, "T>G")),
+            "data": {(42522957, "T>G"): 100},
+            "sol": [
+                ("1.001", [], [(42522957, "T>G")]),
+                ("1.001", [], [(42522957, "T>G")]),
+            ],
+        },
+    )

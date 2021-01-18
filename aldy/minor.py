@@ -76,7 +76,6 @@ def estimate_minor(
             mutations |= set(gene.alleles[sa.major].func_muts)
             for sa in gene.alleles[sa.major].minors.values():
                 mutations |= set(sa.neutral_muts)
-        # if phases:
         mutations |= set(major_sol.added)
 
     # Filter out low quality mutations
@@ -446,12 +445,20 @@ def solve_minor_model(
             objective += ADD_PENALTY_FACTOR * (1 + cnt / 1000000) * v[0]
             cnt += 1
     # ... and novel functional mutations from the major model!
-    objective += NOVEL_MUTATION_PENAL * model.quicksum(
-        v[0]
-        for a in VNEW
-        for m, v in VNEW[a].items()
-        if gene.is_functional(m) and m not in gene.alleles[a[0].major].func_muts
-    )
+    for m in {m for a in VNEW for m in VNEW[a]}:
+        vars = [
+            VNEW[a][m][0]
+            for a in VNEW
+            if m in VNEW[a]
+            if gene.is_functional(m)
+            if m not in gene.alleles[a[0].major].func_muts
+        ]
+        if vars:
+            vo = model.addVar(vtype="B", name=f"VNEWOR_{m.pos}_{m.op}")
+            model.addConstr(vo <= model.quicksum(vars))
+            for v in vars:
+                model.addConstr(vo >= v)
+            objective += NOVEL_MUTATION_PENAL * vo
     PHASE_ERROR = 10
     objective += PHASE_ERROR * model.quicksum(VPHASEERR)
 
