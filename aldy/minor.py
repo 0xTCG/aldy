@@ -487,6 +487,16 @@ def solve_minor_model(
             for m, mv in VNEW[allele].items():
                 if model.getValue(mv[0]):
                     added.append(m)
+                else:
+                    copies = coverage.single_copy(m.pos, major_sol.cn_solution)
+                    copies = coverage[m] / copies if copies > 0 else 0
+                    if abs(copies - major_sol.cn_solution.max_cn()) > 1e-5:
+                        continue
+                    # HACK: add homozygous mutation to _all_ alleles
+                    # Works only if a mutation is unambiguiusly homozygous;
+                    # otherwise, it will fall back to the model defaults
+                    if m not in alleles[allele]:
+                        added.append(m)
             solution.append(
                 SolvedAllele(
                     gene,

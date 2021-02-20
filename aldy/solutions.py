@@ -247,3 +247,20 @@ class MinorSolution:
             " + ".join(f"[*{self.get_minor_name(i, legacy)}]" for i in d)
             for d in self.diplotype
         )
+
+    def get_mutation_coverages(self, coverage):
+        muts = collections.defaultdict(int)
+        for sa in self.solution:
+            for m in (
+                sa.gene.alleles[sa.major].func_muts
+                | sa.gene.alleles[sa.major].minors[sa.minor].neutral_muts
+            ):
+                if m not in sa.missing:
+                    muts[m] += 1
+            for m in sa.added:
+                muts[m] += 1
+        covs = {}
+        for m in muts:
+            covs[m] = coverage.single_copy(m.pos, self.major_solution.cn_solution)
+            covs[m] = coverage[m] / covs[m] if covs[m] > 0 else 0
+        return [(m, muts[m], covs[m]) for m in muts]

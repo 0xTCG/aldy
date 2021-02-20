@@ -326,6 +326,17 @@ def genotype(
                 log.info(f"    Minor: {r.get_minor_diplotype()}")
                 log.info(f"    Legacy notation: {r.get_minor_diplotype(legacy=True)}")
                 reported.add(s)
+                # Calculate coverage of each mutation in a solution
+                for m, mc, sc in r.get_mutation_coverages(sample.coverage):
+                    if abs(mc - sc) > 0.5:
+                        log.warn(
+                            "    Warning: Coverage of {} is not in line with "
+                            "the prediction\n"
+                            "             (predicted: {:.1f}, observed: {:.1f})",
+                            gene.get_rsid(m),
+                            mc,
+                            sc,
+                        )
     if any(len(m.major_solution.added) > 0 for m in minor_sols) and not phase:
         novels = {
             gene.get_rsid(mm) for m in minor_sols for mm in m.major_solution.added
