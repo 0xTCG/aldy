@@ -89,8 +89,10 @@ def estimate_minor(
         ):
             return False
         return Coverage.basic_filter(
-            mut, cov, total, thres / MAX_CN
-        ) and Coverage.cn_filter(mut, cov, total, thres, major_sol.cn_solution)
+            mut, cov, total, thres / MAX_CN, coverage.min_cov
+        ) and Coverage.cn_filter(
+            mut, cov, total, thres, major_sol.cn_solution, coverage.min_cov
+        )
 
     if filter_fn:
         cov = coverage.filtered(filter_fn)

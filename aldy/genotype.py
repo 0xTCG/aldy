@@ -47,6 +47,7 @@ def genotype(
     phase: Optional[str] = None,
     report: bool = False,
     genome=None,
+    min_cov: float = 1.0,
 ) -> List[solutions.MinorSolution]:
     """
     Genotype a sample.
@@ -99,7 +100,9 @@ def genotype(
             Prefix for debug information and core dump files.
             ``None`` for no debug information.
             Default is ``None``.
-
+        min_cov (float):
+            Minimum mutation read coverage.
+            Default is 1.
     Raises:
         :obj:`aldy.common.AldyException` if the average coverage is too low (below 2).
     """
@@ -145,6 +148,8 @@ def genotype(
         cn_region = None
         cn_solution = ["1", "1"]
         profile = "illumina"
+        if min_cov == 1:
+            min_cov = min(min_cov, 5.0)
     elif profile == "wgs":
         profile = "illumina"
     elif profile == "pgrnseq-v1":
@@ -168,6 +173,7 @@ def genotype(
             reference=reference,
             cn_region=None if cn_solution else cn_region,
             debug=debug,
+            min_cov=min_cov,
         )
         avg_cov = sample.coverage.average_coverage()
         if avg_cov < 2:

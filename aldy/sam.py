@@ -44,6 +44,7 @@ class Sample:
 
     coverage: Coverage
     sample_name: str
+    min_cov: float
     _prefix: str
     _insertion_sites: Set[Mutation]
     _insertion_counts: Dict[Tuple[int, int], int]
@@ -61,6 +62,7 @@ class Sample:
         cn_region: Optional[GRange] = None,
         debug: Optional[str] = None,
         vcf_path: Optional[str] = None,
+        min_cov: float = 1.0,
     ):
         """
         Initialize a :obj:`Sample` object.
@@ -91,6 +93,7 @@ class Sample:
         # Get the list of indel sites that should be corrected
         # TODO: currently uses only functional indels;
         #       other indels should be corrected as well
+        self.min_cov = min_cov
         self._dump = defaultdict(int), []
         self._insertion_sites = {
             m for a in gene.alleles.values() for m in a.func_muts if m.op[:3] == "ins"
@@ -394,6 +397,7 @@ class Sample:
             threshold,
             self._dump[0],
             self.sample_name,
+            self.min_cov,
         )
 
     def _group_indels(self, gene, coverage):

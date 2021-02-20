@@ -272,8 +272,8 @@ def _filter_alleles(
 
     def filter_fns(mut, cov, total, thres):
         z = Coverage.basic_filter(
-            mut, cov, total, thres / MAX_CN
-        ) and Coverage.cn_filter(mut, cov, total, thres, cn_solution)
+            mut, cov, total, thres / MAX_CN, coverage.min_cov
+        ) and Coverage.cn_filter(mut, cov, total, thres, cn_solution, coverage.min_cov)
         return z
 
     cov = coverage.filtered(filter_fns)

@@ -23,6 +23,7 @@ class Coverage:
         threshold: float,
         cnv_coverage: Dict[int, int],
         sample: str = "sample",
+        min_cov: float = 1.0,
     ) -> None:
         """
         Coverage initialization.
@@ -47,6 +48,7 @@ class Coverage:
         self._threshold = threshold
         self._cnv_coverage = cnv_coverage
         self.sample = sample
+        self.min_cov = min_cov
 
         self._region_coverage: Dict[Tuple[int, str], float] = {}
 
@@ -132,7 +134,11 @@ class Coverage:
         )
 
         new_cov = Coverage(
-            cov, self._threshold, self._cnv_coverage, self.sample  # type: ignore
+            cov,  # type: ignore
+            self._threshold,
+            self._cnv_coverage,
+            self.sample,
+            self.min_cov,
         )
         new_cov._region_coverage = self._region_coverage
         return new_cov
@@ -185,15 +191,22 @@ class Coverage:
                 )
 
     @staticmethod
-    def basic_filter(mut: Mutation, cov: float, total: float, thres: float) -> bool:
+    def basic_filter(
+        mut: Mutation, cov: float, total: float, thres: float, min_cov: float
+    ) -> bool:
         """
         Basic filtering function.
         """
-        return cov >= max(1, total * thres)
+        return cov >= max(min_cov, total * thres)
 
     @staticmethod
     def cn_filter(
-        mut: Mutation, cov: float, total: float, thres: float, cn_solution
+        mut: Mutation,
+        cov: float,
+        total: float,
+        thres: float,
+        cn_solution,
+        min_cov: float,
     ) -> bool:
         """
         Filtering function that takes into the account the copy number of the mutation.
@@ -201,4 +214,4 @@ class Coverage:
         cn = cn_solution.position_cn(mut.pos)
         total = total / cn if cn > 0 else total
 
-        return mut.op == "_" or cov >= max(1, total * thres)
+        return mut.op == "_" or cov >= max(min_cov, total * thres)

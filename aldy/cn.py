@@ -265,7 +265,7 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
     """
     cov = coverage.filtered(
         lambda mut, cov, total, thres: Coverage.basic_filter(
-            mut, cov, total, thres / MAX_CN
+            mut, cov, total, thres / MAX_CN, coverage.min_cov
         )
     )
     configs = copy.deepcopy(gene.cn_configs)
