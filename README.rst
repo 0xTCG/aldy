@@ -12,7 +12,7 @@
   <br/>
   <b><i>A quick and nifty tool for genotyping and phasing popular pharmacogenes.</i></b>
   </p>
-    
+
 
 Aldy calls genotypes of many highly polymorphic pharmacogenes and reports them in a phased star-allele nomenclature.
 It can also call copy number of a given pharmacogene, and genotype each copy present in the sample—something that standard genotype callers like GATK cannot do.
@@ -121,6 +121,10 @@ Gene Support
      - PharmVar 4.1.7
      - ✅
      - ❓
+   * - *CFTR*
+     - PharmGKB (Jun 2020)
+     - ⚠️ (not tested on real data yet)
+     - ❓
    * - *DPYD*
      - PharmVar 4.1.7
      - ✅
@@ -128,6 +132,18 @@ Gene Support
    * - *G6PD*
      - PharmGKB (Sep 2018)
      - ✅
+     - ❓
+   * - *IFNL3*
+     - PharmGKB
+     - ⚠️ (not tested on real data yet)
+     - ❓
+   * - *NAT1*
+     - PharmGKB (Mar 2014)
+     - ⚠️ (not tested on real data yet)
+     - ❓
+   * - *NAT2*
+     - PharmGKB (Mar 2014)
+     - ⚠️ (not tested on real data yet)
      - ❓
    * - *NUDT15*
      - PharmVar 4.1.7
@@ -141,21 +157,25 @@ Gene Support
      - PharmGKB (Jun 2020)
      - ✅
      - ❓
-     
+   * - *UGT1A1*
+     - PharmGKB (Feb 2020)
+     - ⚠️ (not tested on real data yet)
+     - ❓
+
 ⚠️ Warning
 ==========
 
 If you are using Aldy in a clinical or commercial environment, **please read this carefully**.
 
 Aldy is a computational tool whose purpose is to *aid the genotype detection process*. It can be of tremendous help in that process, however it is not perfect, and it can easily make a wrong call if the data is noisy, ambigious or if the target sample contains a previously unknown allele.
-  
-☣️🚨 **Do not use the raw output of Aldy (or any other computational tool for that matter) to diagnose a disease or prescribe a drug!** 
+
+☣️🚨 **Do not use the raw output of Aldy (or any other computational tool for that matter) to diagnose a disease or prescribe a drug!**
 **It is your responsibility to validate every result manually or (ideally) in a wetlab before doing something that can have major consequences.** 🚨☣️
 
 We really mean it.
 
 Finally, note that the allele databases are still work in progress, and that we still do not know the downstream impact of vast majority of genotypes.
-     
+
 Installation
 ============
 
@@ -181,9 +201,9 @@ The following solvers are currently supported:
 * `CBC / Google OR-Tools <https://developers.google.com/optimization/>`_:
   a free, open-source MIP solver that is shipped by default with Google's OR-Tools.
   `pip` installs it by default when installing Aldy.
-  
+
        If you have trouble installing `ortools` on a Nix-based Linux distro, try this::
-          
+
            pip install --platform=manylinux1_x86_64 --only-binary=:all: --target ~/.local/lib/python3.8/site-packages ortools
 
 * `Gurobi <http://www.gurobi.com>`_:
@@ -224,7 +244,7 @@ In case everything is set up properly, you should see something like this::
     rootdir: /Users/inumanag/Projekti/aldy/devel, inifile: setup.cfg
     plugins: xdist-1.31.0, forked-1.1.3
     collected 73 items
-    
+
     tests/test_cn_real.py ........                                                                    [ 12%]
     tests/test_cn_synthetic.py .....                                                                  [ 20%]
     tests/test_diplotype_real.py ....                                                                 [ 27%]
@@ -349,7 +369,7 @@ Additions are marked with `+` in front (e.g. `*1 +42525810:SNP.TC*`).
 Losses carry `-` in front.
 
 Confidence scores express Aldy's confidence in a solution.
-Maximum score is 1.0. By default, Aldy only reports solutions that have the 
+Maximum score is 1.0. By default, Aldy only reports solutions that have the
 confidence score of 1.0. Use `--gap` to report more solutions.
 
 Explicit decomposition is given in the ``file-[gene].aldy``
@@ -395,7 +415,7 @@ The columns stand for:
 VCF support
 -----------
 
-The output will be a VCF file if the output file extension is `.vcf`. 
+The output will be a VCF file if the output file extension is `.vcf`.
 Aldy will report a VCF sample for each potential solution, and the appropriate genotypes.
 Aldy will also output tags `MA` and `MI` for major and minor solutions.
 
@@ -627,44 +647,44 @@ Commands:
   - ``-G, --gap GAP``
 
     Solution gap.
-    By setting this to any positive value, Aldy will also report solutions whose score 
+    By setting this to any positive value, Aldy will also report solutions whose score
     is less than (1+GAP) times the optimal solution score.
     Useful for exploring the solution space.
-    
+
     *Default:* 0 (only optimal solutions allowed)
 
   - ``-d, --debug DEBUG``
 
     Create a DEBUG.tar.gz file that can be shared with the authors for easier debugging.
-    Contains no private information except the file name and sample mutation counts in 
+    Contains no private information except the file name and sample mutation counts in
     the gene of interest.
-    
+
   - ``-f, --fusion-penalty FUSION_PENALTY``
 
     Penalize each fusion additional FUSION_PENALTY times.
     Larger values mean lower likelihood of seeing fusions.
 
     *Default:* 0.1
-    
+
   - ``--max-minor-solutions MAX_MINOR_SOLUTIONS``
 
     Maximum number of minor solutions to report.
     Default setting is to output only one even if there are multiple minor (non-functional) phases.
 
     *Default:* 1
-    
+
   - ``--multiple-warn-level MULTIPLE_WARN_LEVEL``
-  
-    Warning level when multiple optimal solutions are found. 
-    
+
+    Warning level when multiple optimal solutions are found.
+
     If set to 1, Aldy will warn if multiple final optimal solutions are found.
     If set to 2, Aldy will also warn if multiple optimal major star-allele solutions are found.
     If set to 3, Aldy will even warn if multiple copy-number configurations are found.
-    
+
     *Default:* 1
-    
+
   - ``--phase PHASE``
-  
+
     Path to `HapTree-X_<https://github.com/0xTCG/haptreex>` or `HapCUT2_<https://github.com/vibansal/HapCUT2>` phase file
     that can be used to properly resolve multiple optimal solutions and generate more accurate phasing.
 
