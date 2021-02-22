@@ -132,8 +132,6 @@ def genotype(
         pass
     gene = Gene(gene_db, genome=genome)
 
-    min_cov = float(min_cov) if min_cov else 1.0
-
     if not cn_region:
         cn_region = sam.DEFAULT_CN_NEUTRAL_REGION[genome]
     if profile in ["exome", "wxs"]:
@@ -160,6 +158,7 @@ def genotype(
         profile = "pgx2"
     elif profile == "pgrnseq-v3":
         profile = "pgx3"
+    min_cov = float(min_cov) if min_cov else 1.0
 
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
