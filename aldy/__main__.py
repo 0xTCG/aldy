@@ -306,8 +306,8 @@ def _get_args(argv):
         + "Default is 1 (warn after the genotyping).",
     )
     genotype_parser.add_argument(
-        "--min-coverage",
-        default=1.0,
+        "--min-coerage",
+        default=None,
         help=td("""Minimum mutation read coverage. Default is 1."""),
     )
     genotype_parser.add_argument("--phase", help="Use phase file.")
@@ -408,7 +408,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 multiple_warn_level=args.multiple_warn_level,
                 phase=args.phase,
                 report=True,
-                min_cov=float(args.min_coverage),
+                min_cov=args.min_coverage,
             )
         except AldyException as ex:
             log.critical(

@@ -47,7 +47,7 @@ def genotype(
     phase: Optional[str] = None,
     report: bool = False,
     genome=None,
-    min_cov: float = 1.0,
+    min_cov: Optional[str] = None,
 ) -> List[solutions.MinorSolution]:
     """
     Genotype a sample.
@@ -132,6 +132,8 @@ def genotype(
         pass
     gene = Gene(gene_db, genome=genome)
 
+    min_cov = float(min_cov) if min_cov else 1.0
+
     if not cn_region:
         cn_region = sam.DEFAULT_CN_NEUTRAL_REGION[genome]
     if profile in ["exome", "wxs"]:
@@ -148,8 +150,8 @@ def genotype(
         cn_region = None
         cn_solution = ["1", "1"]
         profile = "illumina"
-        if min_cov == 1:
-            min_cov = min(min_cov, 5.0)
+        if not min_cov:
+            min_cov = 5.0
     elif profile == "wgs":
         profile = "illumina"
     elif profile == "pgrnseq-v1":
