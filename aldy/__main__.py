@@ -306,7 +306,7 @@ def _get_args(argv):
         + "Default is 1 (warn after the genotyping).",
     )
     genotype_parser.add_argument(
-        "--min-coerage",
+        "--min-coverage",
         default=None,
         help=td("""Minimum mutation read coverage. Default is 1."""),
     )
