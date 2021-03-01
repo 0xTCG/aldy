@@ -460,7 +460,7 @@ def solve_minor_model(
             model.addConstr(vo <= model.quicksum(vars))
             for v in vars:
                 model.addConstr(vo >= v)
-            objective += NOVEL_MUTATION_PENAL * vo
+            objective += ADD_PENALTY_FACTOR / 2 * vo
     PHASE_ERROR = 10
     objective += PHASE_ERROR * model.quicksum(VPHASEERR)
 

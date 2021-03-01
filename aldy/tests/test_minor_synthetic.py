@@ -234,7 +234,7 @@ def test_phase(toy_gene, solver):
             },
             "major": ({"1": 1, "3": 1}, (100_000_110, "delAC")),
             "sol": [("1.001", [], []), ("3.001", [], [(100_000_110, "delAC")])],
-            "score": NOVEL_MUTATION_PENAL + ADD_PENALTY_FACTOR + 2,
+            "score": ADD_PENALTY_FACTOR * 1.5 + 2,
             "phase": [[(100_000_110, "delAC"), (100_000_150, "C>T")], []],
         },
     )
@@ -261,6 +261,6 @@ def test_major_novel(toy_gene, solver):
                 ("3.001", [(100_000_147, "insA")], []),
                 ("6.001", [], []),
             ],
-            "score": MISS_PENALTY_FACTOR + (ADD_PENALTY_FACTOR + NOVEL_MUTATION_PENAL),
+            "score": MISS_PENALTY_FACTOR + (ADD_PENALTY_FACTOR * 1.5),
         },
     )

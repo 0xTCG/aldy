@@ -3,163 +3,124 @@ version: pharmgkb
 generated: '2021-02-20'
 ensembl: ENSG00000001626
 alleles:
-  CFTR:
-    label: CFTR
+  CFTR*normal:
     mutations: []
-  CFTR.E56K:
-    label: CFTR.E56K
+  CFTR*E56K:
     mutations:
     - [48252, G>A, rs397508256, E56K]
-  CFTR.P67L:
-    label: CFTR.P67L
+  CFTR*P67L:
     mutations:
     - [48286, C>T, rs368505753, P67L]
-  CFTR.R74W:
-    label: CFTR.R74W
+  CFTR*R74W:
     mutations:
     - [48306, C>T, rs115545701, R74W]
-  CFTR.D110E:
-    label: CFTR.D110E
+  CFTR*D110E:
     mutations:
     - [70172, C>A, rs397508537, D110E]
-  CFTR.D110H:
-    label: CFTR.D110H
+  CFTR*D110H:
     mutations:
     - [70170, G>C, rs113993958, D110H]
-  CFTR.R117C:
-    label: CFTR.R117C
+  CFTR*R117C:
     mutations:
     - [70191, C>T, rs77834169, R117C]
-  CFTR.R117H:
-    label: CFTR.R117H
+  CFTR*R117H:
     mutations:
     - [70192, G>A, rs78655421, R117H]
-  CFTR.G178R:
-    label: CFTR.G178R
+  CFTR*G178R:
     mutations:
     - [73535, G>A, rs80282562, G178R]
-  CFTR.E193K:
-    label: CFTR.E193K
+  CFTR*E193K:
     mutations:
     - [73580, G>A, rs397508759, E193K]
-  CFTR.rs397508761:
-    label: CFTR.rs397508761
+  CFTR*rs397508761:
     mutations:
     - [73585, A>G, rs397508761, intron]
-  CFTR.L206W:
-    label: CFTR.L206W
+  CFTR*L206W:
     mutations:
     - [74502, T>G, rs121908752, L206W]
-  CFTR.R347H:
-    label: CFTR.R347H
+  CFTR*R347H:
     mutations:
     - [79487, G>A, rs77932196, R347H]
-  CFTR.R352Q:
-    label: CFTR.R352Q
+  CFTR*R352Q:
     mutations:
     - [79502, G>A, rs121908753, R352Q]
-  CFTR.A455E:
-    label: CFTR.A455E
+  CFTR*A455E:
     mutations:
     - [88012, C>A, rs74551128, A455E]
-  CFTR.S549N:
-    label: CFTR.S549N
+  CFTR*S549N:
     mutations:
     - [127017, G>A, rs121908755, S549N]
-  CFTR.S549R.001:
-    label: CFTR.S549R
+  CFTR*S549R.001:
     mutations:
     - [127016, A>C, rs121908757, S549R]
-  CFTR.S549R.002:
-    label: CFTR.S549R(T>G)
+  CFTR*S549R.002:
+    label: CFTR*S549R(T>G)
     mutations:
     - [127018, T>G, rs121909005, S549R]
-  CFTR.G551S:
-    label: CFTR.G551S
+  CFTR*G551S:
     mutations:
     - [127022, G>A, rs121909013, G551S]
-  CFTR.G551D:
-    label: CFTR.G551D
+  CFTR*G551D:
     mutations:
     - [127023, G>A, rs75527207, G551D]
-  CFTR.D579G:
-    label: CFTR.D579G
+  CFTR*D579G:
     mutations:
     - [129626, A>G, rs397508288, D579G]
-  CFTR.E831X:
-    label: CFTR.E831X
+  CFTR*E831X:
     mutations:
     - [134147, G>T, rs397508387, E831X]
-  CFTR.rs80224560:
-    label: CFTR.rs80224560
+  CFTR*rs80224560:
     mutations:
     - [142085, G>A, rs80224560, intron]
-  CFTR.S945L:
-    label: CFTR.S945L
+  CFTR*S945L:
     mutations:
     - [142925, C>T, rs397508442, S945L]
-  CFTR.S977F:
-    label: CFTR.S977F
+  CFTR*S977F:
     mutations:
     - [145912, C>T, rs141033578, S977F]
-  CFTR.rs76151804:
-    label: CFTR.rs76151804
+  CFTR*rs76151804:
     mutations:
     - [150772, A>G, rs76151804, intron]
-  CFTR.F1052V:
-    label: CFTR.F1052V
+  CFTR*F1052V:
     mutations:
     - [150812, T>G, rs150212784, F1052V]
-  CFTR.K1060T:
-    label: CFTR.K1060T
+  CFTR*K1060T:
     mutations:
     - [150837, A>C, rs397508513, K1060T]
-  CFTR.A1067T:
-    label: CFTR.A1067T
+  CFTR*A1067T:
     mutations:
     - [150857, G>A, rs121909020, A1067T]
-  CFTR.G1069R:
-    label: CFTR.G1069R
+  CFTR*G1069R:
     mutations:
     - [150863, G>A, rs200321110, G1069R]
-  CFTR.R1070Q:
-    label: CFTR.R1070Q
+  CFTR*R1070Q:
     mutations:
     - [150867, G>A, rs78769542, R1070Q]
-  CFTR.R1070W:
-    label: CFTR.R1070W
+  CFTR*R1070W:
     mutations:
     - [150866, C>T, rs202179988, R1070W]
-  CFTR.F1074L:
-    label: CFTR.F1074L
+  CFTR*F1074L:
     mutations:
     - [150880, T>A, rs186045772, F1074L]
-  CFTR.D1152H:
-    label: CFTR.D1152H
+  CFTR*D1152H:
     mutations:
     - [153916, G>C, rs75541969, D1152H]
-  CFTR.rs75039782:
-    label: CFTR.rs75039782
+  CFTR*rs75039782:
     mutations:
     - [179178, C>T, rs75039782, intron]
-  CFTR.G1244E:
-    label: CFTR.G1244E
+  CFTR*G1244E:
     mutations:
     - [181668, G>A, rs267606723, G1244E]
-  CFTR.S1251N:
-    label: CFTR.S1251N
+  CFTR*S1251N:
     mutations:
     - [181689, G>A, rs74503330, S1251N]
-  CFTR.S1255P:
-    label: CFTR.S1255P
+  CFTR*S1255P:
     mutations:
     - [181700, T>C, rs121909041, S1255P]
-  CFTR.D1270N:
-    label: CFTR.D1270N
+  CFTR*D1270N:
     mutations:
     - [181745, G>A, rs11971167, D1270N]
-  CFTR.G1349D:
-    label: CFTR.G1349D
+  CFTR*G1349D:
     mutations:
     - [203987, G>A, rs193922525, G1349D]
 structure:

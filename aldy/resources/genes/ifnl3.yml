@@ -3,11 +3,9 @@ version: pharmgkb-karolinska
 generated: '2021-02-20'
 ensembl: ENSG00000197110
 alleles:
-  IFNL3.C:
-    label: IFNL3.C
+  IFNL3*normal:
     mutations: []
-  IFNL3.T:
-    label: IFNL3.T
+  IFNL3*T:
     mutations:
     - [1825, G>A, rs12979860, Intron]
 structure:

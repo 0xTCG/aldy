@@ -747,6 +747,8 @@ def load_sam_profile(
 
     cov: dict = defaultdict(lambda: defaultdict(int))
     for c, (s, e) in natsorted(chr_regions.items()):
+        if sam_path == "<illumina>":
+            continue
         with pysam.AlignmentFile(sam_path) as sam:
             region = GRange(c, s, e).samtools(
                 pad_left=1000,
@@ -785,7 +787,10 @@ def load_sam_profile(
             d[g][r] = [0]
         if ri >= len(d[g][r]):
             d[g][r].append(0)
-        d[g][r][ri] = sum(cov[c][i] * (factor / 2.0) for i in range(s, e))
+        if sam_path == "<illumina>":
+            d[g][r][ri] = sum(1.0 for i in range(s, e))
+        else:
+            d[g][r][ri] = sum(cov[c][i] * (factor / 2.0) for i in range(s, e))
     return d
 
 

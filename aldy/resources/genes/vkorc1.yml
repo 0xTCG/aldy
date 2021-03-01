@@ -3,11 +3,9 @@ version: pharmgkb
 generated: '2021-02-23'
 ensembl: ENSG00000167397
 alleles:
-  VKORC1.C:
-    label: VKORC1.C
+  VKORC1*normal:
     mutations: []
-  VKORC1.T:
-    label: VKORC1.T
+  VKORC1*T:
     mutations:
     - [3588, G>A, rs9923231, 5' region]
 structure:
