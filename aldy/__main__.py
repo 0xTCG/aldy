@@ -81,19 +81,19 @@ def main(argv):
         elif args.subparser == "test":
             _run_test()
         elif args.subparser in ["query", "q"]:
-            q = args.gene
+            q = args.query
             if "*" in q:
                 gene, q = q.split("*", maxsplit=1)
             else:
                 gene, q = q, ""
+            if args.gene:
+                gene = args.gene
             db_file = script_path("aldy.resources.genes/{}.yml".format(gene.lower()))
-            if os.path.exists(db_file):
-                gene_db = db_file
-            else:
-                gene_db = gene
-            with open(gene_db):  # Check if file exists
+            if not os.path.exists(db_file):
+                db_file = gene
+            with open(db_file):  # Check if file exists
                 pass
-            query(Gene(gene_db), q)
+            query(Gene(db_file), q)
         elif args.subparser == "profile":
             p = load_sam_profile(
                 args.file, cn_region=parse_cn_region(args.cn_neutral_region)
@@ -326,7 +326,8 @@ def _get_args(argv):
         parents=[base],
         help="Query database definitions for a given gene.",
     )
-    show_parser.add_argument("gene", help="Gene or allele to show.")
+    show_parser.add_argument("--gene", "-g", default=None, help="Gene file.")
+    show_parser.add_argument("query", help="Gene or allele to show.")
 
     profile_parser = subparsers.add_parser(
         "profile",

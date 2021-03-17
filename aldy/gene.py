@@ -217,7 +217,7 @@ class Gene:
         path: Optional[str],
         name: Optional[str] = None,
         yml: Optional[str] = None,
-        genome: str = "hg19",
+        genome: Optional[str] = None,
     ) -> None:
         """
         Initialize the Gene class with the database description
@@ -240,7 +240,10 @@ class Gene:
             raise AldyException("Either a path or a name should be given")
 
         yml = yaml.safe_load(yml)
-        self.genome = genome
+        if genome:
+            self.genome = genome
+        else:
+            self.genome = list(yml["reference"]["mappings"].keys())[0]  # type: ignore
         self._init_basic(name, yml)
         self._init_regions(yml)
         self._init_alleles(yml)
@@ -400,7 +403,7 @@ class Gene:
         Aldy internally uses 0-based indexing.
         """
         self.name = yml["name"]
-        self.version = f"{yml['version']} ({yml['generated']})"
+        self.version = f"{yml.get('version', 'v?')} ({yml.get('generated', '-')})"
         self.refseq = yml["reference"]["name"]
         self.pharmvar = yml.get("pharmvar", None)
         self.ensembl = yml.get("ensembl", None)
@@ -535,6 +538,8 @@ class Gene:
                             fusions_right[name] = op
                     else:
                         orig_op = op
+                        if info == []:
+                            info = ["-"]
                         rsid, function = info[0], info[1] if len(info) > 1 else None
                         if self.strand < 0:
                             if ">" in op:
