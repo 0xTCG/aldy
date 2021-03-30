@@ -136,7 +136,7 @@ def main(argv):
         exit(ex.code)
     except Exception as ex:
         log.critical(
-            f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
+            f"ERROR: gene= {args.gene}, file= {args.file if 'file' in args else '-'}"
         )
         log.critical(repr(ex))
         log.warn(traceback.format_exc())
@@ -144,7 +144,7 @@ def main(argv):
     except:  # noqa
         exc = sys.exc_info()[0]
         log.critical(
-            f"ERROR: gene= {args.gene}, profile= {args.profile}, file= {args.file}"
+            f"ERROR: gene= {args.gene}, file= {args.file if 'file' in args else '-'}"
         )
         log.critical("Unrecoverable error: {}", repr(exc))
         log.warn(traceback.format_exc())
