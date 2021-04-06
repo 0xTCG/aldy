@@ -177,13 +177,13 @@ def genotype(
             min_cov=min_cov,
         )
         avg_cov = sample.coverage.average_coverage()
-        if avg_cov < 2:
+        if cn_region and avg_cov < 2:
             raise AldyException(
                 f"Average coverage of {avg_cov:.2f} for gene {gene.name} is too low; "
                 + f"skipping gene {gene.name}. "
                 + f"Please ensure that {gene.name} is present in the input SAM/BAM."
             )
-        elif avg_cov < 20:
+        elif cn_region and avg_cov < 20:
             log.warn(
                 f"Average sample coverage is {avg_cov}. "
                 + "We recommend at least 20x coverage for the best results."
