@@ -399,6 +399,9 @@ class Sample:
             self.sample_name,
             self.min_cov,
         )
+        # for p in coverage:
+        # if len(coverage[p]) > 1:
+        # log.trace('{}: {}', p, {m: v for m,v in coverage[p].items() if v>1})
 
     def _group_indels(self, gene, coverage):
         # Group ambiguous deletions

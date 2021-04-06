@@ -72,6 +72,11 @@ alleles:
     activity: uncertain function
     mutations:
     - [5235, insGAGTCG, rs746071566, V18_V19insGV]
+  NUDT15*6.002:
+    pharmvar: https://www.pharmvar.org/haplotype/351
+    activity: no function
+    mutations:
+    - [5235, insGGAGTC, rs746071566, V18_V19insGV]
   NUDT15*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/360
     activity: uncertain function
@@ -86,7 +91,12 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/345
     activity: no function
     mutations:
-    - [5230, delGAGTCG, rs746071566, del17_18GV]
+    - [5217, delGAGTCG, rs746071566, del17_18GV]
+  NUDT15*9.002:
+    pharmvar: https://www.pharmvar.org/haplotype/345
+    activity: no function
+    mutations:
+    - [5217, delGGAGTC, rs746071566, del17_18GV]
   NUDT15*10.001:
     pharmvar: https://www.pharmvar.org/haplotype/346
     mutations:
