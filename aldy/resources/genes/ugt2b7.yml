@@ -1,58 +1,128 @@
 name: UGT2B7
-version: 'pharmscan'
+version: 'pharmscan / pharmacogenomics.pha.ulaval.ca (2015-04)'
 generated: '2021-03-18'
 ensembl: ENSG00000171234
 alleles:
-  UGT2B7*1:
-    mutations: []
-  UGT2B7*2:
+  UGT2B7*1.001:
+    label: UGT2B7*1a
+    mutations:
+    - [44035, T>C, rs11940316]
+    - [55371, C>T, rs4356975]
+    - [44820, A>G, rs7662029]
+    - [44986, T>C, rs7668258]
+  UGT2B7*1.002:
+    label: UGT2B7*1b
+    mutations:
+    - [45022, T>C, rs7668282]
+  UGT2B7*1.003:
+    label: UGT2B7*1c
+    mutations:
+    - [47179, A>G, rs28365062]
+  UGT2B7*1.004:
+    label: UGT2B7*1d
+    mutations:
+    - [45518, A>G, rs28365063]
+  UGT2B7*1.005:
+    label: UGT2B7*1j
+    mutations:
+    - [47179, A>G, rs28365062]
+    - [44035, T>C, rs11940316]
+    - [44247, G>A, rs7438135]
+    - [44820, A>G, rs7662029]
+    - [44986, T>C, rs7668258]
+  UGT2B7*1.006:
+    label: UGT2B7*1k
+    mutations:
+    - [45518, A>G, rs28365063]
+    - [44035, T>C, rs11940316]
+    - [44247, G>A, rs7438135]
+    - [44820, A>G, rs7662029]
+    - [44986, T>C, rs7668258]
+  UGT2B7*1.007:
+    label: UGT2B7*1.ALDY
+    mutations:
+    - [45022, T>C, rs7668282]
+    - [47179, A>G, rs28365062]
+    - [45518, A>G, rs28365063]
+    - [44035, T>C, rs11940316]
+    - [44247, G>A, rs7438135]
+    - [44820, A>G, rs7662029]
+    - [44986, T>C, rs7668258]
+    - [43295, C>G, rs6600879]
+    - [43388, T>A, rs6600880]
+    - [43463, C>T, rs4554144]
+    - [45009, G>A, rs73823859]
+    - [46852, A>G, rs62298861]
+    - [55371, C>T, rs4356975]
+    - [61809, T>C, rs6600893]
+  UGT2B7*2.001:
+    label: UGT2B7*2a
     mutations:
     - [47246, T>C, rs7439366, H268Y]
-  UGT2B7*3:
+  UGT2B7*2.002:
+    label: UGT2B7*2.ALDY
+    mutations:
+    - [47246, T>C, rs7439366, H268Y]
+    - [45022, T>C, rs7668282]
+    - [47179, A>G, rs28365062]
+    - [45518, A>G, rs28365063]
+    - [44035, T>C, rs11940316]
+    - [44247, G>A, rs7438135]
+    - [44820, A>G, rs7662029]
+    - [44986, T>C, rs7668258]
+    - [43295, C>G, rs6600879]
+    - [43388, T>A, rs6600880]
+    - [43463, C>T, rs4554144]
+    - [45009, G>A, rs73823859]
+    - [46852, A>G, rs62298861]
+    - [55371, C>T, rs4356975]
+    - [61809, T>C, rs6600893]
+  UGT2B7*3.001:
+    label: UGT2B7*3
     mutations:
     - [45357, G>T, rs12233719, A71S]
-  UGT2B7*rs28365062:
+    - [45518, A>G, rs28365063]
+  UGT2B7*3.002:
+    label: UGT2B7*3.ALDY
     mutations:
-    - [47179, A>G, rs28365062, T245=]
-  UGT2B7*rs7438135:
+    - [45357, G>T, rs12233719, A71S]
+    - [45022, T>C, rs7668282]
+    - [47179, A>G, rs28365062]
+    - [45518, A>G, rs28365063]
+    - [44035, T>C, rs11940316]
+    - [44247, G>A, rs7438135]
+    - [44820, A>G, rs7662029]
+    - [44986, T>C, rs7668258]
+    - [43295, C>G, rs6600879]
+    - [43388, T>A, rs6600880]
+    - [43463, C>T, rs4554144]
+    - [45009, G>A, rs73823859]
+    - [46852, A>G, rs62298861]
+    - [55371, C>T, rs4356975]
+    - [61809, T>C, rs6600893]
+  UGT2B7*4.001:
+    label: UGT2B7*4
     mutations:
-    - [44247, G>A, rs7438135, 5prime UTR]
-  UGT2B7*rs4554144:
+    - [47179, A>G, rs28365062]
+    - [47636, G>A, rs145725367, D398N]
+  UGT2B7*4.002:
+    label: UGT2B7*4.ALDY
     mutations:
-    - [43463, C>T, rs4554144, 5prime UTR]
-  UGT2B7*rs4356975:
-    mutations:
-    - [55371, C>T, rs4356975, intron]
-  UGT2B7*rs11940316:
-    mutations:
-    - [44035, T>C, rs11940316, 5prime UTR]
-  UGT2B7*rs7662029:
-    mutations:
-    - [44820, A>G, rs7662029, 5prime UTR]
-  UGT2B7*rs7668258:
-    mutations:
-    - [44986, T>C, rs7668258, 5prime UTR]
-  UGT2B7*rs28365063:
-    mutations:
-    - [45518, A>G, rs28365063, R124=]
-  UGT2B7*rs6600893:
-    mutations:
-    - [61809, T>C, rs6600893, 3prime UTR]
-  UGT2B7*rs62298861:
-    mutations:
-    - [46852, A>G, rs62298861, intron]
-  UGT2B7*rs73823859:
-    mutations:
-    - [45009, G>A, rs73823859, 5prime UTR]
-  UGT2B7*rs6600879:
-    mutations:
-    - [43295, C>G, rs6600879, 5prime UTR]
-  UGT2B7*rs6600880:
-    mutations:
-    - [43388, T>A, rs6600880, 5prime UTR]
-  UGT2B7*rs7668282:
-    mutations:
-    - [45022, T>C, rs7668282, 5prime UTR]
+    - [47636, G>A, rs145725367, D398N]
+    - [45022, T>C, rs7668282]
+    - [47179, A>G, rs28365062]
+    - [45518, A>G, rs28365063]
+    - [44035, T>C, rs11940316]
+    - [44247, G>A, rs7438135]
+    - [44820, A>G, rs7662029]
+    - [44986, T>C, rs7668258]
+    - [43295, C>G, rs6600879]
+    - [43388, T>A, rs6600880]
+    - [43463, C>T, rs4554144]
+    - [45009, G>A, rs73823859]
+    - [46852, A>G, rs62298861]
+    - [55371, C>T, rs4356975]
+    - [61809, T>C, rs6600893]
 structure:
   genes: [UGT2B7]
   regions:
