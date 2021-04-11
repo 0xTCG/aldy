@@ -14,12 +14,11 @@ alleles:
   GSTP1*rs4986949:
     mutations: 
     - [7612, G>T, rs4986949, D147Y]
-  GSTP1*rs8191439:
-    mutations: 
-    - [5232, G>A, rs8191439, 5prime UTR]
   GSTP1*rs8191444:
     mutations: 
     - [5559, C>G, rs8191444, V7=]
+  random:
+  - [5232, G>A, rs8191439, 5prime UTR]
 structure:
   genes: [GSTP1]
   regions:

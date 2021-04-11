@@ -77,6 +77,7 @@ def estimate_minor(
             for sa in gene.alleles[sa.major].minors.values():
                 mutations |= set(sa.neutral_muts)
         mutations |= set(major_sol.added)
+    mutations |= gene.random_mutations
 
     # Filter out low quality mutations
     def default_filter_fn(mut, cov, total, thres):

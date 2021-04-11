@@ -159,6 +159,8 @@ class Gene:
 
     :param mutations:
         Maps ``(position, mutation_type)`` to a corresponding :obj:`Mutation`.
+    :param random_mutations:
+        Set of (silent) mutations that can occur in any allele.
     :param mutation_info:
         Attributes of each mutation.
         These attributes currently consist:
@@ -200,6 +202,7 @@ class Gene:
 
     # Mutations
     mutations: Dict[Tuple[int, str], Tuple[Optional[str], str, int, str]]
+    random_mutations: Set[Tuple[Optional[str], str, int, str]]
 
     # Copy number configurations
     do_copy_number: bool
@@ -520,56 +523,63 @@ class Gene:
         # allele ID of the deletion allele (i.e. whole gene is missing).
         deletion_allele = None
 
+        def process_mutation(pos, op, info):
+            if pos in self.pseudogenes:
+                assert pos == self.pseudogenes[0]  # TODO: relax later
+                if op[-1] == "-":
+                    fusions_left[name] = op[:-1]
+                else:
+                    if op[-1] == "+":
+                        op = op[:-1]
+                    fusions_right[name] = op
+            else:
+                orig_op = op
+                if info == []:
+                    info = ["-"]
+                rsid, function = info[0], info[1] if len(info) > 1 else None
+                if self.strand < 0:
+                    if ">" in op:
+                        l, r = op.split(">")
+                        op = f"{rev_comp(l)}>{rev_comp(r)}"
+                        pos = pos + len(l) - 1
+                    elif op[:3] == "ins":
+                        ins = op[3:]
+                        while self.seq[pos - len(ins) : pos] == ins:
+                            pos -= len(ins)
+                        pos += 1
+                        op = f"ins{rev_comp(op[3:])}"
+                    elif op[:3] == "del":
+                        pos = pos + len(op) - 4
+                        op = f"del{rev_comp(op[3:])}"
+                pos -= 1  # Cast to 0-based index
+                if pos not in self.ref_to_chr:
+                    log.warn(f"Ignoring {pos}.{op} in {name} (not in {self.refseq})")
+                elif self.region_at(self.ref_to_chr[pos]) is None:
+                    log.warn(f"Ignoring {pos}.{op} in {name} (not in named region)")
+                else:
+                    self.mutations.setdefault(
+                        (self.ref_to_chr[pos], op),
+                        (function, rsid, pos, orig_op),
+                    )
+                    yield Mutation(self.ref_to_chr[pos], op)
+
         self.mutations = {}
+        self.random_mutations = set()
         for name, allele in yml["alleles"].items():
+            if name == "random":
+                for pos, op, *info in allele:
+                    for m in process_mutation(pos, op, info):
+                        self.random_mutations.add(m)
+                continue
             name = allele_name(name)
             mutations: Set[Mutation] = set()
             if [self.name, "deletion"] in allele["mutations"]:
                 deletion_allele = name
             else:
                 for pos, op, *info in allele["mutations"]:
-                    if pos in self.pseudogenes:
-                        assert pos == self.pseudogenes[0]  # TODO: relax later
-                        if op[-1] == "-":
-                            fusions_left[name] = op[:-1]
-                        else:
-                            if op[-1] == "+":
-                                op = op[:-1]
-                            fusions_right[name] = op
-                    else:
-                        orig_op = op
-                        if info == []:
-                            info = ["-"]
-                        rsid, function = info[0], info[1] if len(info) > 1 else None
-                        if self.strand < 0:
-                            if ">" in op:
-                                l, r = op.split(">")
-                                op = f"{rev_comp(l)}>{rev_comp(r)}"
-                                pos = pos + len(l) - 1
-                            elif op[:3] == "ins":
-                                ins = op[3:]
-                                while self.seq[pos - len(ins) : pos] == ins:
-                                    pos -= len(ins)
-                                pos += 1
-                                op = f"ins{rev_comp(op[3:])}"
-                            elif op[:3] == "del":
-                                pos = pos + len(op) - 4
-                                op = f"del{rev_comp(op[3:])}"
-                        pos -= 1  # Cast to 0-based index
-                        if pos not in self.ref_to_chr:
-                            log.warn(
-                                f"Ignoring {pos}.{op} in {name} (not in {self.refseq})"
-                            )
-                        elif self.region_at(self.ref_to_chr[pos]) is None:
-                            log.warn(
-                                f"Ignoring {pos}.{op} in {name} (not in named region)"
-                            )
-                        else:
-                            mutations.add(Mutation(self.ref_to_chr[pos], op))
-                            self.mutations.setdefault(
-                                (self.ref_to_chr[pos], op),
-                                (function, rsid, pos, orig_op),
-                            )
+                    for m in process_mutation(pos, op, info):
+                        mutations.add(m)
+
             alt_name = allele.get("label", None)
             if alt_name:
                 alt_name = allele_name(alt_name)

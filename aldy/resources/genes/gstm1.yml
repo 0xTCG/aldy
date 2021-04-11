@@ -20,18 +20,11 @@ alleles:
   GSTM1*9233CA:
     mutations: 
     - [9233, C>A, '-', functional]
-  GSTM1*rs737497:
-    mutations: 
-    - [6175, T>C, rs737497, intron]
-  GSTM1*rs2239892:
-    mutations: 
-    - [8869, A>G, rs2239892, intron]
-  GSTM1*rs12097277:
-    mutations: 
-    - [9153, G>A, rs12097277, intron]
-  GSTM1*rs538603890:
-    mutations: 
-    - [8373, G>A, rs538603890, intron]
+  random:
+  - [6175, T>C, rs737497]
+  - [8869, A>G, rs2239892]
+  - [9153, G>A, rs12097277]
+  - [8373, G>A, rs538603890]
 structure:
   genes: [GSTM1]
   regions:

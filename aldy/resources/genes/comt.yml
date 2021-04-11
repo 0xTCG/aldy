@@ -20,72 +20,35 @@ alleles:
   COMT*rs6269:
     mutations: 
     - [25690, A>G, rs6269, SolublePromoter]
-  COMT*rs165599:
-    mutations: 
-    - [32519, G>A, rs165599, 3'UTR]
-  COMT*rs165728:
-    mutations: 
-    - [32761, C>T, rs165728, 3'UTR]
-  COMT*rs174699:
-    mutations: 
-    - [30196, C>T, rs174699, downstream]
-  COMT*rs737864:
-    mutations: 
-    - [5897, C>T, rs737864, upstream]
-  COMT*rs737865:
-    mutations: 
-    - [5859, A>G, rs737865, upstream]
-  COMT*rs737866:
-    mutations: 
-    - [5847, T>C, rs737866, upstream]
-  COMT*rs740603:
-    mutations: 
-    - [20915, A>G, rs740603, upstream]
   COMT*rs769224:
     mutations: 
     - [27542, G>A, rs769224, P199=]
-  COMT*rs933271:
-    mutations: 
-    - [7145, T>C, rs933271, upstream]
-  COMT*rs2020917:
-    mutations: 
-    - [4622, C>T, rs2020917, upstream]
-  COMT*rs2239393:
-    mutations: 
-    - [26166, A>G, rs2239393, upstream]
-  COMT*rs4646312:
-    mutations: 
-    - [24075, T>C, rs4646312, upstream]
-  COMT*rs4646316:
-    mutations: 
-    - [27870, C>T, rs4646316, intron]
   COMT*rs5031015:
     mutations: 
     - [26841, G>A, rs5031015, A102T]
-  COMT*rs5746849:
-    mutations: 
-    - [18735, A>G, rs5746849, upstream]
   COMT*rs8192488:
     mutations: 
-    - [26975, C>T, rs8192488, A146=]
-  COMT*rs9332377:
-    mutations: 
-    - [31430, C>T, rs9332377, downstream]
-  COMT*rs13306278:
-    mutations: 
-    - [4765, C>T, rs13306278, upstream]
-  COMT*rs34068292:
-    mutations: 
-    - [27962, T>C, rs34068292, intron]
-  COMT*rs35788262:
-    mutations: 
-    - [16321, G>A, rs35788262, upstream]
-  COMT*rs45616631:
-    mutations: 
-    - [6548, T>C, rs45616631, upstream]
-  COMT*rs74451762:
-    mutations: 
-    - [17441, C>T, rs74451762, upstream]
+    - [26975, C>T, rs8192488, A146=]  
+  random:
+  - [27962, T>C, rs34068292]
+  - [27870, C>T, rs4646316]
+  - [30196, C>T, rs174699]
+  - [31430, C>T, rs9332377]
+  - [5897, C>T, rs737864]
+  - [5859, A>G, rs737865]
+  - [5847, T>C, rs737866]
+  - [20915, A>G, rs740603]
+  - [7145, T>C, rs933271]
+  - [4622, C>T, rs2020917]
+  - [26166, A>G, rs2239393]
+  - [24075, T>C, rs4646312]
+  - [18735, A>G, rs5746849]
+  - [4765, C>T, rs13306278]
+  - [16321, G>A, rs35788262]
+  - [6548, T>C, rs45616631]
+  - [17441, C>T, rs74451762]
+  - [32519, G>A, rs165599]
+  - [32761, C>T, rs165728]
 structure:
   genes: [COMT]
   regions:
