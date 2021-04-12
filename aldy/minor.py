@@ -5,12 +5,12 @@
 
 from typing import List, Set, Callable, Optional, Tuple, Dict
 
+from os import environ
 from natsort import natsorted
 from . import lpinterface
 from .common import log, json
 from .gene import Mutation, Gene
 from .cn import MAX_CN
-from .major import NOVEL_MUTATION_PENAL
 from .coverage import Coverage
 from .solutions import MajorSolution, SolvedAllele, MinorSolution
 from .diplotype import estimate_diplotype
@@ -74,8 +74,8 @@ def estimate_minor(
                 SolvedAllele(gene, sa.major, mi) for mi in gene.alleles[sa.major].minors
             ]
             mutations |= set(gene.alleles[sa.major].func_muts)
-            for sa in gene.alleles[sa.major].minors.values():
-                mutations |= set(sa.neutral_muts)
+            for minor in gene.alleles[sa.major].minors.values():
+                mutations |= set(minor.neutral_muts)
         mutations |= set(major_sol.added)
     mutations |= gene.random_mutations
 
@@ -525,7 +525,7 @@ def solve_minor_model(
     if not results:
         log.debug("[minor] solution= []")
         debug_info["sol"] = []
-        if debug and False:  # Enable to debug infeasible models
+        if debug and "ALDY_IIS" in environ:  # Enable to debug infeasible models
             model.model.computeIIS()
             model.dump(f"{debug}.iis.ilp")
     return sorted(results.values(), key=lambda x: str(x.get_minor_diplotype()))

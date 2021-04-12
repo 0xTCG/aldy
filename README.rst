@@ -9,6 +9,7 @@
    <a href="https://aldy.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/aldy/badge/?version=latest" alt="ReadTheDocs"/></a>
    <a href="https://codecov.io/github/0xTCG/aldy"><img src="https://codecov.io/github/0xTCG/aldy/coverage.svg?branch=master" alt="Code Coverage"/></a>
    <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black"/></a>
+   <a href="https://lgtm.com/projects/g/0xTCG/aldy/context:python"><img src="https://img.shields.io/lgtm/grade/python/g/0xTCG/aldy.svg?logo=lgtm&logoWidth=18" alt="Language grade: Python"/></a>
   <br/>
   <b><i>A quick and nifty tool for genotyping and phasing popular pharmacogenes.</i></b>
   </p>
@@ -123,7 +124,11 @@ Gene Support
      - ❓
    * - *CFTR*
      - PharmGKB (Jun 2020)
-     - ⚠️ (not tested on real data yet)
+     - ✅
+     - ❓
+   * - *COMT*
+     - Pharmacoscan
+     - ✅
      - ❓
    * - *DPYD*
      - PharmVar 4.1.7
@@ -133,21 +138,29 @@ Gene Support
      - PharmGKB (Sep 2018)
      - ✅
      - ❓
+   * - *GSTM1*
+     - Pharmacoscan
+     - ✅
+     - ❓
+   * - *GSTP1*
+     - Pharmacoscan
+     - ✅
+     - ❓
    * - *IFNL3*
      - PharmGKB
-     - ⚠️ (not tested on real data yet)
+     - ✅
      - ❓
    * - *NAT1*
      - PharmGKB (Mar 2014)
-     - ⚠️ (not tested on real data yet)
+     - ✅
      - ❓
    * - *NAT2*
      - PharmGKB (Mar 2014)
-     - ⚠️ (not tested on real data yet)
+     - ✅
      - ❓
    * - *NUDT15*
      - PharmVar 4.1.7
-     - ⚠️ (not tested on real data yet)
+     - ✅
      - ❓
    * - *SLCO1B1*
      - PharmGKB (Oct 2019)
@@ -159,7 +172,15 @@ Gene Support
      - ❓
    * - *UGT1A1*
      - PharmGKB (Feb 2020)
-     - ⚠️ (not tested on real data yet)
+     - ✅
+     - ❓
+   * - *UGT2B7*
+     - pharmacogenomics.pha.ulaval.ca (Apr 2015) / Pharmacoscan
+     - ✅
+     - ❓
+   * - *VKORC1*
+     - PharmGKB (Jan 2021)
+     - ✅
      - ❓
 
 ⚠️ Warning

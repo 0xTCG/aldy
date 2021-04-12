@@ -149,7 +149,7 @@ def genotype(
         cn_solution = ["1", "1"]
         profile = "illumina"
         if not min_cov:
-            min_cov = 5.0
+            min_cov = "5.0"
     elif profile == "wgs":
         profile = "illumina"
     elif profile == "pgrnseq-v1":
@@ -158,7 +158,6 @@ def genotype(
         profile = "pgx2"
     elif profile == "pgrnseq-v3":
         profile = "pgx3"
-    min_cov = float(min_cov) if min_cov else 1.0
 
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
@@ -174,7 +173,7 @@ def genotype(
             reference=reference,
             cn_region=None if cn_solution else cn_region,
             debug=debug,
-            min_cov=min_cov,
+            min_cov=float(min_cov) if min_cov else 1.0,
         )
         avg_cov = sample.coverage.average_coverage()
         if cn_region and avg_cov < 2:
