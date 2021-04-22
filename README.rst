@@ -10,6 +10,7 @@
    <a href="https://codecov.io/github/0xTCG/aldy"><img src="https://codecov.io/github/0xTCG/aldy/coverage.svg?branch=master" alt="Code Coverage"/></a>
    <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black"/></a>
    <a href="https://lgtm.com/projects/g/0xTCG/aldy/context:python"><img src="https://img.shields.io/lgtm/grade/python/g/0xTCG/aldy.svg?logo=lgtm&logoWidth=18" alt="Language grade: Python"/></a>
+   <a href="https://www.nature.com/articles/s41467-018-03273-1"><img src="https://img.shields.io/badge/Published%20in-Nature%20Communications-red.svg" alt="Published in Nature Communications" /></a>
   <br/>
   <b><i>A quick and nifty tool for genotyping and phasing popular pharmacogenes.</i></b>
   </p>
