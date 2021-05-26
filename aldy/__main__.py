@@ -406,7 +406,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 gap=float(args.gap),
                 max_minor_solutions=int(args.max_minor_solutions),
                 debug=debug,
-                multiple_warn_level=args.multiple_warn_level,
+                multiple_warn_level=int(args.multiple_warn_level),
                 phase=args.phase,
                 report=True,
                 min_cov=args.min_coverage,
