@@ -103,7 +103,8 @@ class Coverage:
     #             o: c
     #             for o, c in pos_mut.items()
     #             if filter_fn
-    #             and not filter_fn(Mutation(pos, o), c, self.total(pos), self._threshold)
+    #             and not filter_fn(Mutation(pos, o), c, self.total(pos),
+    #             self._threshold)
     #         }
     #         if len(z):
     #             s.append(f"{pos}: {z} {self._threshold} {self.total(pos)}")
