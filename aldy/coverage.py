@@ -96,6 +96,19 @@ class Coverage:
             len(self._coverage) + 0.1
         )
 
+    def dump(self, filter_fn=None):
+        s = []
+        for pos, pos_mut in self._coverage.items():
+            z = {
+                o: c
+                for o, c in pos_mut.items()
+                if filter_fn
+                and not filter_fn(Mutation(pos, o), c, self.total(pos), self._threshold)
+            }
+            if len(z):
+                s.append(f"{pos}: {z} {self._threshold} {self.total(pos)}")
+        return "\n".join(s)
+
     def filtered(
         self, filter_fn: Callable[[Mutation, float, float, float], bool]
     ):  # -> Coverage
