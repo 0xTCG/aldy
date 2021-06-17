@@ -25,7 +25,7 @@ jobs:
       run: |
         sudo apt-get install libgfortran4
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest pytest-cov codecov black mypy
+        python -m pip install flake8 pytest pytest-cov codecov black mypy types-pkg_resources types-pyyaml
         python -m pip install setuptools wheel twine
         # SCIP
         export VERSION=7.0.1
