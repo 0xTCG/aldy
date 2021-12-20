@@ -1,0 +1,23 @@
+COMT: [NO IDEA]
+  ValB
+  ValA
+  ValC
+  ValD
+  ValE
+  Met
+  MetB
+CYP2B6: 
+  *18.002
+NAT2:
+  *5X
+  *5Y
+  *6V
+  *12O
+  *13D
+  *13F
+  *14K
+  *14K
+TPMT:
+  *3D
+UGT2B7:
+  *2g
