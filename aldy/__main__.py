@@ -27,7 +27,6 @@ from .sam import load_sam_profile
 from .genotype import genotype
 from .query import query
 from .version import __version__
-from .pharmacoscan import compare
 
 
 def get_version():
@@ -122,6 +121,7 @@ def main(argv):
             if output and output != sys.stdout:
                 output.close()
         elif args.subparser == "compare-pharmacoscan":
+            from .pharmacoscan import compare
             compare(*args.input)
         else:
             raise AldyException("Invalid sub-command " + args.subparser)
