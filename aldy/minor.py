@@ -40,7 +40,6 @@ def estimate_minor(
     filter_fn: Optional[Callable] = None,
     max_solutions: int = 1,
     debug: Optional[str] = None,
-    phases: Optional[List[List[Mutation]]] = None,
     novel: bool = False,
 ) -> List[MinorSolution]:
     """
@@ -131,7 +130,6 @@ def estimate_minor(
                 i,
                 max_solutions,
                 debug,
-                phases,
             )
     return minor_sols
 
@@ -146,7 +144,6 @@ def solve_minor_model(
     identifier: int = 0,
     max_solutions: int = 1,
     debug: Optional[str] = None,
-    phases: Optional[List[List[Mutation]]] = None,
 ) -> List[MinorSolution]:
     """
     Solves the minor star-allele detection problem via integer linear programming.
@@ -394,12 +391,12 @@ def solve_minor_model(
     VPHASEERR = []
     VPHASE = {}
     PHx = {}
-    if phases:
+    if coverage.phases:
         log.info("Using phasing information")
         poss = {m.pos for m in mutations}
         phases = [
             [m for m in p if m in mutations or (m.op == "_" and m.pos in poss)]
-            for p in phases
+            for p in coverage.phases
         ]
         VPHASE = {
             pi: {a: model.addVar(vtype="B", name=f"PHASE_{pi}_{a[1]}") for a in alleles}
@@ -472,7 +469,7 @@ def solve_minor_model(
     # Solve the model
     results = {}
     for status, opt, sol in model.solutions():
-        if phases:
+        if coverage.phases:
             assignments = {a: set() for a in alleles}
             for p, _ in enumerate(phases):
                 a = next(a for a in VPHASE[p] if model.getValue(VPHASE[p][a]))

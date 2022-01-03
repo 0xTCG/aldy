@@ -51,6 +51,7 @@ class Coverage:
         self.min_cov = min_cov
 
         self._region_coverage: Dict[Tuple[int, str], float] = {}
+        self.phases = []
 
     def __getitem__(self, mut: Mutation) -> float:
         """ :return: Coverage of the mutation ``mut``. """
@@ -155,6 +156,8 @@ class Coverage:
             self.min_cov,
         )
         new_cov._region_coverage = self._region_coverage
+        new_cov.fragments = self.fragments[:]
+        new_cov.phases = self.phases[:]
         return new_cov
 
     def diploid_avg_coverage(self) -> float:
@@ -229,3 +232,78 @@ class Coverage:
         total = total / cn if cn > 0 else total
 
         return mut.op == "_" or cov >= max(min_cov, total * thres)
+
+    def load_phase(self, gene):
+        """Loads a HapTree-X/HapCUT2 phase file."""
+
+        import subprocess, os, tempfile
+
+
+        phases: List[List[Mutation]] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            snps = {}
+            for read in self.fragments:
+                for pos, op in read:
+                    snps.setdefault(pos, set()).add(op)
+            snps = {pos: ops for pos, ops in snps.items() if len(ops) > 1}
+            frags = {}
+            for read in self.fragments:
+                key = tuple(sorted([(pos, op) for pos, op in read if pos in snps]))
+                if key not in frags:
+                    frags[key] = 0
+                frags[key] += 1
+
+            frag_file = f'{tmp}/fragments.txt'
+            with open(frag_file, 'w') as fo:
+                for s, c in frags.items():
+                    fo.write(f'{c}')
+                    for p, a in s:
+                        fo.write(f';{p},{a}')
+                    fo.write('\n')
+
+            phase_file = f'{tmp}/phase.txt'
+            ret = subprocess.run(
+                ['haptreex', '--aldy', frag_file, '-o', phase_file],
+                env={
+                    **os.environ,
+                    'OMP_NUM_THREADS': '1'
+                }
+            )
+            if ret.returncode != 0:
+                raise AldyException(
+                    'HapTree-X failed: {}',
+                    ret.stderr.decode('ascii') if ret.stderr else ''
+                )
+            log.debug('HapTree-X done')
+
+            haplotypes: Tuple[List[Mutation], List[Mutation]] = ([], [])
+            _, g_s, g_e = gene.get_wide_region()
+            with open(phase_file) as hap:
+                for li, line in enumerate(hap):
+                    if line[:5] == "BLOCK":
+                        if haplotypes[0]:
+                            phases += list(haplotypes)
+                        haplotypes = [], []
+                    elif line[:5] == "*****":
+                        continue
+                    else:
+                        ls = line.strip().split("\t")
+                        if len(ls) < 7:
+                            raise AldyException(f"Invalid phasing line {li + 1}")
+                        _, gt0_, gt1_, _, pos_, al0, al1, *_ = ls
+                        gt0, gt1, pos = int(gt0_), int(gt1_), int(pos_) - 1
+                        if gt0 + gt1 != 1:
+                            continue
+                        if pos < g_s or pos >= g_e:
+                            continue
+
+                        if (pos, f"{al0}>{al1}") not in gene.mutations:
+                            if (pos, f"{al1}>{al0}") in gene.mutations:
+                                log.warn(f"reorienting {pos} {al0} {al1}")
+                                al1, al0 = al0, al1
+                                gt0, gt1 = gt1, gt0
+                        haplotypes[0].append(Mutation(pos, f"{al0}>{al1}" if gt0 else "_"))
+                        haplotypes[1].append(Mutation(pos, f"{al0}>{al1}" if gt1 else "_"))
+            if haplotypes[0]:
+                phases += [haplotypes[0], haplotypes[1]]
+        self.phases = phases

@@ -221,8 +221,6 @@ def genotype(
         log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
 
-    phases = sam.load_phase(gene, phase) if phase else None
-
     for i, cn_sol in enumerate(cn_sols):
         major_sols += major.estimate_major(
             gene,
@@ -267,7 +265,6 @@ def genotype(
         solver,
         max_solutions=max_minor_solutions,
         debug=debug,
-        phases=phases,
     ):
         n = solutions.MinorSolution(
             m.score

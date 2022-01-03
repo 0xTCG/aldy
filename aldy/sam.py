@@ -37,6 +37,16 @@ DEFAULT_CN_NEUTRAL_REGION = {
 
 
 @dataclass
+class Fragment:
+    snps: Dict[int, str]  # Location -> Allele
+    count: int  # Support
+    special_snp: int
+    rates: List[float]
+
+    def __eq__(self, other):
+        return self.snps == other.snps
+
+@dataclass
 class Sample:
     """
     Interface for reading SAM/BAM/CRAM files that parses and stores read alignments.
@@ -52,6 +62,8 @@ class Sample:
     _multi_sites: Dict[int, str]
     _dump: Tuple[Dict[int, int], List[Tuple[Tuple[int, int, int], List[Mutation]]]]
 
+    # Phasing data
+
     def __init__(
         self,
         gene: Gene,
@@ -63,6 +75,7 @@ class Sample:
         debug: Optional[str] = None,
         vcf_path: Optional[str] = None,
         min_cov: float = 1.0,
+        phase: bool = True
     ):
         """
         Initialize a :obj:`Sample` object.
@@ -109,6 +122,7 @@ class Sample:
             if ">" in m.op and len(m.op) > 3
         }
 
+        has_index = False
         assert vcf_path or (sam_path and profile)
         if vcf_path:
             try:
@@ -119,8 +133,12 @@ class Sample:
             norm, muts = self._load_dump(sam_path)
         else:
             assert sam_path
-            norm, muts = self._load_sam(sam_path, gene, reference, cn_region, debug)
+            has_index, norm, muts = self._load_sam(sam_path, gene, reference, cn_region, debug)
         self._make_coverage(gene, norm, muts, threshold)
+
+        self.coverage.fragments = []
+        if has_index and phase:
+            self.coverage.fragments = self._get_phases(sam_path, gene, reference, muts)
 
         if cn_region:
             assert profile
@@ -188,12 +206,13 @@ class Sample:
                         self._dump[0][start + i] += 1
                     start += size
 
+        has_index = True
         with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
             # Check do we have proper index to speed up the queries
             try:
                 sam.check_index()
             except AttributeError:
-                pass  # SAM files do not have an index. BAMs might also lack it
+                has_index = False  # SAM files do not have an index. BAMs might also lack it
             except ValueError:
                 raise AldyException(f"File {sam_path} has no index")
 
@@ -225,7 +244,7 @@ class Sample:
                     self._dump[1].append(r)
         if debug:
             self._dump_alignments(debug)
-        return norm, muts
+        return has_index, norm, muts
 
     def _load_vcf(self, vcf_path: str, gene: Gene):
         """
@@ -508,10 +527,7 @@ class Sample:
         start, s_start = read.reference_start, 0
         for op, size in read.cigartuples:
             if op == 2:  # Deletion
-                mut = (
-                    start,
-                    "del" + gene[start : start + size],
-                )
+                mut = (start, "del" + gene[start : start + size])
                 muts[mut] += 1
                 dump_arr.append(mut)
                 start += size
@@ -602,6 +618,84 @@ class Sample:
             log.debug(f"[sam] rescale {mut} from {orig_cov} to {new_cov}")
             return new_cov
         return orig_cov
+
+    def _get_phases(self, sam_path, gene, reference, max_insert=1000):
+        index = sorted(p for p, m in self.coverage._coverage.items() if len(m) > 1)
+        fragments = []
+
+        def add(lo, *args):
+            frag = {}
+            for r in args:
+                start, s_start = r.reference_start, 0
+                for op, size in r.cigartuples:
+                    if op == 2:  # Deletion
+                        # frag.setdefault(start, set()).add("del" + str(size))
+                        start += size
+                    elif op == 1:  # Insertion
+                        # if r.query_qualities[s_start] >= 10:
+                            # frag.setdefault(start, set()).add("ins" + str(size))
+                        s_start += size
+                    elif op == 4:  # Soft-clip
+                        s_start += size
+                    elif op in [0, 7, 8]:  # M, X and =
+                        for i in range(size):
+                            while lo < len(index) and index[lo] < start + i:
+                                lo += 1
+                            if lo < len(index) and index[lo] == start + i:
+                                if r.query_qualities[s_start + i] >= 10:
+                                    frag.setdefault(start + i, set()).add(
+                                        r.query_sequence[s_start + i]
+                                    )
+                        start += size
+                        s_start += size
+            read = []
+            for pos, snps in frag.items():
+                if len(snps) == 1:  # avoid contradicting pairs
+                    read.append((pos, snps.pop()))
+            if len(read) > 1:  # links at least 2 mutations
+                fragments.append(read)
+
+
+        with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
+            sam.check_index()
+
+            vlo = 0
+            seen = {}
+            # Fetch the reads
+            for r in sam.fetch(
+                region=gene.get_wide_region().samtools(prefix=self._prefix)
+            ):
+                if not _in_region(gene.get_wide_region(), r, self._prefix):
+                    continue  # ensure that it is a proper gene read
+                if not r.cigartuples:  # only valid alignments
+                    continue
+                if r.is_supplementary or r.is_secondary or r.is_duplicate:
+                    continue
+                if "H" in r.cigarstring:  # avoid hard-clipped reads
+                    continue
+
+                # any SNPs here?
+                while index[vlo] < r.reference_start:
+                    vlo += 1
+                if index[vlo] >= r.reference_end:
+                    continue
+
+                name = r.query_name
+                if len(name) > 2 and (name[-2] == '#' or name[-2] == '/'):
+                    name = name[:-2]
+
+                if r.mate_is_unmapped or r.reference_id != r.next_reference_id or r.insert_size > max_insert:
+                    add(vlo, r)
+                elif name in seen: # Paired reads
+                    add(vlo, seen[name], r)
+                    del seen[name]
+                elif r.mate_pos < r.pos: # already seen but not added
+                    add(vlo, r)
+                else:
+                    seen[name] = r
+
+        return fragments
+
 
     # ----------------------------------------------------------------------------------
     # Coverage-rescaling functions
@@ -863,46 +957,3 @@ def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
         and read.reference_name == prefix + region.chr
         and region.start - 500 <= read.reference_start <= region.end
     )
-
-
-def load_phase(gene: Gene, path: str):
-    """Loads a HapTree-X/HapCUT2 phase file."""
-
-    haplotypes: Tuple[List[Mutation], List[Mutation]] = ([], [])
-    phases: List[List[Mutation]] = []
-
-    g_chr, g_s, g_e = gene.get_wide_region()
-    with open(path) as hap:
-        for li, line in enumerate(hap):
-            if line[:5] == "BLOCK":
-                if haplotypes[0]:
-                    phases += list(haplotypes)
-                haplotypes = [], []
-            elif line[:5] == "*****":
-                continue
-            else:
-                ls = line.strip().split("\t")
-                if len(ls) < 7:
-                    raise AldyException(
-                        f"Invalid phasing line {li + 1} in {path} (less than 7 columns)"
-                    )
-                _, gt0_, gt1_, chr, pos_, al0, al1, *_ = ls
-                gt0, gt1, pos = int(gt0_), int(gt1_), int(pos_) - 1
-                if gt0 + gt1 != 1:
-                    continue
-                chr = chr[3:] if chr.startswith("chr") else chr
-                if chr != g_chr:
-                    continue
-                if pos < g_s or pos >= g_e:
-                    continue
-
-                if (pos, f"{al0}>{al1}") not in gene.mutations:
-                    if (pos, f"{al1}>{al0}") in gene.mutations:
-                        log.warn(f"reorienting {pos} {al0} {al1}")
-                        al1, al0 = al0, al1
-                        gt0, gt1 = gt1, gt0
-                haplotypes[0].append(Mutation(pos, f"{al0}>{al1}" if gt0 else "_"))
-                haplotypes[1].append(Mutation(pos, f"{al0}>{al1}" if gt1 else "_"))
-    if haplotypes[0]:
-        phases += [haplotypes[0], haplotypes[1]]
-    return phases

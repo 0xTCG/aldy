@@ -63,6 +63,8 @@ def estimate_major(
         )
 
     alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
+    coverage.load_phase(gene)
+
     # Check if some CN solution has no matching allele
     if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):
         results: List[MajorSolution] = []
