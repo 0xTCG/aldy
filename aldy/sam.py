@@ -13,6 +13,7 @@ import re
 import yaml
 import gzip
 import struct
+import tarfile
 
 from dataclasses import dataclass
 from collections import defaultdict
@@ -129,7 +130,9 @@ class Sample:
                 norm, muts = self._load_vcf(vcf_path, gene)
             except ValueError:
                 raise AldyException(f"VCF {vcf_path} is not indexed")
-        elif sam_path and sam_path[-5:] == ".dump":
+        elif sam_path and sam_path.endswith(".dump"):
+            norm, muts = self._load_dump(sam_path)
+        elif sam_path and sam_path.endswith(".tar.gz"):
             norm, muts = self._load_dump(sam_path)
         else:
             assert sam_path
@@ -325,61 +328,73 @@ class Sample:
     def _load_dump(self, dump_path: str):
         log.debug("[dump] path= {}", os.path.abspath(dump_path))
 
+        if dump_path.endswith('.tar.gz'):
+            tar = tarfile.open(dump_path, 'r:gz')
+
+            f = [i for i in tar.getnames() if i.endswith('.dump')]
+            if not f:
+                raise AldyException('Invalid dump file')
+            log.debug('Found {} in the archive', f[0])
+            fd = gzip.open(tar.extractfile(f[0]))
+        else:
+            fd = gzip.open(dump_path, "rb")
+
         self.sample_name = "DUMP"
         norm: dict = defaultdict(int)
         muts: dict = defaultdict(int)
-        with gzip.open(dump_path, "rb") as fd:
-            log.warn("Loading debug dump from {}", dump_path)
-            l, h, i = (
-                struct.calcsize("<l"),
-                struct.calcsize("<h"),
-                struct.calcsize("<i"),
-            )
-            cn_len = struct.unpack("<l", fd.read(l))[0]
-            for _ in range(cn_len):
-                i, v = struct.unpack("<ll", fd.read(l + l))
-                self._dump[0][i] = v
 
-            ld = struct.unpack("<l", fd.read(l))[0]
-            for _ in range(ld):
-                ref_start, ref_end, read_len, num_mutations = struct.unpack(
-                    "<llhh", fd.read(l + l + h + h)
-                )
-                ref_end += ref_start
-                for j in range(ref_start, ref_end):
-                    norm[j] += 1
-                mut_set = set()
-                for _ in range(num_mutations):
-                    mut_start, op_len = struct.unpack("<hh", fd.read(h + h))
-                    mut_start += ref_start
-                    op = fd.read(op_len).decode("ascii")
-                    muts[mut_start, op] += 1
-                    mut_set.add((mut_start, op))
-                    if op[:3] == "del":
-                        for j in range(0, len(op) - 3):
-                            norm[mut_start + j] -= 1
-                    elif op[:3] == "ins":
-                        self._insertion_counts[mut_start, len(op) - 3] += 1
-                    else:
-                        norm[mut_start] -= 1
-                mut_set_pos = {p for p, _ in mut_set}
-                for pos, op in self._multi_sites.items():
-                    if pos not in mut_set_pos:
-                        continue
-                    ll, r = op.split(">")
-                    if all(
-                        (pos + p, f"{ll[p]}>{r[p]}") in mut_set
-                        for p in range(len(ll))
-                        if ll[p] != "."
-                    ):
-                        for p in range(len(ll)):
-                            if ll[p] != ".":
-                                muts[pos + p, f"{ll[p]}>{r[p]}"] -= 1
-                                if p:
-                                    norm[pos + p] += 1
-                        muts[pos, op] += 1
-                for data in self._insertion_reads.values():
-                    data[ref_start, ref_end, read_len] += 1
+        log.warn("Loading debug dump from {}", dump_path)
+        l, h, i = (
+            struct.calcsize("<l"),
+            struct.calcsize("<h"),
+            struct.calcsize("<i"),
+        )
+        cn_len = struct.unpack("<l", fd.read(l))[0]
+        for _ in range(cn_len):
+            i, v = struct.unpack("<ll", fd.read(l + l))
+            self._dump[0][i] = v
+
+        ld = struct.unpack("<l", fd.read(l))[0]
+        for _ in range(ld):
+            ref_start, ref_end, read_len, num_mutations = struct.unpack(
+                "<llhh", fd.read(l + l + h + h)
+            )
+            ref_end += ref_start
+            for j in range(ref_start, ref_end):
+                norm[j] += 1
+            mut_set = set()
+            for _ in range(num_mutations):
+                mut_start, op_len = struct.unpack("<hh", fd.read(h + h))
+                mut_start += ref_start
+                op = fd.read(op_len).decode("ascii")
+                muts[mut_start, op] += 1
+                mut_set.add((mut_start, op))
+                if op[:3] == "del":
+                    for j in range(0, len(op) - 3):
+                        norm[mut_start + j] -= 1
+                elif op[:3] == "ins":
+                    self._insertion_counts[mut_start, len(op) - 3] += 1
+                else:
+                    norm[mut_start] -= 1
+            mut_set_pos = {p for p, _ in mut_set}
+            for pos, op in self._multi_sites.items():
+                if pos not in mut_set_pos:
+                    continue
+                ll, r = op.split(">")
+                if all(
+                    (pos + p, f"{ll[p]}>{r[p]}") in mut_set
+                    for p in range(len(ll))
+                    if ll[p] != "."
+                ):
+                    for p in range(len(ll)):
+                        if ll[p] != ".":
+                            muts[pos + p, f"{ll[p]}>{r[p]}"] -= 1
+                            if p:
+                                norm[pos + p] += 1
+                    muts[pos, op] += 1
+            for data in self._insertion_reads.values():
+                data[ref_start, ref_end, read_len] += 1
+        fd.close()
         return norm, muts
 
     def _make_coverage(self, gene, norm, muts, threshold):

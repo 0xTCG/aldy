@@ -120,9 +120,6 @@ def main(argv):
                 _genotype(gene, output, args)
             if output and output != sys.stdout:
                 output.close()
-        elif args.subparser == "compare-pharmacoscan":
-            from .pharmacoscan import compare
-            compare(*args.input)
         else:
             raise AldyException("Invalid sub-command " + args.subparser)
     except IOError as ex:
@@ -355,11 +352,6 @@ def _get_args(argv):
     _ = subparsers.add_parser(
         "help", parents=[base], help="Show program usage and exit."
     )
-
-    cp = subparsers.add_parser(
-        "compare-pharmacoscan", parents=[base], help="Show program usage and exit."
-    )
-    cp.add_argument("input", nargs="+")
 
     return parser, parser.parse_args(argv)
 
