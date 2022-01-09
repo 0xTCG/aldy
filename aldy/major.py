@@ -63,7 +63,8 @@ def estimate_major(
         )
 
     alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
-    coverage.load_phase(gene)
+    if len(cn_solution.solution) == 1 and '1' in cn_solution.solution:
+        coverage.load_phase(gene, ploidy=cn_solution.solution['1'])
 
     # Check if some CN solution has no matching allele
     if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):

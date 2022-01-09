@@ -18,7 +18,7 @@ import tarfile
 from dataclasses import dataclass
 from collections import defaultdict
 from natsort import natsorted
-from .common import log, GRange, AldyException, script_path
+from .common import log, GRange, AldyException, script_path, Timing
 from .coverage import Coverage
 from .gene import Gene, Mutation
 
@@ -36,16 +36,6 @@ DEFAULT_CN_NEUTRAL_REGION = {
 }
 """Default copy-number neutral region (exon 4-6 of the CYP2D8 gene)"""
 
-
-@dataclass
-class Fragment:
-    snps: Dict[int, str]  # Location -> Allele
-    count: int  # Support
-    special_snp: int
-    rates: List[float]
-
-    def __eq__(self, other):
-        return self.snps == other.snps
 
 @dataclass
 class Sample:
@@ -76,7 +66,7 @@ class Sample:
         debug: Optional[str] = None,
         vcf_path: Optional[str] = None,
         min_cov: float = 1.0,
-        phase: bool = True
+        phase: bool = False
     ):
         """
         Initialize a :obj:`Sample` object.
@@ -123,25 +113,27 @@ class Sample:
             if ">" in m.op and len(m.op) > 3
         }
 
-        has_index = False
-        assert vcf_path or (sam_path and profile)
-        if vcf_path:
-            try:
-                norm, muts = self._load_vcf(vcf_path, gene)
-            except ValueError:
-                raise AldyException(f"VCF {vcf_path} is not indexed")
-        elif sam_path and sam_path.endswith(".dump"):
-            norm, muts = self._load_dump(sam_path)
-        elif sam_path and sam_path.endswith(".tar.gz"):
-            norm, muts = self._load_dump(sam_path)
-        else:
-            assert sam_path
-            has_index, norm, muts = self._load_sam(sam_path, gene, reference, cn_region, debug)
-        self._make_coverage(gene, norm, muts, threshold)
+        with Timing("Read SAM"):
+            has_index = False
+            assert vcf_path or (sam_path and profile)
+            if vcf_path:
+                try:
+                    norm, muts = self._load_vcf(vcf_path, gene)
+                except ValueError:
+                    raise AldyException(f"VCF {vcf_path} is not indexed")
+            elif sam_path and sam_path.endswith(".dump"):
+                norm, muts = self._load_dump(sam_path)
+            elif sam_path and sam_path.endswith(".tar.gz"):
+                norm, muts = self._load_dump(sam_path)
+            else:
+                assert sam_path
+                has_index, norm, muts = self._load_sam(sam_path, gene, reference, cn_region, debug)
+            self._make_coverage(gene, norm, muts, threshold)
 
         self.coverage.fragments = []
         if has_index and phase:
-            self.coverage.fragments = self._get_phases(sam_path, gene, reference, muts)
+            with Timing("Read phase"):
+                self.coverage.fragments = self._get_phases(sam_path, gene, reference)
 
         if cn_region:
             assert profile
@@ -690,21 +682,21 @@ class Sample:
                     continue
 
                 # any SNPs here?
-                while index[vlo] < r.reference_start:
+                while vlo < len(index) and index[vlo] < r.reference_start:
                     vlo += 1
-                if index[vlo] >= r.reference_end:
+                if vlo == len(index) or index[vlo] >= r.reference_end:
                     continue
 
                 name = r.query_name
                 if len(name) > 2 and (name[-2] == '#' or name[-2] == '/'):
                     name = name[:-2]
 
-                if r.mate_is_unmapped or r.reference_id != r.next_reference_id or r.insert_size > max_insert:
+                if r.mate_is_unmapped or r.reference_id != r.next_reference_id or r.template_length > max_insert:
                     add(vlo, r)
                 elif name in seen: # Paired reads
                     add(vlo, seen[name], r)
                     del seen[name]
-                elif r.mate_pos < r.pos: # already seen but not added
+                elif r.next_reference_start < r.reference_start: # already seen but not added
                     add(vlo, r)
                 else:
                     seen[name] = r
@@ -810,6 +802,7 @@ def load_sam_profile(
     factor: float = 2.0,
     regions: Dict[Tuple[str, str, int], GRange] = dict(),
     cn_region: Optional[GRange] = None,
+    genome: Optional[str] = "hg19"
 ) -> Dict[str, Dict[str, List[float]]]:
     """
     Load the profile information from a SAM/BAM file.
@@ -833,6 +826,8 @@ def load_sam_profile(
             3. Illumina: by definition contains all ones (uniform coverage profile).
     """
 
+    if not genome:
+        genome = "hg19"
     if len(regions) == 0:
         import pkg_resources
 
@@ -840,14 +835,14 @@ def load_sam_profile(
         for g in sorted(pkg_resources.resource_listdir("aldy.resources", "genes")):
             if g[-4:] != ".yml":
                 continue
-            gg = Gene(script_path(f"aldy.resources.genes/{g}"))
+            gg = Gene(script_path(f"aldy.resources.genes/{g}"), genome=genome)
             for gi, gr in enumerate(gg.regions):
                 for r, rng in gr.items():
                     gene_regions[gg.name, r, gi] = rng
     else:
         gene_regions = regions
     gene_regions["neutral", "cn", 0] = (
-        cn_region if cn_region else DEFAULT_CN_NEUTRAL_REGION["hg19"]
+        cn_region if cn_region else DEFAULT_CN_NEUTRAL_REGION[genome]
     )
 
     chr_regions: Dict[str, Tuple[int, int]] = {}
@@ -967,8 +962,9 @@ def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
         The region is padded with 500bp on the left side.
     """
 
-    return (
-        read.reference_id != -1
-        and read.reference_name == prefix + region.chr
-        and region.start - 500 <= read.reference_start <= region.end
-    )
+    if read.reference_id == -1 or read.reference_name != prefix + region.chr:
+        return False
+
+    a = (read.reference_start, read.reference_end)
+    b = (region.start, region.end)
+    return a[0] <= b[0] <= a[1] or b[0] <= a[0] <= b[1]

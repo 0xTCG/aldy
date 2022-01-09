@@ -213,6 +213,20 @@ def timing(f):  # pragma: no cover
     return wrap
 
 
+
+class Timing:
+    def __init__(self, name = 'Block'):
+        self.name = name
+
+    def __enter__(self):
+        self.start = time.time()
+        return self
+
+    def __exit__(self, *args):
+        self.end = time.time()
+        log.debug("{} took {}", self.name, self.end - self.start)
+
+
 def pp(x) -> str:
     """
     Returns:

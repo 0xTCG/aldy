@@ -51,7 +51,7 @@ class Coverage:
         self.min_cov = min_cov
 
         self._region_coverage: Dict[Tuple[int, str], float] = {}
-        self.phases = []
+        self.fragments = []
 
     def __getitem__(self, mut: Mutation) -> float:
         """ :return: Coverage of the mutation ``mut``. """
@@ -186,6 +186,7 @@ class Coverage:
         sam_ref = sum(
             self._cnv_coverage[i] for i in range(cn_region.start, cn_region.end)
         )
+        # print(self._cnv_coverage, cn_region, sam_ref)
 
         if sam_ref == 0:
             raise AldyException(
@@ -233,11 +234,72 @@ class Coverage:
 
         return mut.op == "_" or cov >= max(min_cov, total * thres)
 
-    def load_phase(self, gene):
+    def load_phase(self, gene, ploidy=2):
+        log.debug('[phase] Phasing {} copies...', ploidy)
+        return self._load_phase(gene, ploidy)
+
+        # from .phase import Read, Graph, phase
+        # from .common import Timing
+        # from pprint import pprint
+
+        # snps = {}
+        # for read in self.fragments:
+        #     for pos, op in read:
+        #         snps.setdefault(pos, set()).add(op)
+        # snps = {
+        #     pos: (id, list(ops)) for id, (pos, ops) in enumerate(snps.items()) if len(ops) > 1
+        # }
+        # frags = {}
+        # for read in self.fragments:
+        #     key = tuple(sorted([(pos, op) for pos, op in read if pos in snps]))
+        #     if len(key) > 1:
+        #         if key not in frags:
+        #             frags[key] = 0
+        #         frags[key] += 1
+
+        # reads = []
+        # for pairs, cov in frags.items():
+        #     assert len(pairs) >= 2
+        #     items = {}
+        #     for pos, al in pairs:
+        #         assert pos in snps
+        #         id = snps[pos][0]
+        #         al = snps[pos][1].index(al)
+        #         items[id] = al
+        #     reads.append(Read(items, cov, len(reads)))
+        #     reads[-1].special_snp = sorted(reads[-1].snps)[1]
+        #     reads[-1].rates = [1.0 / ploidy] * ploidy
+
+        # with Timing("[phase] HapTree-X"):
+        #     g = Graph(reads, ploidy)
+        #     phases = phase(g)
+
+        # haplotypes = [[] for _ in range(ploidy)]
+        # id_snp = {id: (pos, alleles) for pos, (id, alleles) in snps.items()}
+        # for root in sorted(g.components.keys()):
+        #     if root not in phases: continue
+        #     comp = g.components[root]
+        #     reads = sum(len(x) for x in comp.reads)
+        #     haps = sorted([(h[root], i) for i, h in enumerate(phases[root].haplotypes)])
+        #     for snp in comp.nodes:
+        #         pos, alleles = id_snp[snp]
+        #         for i, (_, hap) in enumerate(haps):
+        #             idx = phases[root].haplotypes[hap][snp]
+        #             al = alleles[idx]
+        #             haplotypes[i].append((pos, ))
+        #             if al == gene[pos]:
+        #                 haplotypes[i].append(Mutation(pos, "_"))
+        #             else:
+        #                 haplotypes[i].append(Mutation(pos, f"{gene[pos]}>{al}"))
+        # return haplotypes
+
+    def _load_phase(self, gene, ploidy=2):
         """Loads a HapTree-X/HapCUT2 phase file."""
 
-        import subprocess, os, tempfile
+        if len(self.fragments) == 0:
+            return
 
+        import subprocess, os, tempfile
 
         phases: List[List[Mutation]] = []
         with tempfile.TemporaryDirectory() as tmp:
@@ -256,14 +318,17 @@ class Coverage:
             frag_file = f'{tmp}/fragments.txt'
             with open(frag_file, 'w') as fo:
                 for s, c in frags.items():
+                    if not s:
+                        continue
                     fo.write(f'{c}')
                     for p, a in s:
                         fo.write(f';{p},{a}')
                     fo.write('\n')
-
             phase_file = f'{tmp}/phase.txt'
+            cmd = ['haptreex', '--aldy', frag_file, '-o', phase_file, '-p', str(ploidy)]
+            print(cmd)
             ret = subprocess.run(
-                ['haptreex', '--aldy', frag_file, '-o', phase_file],
+                cmd,
                 env={
                     **os.environ,
                     'OMP_NUM_THREADS': '1'
@@ -276,7 +341,7 @@ class Coverage:
                 )
             log.debug('HapTree-X done')
 
-            haplotypes: Tuple[List[Mutation], List[Mutation]] = ([], [])
+            haplotypes: Tuple[List[Mutation], List[Mutation]] = [[] for _ in range(ploidy)]
             _, g_s, g_e = gene.get_wide_region()
             with open(phase_file) as hap:
                 for li, line in enumerate(hap):

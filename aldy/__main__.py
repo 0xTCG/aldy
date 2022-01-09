@@ -96,7 +96,9 @@ def main(argv):
             query(Gene(db_file), q)
         elif args.subparser == "profile":
             p = load_sam_profile(
-                args.file, cn_region=parse_cn_region(args.cn_neutral_region)
+                args.file,
+                cn_region=parse_cn_region(args.cn_neutral_region),
+                genome=args.genome,
             )
             print(yaml.dump(p, default_flow_style=None))
         elif args.subparser in ["genotype", "g"]:
@@ -221,6 +223,11 @@ def _get_args(argv):
         "-r",
         default=None,
         help="Genome reference used for reading CRAM files",
+    )
+    genotype_parser.add_argument(
+        "--genome",
+        default=None,
+        help="SAM/BAM reference genome (hg19 or hg38; none for auto-detection)",
     )
     genotype_parser.add_argument(
         "--cn-neutral-region",
@@ -348,6 +355,11 @@ def _get_args(argv):
                Default is CYP2D8 region within hg19 (22:42547463-42548249)."""
         ),
     )
+    profile_parser.add_argument(
+        "--genome",
+        default=None,
+        help="SAM/BAM reference genome (hg19 or hg38; hg19 by default)",
+    )
 
     _ = subparsers.add_parser(
         "help", parents=[base], help="Show program usage and exit."
@@ -409,6 +421,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 multiple_warn_level=int(args.multiple_warn_level),
                 phase=args.phase,
                 report=True,
+                genome=args.genome,
                 min_cov=args.min_coverage,
             )
         except AldyException as ex:
