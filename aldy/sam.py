@@ -13,11 +13,12 @@ import re
 import yaml
 import gzip
 import struct
+import tarfile
 
 from dataclasses import dataclass
 from collections import defaultdict
 from natsort import natsorted
-from .common import log, GRange, AldyException, script_path
+from .common import log, GRange, AldyException, script_path, Timing
 from .coverage import Coverage
 from .gene import Gene, Mutation
 
@@ -37,16 +38,6 @@ DEFAULT_CN_NEUTRAL_REGION = {
 
 
 @dataclass
-class Fragment:
-    snps: Dict[int, str]  # Location -> Allele
-    count: int  # Support
-    special_snp: int
-    rates: List[float]
-
-    def __eq__(self, other):
-        return self.snps == other.snps
-
-@dataclass
 class Sample:
     """
     Interface for reading SAM/BAM/CRAM files that parses and stores read alignments.
@@ -60,7 +51,10 @@ class Sample:
     _insertion_counts: Dict[Tuple[int, int], int]
     _insertion_reads: Dict[Mutation, Dict[Any, int]]
     _multi_sites: Dict[int, str]
-    _dump: Tuple[Dict[int, int], List[Tuple[Tuple[int, int, int], List[Mutation]]]]
+
+    # Dump data
+    _dump_cn: Dict[int, int]  # pos -> coverage
+    _dump_reads: List[Tuple[Tuple[int, int, int], List[Mutation]]]
 
     # Phasing data
 
@@ -75,7 +69,7 @@ class Sample:
         debug: Optional[str] = None,
         vcf_path: Optional[str] = None,
         min_cov: float = 1.0,
-        phase: bool = True
+        phase: bool = False,
     ):
         """
         Initialize a :obj:`Sample` object.
@@ -107,7 +101,9 @@ class Sample:
         # TODO: currently uses only functional indels;
         #       other indels should be corrected as well
         self.min_cov = min_cov
-        self._dump = defaultdict(int), []
+        self._dump_cn = defaultdict(int)
+        self._dump_reads = []
+        self._dump_phase = []
         self._insertion_sites = {
             m for a in gene.alleles.values() for m in a.func_muts if m.op[:3] == "ins"
         }
@@ -122,23 +118,35 @@ class Sample:
             if ">" in m.op and len(m.op) > 3
         }
 
-        has_index = False
-        assert vcf_path or (sam_path and profile)
-        if vcf_path:
-            try:
-                norm, muts = self._load_vcf(vcf_path, gene)
-            except ValueError:
-                raise AldyException(f"VCF {vcf_path} is not indexed")
-        elif sam_path and sam_path[-5:] == ".dump":
-            norm, muts = self._load_dump(sam_path)
-        else:
-            assert sam_path
-            has_index, norm, muts = self._load_sam(sam_path, gene, reference, cn_region, debug)
-        self._make_coverage(gene, norm, muts, threshold)
-
-        self.coverage.fragments = []
-        if has_index and phase:
-            self.coverage.fragments = self._get_phases(sam_path, gene, reference, muts)
+        with Timing("Read SAM"):
+            has_index = False
+            frags = []
+            is_sam = False
+            assert vcf_path or (sam_path and profile)
+            if vcf_path:
+                try:
+                    norm, muts = self._load_vcf(vcf_path, gene)
+                except ValueError:
+                    raise AldyException(f"VCF {vcf_path} is not indexed")
+            elif sam_path and sam_path.endswith(".dump"):
+                norm, muts, frags = self._load_dump(sam_path, gene.name)
+            elif sam_path and sam_path.endswith(".tar.gz"):
+                norm, muts, frags = self._load_dump(sam_path, gene.name)
+            else:
+                assert sam_path
+                is_sam = True
+                has_index, norm, muts = self._load_sam(
+                    sam_path, gene, reference, cn_region, debug
+                )
+            self._make_coverage(gene, norm, muts, threshold)
+            if is_sam and (debug or phase):
+                if has_index:
+                    with Timing("Read phase"):
+                        frags = self._get_phases(sam_path, gene, reference)
+                if debug:
+                    self._dump_alignments(f"{debug}.{gene.name}")
+            if phase and frags:
+                self.coverage.fragments = frags
 
         if cn_region:
             assert profile
@@ -203,7 +211,7 @@ class Sample:
             for op, size in read.cigartuples:
                 if op in [0, 7, 8, 2]:
                     for i in range(size):
-                        self._dump[0][start + i] += 1
+                        self._dump_cn[start + i] += 1
                     start += size
 
         has_index = True
@@ -212,7 +220,9 @@ class Sample:
             try:
                 sam.check_index()
             except AttributeError:
-                has_index = False  # SAM files do not have an index. BAMs might also lack it
+                has_index = (
+                    False  # SAM files do not have an index. BAMs might also lack it
+                )
             except ValueError:
                 raise AldyException(f"File {sam_path} has no index")
 
@@ -241,9 +251,7 @@ class Sample:
 
                 r = self._parse_read(read, gene, norm, muts)
                 if r and debug:
-                    self._dump[1].append(r)
-        if debug:
-            self._dump_alignments(debug)
+                    self._dump_reads.append(r)
         return has_index, norm, muts
 
     def _load_vcf(self, vcf_path: str, gene: Gene):
@@ -322,65 +330,88 @@ class Sample:
                         muts[pos, op] += 10
         return norm, muts
 
-    def _load_dump(self, dump_path: str):
+    def _load_dump(self, dump_path: str, gene: str):
         log.debug("[dump] path= {}", os.path.abspath(dump_path))
+
+        if dump_path.endswith(".tar.gz"):
+            tar = tarfile.open(dump_path, "r:gz")
+
+            f = [i for i in tar.getnames() if i.endswith(f".{gene}.dump")]
+            if not f:
+                raise AldyException("Invalid dump file")
+            log.debug("Found {} in the archive", f[0])
+            fd = gzip.open(tar.extractfile(f[0]))
+        else:
+            fd = gzip.open(dump_path, "rb")
 
         self.sample_name = "DUMP"
         norm: dict = defaultdict(int)
         muts: dict = defaultdict(int)
-        with gzip.open(dump_path, "rb") as fd:
-            log.warn("Loading debug dump from {}", dump_path)
-            l, h, i = (
-                struct.calcsize("<l"),
-                struct.calcsize("<h"),
-                struct.calcsize("<i"),
-            )
-            cn_len = struct.unpack("<l", fd.read(l))[0]
-            for _ in range(cn_len):
-                i, v = struct.unpack("<ll", fd.read(l + l))
-                self._dump[0][i] = v
 
-            ld = struct.unpack("<l", fd.read(l))[0]
-            for _ in range(ld):
-                ref_start, ref_end, read_len, num_mutations = struct.unpack(
-                    "<llhh", fd.read(l + l + h + h)
-                )
-                ref_end += ref_start
-                for j in range(ref_start, ref_end):
-                    norm[j] += 1
-                mut_set = set()
-                for _ in range(num_mutations):
-                    mut_start, op_len = struct.unpack("<hh", fd.read(h + h))
-                    mut_start += ref_start
-                    op = fd.read(op_len).decode("ascii")
-                    muts[mut_start, op] += 1
-                    mut_set.add((mut_start, op))
-                    if op[:3] == "del":
-                        for j in range(0, len(op) - 3):
-                            norm[mut_start + j] -= 1
-                    elif op[:3] == "ins":
-                        self._insertion_counts[mut_start, len(op) - 3] += 1
-                    else:
-                        norm[mut_start] -= 1
-                mut_set_pos = {p for p, _ in mut_set}
-                for pos, op in self._multi_sites.items():
-                    if pos not in mut_set_pos:
-                        continue
-                    ll, r = op.split(">")
-                    if all(
-                        (pos + p, f"{ll[p]}>{r[p]}") in mut_set
-                        for p in range(len(ll))
-                        if ll[p] != "."
-                    ):
-                        for p in range(len(ll)):
-                            if ll[p] != ".":
-                                muts[pos + p, f"{ll[p]}>{r[p]}"] -= 1
-                                if p:
-                                    norm[pos + p] += 1
-                        muts[pos, op] += 1
-                for data in self._insertion_reads.values():
-                    data[ref_start, ref_end, read_len] += 1
-        return norm, muts
+        log.warn("Loading debug dump from {}", dump_path)
+        l, h, i = (
+            struct.calcsize("<l"),
+            struct.calcsize("<h"),
+            struct.calcsize("<i"),
+        )
+        cn_len = struct.unpack("<l", fd.read(l))[0]
+        for _ in range(cn_len):
+            i, v = struct.unpack("<ll", fd.read(l + l))
+            self._dump_cn[i] = v
+
+        ld = struct.unpack("<l", fd.read(l))[0]
+        for _ in range(ld):
+            ref_start, ref_end, read_len, num_mutations = struct.unpack(
+                "<llhh", fd.read(l + l + h + h)
+            )
+            ref_end += ref_start
+            for j in range(ref_start, ref_end):
+                norm[j] += 1
+            mut_set = set()
+            for _ in range(num_mutations):
+                mut_start, op_len = struct.unpack("<hh", fd.read(h + h))
+                mut_start += ref_start
+                op = fd.read(op_len).decode("ascii")
+                muts[mut_start, op] += 1
+                mut_set.add((mut_start, op))
+                if op[:3] == "del":
+                    for j in range(0, len(op) - 3):
+                        norm[mut_start + j] -= 1
+                elif op[:3] == "ins":
+                    self._insertion_counts[mut_start, len(op) - 3] += 1
+                else:
+                    norm[mut_start] -= 1
+            mut_set_pos = {p for p, _ in mut_set}
+            for pos, op in self._multi_sites.items():
+                if pos not in mut_set_pos:
+                    continue
+                ll, r = op.split(">")
+                if all(
+                    (pos + p, f"{ll[p]}>{r[p]}") in mut_set
+                    for p in range(len(ll))
+                    if ll[p] != "."
+                ):
+                    for p in range(len(ll)):
+                        if ll[p] != ".":
+                            muts[pos + p, f"{ll[p]}>{r[p]}"] -= 1
+                            if p:
+                                norm[pos + p] += 1
+                    muts[pos, op] += 1
+            for data in self._insertion_reads.values():
+                data[ref_start, ref_end, read_len] += 1
+
+        frags = []
+        ld = struct.unpack("<l", fd.read(l))[0]
+        for _ in range(ld):
+            ln = struct.unpack("<l", fd.read(l))[0]
+            frags.append([])
+            for _ in range(ln):
+                mut_start, op_len = struct.unpack("<ll", fd.read(l + l))
+                op = fd.read(op_len).decode("ascii")
+                frags[-1].append((mut_start, op))
+        fd.close()
+
+        return norm, muts, frags
 
     def _make_coverage(self, gene, norm, muts, threshold):
         # Establish the coverage dictionary
@@ -414,13 +445,10 @@ class Sample:
         self.coverage = Coverage(
             {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
             threshold,
-            self._dump[0],
+            self._dump_cn,
             self.sample_name,
             self.min_cov,
         )
-        # for p in coverage:
-        # if len(coverage[p]) > 1:
-        # log.trace('{}: {}', p, {m: v for m,v in coverage[p].items() if v>1})
 
     def _group_indels(self, gene, coverage):
         # Group ambiguous deletions
@@ -512,15 +540,15 @@ class Sample:
         .. note:: `norm` and `muts` are modified.
         """
 
-        if not _in_region(
-            gene.get_wide_region(), read, self._prefix
-        ):  # ensure that it is a proper gene read
-            return None
         if not read.cigartuples:  # only valid alignments
             return None
         if read.flag & 0x800:  # avoid supplementary alignments
             return None
         if "H" in read.cigarstring:  # avoid hard-clipped reads
+            return None
+        if not _in_region(
+            gene.get_wide_region(), read, self._prefix
+        ):  # ensure that it is a proper gene read
             return None
 
         dump_arr = []
@@ -623,17 +651,14 @@ class Sample:
         index = sorted(p for p, m in self.coverage._coverage.items() if len(m) > 1)
         fragments = []
 
-        def add(lo, *args):
+        def add(lo, extra, *args):
             frag = {}
             for r in args:
                 start, s_start = r.reference_start, 0
                 for op, size in r.cigartuples:
                     if op == 2:  # Deletion
-                        # frag.setdefault(start, set()).add("del" + str(size))
                         start += size
                     elif op == 1:  # Insertion
-                        # if r.query_qualities[s_start] >= 10:
-                            # frag.setdefault(start, set()).add("ins" + str(size))
                         s_start += size
                     elif op == 4:  # Soft-clip
                         s_start += size
@@ -653,8 +678,7 @@ class Sample:
                 if len(snps) == 1:  # avoid contradicting pairs
                     read.append((pos, snps.pop()))
             if len(read) > 1:  # links at least 2 mutations
-                fragments.append(read)
-
+                fragments.append((extra, read))
 
         with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
             sam.check_index()
@@ -675,27 +699,59 @@ class Sample:
                     continue  # ensure that it is a proper gene read
 
                 # any SNPs here?
-                while index[vlo] < r.reference_start:
+                while vlo < len(index) and index[vlo] < r.reference_start:
                     vlo += 1
-                if index[vlo] >= r.reference_end:
+                if vlo == len(index) or index[vlo] >= r.reference_end:
                     continue
 
                 name = r.query_name
-                if len(name) > 2 and (name[-2] == '#' or name[-2] == '/'):
+                if len(name) > 2 and (name[-2] == "#" or name[-2] == "/"):
                     name = name[:-2]
 
-                if r.mate_is_unmapped or r.reference_id != r.next_reference_id or r.insert_size > max_insert:
-                    add(vlo, r)
-                elif name in seen: # Paired reads
-                    add(vlo, seen[name], r)
+                # 10X data support
+                extra = name
+                if r.has_tag("BX"):
+                    extra = r.get_tag("BX")
+                if extra and r.has_tag("XC"):
+                    extra = f"{extra}:{r.get_tag('XC')}"
+                elif extra and r.has_tag("MI"):
+                    extra = f"{extra}:{r.get_tag('MI')}"
+
+                if (
+                    r.mate_is_unmapped
+                    or r.reference_id != r.next_reference_id
+                    or r.template_length > max_insert
+                ):
+                    add(vlo, extra, r)
+                elif name in seen:  # Paired reads
+                    add(vlo, extra, seen[name][0], r)
                     del seen[name]
-                elif r.mate_pos < r.pos: # already seen but not added
-                    add(vlo, r)
+                elif (
+                    r.next_reference_start < r.reference_start
+                ):  # already seen but not added
+                    add(vlo, extra, r)
                 else:
-                    seen[name] = r
+                    seen[name] = (r, vlo, extra)
+            for name, (r, vlo, extra) in seen.items():
+                add(vlo, extra, r)
 
-        return fragments
+        fragments.sort(key=lambda x: x[0])
+        new_fragments = []
+        prev_fid, prev_read = "", []
+        for fid, read in fragments:
+            if fid != prev_fid:
+                if prev_read:
+                    new_fragments.append(prev_read)
+                prev_fid, prev_read = fid, read
+            else:
+                prev_read += read
+        if prev_read:
+            new_fragments.append(prev_read)
+        for r in new_fragments:
+            r.sort()
 
+        self._dump_phase = new_fragments
+        return new_fragments
 
     # ----------------------------------------------------------------------------------
     # Coverage-rescaling functions
@@ -778,15 +834,22 @@ class Sample:
 
     def _dump_alignments(self, debug: str):
         with gzip.open(f"{debug}.dump", "wb") as fd:
-            cn, dump_data = self._dump
-            fd.write(struct.pack("<l", len(cn)))
-            for i, v in cn.items():
+            fd.write(struct.pack("<l", len(self._dump_cn)))
+            for i, v in self._dump_cn.items():
                 fd.write(struct.pack("<ll", i, v))
-            fd.write(struct.pack("<l", len(dump_data)))
-            for (s, e, l), m in dump_data:
+
+            fd.write(struct.pack("<l", len(self._dump_reads)))
+            for (s, e, l), m in self._dump_reads:
                 fd.write(struct.pack("<llhh", s, e - s, l, len(m)))
                 for p, md in m:
                     fd.write(struct.pack("<hh", p - s, len(md)))
+                    fd.write(md.encode("ascii"))
+
+            fd.write(struct.pack("<l", len(self._dump_phase)))
+            for r in self._dump_phase:
+                fd.write(struct.pack("<l", len(r)))
+                for p, md in r:
+                    fd.write(struct.pack("<ll", p, len(md)))
                     fd.write(md.encode("ascii"))
 
 
@@ -795,6 +858,7 @@ def load_sam_profile(
     factor: float = 2.0,
     regions: Dict[Tuple[str, str, int], GRange] = dict(),
     cn_region: Optional[GRange] = None,
+    genome: Optional[str] = "hg19",
 ) -> Dict[str, Dict[str, List[float]]]:
     """
     Load the profile information from a SAM/BAM file.
@@ -818,6 +882,8 @@ def load_sam_profile(
             3. Illumina: by definition contains all ones (uniform coverage profile).
     """
 
+    if not genome:
+        genome = "hg19"
     if len(regions) == 0:
         import pkg_resources
 
@@ -825,14 +891,14 @@ def load_sam_profile(
         for g in sorted(pkg_resources.resource_listdir("aldy.resources", "genes")):
             if g[-4:] != ".yml":
                 continue
-            gg = Gene(script_path(f"aldy.resources.genes/{g}"))
+            gg = Gene(script_path(f"aldy.resources.genes/{g}"), genome=genome)
             for gi, gr in enumerate(gg.regions):
                 for r, rng in gr.items():
                     gene_regions[gg.name, r, gi] = rng
     else:
         gene_regions = regions
     gene_regions["neutral", "cn", 0] = (
-        cn_region if cn_region else DEFAULT_CN_NEUTRAL_REGION["hg19"]
+        cn_region if cn_region else DEFAULT_CN_NEUTRAL_REGION[genome]
     )
 
     chr_regions: Dict[str, Tuple[int, int]] = {}
@@ -952,8 +1018,9 @@ def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
         The region is padded with 500bp on the left side.
     """
 
-    return (
-        read.reference_id != -1
-        and read.reference_name == prefix + region.chr
-        and region.start - 500 <= read.reference_start <= region.end
-    )
+    if read.reference_id == -1 or read.reference_name != prefix + region.chr:
+        return False
+
+    a = (read.reference_start, read.reference_end)
+    b = (region.start, region.end)
+    return a[0] <= b[0] <= a[1] or b[0] <= a[0] <= b[1]

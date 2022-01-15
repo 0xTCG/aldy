@@ -177,7 +177,7 @@ def solve_minor_model(
 
     log.debug("[minor] major= {}", major_sol._solution_nice())
     model = lpinterface.model("AldyMinor", solver)
-    debug_info = json["minor"][len(json["minor"])]
+    debug_info = json[gene.name]["minor"][len(json[gene.name]["minor"])]
 
     # Establish minor alleles and their mutations
     alleles: Dict[Tuple[SolvedAllele, int], Set[Mutation]] = {
@@ -464,7 +464,7 @@ def solve_minor_model(
 
     model.setObjective(objective)
     if debug:
-        model.dump(f"{debug}.minor{identifier}.lp")
+        model.dump(f"{debug}.{gene.name}.minor{identifier}.lp")
 
     # Solve the model
     results = {}

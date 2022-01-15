@@ -156,7 +156,7 @@ def solve_cn_model(
     """
 
     model = lpinterface.model("AldyCN", solver)
-    debug_info = json["cn"]
+    debug_info = json[gene.name]["cn"]
 
     # List of CN configurations (a.k.a. structures):
     # dict of (`name`, `number`): structure, where multiple copies of the same `name`
@@ -236,7 +236,7 @@ def solve_cn_model(
     )
     model.setObjective(objective)
     if debug:
-        model.dump(f"{debug}.cn.lp")
+        model.dump(f"{debug}.{gene.name}.cn.lp")
 
     # Solve the model
     lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
