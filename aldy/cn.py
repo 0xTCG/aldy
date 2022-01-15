@@ -287,8 +287,12 @@ def _print_coverage(gene: Gene, coverage: Coverage) -> None:
     Pretty-print the region coverage.
     """
     log.debug("[cn] coverage=")
-    gname = re.split(r"(\d.+)", gene.name)[1]
-    pname = re.split(r"(\d.+)", gene.pseudogenes[0])[1] if gene.pseudogenes else ""
+    gname_ = re.split(r"(\d.+)", gene.name)
+    gname = gname_[1] if len(gname_) > 1 else gene.name
+    pname = ""
+    if gene.pseudogenes:
+        pname_ = re.split(r"(\d.+)", gene.pseudogenes[0])
+        pname = pname_[1] if len(pname_) > 1 else gene.pseudogenes[0]
     log.debug(f"  {'':5} {gname:4} {pname:4}")
     for r in gene.regions[0]:
         g = coverage.region_coverage(0, r)

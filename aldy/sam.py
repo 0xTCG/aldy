@@ -665,14 +665,14 @@ class Sample:
             for r in sam.fetch(
                 region=gene.get_wide_region().samtools(prefix=self._prefix)
             ):
-                if not _in_region(gene.get_wide_region(), r, self._prefix):
-                    continue  # ensure that it is a proper gene read
                 if not r.cigartuples:  # only valid alignments
                     continue
                 if r.is_supplementary or r.is_secondary or r.is_duplicate:
                     continue
                 if "H" in r.cigarstring:  # avoid hard-clipped reads
                     continue
+                if not _in_region(gene.get_wide_region(), r, self._prefix):
+                    continue  # ensure that it is a proper gene read
 
                 # any SNPs here?
                 while index[vlo] < r.reference_start:
