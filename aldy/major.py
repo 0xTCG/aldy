@@ -63,8 +63,8 @@ def estimate_major(
         )
 
     alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
-    if len(cn_solution.solution) == 1 and '1' in cn_solution.solution:
-        coverage.load_phase(gene, ploidy=cn_solution.solution['1'])
+    if len(cn_solution.solution) == 1 and "1" in cn_solution.solution:
+        coverage.load_phase(gene, ploidy=cn_solution.solution["1"])
 
     # Check if some CN solution has no matching allele
     if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):
@@ -115,7 +115,7 @@ def solve_major_model(
     """
 
     model = lpinterface.model("AldyMajor", solver)
-    debug_info = json["major"][len(json["major"])]
+    debug_info = json[gene.name]["major"][len(json[gene.name]["major"])]
 
     # Get the list of _all_ functional mutations present in the sample
     # and the database (intersection)
@@ -224,7 +224,7 @@ def solve_major_model(
     objective += 0.1 * model.quicksum(VNEW[m] for m in VNEW)
     model.setObjective(objective)
     if debug:
-        model.dump(f"{debug}.major{identifier}.lp")
+        model.dump(f"{debug}.{gene.name}.major{identifier}.lp")
 
     # Solve the model
     lookup = {

@@ -4,10 +4,11 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Optional, Any, Set
+from typing import List, Optional, Any, Set, Dict
 
 import os
 import sys
+import pkg_resources
 
 from . import sam
 from . import cn
@@ -48,12 +49,13 @@ def genotype(
     report: bool = False,
     genome=None,
     min_cov: Optional[str] = None,
-) -> List[solutions.MinorSolution]:
+) -> Dict[str, List[solutions.MinorSolution]]:
     """
     Genotype a sample.
 
     Returns:
-        list[:obj:`aldy.solutions.MinorSolution`]: List of genotype solutions.
+        dict[str, list[:obj:`aldy.solutions.MinorSolution`]]: List of genotype
+        solutions for each gene.
 
     Args:
         gene_db (str):
@@ -124,8 +126,46 @@ def genotype(
     if genome not in ["hg19", "hg38"]:
         raise AldyException(f"Unknown genome {genome}")
 
+    avail_genes = []
+    if gene_db == "all":
+        avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
+        avail_genes = [i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"]
+        avail_genes = sorted(avail_genes)
+    else:
+        avail_genes = gene_db.lower().split(",")
+    if len(avail_genes) != 1:
+        res = {}
+        for a in avail_genes:
+            log.warn("=" * 50)
+            log.warn("Gene {}", a.upper())
+            res[a] = genotype(
+                a,
+                sam_path,
+                profile,
+                output_file,
+                cn_region,
+                cn_solution,
+                threshold,
+                fusion_penalty,
+                solver,
+                reference,
+                gap,
+                max_minor_solutions,
+                debug,
+                multiple_warn_level,
+                phase,
+                report,
+                genome,
+                min_cov,
+            )
+            log.warn("")
+        return res
+    else:
+        db_file = script_path(
+            "aldy.resources.genes/{}.yml".format(avail_genes[0].lower())
+        )
+
     # Load the gene specification
-    db_file = script_path("aldy.resources.genes/{}.yml".format(gene_db.lower()))
     if os.path.exists(db_file):
         gene_db = db_file
     with open(gene_db):  # Check if file exists
@@ -135,16 +175,6 @@ def genotype(
     if not cn_region:
         cn_region = sam.DEFAULT_CN_NEUTRAL_REGION[genome]
     if profile in ["exome", "wxs"]:
-        log.warn("WARNING: Copy-number calling is not available for exome data.")
-        log.warn(
-            "WARNING: Aldy will NOT be able to detect gene duplications, "
-            + "deletions and fusions."
-        )
-        log.warn(
-            "WARNING: Calling of alleles that are defined by non-exonic mutations "
-            + "is not available."
-        )
-        log.warn("         Results might not be biologically relevant!")
         cn_region = None
         cn_solution = ["1", "1"]
         profile = "illumina"
@@ -173,10 +203,21 @@ def genotype(
             reference=reference,
             cn_region=None if cn_solution else cn_region,
             debug=debug,
+            phase=phase,
             min_cov=float(min_cov) if min_cov else 1.0,
         )
+
+    json[gene.name].update({"sample": os.path.basename(sam_path).split(".")[0]})
+    is_vcf = output_file and output_file.name.endswith(".vcf")
+    is_simple = output_file and output_file.name.endswith(".simple")
+    is_aldy = output_file and not (is_vcf or is_simple)
+    if is_simple:
+        print(sample.coverage.sample, gene.name, sep="\t", end="\t", file=output_file)
+    if kind != "vcf":
         avg_cov = sample.coverage.average_coverage()
         if cn_region and avg_cov < 2:
+            if is_simple:
+                print(file=output_file)
             raise AldyException(
                 f"Average coverage of {avg_cov:.2f} for gene {gene.name} is too low; "
                 + f"skipping gene {gene.name}. "
@@ -187,8 +228,6 @@ def genotype(
                 f"Average sample coverage is {avg_cov}. "
                 + "We recommend at least 20x coverage for the best results."
             )
-
-    json.update({"sample": os.path.basename(sam_path).split(".")[0], "gene": gene.name})
 
     # Get copy-number solutions
     cn_sols = cn.estimate_cn(
@@ -214,6 +253,8 @@ def genotype(
     major_sols: list = []
     cn_sols = sorted(cn_sols, key=lambda m: (int(1000 * m.score), m._solution_nice()))
     if len(cn_sols) == 0:
+        if is_simple:
+            print(file=output_file)
         raise AldyException("No solutions found!")
     min_cn_score = min(cn_sols, key=lambda m: m.score).score
     for i, cn_sol in enumerate(cn_sols):
@@ -232,6 +273,8 @@ def genotype(
             debug=debug,
         )
     if len(major_sols) == 0:
+        if is_simple:
+            print(file=output_file)
         raise AldyException("No major solutions found!")
 
     major_sols = [
@@ -276,6 +319,8 @@ def genotype(
         minor_sols.append(n)
 
     if len(minor_sols) == 0:
+        if is_simple:
+            print(file=output_file)
         raise AldyException(
             "Aldy could not phase any major solution.\n"
             + "Possible solutions:\n"
@@ -296,8 +341,7 @@ def genotype(
         f"{{}} {gene.name} star-alleles for {sample_name}:",
         "Best" if len(minor_sols) == 1 else "Potential",
     )
-    is_vcf = output_file and output_file.name[-4:] == ".vcf"
-    if output_file and not is_vcf:
+    if is_aldy:
         print("#" + "\t".join(OUTPUT_COLS), file=output_file)
     for i, minor_sol in enumerate(minor_sols):
         conf = 100 * (min_minor_score + SLACK) / (minor_sol.score + SLACK)
@@ -306,13 +350,23 @@ def genotype(
             + f" (confidence={conf:.0f}%)"
         )
         log.info(f"      Minor alleles: {minor_sol._solution_nice()}")
-        if output_file and not is_vcf:
+        if is_aldy:
             print(f"#Solution {i + 1}: {minor_sol._solution_nice()}", file=output_file)
             diplotype.write_decomposition(
                 sample_name, gene, i + 1, minor_sol, output_file
             )
+        elif is_simple:
+            print(
+                minor_sol.get_major_diplotype().replace(" ", ""),
+                minor_sol.get_minor_diplotype(legacy=True).replace(" ", ""),
+                sep="\t",
+                end="\t",
+                file=output_file,
+            )
     if is_vcf:
         diplotype.write_vcf(sample_name, gene, sample.coverage, minor_sols, output_file)
+    elif is_simple:
+        print(file=output_file)
 
     if report:
         log.info(colorize(f"{gene.name} results:"))
@@ -348,4 +402,4 @@ def genotype(
             ", ".join(sorted(novels)),
         )
 
-    return minor_sols
+    return {gene_db: minor_sols}

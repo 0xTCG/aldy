@@ -102,24 +102,13 @@ def main(argv):
             )
             print(yaml.dump(p, default_flow_style=None))
         elif args.subparser in ["genotype", "g"]:
-            # Prepare the list of available genes
-            if args.gene.lower() == "all":
-                avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
-                avail_genes = [
-                    i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"
-                ]
-                avail_genes = sorted(avail_genes)
-            else:
-                avail_genes = args.gene.lower().split(",")
-
             # Prepare the output file
             output = args.output
             if output == "-":
                 output = sys.stdout
             elif output:
                 output = open(output, "w")
-            for gene in avail_genes:
-                _genotype(gene, output, args)
+            _genotype(args.gene, output, args)
             if output and output != sys.stdout:
                 output.close()
         else:
@@ -317,7 +306,7 @@ def _get_args(argv):
         default=None,
         help=td("""Minimum mutation read coverage. Default is 1."""),
     )
-    genotype_parser.add_argument("--phase", help="Use phase file.")
+    genotype_parser.add_argument("--phase", action="store_true", help="Use phase file.")
 
     _ = subparsers.add_parser(
         "test",
@@ -403,6 +392,19 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             " ".join(k + "=" + str(v) for k, v in vars(args).items() if k is not None),
         )
         log.info("Genotyping sample {}...", os.path.basename(args.file))
+
+        if args.profile in ["exome", "wxs"]:
+            log.warn("WARNING: Copy-number calling is not available for exome data.")
+            log.warn(
+                "WARNING: Aldy will NOT be able to detect gene duplications, "
+                + "deletions and fusions."
+            )
+            log.warn(
+                "WARNING: Calling of alleles that are defined by non-exonic mutations "
+                + "is not available."
+            )
+            log.warn("         Results might not be biologically relevant!")
+
         try:
             _ = genotype(
                 gene_db=gene,
@@ -431,7 +433,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             log.error(str(ex))
 
     if args.log:
-        fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="DEBUG")
+        fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="TRACE")
         fh.formatter = lambda record, _: record.message
         fh.push_application()
     if args.debug:
