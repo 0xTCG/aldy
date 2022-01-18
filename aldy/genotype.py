@@ -129,7 +129,11 @@ def genotype(
     avail_genes = []
     if gene_db == "all":
         avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
-        avail_genes = [i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"]
+        avail_genes = [
+            i[:-4]
+            for i in avail_genes
+            if len(i) > 4 and i.endswith(".yml") and not i.startswith("pharma-")
+        ]
         avail_genes = sorted(avail_genes)
     elif gene_db == "pharma":
         avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
@@ -142,26 +146,30 @@ def genotype(
         for a in avail_genes:
             log.warn("=" * 50)
             log.warn("Gene {}", a.upper())
-            res[a] = genotype(
-                a,
-                sam_path,
-                profile,
-                output_file,
-                cn_region,
-                cn_solution,
-                threshold,
-                fusion_penalty,
-                solver,
-                reference,
-                gap,
-                max_minor_solutions,
-                debug,
-                multiple_warn_level,
-                phase,
-                report,
-                genome,
-                min_cov,
-            )
+            try:
+                res[a] = genotype(
+                    a,
+                    sam_path,
+                    profile,
+                    output_file,
+                    cn_region,
+                    cn_solution,
+                    threshold,
+                    fusion_penalty,
+                    solver,
+                    reference,
+                    gap,
+                    max_minor_solutions,
+                    debug,
+                    multiple_warn_level,
+                    phase,
+                    report,
+                    genome,
+                    min_cov,
+                )
+            except AldyException as ex:
+                log.error(f"Failed gene {a.upper()}")
+                log.error(f"Message: {str(ex)}")
             log.warn("")
         return res
     else:

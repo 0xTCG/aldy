@@ -213,9 +213,8 @@ def timing(f):  # pragma: no cover
     return wrap
 
 
-
 class Timing:
-    def __init__(self, name = 'Block'):
+    def __init__(self, name="Block"):
         self.name = name
 
     def __enter__(self):
