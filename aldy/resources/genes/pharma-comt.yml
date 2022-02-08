@@ -3,33 +3,33 @@ version: 'pharmscan'
 generated: '2021-03-30'
 ensembl: ENSG00000093010
 alleles:
-  COMT*normal:
+  COMT*ValB:
     mutations: []
-  COMT*rs4633:
-    mutations: 
+  COMT*Met:
+    mutations:
     - [25973, C>T, rs4633, H62=]
-  COMT*rs4680:
-    mutations: 
     - [27009, G>A, rs4680, V158M]
-  COMT*rs4818:
-    mutations: 
-    - [26945, C>G, rs4818, L136=]
-  COMT*rs6267:
-    mutations: 
-    - [26001, G>T, rs6267, A72S]
-  COMT*rs6269:
-    mutations: 
+  COMT*MetB:
+    mutations:
+    - [27009, G>A, rs4680, V158M]
     - [25690, A>G, rs6269, SolublePromoter]
-  COMT*rs769224:
-    mutations: 
-    - [27542, G>A, rs769224, P199=]
-  COMT*rs5031015:
-    mutations: 
-    - [26841, G>A, rs5031015, A102T]
-  COMT*rs8192488:
-    mutations: 
-    - [26975, C>T, rs8192488, A146=]  
+  COMT*ValA:
+    mutations:
+    - [26945, C>G, rs4818, L136=]
+    - [25690, A>G, rs6269, SolublePromoter]
+  COMT*ValC:
+    mutations:
+    - [25690, A>G, rs6269, SolublePromoter]
+  COMT*ValD:
+    mutations:
+    - [26945, C>G, rs4818, L136=]
+  COMT*ValE:
+    mutations:
+    - [25973, C>T, rs4633, H62=]
   random:
+  - [26841, G>A, rs5031015, A102T]
+  - [27542, G>A, rs769224, P199=]
+  - [26975, C>T, rs8192488, A146=]
   - [27962, T>C, rs34068292]
   - [27870, C>T, rs4646316]
   - [30196, C>T, rs174699]

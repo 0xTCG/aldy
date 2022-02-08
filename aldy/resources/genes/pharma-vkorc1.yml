@@ -4,44 +4,40 @@ url: https://www.agenabio.com/wp-content/uploads/2016/03/51-20032R2.0_iPLEX_CYP2
 generated: '2021-12-13'
 ensembl: ENSG00000167397
 alleles:
-  VKORC1*1:
+  VKORC1*H6:
     mutations: []
   VKORC1*H1:
     label: VKORC1*2
     mutations:
-    - [3588, G>A, rs9923231, upstream]
+    - [3588, G>A, rs9923231, 5'UTR]
     - [6399, C>T, rs9934438, intron]
-    - [7481, T>C, rs2359612, intron]
+    - [6768, G>C, rs8050894, intron]
+    - [7481, C>T, rs2359612, intron]
+    - [296, T>C, rs7196161, 5'UTR]
   VKORC1*H2:
     mutations:
-    - [3588, G>A, rs9923231, upstream]
+    - [3588, G>A, rs9923231, 5'UTR]
     - [5723, T>G, rs2884737, intron]
     - [6399, C>T, rs9934438, intron]
-    - [7481, T>C, rs2359612, intron]
+    - [7481, C>T, rs2359612, intron]
+    - [296, T>C, rs7196161, 5'UTR]
+    - [6768, G>C, rs8050894, intron]
   VKORC1*H3:
     mutations:
-    - [7481, T>C, rs2359612, intron]
+    - [296, T>C, rs7196161, 5'UTR]
+    - [6768, G>C, rs8050894, intron]
   VKORC1*H4:
     mutations:
-    - [6768, G>C, rs8050894, intron]
-    - [7481, T>C, rs2359612, intron]
-  VKORC1*H6:
+    - [296, T>C, rs7196161, 5'UTR]
+    - [7481, C>T, rs2359612, intron]
+  VKORC1*H7:
     mutations:
-    - [6768, G>C, rs8050894, intron]
-  VKORC1*H7A:
-    mutations:
-    - [6768, G>C, rs8050894, intron]
-    - [8688, C>T, rs7200749, P83L]
-    - [8956, G>A, rs7294, 3prime]
-  VKORC1*H7B:
-    mutations:
-    - [6768, G>C, rs8050894, intron]
-    - [8956, G>A, rs7294, 3prime]
+    - [8956, G>A, rs7294, 3'UTR]
   VKORC1*H9:
     mutations:
-    - [776, C>A, rs17880887, intron]
+    - [776, C>A, rs17880887, 5'UTR]
     - [5924, C>T, rs17708472, intron]
-    - [6768, G>C, rs8050894, intron]
+    - [2568, G>C, rs17881535, 5'UTR]
 structure:
   genes: [VKORC1]
   regions:

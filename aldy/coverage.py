@@ -98,19 +98,24 @@ class Coverage:
             len(self._coverage) + 0.1
         )
 
-    # def dump(self, filter_fn=None):
-    #     s = []
-    #     for pos, pos_mut in self._coverage.items():
-    #         z = {
-    #             o: c
-    #             for o, c in pos_mut.items()
-    #             if filter_fn
-    #             and not filter_fn(Mutation(pos, o), c, self.total(pos),
-    #             self._threshold)
-    #         }
-    #         if len(z):
-    #             s.append(f"{pos}: {z} {self._threshold} {self.total(pos)}")
-    #     return "\n".join(s)
+    def dump(self, gene, out):
+        for pos, pos_mut in sorted(self._coverage.items()):
+            if not (len(pos_mut) == 1 and "_" in pos_mut):
+                for i, (op, cov) in enumerate(sorted(pos_mut.items(), reverse=True)):
+                    p = self.percentage(Mutation(pos, op))
+                    if pos in gene:
+                        x = gene.get_functional((pos, op))
+                        if op == "_":
+                            x = ""
+                        if x and (pos, op) not in gene.mutations:
+                            x += "**"
+                        t = f"{x if x else ''}\t{gene.region_at(pos)[1]}"
+                        t += "\t" + gene.get_rsid((pos, op))
+                    else:
+                        t = "\t\t"
+                    out(
+                        f"[dump] {self.sample}\t{gene.name}\t{gene.chr_to_ref.get(pos, '-')+1}\t{op}\t{p:.1f}\t{t}"
+                    )
 
     def filtered(
         self, filter_fn: Callable[[Mutation, float, float, float], bool]

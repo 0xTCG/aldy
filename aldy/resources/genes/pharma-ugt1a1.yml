@@ -3,50 +3,63 @@ version: pharmgkb
 generated: '2021-02-20'
 ensembl: ENSG00000241635
 alleles:
-  UGT1A1*1.001:
+  UGT1A1*1:
     label: UGT1A1*1
     mutations: []
-  UGT1A1*6.001:
+  UGT1A1*6:
     label: UGT1A1*6
     mutations:
     - [175755, G>A, rs4148323, G71R]
-  UGT1A1*27.001:
+  UGT1A1*27:
     label: UGT1A1*27
     mutations:
     - [176230, C>A, rs35350960, P229Q]
-  UGT1A1*28.001:
-    label: UGT1A1*28
+  UGT1A1*27^28^60^80:
+    label: UGT1A1*27^28^60^80
     mutations:
-    - [175492, insTA, rs3064744, Promoter]
-  UGT1A1*36.001:
-    label: UGT1A1*36+60
-    mutations:
-    - [172270, T>G, rs4124874]
-    - [175492, delTA, rs3064744, Promoter]
-  UGT1A1*60.001:
-    label: UGT1A1*60
-    mutations:
-    - [172270, T>G, rs4124874]
-  UGT1A1*80.001:
-    label: UGT1A1*80+60
-    mutations:
-    - [172270, T>G, rs4124874]
-    - [175181, C>T, rs887829, nearGene-5]
-  UGT1A1*80.002:
-    label: UGT1A1*80+28+60
-    mutations:
-    - [172270, T>G, rs4124874]
-    - [175181, C>T, rs887829, nearGene-5]
-    - [175492, insTA, rs3064744, Promoter]
-    - [172393, G>A, rs10929302]
-  UGT1A1*80.003:
-    label: UGT1A1*80+27+28+60
-    mutations:
-    - [172270, T>G, rs4124874]
+    - [172270, T>G, rs4124874, 5'UTR]
     - [175181, C>T, rs887829, nearGene-5]
     - [175492, insTA, rs3064744, Promoter]
     - [176230, C>A, rs35350960, P229Q]
-    - [172393, G>A, rs10929302]
+  UGT1A1*27^28^60^80^93:
+    label: UGT1A1*27^28^60^80^93
+    mutations:
+    - [172270, T>G, rs4124874, 5'UTR]
+    - [175181, C>T, rs887829, nearGene-5]
+    - [175492, insTA, rs3064744, Promoter]
+    - [176230, C>A, rs35350960, P229Q]
+    - [172393, G>A, rs10929302, 5'UTR]
+  UGT1A1*28:
+    label: UGT1A1*28
+    mutations:
+    - [175492, insTA, rs3064744, Promoter]
+  UGT1A1*28^60^80:
+    label: UGT1A1*28^60^80
+    mutations:
+    - [172270, T>G, rs4124874, 5'UTR]
+    - [175181, C>T, rs887829, nearGene-5]
+    - [175492, insTA, rs3064744, Promoter]
+  UGT1A1*28^60^80^93:
+    label: UGT1A1*28^60^80^93
+    mutations:
+    - [172270, T>G, rs4124874, 5'UTR]
+    - [175181, C>T, rs887829, nearGene-5]
+    - [175492, insTA, rs3064744, Promoter]
+    - [172393, G>A, rs10929302, 5'UTR]
+  UGT1A1*36^60:
+    label: UGT1A1*36^60
+    mutations:
+    - [172270, T>G, rs4124874, 5'UTR]
+    - [175492, delTA, rs3064744, Promoter]
+  UGT1A1*60:
+    label: UGT1A1*60
+    mutations:
+    - [172270, T>G, rs4124874, 5'UTR]
+  UGT1A1*60^80:
+    label: UGT1A1*60^80
+    mutations:
+    - [172270, T>G, rs4124874, 5'UTR]
+    - [175181, C>T, rs887829, nearGene-5]
 structure:
   genes: [UGT1A1]
   regions:

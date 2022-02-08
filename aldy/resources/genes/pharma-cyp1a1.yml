@@ -3,17 +3,17 @@ version: pharmgkb-karolinska
 generated: '2020-07-20'
 ensembl: ENSG00000140465
 alleles:
-  CYP1A1*1.001:
+  CYP1A1*1:
     label: CYP1A1*1
     mutations: []
-  CYP1A1*2.003:
+  CYP1A1*2C:
     label: CYP1A1*2C
     mutations:
     - [9885, A>G, rs1048943, I462V]
   CYP1A1*3.001:
     label: CYP1A1*3
     mutations:
-    - [10635, T>C, rs1800031, F]
+    - [10635, T>C, rs1800031, 3'UTR]
   CYP1A1*4.001:
     label: CYP1A1*4
     mutations:

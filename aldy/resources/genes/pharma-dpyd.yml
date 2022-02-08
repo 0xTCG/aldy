@@ -2,73 +2,75 @@ name: DPYD
 version: pharmvar-4.1.7
 generated: '2020-07-20'
 pharmvar: 1409
-ensembl: ENSG00000188641
 alleles:
   DPYD*1:
     label: DPYD*1
     mutations: []
-  DPYD*1905+1GA:
+  DPYD*1905^1G>A:
     pharmvar: https://www.pharmvar.org/haplotype/983
     activity: no function
-    label: DPYD*2A
+    label: DPYD*1905^1G>A
     mutations:
     - [476002, G>A, rs3918290, splicing]
-  DPYD*1898delC:
+  DPYD*1898del:
     pharmvar: https://www.pharmvar.org/haplotype/1034
     activity: no function
-    label: DPYD*3
+    label: DPYD*1898del
     mutations:
     - [475994, delC, rs72549303, P633Qfs]
-  DPYD*299delTCAT:
+  DPYD*295_298delTCAT:
     pharmvar: https://www.pharmvar.org/haplotype/1041
     activity: no function
-    label: DPYD*7
+    label: DPYD*295_298delTCAT
     mutations:
     - [185642, delTCAT, rs72549309, F100Sfs]
-  DPYD*703CT:
+  DPYD*703C>T:
     pharmvar: https://www.pharmvar.org/haplotype/911
     activity: no function
-    label: DPYD*8
+    label: DPYD*703C>T
     mutations:
     - [234284, C>T, rs1801266, R235W]
-  DPYD*2983GT:
+  DPYD*2983G>T:
     pharmvar: https://www.pharmvar.org/haplotype/913
     activity: no function
-    label: DPYD*10
+    label: DPYD*2983G>T
     mutations:
     - [846989, G>T, rs1801268, V995F]
-  DPYD*1156GT:
+  DPYD*1156G>T:
     pharmvar: https://www.pharmvar.org/haplotype/1302
     activity: no function
-    label: DPYD*12
+    label: DPYD*1156G>T
     mutations:
     - [352117, G>T, rs78060119, E386X]
-  DPYD*1679TG:
+  DPYD*1679T>G:
     pharmvar: https://www.pharmvar.org/haplotype/1000
     activity: no function
-    label: DPYD*13
+    label: DPYD*1679T>G
     mutations:
     - [410273, T>G, rs55886062, I560S]
-  DPYD*1129_5923CG:
+  DPYD*1129_5923C>G:
     pharmvar: https://www.pharmvar.org/haplotype/1077
     activity: decreased function
-    label: HapB3
+    label: DPYD*1129_5923C>G
     mutations:
-    - [346167, C>G, rs75017182, intronic]
-    - [352197, G>A, rs56038477, intronic]
-  DPYD*2846AT:
+    - [346167, C>G, rs75017182, splice]
+    - [352197, G>A, rs56038477, E412=]
+  DPYD*2846A>T:
     pharmvar: https://www.pharmvar.org/haplotype/1031
     activity: decreased function
+    label: DPYD*2846A>T
     mutations:
     - [843669, A>T, rs67376798, D949V]
   DPYD*61CT:
+    label: DPYD*61C>T
     pharmvar: https://www.pharmvar.org/haplotype/1042
     activity: no function
     mutations:
     - [42707, C>T, rs72549310, R21X]
-  DPYD*557AG:
+  DPYD*557A>G:
     pharmvar: https://www.pharmvar.org/haplotype/862
     activity: decreased function
+    label: DPYD*557A>G
     mutations:
     - [226586, A>G, rs115232898, Y186C]
 structure:

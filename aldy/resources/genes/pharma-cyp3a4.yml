@@ -4,90 +4,9 @@ generated: '2020-07-11'
 ensembl: ENSG00000160868
 alleles:
   CYP3A4*1.001:
-    label: CYP3A4*1B
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations: []
-  CYP3A4*1.002:
     label: CYP3A4*1
     activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [4713, G>A, rs2740574]
-  CYP3A4*1.003:
-    label: CYP3A4*1C
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [4661, T>G, rs72554603]
-  CYP3A4*1.004:
-    label: CYP3A4*1D
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [5043, C>A, rs12721636]
-  CYP3A4*1.005:
-    label: CYP3A4*1E
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [4736, T>A, rs72552802]
-  CYP3A4*1.006:
-    label: CYP3A4*1F
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [4358, C>G, rs11773597]
-  CYP3A4*1.007:
-    label: CYP3A4*1G
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [25343, G>A, rs2242480]
-  CYP3A4*1.008:
-    label: CYP3A4*1H
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [25343, G>A, rs2242480]
-    - [31319, C>A, rs59715127]
-  CYP3A4*1.009:
-    label: CYP3A4*1J
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [11180, A>G, rs72552800]
-  CYP3A4*1.010:
-    label: CYP3A4*1K
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [4450, A>G, rs1298207919]
-  CYP3A4*1.011:
-    label: CYP3A4*1L
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [4475, A>G, rs28988569]
-  CYP3A4*1.012:
-    label: CYP3A4*1M
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [4949, C>A, rs59537101]
-  CYP3A4*1.013:
-    label: CYP3A4*1N
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [19313, T>G, rs68106838]
-  CYP3A4*1.014:
-    label: CYP3A4*1P
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [20840, G>A, rs55808838]
-  CYP3A4*1.016:
-    label: CYP3A4*1R
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [21888, A>G, rs56997749]
-  CYP3A4*1.017:
-    label: CYP3A4*1S
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [22928, delAT, rs56153749]
-  CYP3A4*1.018:
-    label: CYP3A4*1T
-    activity: Normal (in vivo); Normal (in vitro)
-    mutations:
-    - [31126, T>C, rs72552794]
+    mutations: []
   CYP3A4*2.001:
     label: CYP3A4*2
     mutations:
@@ -145,44 +64,27 @@ alleles:
     mutations:
     - [5148, T>C, rs12721634, L15P]
   CYP3A4*15A.001:
-    label: CYP3A4*15A
+    label: CYP3A4*15
     mutations:
     - [19382, G>A, rs4986907, R162Q]
-  CYP3A4*15.002:
-    label: CYP3A4*15B
-    mutations:
-    - [19382, G>A, rs4986907, R162Q]
-    - [4260, insATGGAGTAG, rs28988568]
   CYP3A4*16.001:
-    label: CYP3A4*16A
+    label: CYP3A4*16
     activity: Decr (in vitro)
     mutations:
     - [20716, C>G, rs12721627, T185S]
-  CYP3A4*16.002:
-    label: CYP3A4*16B
-    activity: Decr (in vitro)
-    mutations:
-    - [20716, C>G, rs12721627, T185S]
-    - [25343, G>A, rs2242480]
   CYP3A4*17.001:
     label: CYP3A4*17
     activity: Decr (in vitro)
     mutations:
     - [20728, T>C, rs4987161, F189S]
   CYP3A4*18.001:
-    label: CYP3A4*18A
+    label: CYP3A4*18
     activity: Decr (m) (in vivo); Incr(t, c, e) (in vitro)
     mutations:
     - [25183, T>C, rs28371759, L293P]
-  CYP3A4*18.002:
-    label: CYP3A4*18B
-    mutations:
-    - [25183, T>C, rs28371759, L293P]
-    - [25343, G>A, rs2242480]
   CYP3A4*19.001:
     label: CYP3A4*19
     mutations:
-    - [25343, G>A, rs2242480]
     - [28350, C>T, rs4986913, P467S]
   CYP3A4*20.001:
     label: CYP3A4*20
@@ -193,13 +95,11 @@ alleles:
     label: CYP3A4*22
     activity: Decr. (in vivo)
     mutations:
-    - [20493, C>T, rs35599367, F]
+    - [20493, C>T, rs35599367, intron]
   CYP3A4*23.001:
     label: CYP3A4*23
     mutations:
     - [19381, C>T, rs57409622, R162W]
-    - [25343, G>A, rs2242480]
-    - [30834, A>G, rs3735451]
 structure:
   genes: [CYP3A4]
   regions:

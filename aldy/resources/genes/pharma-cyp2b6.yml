@@ -7,111 +7,16 @@ alleles:
   CYP2B6*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/739
     activity: normal function
-    label: CYP2B6*1A
+    label: CYP2B6*1
     evidence: D
     mutations: []
-  CYP2B6*1.002:
-    pharmvar: https://www.pharmvar.org/haplotype/823
-    activity: normal function
-    label: CYP2B6*1B,CYP2B6*1C
-    evidence: L
-    mutations:
-    - [2688, T>C, rs7254579]
-  CYP2B6*1.003:
-    pharmvar: https://www.pharmvar.org/haplotype/828
-    activity: normal function
-    label: CYP2B6*1D
-    evidence: L
-    mutations:
-    - [3230, A>G, rs3760657]
-    - [3822, C>G, rs4802100]
-  CYP2B6*1.004:
-    pharmvar: https://www.pharmvar.org/haplotype/827
-    activity: normal function
-    label: CYP2B6*1E
-    evidence: L
-    mutations:
-    - [3430, C>T, rs12721652]
-    - [4251, C>T, rs12721653]
-  CYP2B6*1.005:
-    pharmvar: https://www.pharmvar.org/haplotype/826
-    activity: normal function
-    label: CYP2B6*1F
-    evidence: L
-    mutations:
-    - [3784, A>G, rs12721648]
-  CYP2B6*1.006:
-    pharmvar: https://www.pharmvar.org/haplotype/825
-    activity: normal function
-    label: CYP2B6*1G
-    evidence: L
-    mutations:
-    - [4258, T>C, rs4802101]
-  CYP2B6*1.007:
-    pharmvar: https://www.pharmvar.org/haplotype/831
-    activity: normal function
-    label: CYP2B6*1H
-    evidence: L
-    mutations:
-    - [2688, T>C, rs7254579]
-    - [4258, T>C, rs4802101]
-  CYP2B6*1.008:
-    pharmvar: https://www.pharmvar.org/haplotype/830
-    activity: normal function
-    label: CYP2B6*1J
-    evidence: L
-    mutations:
-    - [2688, T>C, rs7254579]
-    - [3230, A>G, rs3760657]
-    - [3822, C>G, rs4802100]
-    - [4258, T>C, rs4802101]
-  CYP2B6*1.009:
-    pharmvar: https://www.pharmvar.org/haplotype/829
-    activity: normal function
-    label: CYP2B6*1K
-    evidence: L
-    mutations:
-    - [3036, C>T, rs1962261]
-    - [3430, C>T, rs12721652]
-    - [4258, T>C, rs4802101]
-  CYP2B6*1.010:
-    pharmvar: https://www.pharmvar.org/haplotype/813
-    activity: normal function
-    label: CYP2B6*1L
-    evidence: L
-    mutations:
-    - [3430, C>T, rs12721652]
-    - [4258, T>C, rs4802101]
-  CYP2B6*1.011:
-    pharmvar: https://www.pharmvar.org/haplotype/812
-    activity: normal function
-    label: CYP2B6*1M
-    evidence: L
-    mutations:
-    - [3430, C>T, rs12721652]
-  CYP2B6*1.012:
-    pharmvar: https://www.pharmvar.org/haplotype/811
-    activity: normal function
-    label: CYP2B6*1N
-    evidence: L
-    mutations:
-    - [3552, T>C, rs2054675]
-    - [4258, T>C, rs4802101]
-  CYP2B6*2.001:
+  CYP2B6*2:
     pharmvar: https://www.pharmvar.org/haplotype/819
     activity: normal function
-    label: CYP2B6*2A
+    label: CYP2B6*2
     evidence: L
     mutations:
     - [5071, C>T, rs8192709, R22C]
-  CYP2B6*2.002:
-    pharmvar: https://www.pharmvar.org/haplotype/821
-    activity: normal function
-    label: CYP2B6*2B
-    evidence: L
-    mutations:
-    - [5071, C>T, rs8192709, R22C]
-    - [17747, G>C, rs2279341]
   CYP2B6*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/820
     activity: uncertain function
@@ -122,82 +27,31 @@ alleles:
   CYP2B6*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/789
     activity: increased function
-    label: CYP2B6*4A,CYP2B6*4B,CYP2B6*4C
+    label: CYP2B6*4
     evidence: L
     mutations:
-    - [2688, T>C, rs7254579]
-    - [3230, A>G, rs3760657]
-    - [3822, C>G, rs4802100]
-    - [4258, T>C, rs4802101]
-    - [23060, A>G, rs2279343, K262R]
-  CYP2B6*4.002:
-    pharmvar: https://www.pharmvar.org/haplotype/791
-    activity: increased function
-    label: CYP2B6*4D
-    evidence: L
-    mutations:
-    - [3552, T>C, rs2054675]
-    - [4258, T>C, rs4802101]
     - [23060, A>G, rs2279343, K262R]
   CYP2B6*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/780
     activity: normal function
-    label: CYP2B6*5A
+    label: CYP2B6*5
     evidence: L
     mutations:
-    - [30512, C>T, rs3211371, R487C]
-  CYP2B6*5.002:
-    pharmvar: https://www.pharmvar.org/haplotype/779
-    activity: normal function
-    label: CYP2B6*5B
-    evidence: L
-    mutations:
-    - [2688, T>C, rs7254579]
-    - [4258, T>C, rs4802101]
-    - [30512, C>T, rs3211371, R487C]
-  CYP2B6*5.003:
-    pharmvar: https://www.pharmvar.org/haplotype/784
-    activity: normal function
-    label: CYP2B6*5C
-    evidence: L
-    mutations:
-    - [4417, A>G, rs559553896]
     - [30512, C>T, rs3211371, R487C]
   CYP2B6*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/799
     activity: decreased function
-    label: CYP2B6*6A
+    label: CYP2B6*6
     evidence: L
     mutations:
-    - [20638, G>T, rs3745274, Q172H]
-    - [23060, A>G, rs2279343, K262R]
-  CYP2B6*6.002:
-    pharmvar: https://www.pharmvar.org/haplotype/801
-    activity: decreased function
-    label: CYP2B6*6B
-    evidence: L
-    mutations:
-    - [3552, T>C, rs2054675]
-    - [4258, T>C, rs4802101]
-    - [20638, G>T, rs3745274, Q172H]
-    - [23060, A>G, rs2279343, K262R]
-  CYP2B6*6.003:
-    pharmvar: https://www.pharmvar.org/haplotype/800
-    activity: decreased function
-    label: CYP2B6*6C
-    evidence: L
-    mutations:
-    - [4258, T>C, rs4802101]
     - [20638, G>T, rs3745274, Q172H]
     - [23060, A>G, rs2279343, K262R]
   CYP2B6*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/796
     activity: decreased function
-    label: CYP2B6*7A,CYP2B6*7B
+    label: CYP2B6*7
     evidence: L
     mutations:
-    - [3552, T>C, rs2054675]
-    - [4258, T>C, rs4802101]
     - [20638, G>T, rs3745274, Q172H]
     - [23060, A>G, rs2279343, K262R]
     - [30512, C>T, rs3211371, R487C]
@@ -211,7 +65,7 @@ alleles:
   CYP2B6*11.001:
     pharmvar: https://www.pharmvar.org/haplotype/797
     activity: uncertain function
-    label: CYP2B6*11A,CYP2B6*11B
+    label: CYP2B6*11
     evidence: L
     mutations:
     - [5143, A>G, rs35303484, M46V]
@@ -225,7 +79,7 @@ alleles:
   CYP2B6*13.001:
     pharmvar: https://www.pharmvar.org/haplotype/806
     activity: no function
-    label: CYP2B6*13A,CYP2B6*13B
+    label: CYP2B6*13
     evidence: L
     mutations:
     - [18079, A>G, rs12721655, K139E]
@@ -237,29 +91,18 @@ alleles:
     label: CYP2B6*14
     evidence: L
     mutations:
-    - [18083, G>A, rs35773040, A140G]
+    - [18083, G>A, rs35773040, R140Q]
   CYP2B6*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/816
     activity: uncertain function
-    label: CYP2B6*15A,CYP2B6*15B
+    label: CYP2B6*15
     evidence: L
     mutations:
     - [26395, T>A, rs35979566, I391N]
   CYP2B6*17.001:
     pharmvar: https://www.pharmvar.org/haplotype/783
     activity: normal function
-    label: CYP2B6*17A
-    evidence: L
-    mutations:
-    - [5083, A>T, rs33973337, T26S]
-    - [5090, A>G, rs386809310, D28G]
-    - [5092, C>A, rs33926104, R29S]
-    - [5093, G>C, rs34284776, R29P]
-    - [23806, C>T, rs35468935]
-  CYP2B6*17.002:
-    pharmvar: https://www.pharmvar.org/haplotype/786
-    activity: normal function
-    label: CYP2B6*17B
+    label: CYP2B6*17
     evidence: L
     mutations:
     - [5083, A>T, rs33973337, T26S]
@@ -269,10 +112,18 @@ alleles:
   CYP2B6*18.001:
     pharmvar: https://www.pharmvar.org/haplotype/785
     activity: no function
-    label: CYP2B6*18
+    label: CYP2B6*18.001
     evidence: L
     mutations:
     - [26018, T>C, rs28399499, I328T]
+  CYP2B6*18.002:
+    pharmvar: https://www.pharmvar.org/haplotype/785
+    activity: no function
+    label: CYP2B6*18.002
+    evidence: L
+    mutations:
+    - [26018, T>C, rs28399499, I328T]
+    - [23060, A>G, rs2279343, K262R]
   CYP2B6*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/790
     activity: decreased function
@@ -304,10 +155,7 @@ alleles:
     label: CYP2B6*22
     evidence: L
     mutations:
-    - [3160, C>A, rs139512553]
-    - [4207, G>T, rs147862019]
-    - [4258, T>C, rs4802101]
-    - [4926, T>C, rs34223104, upstream]
+    - [4926, T>C, rs34223104, 5'UTR]
   CYP2B6*24.001:
     pharmvar: https://www.pharmvar.org/haplotype/794
     activity: no function
@@ -352,13 +200,10 @@ alleles:
     label: CYP2B6*35
     evidence: L
     mutations:
-    - [4926, T>C, rs34223104, upstream]
-    - [17732, G>A, rs142657251]
-    - [17795, T>G, rs149403002]
+    - [4926, T>C, rs34223104, 5'UTR]
     - [17860, G>T, rs186335453, G110V]
     - [18005, T>C, rs139801276, I114T]
     - [18108, G>T, rs145884402, E148D]
-    - [18129, G>A, rs138652715]
     - [20715, T>C, rs36079186, M198T]
     - [23708, G>C, rs139029625, A279P]
   CYP2B6*36.001:
@@ -367,7 +212,7 @@ alleles:
     label: CYP2B6*36
     evidence: L
     mutations:
-    - [4926, T>C, rs34223104, upstream]
+    - [4926, T>C, rs34223104, 5'UTR]
     - [20638, G>T, rs3745274, Q172H]
     - [23060, A>G, rs2279343, K262R]
   CYP2B6*37.001:

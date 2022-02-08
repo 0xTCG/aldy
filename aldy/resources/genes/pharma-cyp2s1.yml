@@ -7,56 +7,18 @@ alleles:
   CYP2S1*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/320
     activity: normal function
-    label: CYP2S1*1A
+    label: CYP2S1*1
     mutations: []
-  CYP2S1*1.002:
-    pharmvar: https://www.pharmvar.org/haplotype/318
-    label: CYP2S1*1B
-    mutations:
-    - [6355, G>A, rs60694775]
-  CYP2S1*1.003:
-    pharmvar: https://www.pharmvar.org/haplotype/317
-    label: CYP2S1*1C
-    mutations:
-    - [6379, C>G, rs338599]
-  CYP2S1*1.004:
-    pharmvar: https://www.pharmvar.org/haplotype/316
-    label: CYP2S1*1D
-    mutations:
-    - [6379, C>G, rs338599]
-    - [18310, A>G, rs338583]
-  CYP2S1*1.005:
-    pharmvar: https://www.pharmvar.org/haplotype/315
-    label: CYP2S1*1E
-    mutations:
-    - [9679, G>A, rs57266494]
-  CYP2S1*1.006:
-    pharmvar: https://www.pharmvar.org/haplotype/314
-    label: CYP2S1*1F
-    mutations:
-    - [13087, G>A, rs151310483]
-  CYP2S1*1.007:
-    pharmvar: https://www.pharmvar.org/haplotype/313
-    label: CYP2S1*1G
-    mutations:
-    - [18171, G>A, rs111879045]
-  CYP2S1*1.008:
-    pharmvar: https://www.pharmvar.org/haplotype/312
-    label: CYP2S1*1H
-    mutations:
-    - [18310, A>G, rs338583]
   CYP2S1*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/319
     label: CYP2S1*2
     mutations:
     - [15402, C>T, rs72547592, R380C]
-    - [18310, A>G, rs338583]
   CYP2S1*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/321
     label: CYP2S1*3
     mutations:
     - [18161, C>T, rs34971233, P466L]
-    - [18310, A>G, rs338583]
   CYP2S1*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/311
     label: CYP2S1*4

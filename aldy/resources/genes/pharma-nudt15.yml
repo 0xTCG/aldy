@@ -4,43 +4,11 @@ generated: '2020-07-11'
 pharmvar: 22812
 ensembl: ENSG00000136159
 alleles:
-  NUDT15*1.001:
+  NUDT15*1:
     pharmvar: https://www.pharmvar.org/haplotype/358
     activity: normal function
     mutations: []
-  NUDT15*1.002:
-    pharmvar: https://www.pharmvar.org/haplotype/362
-    activity: normal function
-    mutations:
-    - [5216, A>C, rs61746486]
-  NUDT15*1.003:
-    pharmvar: https://www.pharmvar.org/haplotype/361
-    activity: normal function
-    mutations:
-    - [5102, G>A, rs181638201]
-  NUDT15*1.004:
-    pharmvar: https://www.pharmvar.org/haplotype/356
-    activity: normal function
-    mutations:
-    - [5161, G>A, rs368390627]
-  NUDT15*1.005:
-    pharmvar: https://www.pharmvar.org/haplotype/355
-    activity: normal function
-    mutations:
-    - [13240, G>A, rs61973267]
-  NUDT15*1.006:
-    pharmvar: https://www.pharmvar.org/haplotype/357
-    activity: normal function
-    mutations:
-    - [5303, C>A, rs138959770]
-  NUDT15*1.007:
-    pharmvar: https://www.pharmvar.org/haplotype/1316
-    activity: normal function
-    label: ''
-    mutations:
-    - [5060, G>A, rs544736228]
-    - [5102, G>A, rs181638201]
-  NUDT15*3.001:
+  NUDT15*3:
     pharmvar: https://www.pharmvar.org/haplotype/364
     activity: no function
     mutations:

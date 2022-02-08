@@ -7,111 +7,37 @@ alleles:
   CYP2C9*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/30
     activity: normal function
-    label: CYP2C9*1A
+    label: CYP2C9*1
     evidence: D
     mutations: []
-  CYP2C9*1.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1321
-    activity: normal function
-    label: CYP2C9*1B
-    evidence: L
-    mutations:
-    - [2363, delTG, rs146705863]
-    - [3838, T>C, rs4918758]
-  CYP2C9*1.003:
-    pharmvar: https://www.pharmvar.org/haplotype/32
-    activity: normal function
-    label: CYP2C9*1C
-    evidence: L
-    mutations:
-    - [3838, T>C, rs4918758]
-  CYP2C9*1.005:
-    pharmvar: https://www.pharmvar.org/haplotype/420
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3141, C>G, rs9332093]
-    - [3489, G>A, rs61604699]
-    - [4045, G>A, rs9332098]
-    - [55323, A>T, rs1057911]
-  CYP2C9*1.006:
-    pharmvar: https://www.pharmvar.org/haplotype/419
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3461, C>T, rs9332096]
-    - [3838, T>C, rs4918758]
   CYP2C9*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/44
     activity: decreased function
-    label: CYP2C9*2A
+    label: CYP2C9*2
     evidence: D
     mutations:
-    - [3838, T>C, rs4918758]
-    - [3930, A>G, rs4917636]
-    - [4406, G>T, rs9332100]
-    - [4541, T>A, rs9332101]
-    - [4542, C>A, rs9332102]
     - [8633, C>T, rs1799853, R144C]
-  CYP2C9*2.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1322
-    activity: decreased function
-    label: CYP2C9*2B
-    evidence: L
+  CYP2C9*2^36:
+    label: CYP2C9*2^36
     mutations:
-    - [2363, delTG, rs146705863]
-    - [3838, T>C, rs4918758]
-    - [3930, A>G, rs4917636]
-    - [4406, G>T, rs9332100]
-    - [4541, T>A, rs9332101]
-    - [4542, C>A, rs9332102]
+    - [5026, A>G, rs114071557, M1V]
     - [8633, C>T, rs1799853, R144C]
-  CYP2C9*2.003:
-    pharmvar: https://www.pharmvar.org/haplotype/45
-    activity: decreased function
-    label: CYP2C9*2C
-    evidence: L
-    mutations:
-    - [3930, A>G, rs4917636]
-    - [4406, G>T, rs9332100]
-    - [4541, T>A, rs9332101]
-    - [4542, C>A, rs9332102]
-    - [8633, C>T, rs1799853, R144C]
-  CYP2C9*2.004:
-    pharmvar: https://www.pharmvar.org/haplotype/417
-    activity: decreased function
-    evidence: M
-    mutations:
-    - [3838, T>C, rs4918758]
-    - [3930, A>G, rs4917636]
-    - [4406, G>T, rs9332100]
-    - [8633, C>T, rs1799853, R144C]
-    - [55479, C>G, rs9332242]
   CYP2C9*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/58
     activity: no function
-    label: CYP2C9*3A
+    label: CYP2C9*3
     evidence: L
     mutations:
-    - [3115, T>C, rs9332092]
-    - [3141, C>G, rs9332093]
-    - [3489, G>A, rs61604699]
-    - [4045, G>A, rs9332098]
+    - [3115, T>C, rs9332092, 5'UTR]
     - [47639, A>C, rs1057910, I359L]
-    - [55323, A>T, rs1057911]
   CYP2C9*3.002:
-    pharmvar: https://www.pharmvar.org/haplotype/57
+    pharmvar: https://www.pharmvar.org/haplotype/58
     activity: no function
-    label: CYP2C9*3B
-    evidence: D
+    label: CYP2C9*3
+    evidence: L
     mutations:
-    - [3115, T>C, rs9332092]
-    - [3141, C>G, rs9332093]
-    - [3489, G>A, rs61604699]
-    - [3838, T>C, rs4918758]
-    - [4045, G>A, rs9332098]
+    # - [3115, T>C, rs9332092, 5'UTR]
     - [47639, A>C, rs1057910, I359L]
-    - [55323, A>T, rs1057911]
   CYP2C9*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/24
     activity: decreased function
@@ -133,12 +59,12 @@ alleles:
     label: CYP2C9*6
     evidence: L
     mutations:
-    - [15626, delA, rs9332131, 273frameshift]
+    - [15626, delA, rs9332131, K273frameshift]
   CYP2C9*8.001:
-    label: CYP2C9*rs9332094
+    label: CYP2C9*8
     evidence: M
     mutations:
-    - [3260, T>C, rs9332094]
+    - [3260, T>C, rs9332094, 5'UTR]
   CYP2C9*9.001:
     pharmvar: https://www.pharmvar.org/haplotype/19
     activity: normal function
@@ -156,18 +82,9 @@ alleles:
   CYP2C9*11.001:
     pharmvar: https://www.pharmvar.org/haplotype/59
     activity: decreased function
-    label: CYP2C9*11A
+    label: CYP2C9*11
     evidence: D
     mutations:
-    - [47567, C>T, rs28371685, R335W]
-  CYP2C9*11.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1319
-    activity: decreased function
-    label: CYP2C9*11B
-    evidence: M
-    mutations:
-    - [2363, delTG, rs146705863]
-    - [3838, T>C, rs4918758]
     - [47567, C>T, rs28371685, R335W]
   CYP2C9*12.001:
     pharmvar: https://www.pharmvar.org/haplotype/10
@@ -211,14 +128,9 @@ alleles:
     label: CYP2C9*18
     evidence: M
     mutations:
-    - [3115, T>C, rs9332092]
-    - [3141, C>G, rs9332093]
-    - [3489, G>A, rs61604699]
-    - [3838, T>C, rs4918758]
-    - [4045, G>A, rs9332098]
+    - [3115, T>C, rs9332092, 5'UTR]
     - [47639, A>C, rs1057910, I359L]
     - [52416, A>C, rs72558193, D397A]
-    - [55323, A>T, rs1057911]
   CYP2C9*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/26
     activity: uncertain function
@@ -233,7 +145,6 @@ alleles:
     label: CYP2C9*20
     evidence: M
     mutations:
-    - [3838, T>C, rs4918758]
     - [8240, G>C, rs371055887, G70R]
   CYP2C9*21.001:
     pharmvar: https://www.pharmvar.org/haplotype/34
@@ -262,7 +173,21 @@ alleles:
     label: CYP2C9*25
     evidence: D
     mutations:
-    - [8556, delAGAAATGGAA, rs1304490498, 118frameshift]
+    - [8556, delAGAAATGGAA, rs1304490498, K118frameshift]
+  CYP2C9*26.001:
+    pharmvar: https://www.pharmvar.org/haplotype/41
+    activity: decreased function
+    label: CYP2C9*26
+    evidence: D
+    mutations:
+    - [8592, C>G, '-', T130R]
+  CYP2C9*27.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1320
+    activity: uncertain function
+    label: CYP2C9*27
+    evidence: D
+    mutations:
+    - [8652, G>T, rs7900194, R150L]
   CYP2C9*28.001:
     pharmvar: https://www.pharmvar.org/haplotype/43
     activity: decreased function
@@ -312,12 +237,6 @@ alleles:
     evidence: L
     mutations:
     - [5026, A>G, rs114071557, M1V]
-  CYP2C9*36.002:
-    label: CYP2C9*2+36
-    evidence: L
-    mutations:
-    - [5026, A>G, rs114071557, M1V]
-    - [8633, C>T, rs1799853, R144C]
   CYP2C9*37.001:
     pharmvar: https://www.pharmvar.org/haplotype/55
     activity: decreased function

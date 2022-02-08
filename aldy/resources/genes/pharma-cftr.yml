@@ -11,12 +11,15 @@ alleles:
   CFTR*S549N:
     mutations:
     - [127017, G>A, rs121908755, S549N]
+  CFTR*S549I:
+    mutations:
+    - [127017, G>T, rs121908755, S549I]
   CFTR*S549R_AC:
     mutations:
     - [127016, A>C, rs121908757, S549R]
   CFTR*S549R_TG:
     mutations:
-    - [127018, T>G, rs121909005, S549R]  
+    - [127018, T>G, rs121909005, S549R]
   CFTR*G551S:
     mutations:
     - [127022, G>A, rs121909013, G551S]
@@ -37,7 +40,7 @@ alleles:
     - [203987, G>A, rs193922525, G1349D]
   CFTR*F508del:
     mutations:
-    - [98809, delCTT, rs113993960, F508del]
+    - [98808, delTCT, rs113993960, F508del]
   CFTR*R1158X:
     mutations:
     - [166742, C>T, rs79850223, R1158X]

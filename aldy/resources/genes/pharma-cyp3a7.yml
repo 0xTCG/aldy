@@ -4,47 +4,47 @@ generated: '2020-07-11'
 pharmvar: 13727
 ensembl: ENSG00000160870
 alleles:
-  CYP3A7*1.001:
+  CYP3A7*1A:
     pharmvar: https://www.pharmvar.org/haplotype/337
     activity: normal function
     label: CYP3A7*1A
     mutations: []
-  CYP3A7*1.002:
+  CYP3A7*1B:
     pharmvar: https://www.pharmvar.org/haplotype/338
     label: CYP3A7*1B
     mutations:
-    - [4792, C>T, rs45465393]
-  CYP3A7*1.003:
+    - [4792, C>T, rs45465393, 5'UTR]
+  CYP3A7*1C:
     pharmvar: https://www.pharmvar.org/haplotype/339
     label: CYP3A7*1C
     mutations:
-    - [4815, G>T, rs11568824]
-    - [4822, T>A, rs45494802]
-    - [4824, T>C, rs45575938]
-    - [4825, A>T, rs45467892]
-    - [4836, T>G, rs11568825]
-    - [4844, T>A, rs11568826]
-    - [4874, A>C, rs45446698]
-  CYP3A7*1.004:
+    - [4815, G>T, rs11568824, 5'UTR]
+    # - [4822, T>A, rs45494802, 5'UTR]
+    - [4824, T>C, rs45575938, 5'UTR]
+    - [4825, A>T, rs45467892, 5'UTR]
+    - [4836, T>G, rs11568825, 5'UTR]
+    - [4844, T>A, rs11568826, 5'UTR]
+    - [4874, A>C, rs45446698, 5'UTR]
+  CYP3A7*1D:
     pharmvar: https://www.pharmvar.org/haplotype/340
     label: CYP3A7*1D
     mutations:
-    - [5015, G>A, rs55798860]
-  CYP3A7*1.005:
+    - [5015, G>A, rs55798860, 5'UTR]
+  CYP3A7*1E:
     pharmvar: https://www.pharmvar.org/haplotype/341
     label: CYP3A7*1E
     mutations:
-    - [5057, G>A, rs28451617]
+    - [5057, G>A, rs28451617, 5'UTR]
   CYP3A7*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/342
     label: CYP3A7*2
     mutations:
     - [31137, C>G, rs2257401, T409R]
-  CYP3A7*2.002:
-    label: CYP3A7*2+1E
+  CYP3A7*2^1E:
+    label: CYP3A7*2^1E
     mutations:
     - [31137, C>G, rs2257401, T409R]
-    - [5057, G>A, rs28451617]
+    - [5057, G>A, rs28451617, 5'UTR]
 structure:
   genes: [CYP3A7]
   regions:

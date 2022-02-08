@@ -7,23 +7,18 @@ alleles:
   CYP3A43*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/334
     activity: normal function
-    label: CYP3A43*1A
+    label: CYP3A43*1
     mutations: []
-  CYP3A43*1.002:
-    pharmvar: https://www.pharmvar.org/haplotype/332
-    label: CYP3A43*1B
-    mutations:
-    - [38621, C>T, rs17342647]
   CYP3A43*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/333
     activity: no function
-    label: CYP3A43*2A
+    label: CYP3A43*2.001
     mutations:
     - [13443, delA, rs61469810, 25frameshift]
   CYP3A43*2.002:
     pharmvar: https://www.pharmvar.org/haplotype/335
     activity: no function
-    label: CYP3A43*2B
+    label: CYP3A43*2.002
     mutations:
     - [13443, delA, rs61469810, 25frameshift]
     - [36970, C>G, rs680055, P340A]

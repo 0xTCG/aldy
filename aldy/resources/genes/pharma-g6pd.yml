@@ -4,14 +4,14 @@ generated: '2020-07-18'
 ensembl: ENSG00000160211
 alleles:
   G6PD*B:
-    label: B (wildtype)
+    label: B
     activity: IV/Normal
     mutations: []
-  G6PD*noname:
-    label: No name
-    activity: Not reported/Unknown
+  G6PD*Null:
+    label: Null
+    activity: IV/Normal
     mutations:
-    - [6442, C>T, '-', R9W]
+    - [G6PD, deletion]
   G6PD*sinnai:
     label: Sinnai
     activity: III/Deficient
@@ -120,13 +120,13 @@ alleles:
     - [16571, G>A, rs1050828, V68M]
     - [19451, G>A, rs137852327, V291M]
   G6PD*A-.001:
-    label: A- 202A_376G
+    label: A-(202A_376G)
     activity: III/Deficient
     mutations:
     - [16571, G>A, rs1050828, V68M]
     - [17296, A>G, rs1050829, N126D]
   G6PD*202:
-    label: 202G>A_376A>G_1264C>G
+    label: 202A_376G_1264G
     activity: I/Deficient with CNSHA
     mutations:
     - [16571, G>A, rs1050828, V68M]
@@ -138,7 +138,7 @@ alleles:
     mutations:
     - [16577, T>C, rs137852349, Y70H]
   G6PD*murcia_oristano:
-    label: Murcia Oristano
+    label: Murcia_Oristano
     activity: III/Deficient
     mutations:
     - [16578, A>G, rs782090947, Y70C]
@@ -148,7 +148,7 @@ alleles:
     mutations:
     - [16593, T>C, '-', L75P]
   G6PD*ube_konan:
-    label: Ube Konan
+    label: Ube_Konan
     activity: III/Deficient
     mutations:
     - [16610, C>T, rs138687036, R81C]
@@ -168,7 +168,7 @@ alleles:
     mutations:
     - [17201, delAGA, '-', K95del]
   G6PD*sierra_leone:
-    label: Sierra Leone
+    label: Sierra_Leone
     activity: Not reported/Unknown
     mutations:
     - [17231, G>A, rs181277621, R104H]
@@ -186,12 +186,12 @@ alleles:
     mutations:
     - [17243, T>A, '-', V108E]
   G6PD*sao_borja:
-    label: Sao Borja
+    label: Sao _orja
     activity: IV/Normal
     mutations:
     - [17257, G>A, rs5030870, D113N]
   G6PD*bao_loc:
-    label: Bao Loc
+    label: Bao_Loc
     activity: II/Deficient
     mutations:
     - [17272, T>C, '-', Y118H]
@@ -210,7 +210,7 @@ alleles:
     - [17296, A>G, rs1050829, N126D]
     - [17383, C>G, '-', H155D]
   G6PD*santa_maria:
-    label: Santa Maria
+    label: Santa_Maria
     activity: II/Deficient
     mutations:
     - [17296, A>G, rs1050829, N126D]
@@ -222,13 +222,13 @@ alleles:
     - [17296, A>G, rs1050829, N126D]
     - [19451, G>A, rs137852327, V291M]
   G6PD*A-.002:
-    label: G6PD A- 680T_376G
+    label: A-(680T_376G)
     activity: III/Deficient
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [18448, G>T, rs137852328, R227L]
   G6PD*A-.003:
-    label: G6PD A- 968C_376G
+    label: A-(968C_376G)
     activity: III/Deficient
     mutations:
     - [17296, A>G, rs1050829, N126D]
@@ -239,23 +239,23 @@ alleles:
     mutations:
     - [17296, A>G, rs1050829, N126D]
   G6PD*mt_sinai:
-    label: Mt Sinai
+    label: Mt_Sinai
     activity: I/Deficient with CNSHA
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [19878, C>T, rs137852334, R387C]
   G6PD*vanua_lava:
-    label: Vanua Lava
+    label: Vanua_Lava
     activity: II/Deficient
     mutations:
     - [17303, T>C, rs78365220, L128P]
   G6PD*salerno_pyrgos:
-    label: Salerno Pyrgos
+    label: Salerno_Pyrgos
     activity: III/Deficient
     mutations:
     - [17303, T>G, rs78365220, L128R]
   G6PD*quing_yan:
-    label: Quing Yan
+    label: Quing_Yan
     activity: III/Deficient
     mutations:
     - [17312, G>T, '-', G131V]
@@ -305,7 +305,7 @@ alleles:
     mutations:
     - [18079, G>A, '-', G163D]
   G6PD*taipei:
-    label: "Taipei / Chinese-3"
+    label: Taipei
     activity: II/Deficient
     mutations:
     - [18084, A>G, rs137852331, N165D]
@@ -355,17 +355,17 @@ alleles:
     mutations:
     - [18152, delCTC, '-', S188del]
   G6PD*mediterranean.002:
-    label: "Mediterranean, Dallas, Panama / Sassari, Cagliari, Birmingham"
+    label: Mediterranean
     activity: II/Deficient
     mutations:
     - [18154, C>T, rs5030868, S188F]
   G6PD*pedoplis_ckaro:
-    label: Pedoplis-Ckaro
+    label: Pedoplis_Ckaro
     activity: I/Deficient with CNSHA
     mutations:
     - [18164, C>G, '-', F191L]
   G6PD*coimbra_shunde:
-    label: Coimbra Shunde
+    label: Coimbra_Shunde
     activity: II/Deficient
     mutations:
     - [18183, C>T, rs137852330, R198C]
@@ -390,7 +390,7 @@ alleles:
     mutations:
     - [18225, A>G, rs782754619, M212V]
   G6PD*minnesota:
-    label: Minnesota, Marion, Gastonia, LeJeune
+    label: Minnesota
     activity: I/Deficient with CNSHA
     mutations:
     - [18228, G>T, rs137852326, V213L]
@@ -411,12 +411,12 @@ alleles:
     mutations:
     - [18447, C>T, '-', R227W]
   G6PD*mexico_city:
-    label: Mexico City
+    label: Mexico_City
     activity: III/Deficient
     mutations:
     - [18448, G>A, rs137852328, R227Q]
   G6PD*north_dallas:
-    label: North Dallas
+    label: North_Dallas
     activity: I/Deficient with CNSHA
     mutations:
     - [18451, delACA, '-', N229del]
@@ -456,7 +456,7 @@ alleles:
     mutations:
     - [18944, G>C, '-', V271L]
   G6PD*cleveland_corum:
-    label: Cleveland Corum
+    label: Cleveland_Corum
     activity: I/Deficient with CNSHA
     mutations:
     - [18953, G>A, '-', E274K]
@@ -476,7 +476,7 @@ alleles:
     mutations:
     - [18959, C>T, '-', P276S]
   G6PD*la_jolla:
-    label: La Jolla
+    label: La_Jolla
     activity: I/Deficient with CNSHA
     mutations:
     - [18965, T>C, '-', S278P]
@@ -496,12 +496,12 @@ alleles:
     mutations:
     - [18968, A>T, '-', T279S]
   G6PD*seattle:
-    label: Seattle, Lodi, Modena, Ferrara II, Athens-like
+    label: Seattle
     activity: III/Deficient
     mutations:
     - [18977, G>C, rs137852318, D282Y]
   G6PD*bajo_maumere:
-    label: Bajo Maumere
+    label: Bajo_Maumere
     activity: III/Deficient
     mutations:
     - [18977, G>T, rs137852318, D282H]
@@ -531,12 +531,12 @@ alleles:
     mutations:
     - [18987, G>A, rs74575103, R285H]
   G6PD*viangchan:
-    label: Viangchan, Jammu
+    label: Viangchan
     activity: II/Deficient
     mutations:
     - [19451, G>A, rs137852327, V291M]
   G6PD*west_virginia:
-    label: West Virginia
+    label: West_Virginia
     activity: I/Deficient with CNSHA
     mutations:
     - [19490, G>T, '-', V303F]
@@ -556,7 +556,7 @@ alleles:
     mutations:
     - [19509, G>A, '-', G310E]
   G6PD*kerala:
-    label: Kalyan-Kerala, Jamnaga, Rohini
+    label: Kerala
     activity: III/Deficient
     mutations:
     - [19529, G>A, rs137852339, E317K]
@@ -611,7 +611,7 @@ alleles:
     mutations:
     - [19604, C>T, rs137852342, L342F]
   G6PD*mira_daire:
-    label: Mira d'Aire
+    label: Mira_dAire
     activity: IV/Normal
     mutations:
     - [19628, G>C, rs34193178, D350H]
@@ -641,7 +641,7 @@ alleles:
     mutations:
     - [19803, delCTGAACGAGCGCAAGGCC, '-', L362_A367del]
   G6PD*loma_linda:
-    label: Loma Linda
+    label: Loma_Linda
     activity: I/Deficient with CNSHA
     mutations:
     - [19808, C>A, rs137852329, N363K]
@@ -661,7 +661,7 @@ alleles:
     mutations:
     - [19851, G>A, rs371489738', G378S]
   G6PD*calvo_mackenna:
-    label: Calvo Mackenna
+    label: Calvo_Mackenna
     activity: I/Deficient with CNSHA
     mutations:
     - [19857, A>G, '-', I380V]
@@ -691,7 +691,7 @@ alleles:
     mutations:
     - [19874, C>G, '-', C385W]
   G6PD*iowa:
-    label: Iowa, Walter Reed, Springfield
+    label: Iowa
     activity: I/Deficient with CNSHA
     mutations:
     - [19875, A>G, rs137852320, K386E]
@@ -701,7 +701,7 @@ alleles:
     mutations:
     - [19878, C>T, rs137852334, R387C]
   G6PD*beverly_hills:
-    label: Beverly Hills, Genova, Iwate, Niigata, Yamaguchi
+    label: Beverly_Hills
     activity: I/Deficient with CNSHA
     mutations:
     - [19879, G>A, rs137852321, R387H]
@@ -726,7 +726,7 @@ alleles:
     mutations:
     - [19896, C>G, '-', R393G]
   G6PD*nashville:
-    label: Nashville, Anaheim, Portici
+    label: Nashville
     activity: I/Deficient with CNSHA
     mutations:
     - [19897, G>A, rs137852316, R393H]
@@ -741,7 +741,7 @@ alleles:
     mutations:
     - [19906, C>T, '-', P396L]
   G6PD*puerto_limon:
-    label: Puerto Limon
+    label: Puerto_Limon
     activity: I/Deficient with CNSHA
     mutations:
     - [19911, G>A, rs137852325, E398K]
@@ -751,7 +751,7 @@ alleles:
     mutations:
     - [19912, A>G, '-', E398G]
   G6PD*covao_do_lobo:
-    label: Covao do Lobo
+    label: Covao_do_Lobo
     activity: I/Deficient with CNSHA
     mutations:
     - [19924, C>A, '-', T402N]
@@ -781,7 +781,7 @@ alleles:
     mutations:
     - [19947, G>T, rs137852323, G410C]
   G6PD*shinagawa:
-    label: Japan, Shinagawa
+    label: Shinagawa
     activity: I/Deficient with CNSHA
     mutations:
     - [19948, G>A, rs137852336, G410D]
@@ -796,7 +796,7 @@ alleles:
     mutations:
     - [19950, A>G, '-', M411V]
   G6PD*fukushima:
-    label: Tokyo, Fukushima
+    label: Fukushima
     activity: I-II/Deficient with CNSHA-Deficient
     mutations:
     - [19965, G>A, '-', E416K]
@@ -815,29 +815,23 @@ alleles:
     activity: I/Deficient with CNSHA
     mutations:
     - [20115, T>G, '-', V431G]
-  G6PD*mediterranean.001:
-    label: Mediterranean Haplotype
-    activity: Not reported/Unknown
-    mutations:
-    - [18154, C>T, rs5030868, S188F]
-    - [20134, C>T, rs2230037, Y437Y]
   G6PD*pawnee:
     label: Pawnee
     activity: II/Deficient
     mutations:
     - [20139, G>C, rs137852337, Arg439Pro]
   G6PD*telti:
-    label: Telti/Kobe
+    label: Telti
     activity: I/Deficient with CNSHA
     mutations:
     - [20141, C>T, '-', L440F]
   G6PD*santiago_de_cuba:
-    label: Santiago de Cuba, Morioka
+    label: Santiago_de_Cuba
     activity: I/Deficient with CNSHA
     mutations:
     - [20162, G>A, rs137852317, G447R]
   G6PD*s_antioco:
-    label: S. Antioco
+    label: S_Antioco
     activity: II/Deficient
     mutations:
     - [20165, A>G, '-', S448G]
@@ -858,7 +852,7 @@ alleles:
     mutations:
     - [20181, T>A, '-', V453E]
   G6PD*maewo:
-    label: Union,Maewo, Chinese-2, Kalo
+    label: Maewo
     activity: II/Deficient
     mutations:
     - [20183, C>T, rs398123546, R454C]
@@ -868,7 +862,7 @@ alleles:
     mutations:
     - [20184, G>A, rs137852324, R454H]
   G6PD*figuera_da_foz:
-    label: Figuera da Foz
+    label: Figuera_da_Foz
     activity: I/Deficient with CNSHA
     mutations:
     - [20294, G>C, '-', D456H]
@@ -878,7 +872,7 @@ alleles:
     mutations:
     - [20295, A>T, '-', D456V]
   G6PD*bangkok_noi:
-    label: Bangkok Noi
+    label: Bangkok_Noi
     activity: I/Deficient with CNSHA
     mutations:
     - [20304, G>T, rs72554665, R459L]
@@ -889,17 +883,17 @@ alleles:
     mutations:
     - [20304, G>C, rs72554665, R459P]
   G6PD*canton:
-    label: Canton, Taiwan-Hakka, Gifu-like, Agrigento-like
+    label: Canton
     activity: II/Deficient
     mutations:
     - [20304, G>T, rs72554665, R459L]
   G6PD*nice:
-    label: G6PD-Nice
+    label: Nice
     activity: III/Deficient
     mutations:
     - [20308, G>C, '-', E460D]
   G6PD*kamiube:
-    label: Kamiube, Keelung
+    label: Kamiube
     activity: III/Deficient
     mutations:
     - [20315, C>T, '-', R463C]
@@ -914,7 +908,7 @@ alleles:
     mutations:
     - [20309, G>A, rs782608284, A461T]
   G6PD*kaiping:
-    label: Kaiping, Anant, Dhon, Sapporo-like, Wosera
+    label: Kaiping
     activity: II/Deficient
     mutations:
     - [20316, G>A, rs72554664, R463H]
@@ -944,7 +938,7 @@ alleles:
     mutations:
     - [20488, G>T, '-', G488V]
   G6PD*buenos_aires:
-    label: Buenos Aires
+    label: Buenos_Aires
     activity: I/Deficient with CNSHA
     mutations:
     - [20490, C>T, '-', P489S]

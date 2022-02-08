@@ -6,10 +6,11 @@ alleles:
   GSTP1*A:
     mutations: []
   GSTP1*B:
-    mutations: 
+    mutations:
     - [6624, A>G, rs1695, I105V]
   GSTP1*C:
-    mutations: 
+    mutations:
+    - [6624, A>G, rs1695, I105V]
     - [7514, C>T, rs1138272, A114V]
 structure:
   genes: [GSTP1]

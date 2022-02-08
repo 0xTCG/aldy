@@ -3,10 +3,10 @@ version: pharmgkb
 generated: '2020-07-18'
 ensembl: ENSG00000134538
 alleles:
-  SLCO1B1*1.001:
+  SLCO1B1*1A:
     label: SLCO1B1*1A
     mutations: []
-  SLCO1B1*1.002:
+  SLCO1B1*1B:
     label: SLCO1B1*1B
     mutations:
     - [50611, A>G, rs2306283, N130D]
@@ -70,23 +70,24 @@ alleles:
   SLCO1B1*17.001:
     label: SLCO1B1*17
     mutations:
-    - [4195, G>A, rs4149015, upstream]
+    - [4195, G>A, rs4149015, 5'UTR]
     - [50611, A>G, rs2306283, N130D]
     - [52422, T>C, rs4149056, V174A]
   SLCO1B1*18.001:
     label: SLCO1B1*18
     mutations:
     - [50611, A>G, rs2306283, N130D]
-    - [50634, G>A, rs11045818, S137=]
     - [50686, C>A, rs11045819, P155T]
-    - [52472, T>C, rs4149057, L191=]
     - [52479, T>G, rs72559746, L193R]
   SLCO1B1*21.001:
     label: SLCO1B1*21
     mutations:
-    - [4195, G>A, rs4149015, upstream]
+    - [4195, G>A, rs4149015, 5'UTR]
     - [50611, A>G, rs2306283, N130D]
-    - [52498, C>T, rs2291075, F199=]
+  SLCO1B1*22.001:
+    label: SLCO1B1*22
+    mutations:
+    - [112849, A>C, rs34671512, L643F]
   SLCO1B1*23.001:
     label: SLCO1B1*23
     mutations:
@@ -146,6 +147,11 @@ alleles:
     - [50611, A>G, rs2306283, N130D]
     - [70758, A>G, rs11045852, I245V]
     - [70783, G>A, rs11045853, R253Q]
+  SLCO1B1*35.001:
+    label: SLCO1B1*35
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [112849, A>C, rs34671512, L643F]
 structure:
   genes: [SLCO1B1]
   regions:

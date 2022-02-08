@@ -345,6 +345,7 @@ class Sample:
             fd = gzip.open(dump_path, "rb")
 
         self.sample_name = "DUMP"
+        self.sample_name = os.path.basename(dump_path)
         norm: dict = defaultdict(int)
         muts: dict = defaultdict(int)
 

@@ -5,21 +5,6 @@ ensembl: ENSG00000134184
 alleles:
   GSTM1*Present:
     mutations: []
-  GSTM1*Present.001:
-    mutations: 
-    - [6058, T>C, '-', functional]
-  GSTM1*Present.002:
-    mutations: 
-    - [8198, A>C, '-', functional]
-  GSTM1*Present.003:
-    mutations: 
-    - [8208, A>C, '-', functional]
-  GSTM1*Present.004:
-    mutations: 
-    - [8993, T>C, '-', functional]
-  GSTM1*Present.005:
-    mutations: 
-    - [9233, C>A, '-', functional]
   GSTM1*Null:
     mutations:
     - [GSTM1, deletion]
@@ -28,6 +13,11 @@ alleles:
   - [8869, A>G, rs2239892]
   - [9153, G>A, rs12097277]
   - [8373, G>A, rs538603890]
+  - [6058, T>C, '-', functional]
+  - [8198, A>C, '-', functional]
+  - [8208, A>C, '-', functional]
+  - [8993, T>C, '-', functional]
+  - [9233, C>A, '-', functional]
 structure:
   genes: [GSTM1]
   regions:

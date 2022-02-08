@@ -12,51 +12,17 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/371
     activity: no function
     mutations:
-    - [4701, G>A, rs35107873]
-    - [4709, delC, '-']
-    - [5067, G>A, rs2287940]
-    - [6755, insC, rs3833221]
-    - [6837, G>A, rs305968]
-    - [12516, G>A, rs305974, D218N]
+    - [6755, insC, rs3833221, 55Frameshift]
     - [12662, G>C, rs75405062, Q266H]
-    - [13325, T>G, rs305975]
-    - [16063, C>A, rs305978]
-  CYP2F1*2.002:
-    pharmvar: https://www.pharmvar.org/haplotype/372
-    activity: no function
-    mutations:
-    - [4701, G>A, rs35107873]
-    - [4709, delC, '-']
-    - [5067, G>A, rs2287940]
-    - [6755, insC, rs3833221]
-    - [6837, G>A, rs305968]
-    - [12516, G>A, rs305974, D218N]
-    - [12662, G>C, rs75405062, Q266H]
-    - [13325, T>G, rs305975]
-    - [16051, C>T, rs201789202]
-    - [16063, C>A, rs305978]
   CYP2F1*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/373
     mutations:
-    - [4399, A>G, rs1709114]
-    - [4498, C>T, rs62117444]
-    - [5058, G>A, rs1645712]
-    - [6837, G>A, rs305968]
-    - [12196, G>A, rs191940398]
-    - [12198, A>G, rs199600778]
-    - [12201, G>C, rs200646568]
-    - [12516, G>A, rs305974, D218N]
     - [12662, G>C, rs75405062, Q266H]
-    - [16063, C>A, rs305978]
     - [18628, C>T, rs7246981, P490L]
   CYP2F1*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/368
     mutations:
-    - [6837, G>A, rs305968]
     - [6853, T>C, rs58285195, S38P]
-    - [6915, G>A, rs74824096]
-    - [12516, G>A, rs305974, D218N]
-    - [13325, T>G, rs305975]
   CYP2F1*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/374
     mutations:
