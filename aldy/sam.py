@@ -4,6 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
+import collections
 from typing import Tuple, Dict, List, Optional, Any, Set
 
 import pysam
@@ -70,6 +71,8 @@ class Sample:
         vcf_path: Optional[str] = None,
         min_cov: float = 1.0,
         phase: bool = False,
+        minimap = None,
+        sample_name = None
     ):
         """
         Initialize a :obj:`Sample` object.
@@ -122,34 +125,43 @@ class Sample:
             has_index = False
             frags = []
             is_sam = False
-            assert vcf_path or (sam_path and profile)
+            assert vcf_path or sam_path or minimap
             if vcf_path:
+                self.path = vcf_path
                 try:
                     norm, muts = self._load_vcf(vcf_path, gene)
                 except ValueError:
                     raise AldyException(f"VCF {vcf_path} is not indexed")
+            elif minimap:
+                norm, muts = self._load_minimap(minimap, gene, sample_name, cn_region, debug)
             elif sam_path and sam_path.endswith(".dump"):
+                self.path = sam_path
                 norm, muts, frags = self._load_dump(sam_path, gene.name)
             elif sam_path and sam_path.endswith(".tar.gz"):
+                self.path = sam_path
                 norm, muts, frags = self._load_dump(sam_path, gene.name)
             else:
                 assert sam_path
+                self.path = sam_path
                 is_sam = True
                 has_index, norm, muts = self._load_sam(
-                    sam_path, gene, reference, cn_region, debug
+                    sam_path, gene, reference, debug
                 )
-            self._make_coverage(gene, norm, muts, threshold)
+                if cn_region:
+                    self._dump_cn = self._load_cn_region(cn_region)
+            self._make_coverage(gene, norm, muts, threshold, group_indels=is_sam)
+            if cn_region:
+                self.coverage._cn_region = cn_region
             if is_sam and (debug or phase):
                 if has_index:
                     with Timing("Read phase"):
-                        frags = self._get_phases(sam_path, gene, reference)
+                        frags = self._get_phases(gene, reference)
                 if debug:
                     self._dump_alignments(f"{debug}.{gene.name}")
             if phase and frags:
                 self.coverage.fragments = frags
 
-        if cn_region:
-            assert profile
+        if cn_region and profile:
             self.detect_cn(gene, profile, cn_region)
         log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
         if cn_region and self.coverage.diploid_avg_coverage() < 2:
@@ -159,12 +171,85 @@ class Sample:
                 )
             )
 
+    def _load_minimap(self, minimap_data, gene, sample_name, cn_region, debug):
+        self.sample_name = sample_name
+
+        norm: dict = defaultdict(int)
+        muts: dict = defaultdict(int)
+        tots: dict = defaultdict(int)
+        self.reads = {}
+        for read_name, rc in minimap_data.items():
+            for r_start, seq, cigar in rc:
+                regions = []
+                dump_arr = []
+                start, s_start = r_start, 0
+                for size, op in cigar:
+                    if op == 2:  # Deletion
+                        mut = (start, "del" + gene[start : start + size])
+                        muts[mut] += 1
+                        dump_arr.append(mut)
+                        if gene.region_at(start) and (not regions or gene.region_at(start) != regions[-1]):
+                            regions.append(gene.region_at(start))
+                        for i in range(size):
+                            tots[start + i] += 1
+                        start += size
+                    elif op == 3: # N
+                        start += size
+                    elif op == 1:  # Insertion
+                        mut = (start, "ins" + seq[s_start : s_start + size])
+                        muts[mut] += 1
+                        # HACK: just store the length due to seq. errors
+                        self._insertion_counts[start, size] += 1
+                        dump_arr.append(mut)
+                        s_start += size
+                    elif op == 4:  # Soft-clip
+                        s_start += size
+                    elif op in [0, 7, 8]:  # M, X and =
+                        for i in range(size):
+                            if gene.region_at(start+i) and (not regions or gene.region_at(start+i) != regions[-1]):
+                                regions.append(gene.region_at(start+i))
+                            if ( start + i in gene and gene[start + i] != seq[s_start + i] ):
+                                mut = ( start + i, f"{gene[start + i]}>{seq[s_start + i]}" )
+                                dump_arr.append(mut)
+                                muts[mut] += 1
+                            else:  # We ignore all mutations outside the RefSeq region
+                                norm[start + i] += 1
+                            tots[start + i] += 1
+                        start += size
+                        s_start += size
+                self.reads.setdefault(read_name, []).append((0, regions))
+                dump_arr_pos = {p for p, _ in dump_arr}
+                for pos, op in self._multi_sites.items():
+                    if pos not in dump_arr_pos:
+                        continue
+                    l, r = op.split(">")
+                    if all(
+                        (pos + p, f"{l[p]}>{r[p]}") in dump_arr
+                        for p in range(len(l))
+                        if l[p] != "."
+                    ):
+                        for p in range(len(l)):
+                            if l[p] != ".":
+                                muts[pos + p, f"{l[p]}>{r[p]}"] -= 1
+                                if p:
+                                    norm[pos + p] += 1
+                        muts[pos, op] += 1
+
+                read_pos = (r_start + 42_000_000, start, len(seq))
+                for data in self._insertion_reads.values():
+                    data[read_pos] += 1  # type: ignore
+                if debug:
+                    self._dump_reads.append((read_pos, dump_arr))
+        self._dump_cn = collections.defaultdict(int)
+        for i in range(cn_region.start, cn_region.end):
+            self._dump_cn[i] = tots.get(i, 0)
+        return norm, muts
+
     def _load_sam(
         self,
         sam_path: str,
         gene: Gene,
         reference: Optional[str] = None,
-        cn_region: Optional[GRange] = None,
         debug: Optional[str] = None,
     ):
         """
@@ -178,11 +263,6 @@ class Sample:
         :param reference:
             Reference genome for reading CRAM files.
             Default is None.
-        :param cn_region:
-            Copy-number neutral region to be used for coverage rescaling.
-            If None, profile loading and coverage rescaling will be skipped
-            (and Aldy will require a ``--cn`` parameter to be user-provided).
-            Default is ``DEFAULT_CN_NEUTRAL_REGION`` (CYP2D8).
         :param debug:
             If set, create a "`debug`.dump" file for debug purposes.
             Default is None.
@@ -196,63 +276,72 @@ class Sample:
         norm: dict = defaultdict(int)
         muts: dict = defaultdict(int)
 
-        # Try to read CN-neutral region if there is an index (fast)
-        # If not, the main loop will catch it later on
-        def read_cn_read(read):
-            """
-            Check is pysam.AlignmentSegment valid CN-neutral read,
-            and if so, parse it
-            """
-            start = read.reference_start
-            if read.cigartuples is None or (
-                (read.flag & 1) and (read.flag & 0x40) == 0
-            ):
-                return
-            for op, size in read.cigartuples:
-                if op in [0, 7, 8, 2]:
-                    for i in range(size):
-                        self._dump_cn[start + i] += 1
-                    start += size
-
-        has_index = True
+        self.reads = {}
         with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
             # Check do we have proper index to speed up the queries
             try:
-                sam.check_index()
+                has_index = sam.check_index()
             except AttributeError:
-                has_index = (
-                    False  # SAM files do not have an index. BAMs might also lack it
-                )
+                # SAM files do not have an index. BAMs might also lack it
+                has_index = False
             except ValueError:
-                raise AldyException(f"File {sam_path} has no index")
+                raise AldyException(f"Cannot check index of {sam_path}")
 
             self._prefix = _chr_prefix(gene.chr, [x["SN"] for x in sam.header["SQ"]])
 
-            # Set it to _fetched_ if a CN-neutral region is user-provided.
-            # Then read the CN-neutral region.
-            is_cn_region_fetched = cn_region is None
-            if cn_region and sam.has_index():
-                log.debug("[sam] has_index= True")
-                for read in sam.fetch(region=cn_region.samtools(prefix=self._prefix)):
-                    read_cn_read(read)
-                is_cn_region_fetched = True
-
+            if has_index:
+                iter = sam.fetch(region=gene.get_wide_region().samtools(prefix=self._prefix))
+            else:
+                log.warn("SAM/BAM index not found. Reading will be slow.")
+                iter = sam.fetch()
             # Fetch the reads
-            for read in sam.fetch(
-                region=gene.get_wide_region().samtools(prefix=self._prefix)
-            ):
-                # If we haven't obtained CN-neutral region so far, do it now
-                if (
-                    not is_cn_region_fetched
-                    and cn_region
-                    and _in_region(cn_region, read, self._prefix)
-                ):  # type: ignore
-                    read_cn_read(read)
-
+            for read in iter:
                 r = self._parse_read(read, gene, norm, muts)
                 if r and debug:
                     self._dump_reads.append(r)
         return has_index, norm, muts
+
+    def _load_cn_region(self, cn_region):
+        """
+        Load copy-number-neutral coverage from a SAM/BAM file.
+
+        :param cn_region:
+            Copy-number neutral region to be used for coverage rescaling.
+            If None, profile loading and coverage rescaling will be skipped
+            (and Aldy will require a ``--cn`` parameter to be user-provided).
+            Default is ``DEFAULT_CN_NEUTRAL_REGION`` (CYP2D8).
+        """
+        self._dump_cn = collections.defaultdict(int)
+        with pysam.AlignmentFile(self.path) as sam:
+            # Check do we have proper index to speed up the queries
+            try:
+                has_index = sam.check_index()
+            except AttributeError:
+                # SAM files do not have an index. BAMs might also lack it
+                has_index = False
+            except ValueError:
+                raise AldyException(f"Cannot check index of {self.path}")
+
+            # Set it to _fetched_ if a CN-neutral region is user-provided.
+            # Then read the CN-neutral region.
+            if has_index:
+                iter = sam.fetch(region=cn_region.samtools(prefix=self._prefix))
+            else:
+                log.warn("SAM/BAM index not found. Reading will be slow.")
+                iter = sam.fetch()
+            for read in iter:
+                if _in_region(cn_region, read, self._prefix):
+                    start = read.reference_start
+                    if read.cigartuples is None:
+                        continue
+                    if read.is_supplementary:
+                        continue
+                    for op, size in read.cigartuples:
+                        if op in [0, 7, 8, 2]:
+                            for i in range(size):
+                                self._dump_cn[start + i] += 1
+                            start += size
+        return self._dump_cn
 
     def _load_vcf(self, vcf_path: str, gene: Gene):
         """
@@ -414,7 +503,7 @@ class Sample:
 
         return norm, muts, frags
 
-    def _make_coverage(self, gene, norm, muts, threshold):
+    def _make_coverage(self, gene, norm, muts, threshold, group_indels=True):
         # Establish the coverage dictionary
         coverage: Dict[int, Dict[str, int]] = dict()
         for pos, cov in norm.items():
@@ -433,7 +522,8 @@ class Sample:
             if mut not in coverage[pos]:
                 coverage[pos][mut] = 0
             coverage[pos][mut] += cov
-        self._group_indels(gene, coverage)
+        if group_indels:
+            self._group_indels(gene, coverage)
         for pos, op in self._multi_sites.items():
             if pos in coverage and op in coverage[pos]:
                 log.debug(f"[sam] multi-SNP {pos}{op} with {coverage[pos][op]} reads")
@@ -480,7 +570,7 @@ class Sample:
                 ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.debug(
+                    log.trace(
                         f"[sam] relocate {coverage[pos][mut]} "
                         + f"from {pos+1}{mut} to {new_pos+1}{mut}"
                     )
@@ -515,7 +605,7 @@ class Sample:
                 ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.debug(
+                    log.trace(
                         f"[sam] relocate {coverage[pos][mut]} "
                         + f"from {pos+1}{mut} to {new_pos+1}{mut}"
                     )
@@ -543,7 +633,7 @@ class Sample:
 
         if not read.cigartuples:  # only valid alignments
             return None
-        if read.flag & 0x800:  # avoid supplementary alignments
+        if read.is_supplementary:  # avoid supplementary alignments
             return None
         if "H" in read.cigarstring:  # avoid hard-clipped reads
             return None
@@ -552,6 +642,7 @@ class Sample:
         ):  # ensure that it is a proper gene read
             return None
 
+        regions = []
         dump_arr = []
         start, s_start = read.reference_start, 0
         for op, size in read.cigartuples:
@@ -559,6 +650,8 @@ class Sample:
                 mut = (start, "del" + gene[start : start + size])
                 muts[mut] += 1
                 dump_arr.append(mut)
+                if gene.region_at(start) and (not regions or gene.region_at(start) != regions[-1]):
+                    regions.append(gene.region_at(start))
                 start += size
             elif op == 1:  # Insertion
                 mut = (start, "ins" + read.query_sequence[s_start : s_start + size])
@@ -571,6 +664,8 @@ class Sample:
                 s_start += size
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
+                    if gene.region_at(start+i) and (not regions or gene.region_at(start+i) != regions[-1]):
+                        regions.append(gene.region_at(start+i))
                     if (
                         start + i in gene
                         and gene[start + i] != read.query_sequence[s_start + i]
@@ -586,6 +681,8 @@ class Sample:
                 start += size
                 s_start += size
 
+        r0, r1 = read.query_name.split('$')
+        self.reads.setdefault(r0, []).append((int(r1), regions))
         dump_arr_pos = {p for p, _ in dump_arr}
         for pos, op in self._multi_sites.items():
             if pos not in dump_arr_pos:
@@ -648,7 +745,7 @@ class Sample:
             return new_cov
         return orig_cov
 
-    def _get_phases(self, sam_path, gene, reference, max_insert=1000):
+    def _get_phases(self, gene, reference, max_insert=1000):
         index = sorted(p for p, m in self.coverage._coverage.items() if len(m) > 1)
         fragments = []
 
@@ -681,7 +778,7 @@ class Sample:
             if len(read) > 1:  # links at least 2 mutations
                 fragments.append((extra, read))
 
-        with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
+        with pysam.AlignmentFile(self.path, reference_filename=reference) as sam:
             sam.check_index()
 
             vlo = 0
@@ -828,7 +925,11 @@ class Sample:
                 for r, rng in gr.items():
                     regions[gene.name, r, gi] = rng
             regions["neutral", "cn", 0] = cn_region
-            return load_sam_profile(profile_path, regions=regions)
+            return load_sam_profile(
+                profile_path,
+                regions=regions,
+                genome=gene.genome
+            )
         else:
             with open(profile_path) as f:
                 return yaml.safe_load(f)
@@ -953,8 +1054,10 @@ def load_sam_profile(
             d[g][r].append(0)
         if sam_path == "<illumina>":
             d[g][r][ri] = sum(1.0 for i in range(s, e))
+        elif g == "neutral":
+            d[g][r][ri] = sum(cov[c][i] for i in range(s, e))
         else:
-            d[g][r][ri] = sum(cov[c][i] * (factor / 2.0) for i in range(s, e))
+            d[g][r][ri] = sum(cov[c][i] / factor for i in range(s, e))
     return d
 
 
@@ -1020,6 +1123,8 @@ def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
     """
 
     if read.reference_id == -1 or read.reference_name != prefix + region.chr:
+        return False
+    if read.reference_end is None:
         return False
 
     a = (read.reference_start, read.reference_end)

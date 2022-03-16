@@ -113,9 +113,9 @@ class Coverage:
                         t += "\t" + gene.get_rsid((pos, op))
                     else:
                         t = "\t\t"
-                    out(
-                        f"[dump] {self.sample}\t{gene.name}\t{gene.chr_to_ref.get(pos, '-')+1}\t{op}\t{p:.1f}\t{t}"
-                    )
+                    # out(
+                    #     f"[dump] {self.sample}\t{gene.name}\t{gene.chr_to_ref.get(pos, '-')+1}\t{op}\t{p:.1f}\t{t}"
+                    # )
 
     def filtered(
         self, filter_fn: Callable[[Mutation, float, float, float], bool]
@@ -239,6 +239,7 @@ class Coverage:
         total = total / cn if cn > 0 else total
 
         return mut.op == "_" or cov >= max(min_cov, total * thres)
+
 
     def load_phase(self, gene, ploidy=2):
         log.debug("[phase] Phasing {} copies...", ploidy)

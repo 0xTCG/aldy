@@ -2972,6 +2972,11 @@ alleles:
       - [4300, C>T, rs1065852, P34S]
       - [4510, G>T, rs28371699]
       - [CYP2D7, i1+]
+  CYP2D6*68.002:
+    activity: no function
+    label: CYP2D6*68
+    mutations:
+      - [CYP2D7, i1+]
   CYP2D6*69.001:
     pharmvar: https://www.pharmvar.org/haplotype/202
     activity: no function
@@ -4139,7 +4144,7 @@ structure:
       pce: [42125974, 42125974, 42138080, 42139680]
       rep: [42123774, 42125974, 42135280, 42138080]
   cn_regions: [e1, i1, e2, i2, e3, e5, i5, e6, i6, e9, pce]
-  tandems: 
+  tandems:
   - ['13', '1']
   - ['77', '2']
   - ['79', '2']

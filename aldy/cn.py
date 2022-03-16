@@ -204,7 +204,7 @@ def solve_cn_model(
         # Ignore 1, because A[1] = 1 && A[0] = 0 is valid (e.g. *13/*13+*1)
         elif ai > 1:
             model.addConstr(VCN[a, ai] <= VCN[a, ai - 1], name=f"CORD_{a}_{ai}")
-
+    print(sorted(structures.keys()))
     # Add error variables
     VERR = {}
 

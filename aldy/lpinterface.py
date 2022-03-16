@@ -25,7 +25,8 @@ def escape_name(s: str, d: collections.defaultdict = None) -> str:
     if d is not None:
         d[s] += 1
         if d[s] > 1:
-            return s + "_" + ((d[s] - 1) * "x")
+            # return s + "_" + ((d[s] - 1) * "x")
+            return s + f"_{d[s]}" # + ((d[s] - 1) * "x")
     return s
 
 
