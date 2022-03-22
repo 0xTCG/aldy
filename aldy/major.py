@@ -57,10 +57,10 @@ def estimate_major(
     log.debug("*" * 80)
     log.debug("[major] struct= {}", cn_solution._solution_nice())
 
-    if sum(cn_solution.solution.values()) < 2:
-        raise AldyException(
-            "estimate_major requires at least two valid gene configurations"
-        )
+    # if sum(cn_solution.solution.values()) < 2:
+    #     raise AldyException(
+    #         "estimate_major requires at least two valid gene configurations"
+    #     )
 
     alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
     if (

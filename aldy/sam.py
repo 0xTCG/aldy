@@ -120,6 +120,7 @@ class Sample:
             for m in a.func_muts
             if ">" in m.op and len(m.op) > 3
         }
+        self.gene = gene
 
         with Timing("Read SAM"):
             has_index = False
@@ -134,6 +135,9 @@ class Sample:
                     raise AldyException(f"VCF {vcf_path} is not indexed")
             elif minimap:
                 norm, muts = self._load_minimap(minimap, gene, sample_name, cn_region, debug)
+                if len(self._dump_cn) == 0:
+                    self.path = sam_path
+                    self._dump_cn = self._load_cn_region(cn_region)
             elif sam_path and sam_path.endswith(".dump"):
                 self.path = sam_path
                 norm, muts, frags = self._load_dump(sam_path, gene.name)
@@ -241,8 +245,10 @@ class Sample:
                 if debug:
                     self._dump_reads.append((read_pos, dump_arr))
         self._dump_cn = collections.defaultdict(int)
-        for i in range(cn_region.start, cn_region.end):
-            self._dump_cn[i] = tots.get(i, 0)
+        if cn_region.chr == gene.chr:
+            for i in range(cn_region.start, cn_region.end):
+                if i in tots:
+                    self._dump_cn[i] = tots[i]
         return norm, muts
 
     def _load_sam(
@@ -321,7 +327,7 @@ class Sample:
                 has_index = False
             except ValueError:
                 raise AldyException(f"Cannot check index of {self.path}")
-
+            self._prefix = _chr_prefix(self.gene.chr, [x["SN"] for x in sam.header["SQ"]])
             # Set it to _fetched_ if a CN-neutral region is user-provided.
             # Then read the CN-neutral region.
             if has_index:
@@ -681,8 +687,8 @@ class Sample:
                 start += size
                 s_start += size
 
-        r0, r1 = read.query_name.split('$')
-        self.reads.setdefault(r0, []).append((int(r1), regions))
+        # r0, r1 = read.query_name.split('$')
+        # self.reads.setdefault(r0, []).append((int(r1), regions))
         dump_arr_pos = {p for p, _ in dump_arr}
         for pos, op in self._multi_sites.items():
             if pos not in dump_arr_pos:
