@@ -71,8 +71,8 @@ class Sample:
         vcf_path: Optional[str] = None,
         min_cov: float = 1.0,
         phase: bool = False,
-        minimap = None,
-        sample_name = None
+        minimap=None,
+        sample_name=None,
     ):
         """
         Initialize a :obj:`Sample` object.
@@ -122,6 +122,10 @@ class Sample:
         }
         self.gene = gene
 
+        self.grid_columns = sorted({pos for pos, _ in gene.mutations})
+        self.grid_columns = {pos: i for i, pos in enumerate(self.grid_columns)}
+        self.grid = []
+
         with Timing("Read SAM"):
             has_index = False
             frags = []
@@ -134,7 +138,9 @@ class Sample:
                 except ValueError:
                     raise AldyException(f"VCF {vcf_path} is not indexed")
             elif minimap:
-                norm, muts = self._load_minimap(minimap, gene, sample_name, cn_region, debug)
+                norm, muts = self._load_minimap(
+                    minimap, gene, sample_name, cn_region, debug
+                )
                 if len(self._dump_cn) == 0:
                     self.path = sam_path
                     self._dump_cn = self._load_cn_region(cn_region)
@@ -148,9 +154,7 @@ class Sample:
                 assert sam_path
                 self.path = sam_path
                 is_sam = True
-                has_index, norm, muts = self._load_sam(
-                    sam_path, gene, reference, debug
-                )
+                has_index, norm, muts = self._load_sam(sam_path, gene, reference, debug)
                 if cn_region:
                     self._dump_cn = self._load_cn_region(cn_region)
             self._make_coverage(gene, norm, muts, threshold, group_indels=is_sam)
@@ -182,8 +186,9 @@ class Sample:
         muts: dict = defaultdict(int)
         tots: dict = defaultdict(int)
         self.reads = {}
-        for read_name, rc in minimap_data.items():
-            for r_start, seq, cigar in rc:
+        for read_name, (rc, _) in minimap_data.items():
+            for ri, (r_start, seq, cigar) in enumerate(rc):
+                # d = ["" for _ in choice_index]
                 regions = []
                 dump_arr = []
                 start, s_start = r_start, 0
@@ -192,12 +197,16 @@ class Sample:
                         mut = (start, "del" + gene[start : start + size])
                         muts[mut] += 1
                         dump_arr.append(mut)
-                        if gene.region_at(start) and (not regions or gene.region_at(start) != regions[-1]):
+                        if gene.region_at(start) and (
+                            not regions or gene.region_at(start) != regions[-1]
+                        ):
                             regions.append(gene.region_at(start))
                         for i in range(size):
+                            # if start + i in choice_index:
+                            #     d[choice_index[start + i]] = "-"
                             tots[start + i] += 1
                         start += size
-                    elif op == 3: # N
+                    elif op == 3:  # N
                         start += size
                     elif op == 1:  # Insertion
                         mut = (start, "ins" + seq[s_start : s_start + size])
@@ -210,18 +219,31 @@ class Sample:
                         s_start += size
                     elif op in [0, 7, 8]:  # M, X and =
                         for i in range(size):
-                            if gene.region_at(start+i) and (not regions or gene.region_at(start+i) != regions[-1]):
-                                regions.append(gene.region_at(start+i))
-                            if ( start + i in gene and gene[start + i] != seq[s_start + i] ):
-                                mut = ( start + i, f"{gene[start + i]}>{seq[s_start + i]}" )
+                            if gene.region_at(start + i) and (
+                                not regions or gene.region_at(start + i) != regions[-1]
+                            ):
+                                regions.append(gene.region_at(start + i))
+                            if (
+                                start + i in gene
+                                and gene[start + i] != seq[s_start + i]
+                            ):
+                                mut = (
+                                    start + i,
+                                    f"{gene[start + i]}>{seq[s_start + i]}",
+                                )
                                 dump_arr.append(mut)
                                 muts[mut] += 1
+                                # if start + i in choice_index:
+                                    # d[choice_index[start + i]] = seq[s_start + i]
                             else:  # We ignore all mutations outside the RefSeq region
                                 norm[start + i] += 1
+                                # if start + i in choice_index:
+                                    # d[choice_index[start + i]] = "X"
                             tots[start + i] += 1
                         start += size
                         s_start += size
                 self.reads.setdefault(read_name, []).append((0, regions))
+                # self.grid[read_name, ri] = d
                 dump_arr_pos = {p for p, _ in dump_arr}
                 for pos, op in self._multi_sites.items():
                     if pos not in dump_arr_pos:
@@ -239,7 +261,7 @@ class Sample:
                                     norm[pos + p] += 1
                         muts[pos, op] += 1
 
-                read_pos = (r_start + 42_000_000, start, len(seq))
+                read_pos = (r_start, start, len(seq))
                 for data in self._insertion_reads.values():
                     data[read_pos] += 1  # type: ignore
                 if debug:
@@ -296,7 +318,9 @@ class Sample:
             self._prefix = _chr_prefix(gene.chr, [x["SN"] for x in sam.header["SQ"]])
 
             if has_index:
-                iter = sam.fetch(region=gene.get_wide_region().samtools(prefix=self._prefix))
+                iter = sam.fetch(
+                    region=gene.get_wide_region().samtools(prefix=self._prefix)
+                )
             else:
                 log.warn("SAM/BAM index not found. Reading will be slow.")
                 iter = sam.fetch()
@@ -327,7 +351,9 @@ class Sample:
                 has_index = False
             except ValueError:
                 raise AldyException(f"Cannot check index of {self.path}")
-            self._prefix = _chr_prefix(self.gene.chr, [x["SN"] for x in sam.header["SQ"]])
+            self._prefix = _chr_prefix(
+                self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
+            )
             # Set it to _fetched_ if a CN-neutral region is user-provided.
             # Then read the CN-neutral region.
             if has_index:
@@ -545,6 +571,7 @@ class Sample:
             self._dump_cn,
             self.sample_name,
             self.min_cov,
+            self,
         )
 
     def _group_indels(self, gene, coverage):
@@ -648,6 +675,7 @@ class Sample:
         ):  # ensure that it is a proper gene read
             return None
 
+        grid = {}
         regions = []
         dump_arr = []
         start, s_start = read.reference_start, 0
@@ -656,8 +684,12 @@ class Sample:
                 mut = (start, "del" + gene[start : start + size])
                 muts[mut] += 1
                 dump_arr.append(mut)
-                if gene.region_at(start) and (not regions or gene.region_at(start) != regions[-1]):
+                if gene.region_at(start) and (
+                    not regions or gene.region_at(start) != regions[-1]
+                ):
                     regions.append(gene.region_at(start))
+                if start in self.grid_columns:
+                    grid[start] = mut
                 start += size
             elif op == 1:  # Insertion
                 mut = (start, "ins" + read.query_sequence[s_start : s_start + size])
@@ -670,8 +702,10 @@ class Sample:
                 s_start += size
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
-                    if gene.region_at(start+i) and (not regions or gene.region_at(start+i) != regions[-1]):
-                        regions.append(gene.region_at(start+i))
+                    if gene.region_at(start + i) and (
+                        not regions or gene.region_at(start + i) != regions[-1]
+                    ):
+                        regions.append(gene.region_at(start + i))
                     if (
                         start + i in gene
                         and gene[start + i] != read.query_sequence[s_start + i]
@@ -682,11 +716,16 @@ class Sample:
                         )
                         dump_arr.append(mut)
                         muts[mut] += 1
+                        if start + i in self.grid_columns:
+                            grid[start + i] = mut
                     else:  # We ignore all mutations outside the RefSeq region
                         norm[start + i] += 1
+                        if start + i in self.grid_columns:
+                            grid[start + i] = (start + i, "_")
                 start += size
                 s_start += size
 
+        self.grid.append(grid)
         # r0, r1 = read.query_name.split('$')
         # self.reads.setdefault(r0, []).append((int(r1), regions))
         dump_arr_pos = {p for p, _ in dump_arr}
@@ -931,11 +970,7 @@ class Sample:
                 for r, rng in gr.items():
                     regions[gene.name, r, gi] = rng
             regions["neutral", "cn", 0] = cn_region
-            return load_sam_profile(
-                profile_path,
-                regions=regions,
-                genome=gene.genome
-            )
+            return load_sam_profile(profile_path, regions=regions, genome=gene.genome)
         else:
             with open(profile_path) as f:
                 return yaml.safe_load(f)

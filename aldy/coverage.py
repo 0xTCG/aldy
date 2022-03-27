@@ -24,6 +24,7 @@ class Coverage:
         cnv_coverage: Dict[int, int],
         sample: str = "sample",
         min_cov: float = 1.0,
+        sam = None
     ) -> None:
         """
         Coverage initialization.
@@ -53,6 +54,7 @@ class Coverage:
         self._region_coverage: Dict[Tuple[int, str], float] = {}
         self.fragments = []
         self.phases = []
+        self.sam = sam
 
     def __getitem__(self, mut: Mutation) -> float:
         """:return: Coverage of the mutation ``mut``."""
@@ -160,6 +162,7 @@ class Coverage:
             self._cnv_coverage,
             self.sample,
             self.min_cov,
+            sam=self.sam
         )
         new_cov._region_coverage = self._region_coverage
         new_cov.fragments = self.fragments[:]
