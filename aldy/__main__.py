@@ -22,7 +22,6 @@ import pytest
 from . import common
 from .common import log, script_path, AldyException, td, parse_cn_region
 from .gene import Gene
-from .cn import LEFT_FUSION_PENALTY
 from .sam import load_sam_profile
 from .genotype import genotype
 from .query import query
@@ -268,13 +267,6 @@ def _get_args(argv):
     )
     genotype_parser.add_argument("--log", "-l", default=None, help="Log file location")
     genotype_parser.add_argument(
-        "--fusion-penalty",
-        "-f",
-        default=LEFT_FUSION_PENALTY,
-        help="Fusion penalty. Use higher values to avoid fusions. "
-        + f"Default is {LEFT_FUSION_PENALTY}.",
-    )
-    genotype_parser.add_argument(
         "--max-minor-solutions",
         default=1,
         help="Maximum number of minor solutions to report for each major solution. "
@@ -415,7 +407,6 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 cn_solution=cn_solution,
                 threshold=threshold,
                 solver=args.solver,
-                fusion_penalty=float(args.fusion_penalty),
                 reference=args.reference,
                 gap=float(args.gap),
                 max_minor_solutions=int(args.max_minor_solutions),

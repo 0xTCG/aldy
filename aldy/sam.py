@@ -10,7 +10,6 @@ from typing import Tuple, Dict, List, Optional, Any, Set
 import pysam
 import os
 import os.path
-import re
 import yaml
 import gzip
 import struct
@@ -20,22 +19,17 @@ from dataclasses import dataclass
 from collections import defaultdict
 from natsort import natsorted
 from .common import log, GRange, AldyException, script_path, Timing
+from .gene import Gene, Mutation, CNConfigType
 from .coverage import Coverage
-from .gene import Gene, Mutation
 
 
-CIGAR2CODE: Dict[int, int] = {ord(y): x for x, y in enumerate("MIDNSHP=XB")}
-"""CIGAR characters for an ASCII ordinal of CIGAR character"""
-
-CIGAR_REGEX = re.compile(r"(\d+)([MIDNSHP=XB])")
-"""Regex that matches valid CIGAR strings"""
-
-
-DEFAULT_CN_NEUTRAL_REGION = {
-    "hg19": GRange("22", 42547463, 42548249),
-    "hg38": GRange("22", 42151472, 42152258),
-}
-"""Default copy-number neutral region (exon 4-6 of the CYP2D8 gene)"""
+class Profile:
+    def __init__(self, name, cn_region, data, neutral_value=0, cn_solution=None):
+        self.name = name
+        self.cn_region = cn_region
+        self.data = data
+        self.cn_solution = cn_solution
+        self.neutral_value = neutral_value
 
 
 @dataclass
@@ -57,22 +51,16 @@ class Sample:
     _dump_cn: Dict[int, int]  # pos -> coverage
     _dump_reads: List[Tuple[Tuple[int, int, int], List[Mutation]]]
 
-    # Phasing data
-
     def __init__(
         self,
         gene: Gene,
         sam_path: Optional[str] = None,
         threshold: float = 0.5,
-        profile: Optional[str] = None,
+        profile: Optional[Profile] = None,
         reference: Optional[str] = None,
-        cn_region: Optional[GRange] = None,
         debug: Optional[str] = None,
         vcf_path: Optional[str] = None,
         min_cov: float = 1.0,
-        phase: bool = False,
-        minimap=None,
-        sample_name=None,
     ):
         """
         Initialize a :obj:`Sample` object.
@@ -83,15 +71,11 @@ class Sample:
             Threshold for filtering out low quality mutations. Ranges from 0 to 1.
             Check :obj:`aldy.coverage.Coverage` for more information.
         :param profile:
-            Profile specification (e.g. 'prgnseq-v1') or a profile SAM/BAM file.
+            Profile data (:obj:`Profile`) loaded from a YML profile (e.g. 'prgnseq-v1')
+            or a profile SAM/BAM file.
         :param reference:
             Reference genome for reading CRAM files.
             Default is None.
-        :param cn_region:
-            Copy-number neutral region to be used for coverage rescaling.
-            If None, profile loading and coverage rescaling will be skipped
-            (and Aldy will require a ``--cn`` parameter to be user-provided).
-            Default is ``DEFAULT_CN_NEUTRAL_REGION``.
         :param debug:
             If set, create a "`debug`.dump" file for debug purposes.
             Default is None.
@@ -106,7 +90,6 @@ class Sample:
         self.min_cov = min_cov
         self._dump_cn = defaultdict(int)
         self._dump_reads = []
-        self._dump_phase = []
         self._insertion_sites = {
             m for a in gene.alleles.values() for m in a.func_muts if m.op[:3] == "ins"
         }
@@ -122,164 +105,58 @@ class Sample:
         }
         self.gene = gene
 
+        # Phasing information!
         self.grid_columns = sorted({pos for pos, _ in gene.mutations})
         self.grid_columns = {pos: i for i, pos in enumerate(self.grid_columns)}
         self.grid = []
 
-        with Timing("Read SAM"):
-            has_index = False
-            frags = []
+        self.profile = profile
+        self._fusion_counter = None
+
+        with Timing("[sam] Read SAM"):
             is_sam = False
-            assert vcf_path or sam_path or minimap
+            group_indels = False
+            assert vcf_path or sam_path
             if vcf_path:
                 self.path = vcf_path
                 try:
                     norm, muts = self._load_vcf(vcf_path, gene)
                 except ValueError:
                     raise AldyException(f"VCF {vcf_path} is not indexed")
-            elif minimap:
-                norm, muts = self._load_minimap(
-                    minimap, gene, sample_name, cn_region, debug
-                )
-                if len(self._dump_cn) == 0:
-                    self.path = sam_path
-                    self._dump_cn = self._load_cn_region(cn_region)
             elif sam_path and sam_path.endswith(".dump"):
                 self.path = sam_path
-                norm, muts, frags = self._load_dump(sam_path, gene.name)
+                norm, muts = self._load_dump(sam_path, gene.name)
             elif sam_path and sam_path.endswith(".tar.gz"):
                 self.path = sam_path
-                norm, muts, frags = self._load_dump(sam_path, gene.name)
+                norm, muts = self._load_dump(sam_path, gene.name)
             else:
                 assert sam_path
                 self.path = sam_path
                 is_sam = True
-                has_index, norm, muts = self._load_sam(sam_path, gene, reference, debug)
-                if cn_region:
-                    self._dump_cn = self._load_cn_region(cn_region)
-            self._make_coverage(gene, norm, muts, threshold, group_indels=is_sam)
-            if cn_region:
-                self.coverage._cn_region = cn_region
-            if is_sam and (debug or phase):
-                if has_index:
-                    with Timing("Read phase"):
-                        frags = self._get_phases(gene, reference)
-                if debug:
-                    self._dump_alignments(f"{debug}.{gene.name}")
-            if phase and frags:
-                self.coverage.fragments = frags
+                if self.profile and self.profile.name.startswith("pacbio"):
+                    _, norm, muts = self._load_pacbio_sam(
+                        sam_path, gene, reference, debug
+                    )
+                else:
+                    _, norm, muts = self._load_sam(sam_path, gene, reference, debug)
+                    group_indels = True
+                if self.profile:
+                    self._dump_cn = self._load_cn_region(self.profile.cn_region)
+            self._make_coverage(gene, norm, muts, threshold, group_indels=group_indels)
+            if is_sam and debug:
+                self._dump_alignments(f"{debug}.{gene.name}")
 
-        if cn_region and profile:
-            self.detect_cn(gene, profile, cn_region)
+        if self.profile and self.profile.cn_region:
+            self.coverage._normalize_coverage()
         log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
-        if cn_region and self.coverage.diploid_avg_coverage() < 2:
+        if self.profile and self.coverage.diploid_avg_coverage() < 2:
             raise AldyException(
                 "The average coverage of the sample is too low ({:.1f}).".format(
                     self.coverage.diploid_avg_coverage()
                 )
             )
 
-    def _load_minimap(self, minimap_data, gene, sample_name, cn_region, debug):
-        self.sample_name = sample_name
-
-        norm: dict = defaultdict(int)
-        muts: dict = defaultdict(int)
-        tots: dict = defaultdict(int)
-        self.reads = {}
-        for read_name, (rc, _) in minimap_data.items():
-            for ri, (r_start, seq, cigar) in enumerate(rc):
-                # d = ["" for _ in choice_index]
-                regions = []
-                dump_arr = []
-                start, s_start = r_start, 0
-                for size, op in cigar:
-                    if op == 2:  # Deletion
-                        mut = (start, "del" + gene[start : start + size])
-                        muts[mut] += 1
-                        dump_arr.append(mut)
-                        if gene.region_at(start) and (
-                            not regions or gene.region_at(start) != regions[-1]
-                        ):
-                            regions.append(gene.region_at(start))
-                        for i in range(size):
-                            # if start + i in choice_index:
-                            #     d[choice_index[start + i]] = "-"
-                            tots[start + i] += 1
-                        start += size
-                    elif op == 3:  # N
-                        start += size
-                    elif op == 1:  # Insertion
-                        mut = (start, "ins" + seq[s_start : s_start + size])
-                        muts[mut] += 1
-                        # HACK: just store the length due to seq. errors
-                        self._insertion_counts[start, size] += 1
-                        dump_arr.append(mut)
-                        s_start += size
-                    elif op == 4:  # Soft-clip
-                        s_start += size
-                    elif op in [0, 7, 8]:  # M, X and =
-                        for i in range(size):
-                            if gene.region_at(start + i) and (
-                                not regions or gene.region_at(start + i) != regions[-1]
-                            ):
-                                regions.append(gene.region_at(start + i))
-                            if (
-                                start + i in gene
-                                and gene[start + i] != seq[s_start + i]
-                            ):
-                                mut = (
-                                    start + i,
-                                    f"{gene[start + i]}>{seq[s_start + i]}",
-                                )
-                                dump_arr.append(mut)
-                                muts[mut] += 1
-                                # if start + i in choice_index:
-                                    # d[choice_index[start + i]] = seq[s_start + i]
-                            else:  # We ignore all mutations outside the RefSeq region
-                                norm[start + i] += 1
-                                # if start + i in choice_index:
-                                    # d[choice_index[start + i]] = "X"
-                            tots[start + i] += 1
-                        start += size
-                        s_start += size
-                self.reads.setdefault(read_name, []).append((0, regions))
-                # self.grid[read_name, ri] = d
-                dump_arr_pos = {p for p, _ in dump_arr}
-                for pos, op in self._multi_sites.items():
-                    if pos not in dump_arr_pos:
-                        continue
-                    l, r = op.split(">")
-                    if all(
-                        (pos + p, f"{l[p]}>{r[p]}") in dump_arr
-                        for p in range(len(l))
-                        if l[p] != "."
-                    ):
-                        for p in range(len(l)):
-                            if l[p] != ".":
-                                muts[pos + p, f"{l[p]}>{r[p]}"] -= 1
-                                if p:
-                                    norm[pos + p] += 1
-                        muts[pos, op] += 1
-
-                read_pos = (r_start, start, len(seq))
-                for data in self._insertion_reads.values():
-                    data[read_pos] += 1  # type: ignore
-                if debug:
-                    self._dump_reads.append((read_pos, dump_arr))
-        self._dump_cn = collections.defaultdict(int)
-        if cn_region.chr == gene.chr:
-            for i in range(cn_region.start, cn_region.end):
-                if i in tots:
-                    self._dump_cn[i] = tots[i]
-        return norm, muts
-
-    def _load_sam(
-        self,
-        sam_path: str,
-        gene: Gene,
-        reference: Optional[str] = None,
-        debug: Optional[str] = None,
-    ):
+    def _load_sam(self, sam_path: str, gene: Gene, reference=None, debug=None):
         """
         Load the read, mutation and coverage data from a SAM/BAM/CRAM file.
 
@@ -304,7 +181,6 @@ class Sample:
         norm: dict = defaultdict(int)
         muts: dict = defaultdict(int)
 
-        self.reads = {}
         with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
             # Check do we have proper index to speed up the queries
             try:
@@ -326,7 +202,24 @@ class Sample:
                 iter = sam.fetch()
             # Fetch the reads
             for read in iter:
-                r = self._parse_read(read, gene, norm, muts)
+                if not read.cigartuples:  # only valid alignments
+                    continue
+                if read.is_supplementary:  # avoid supplementary alignments
+                    continue
+                if "H" in read.cigarstring:  # avoid hard-clipped reads
+                    continue
+                # ensure that it is a proper gene read
+                if not _in_region(gene.get_wide_region(), read, self._prefix):
+                    continue
+
+                r = self._parse_read(
+                    gene,
+                    read.reference_start,
+                    read.cigartuples,
+                    read.query_sequence,
+                    norm,
+                    muts,
+                )
                 if r and debug:
                     self._dump_reads.append(r)
         return has_index, norm, muts
@@ -339,7 +232,6 @@ class Sample:
             Copy-number neutral region to be used for coverage rescaling.
             If None, profile loading and coverage rescaling will be skipped
             (and Aldy will require a ``--cn`` parameter to be user-provided).
-            Default is ``DEFAULT_CN_NEUTRAL_REGION`` (CYP2D8).
         """
         self._dump_cn = collections.defaultdict(int)
         with pysam.AlignmentFile(self.path) as sam:
@@ -566,12 +458,13 @@ class Sample:
                     coverage[mut.pos][mut.op] = self._correct_ins_coverage(mut, total)
 
         self.coverage = Coverage(
-            {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
-            threshold,
-            self._dump_cn,
-            self.sample_name,
-            self.min_cov,
+            self.gene,
+            self.profile,
             self,
+            {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
+            self._dump_cn,
+            threshold,
+            self.min_cov,
         )
 
     def _group_indels(self, gene, coverage):
@@ -652,34 +545,25 @@ class Sample:
 
                     coverage[pos][mut] = 0
 
-    def _parse_read(self, read, gene: Gene, norm, muts):
+    def _parse_read(self, gene: Gene, ref_start, cigar, seq, norm, muts):
         """
         Parse a :obj:`pysam.AlignedSegment` read.
 
-        :param read: pysam read.
         :param gene: Gene instance.
+        :param ref_start: Start position in the reference genome.
+        :param cigar: List of CIGAR operations in tuple format (operation, size).
+        :param seq: Read sequence.
         :param norm: Positions within the read that have not been mutated.
         :param muts: Positions within the read that have been mutated.
 
         .. note:: `norm` and `muts` are modified.
         """
 
-        if not read.cigartuples:  # only valid alignments
-            return None
-        if read.is_supplementary:  # avoid supplementary alignments
-            return None
-        if "H" in read.cigarstring:  # avoid hard-clipped reads
-            return None
-        if not _in_region(
-            gene.get_wide_region(), read, self._prefix
-        ):  # ensure that it is a proper gene read
-            return None
-
         grid = {}
         regions = []
         dump_arr = []
-        start, s_start = read.reference_start, 0
-        for op, size in read.cigartuples:
+        start, s_start = ref_start, 0
+        for op, size in cigar:
             if op == 2:  # Deletion
                 mut = (start, "del" + gene[start : start + size])
                 muts[mut] += 1
@@ -692,7 +576,7 @@ class Sample:
                     grid[start] = mut
                 start += size
             elif op == 1:  # Insertion
-                mut = (start, "ins" + read.query_sequence[s_start : s_start + size])
+                mut = (start, "ins" + seq[s_start : s_start + size])
                 muts[mut] += 1
                 # HACK: just store the length due to seq. errors
                 self._insertion_counts[start, size] += 1
@@ -706,14 +590,8 @@ class Sample:
                         not regions or gene.region_at(start + i) != regions[-1]
                     ):
                         regions.append(gene.region_at(start + i))
-                    if (
-                        start + i in gene
-                        and gene[start + i] != read.query_sequence[s_start + i]
-                    ):
-                        mut = (
-                            start + i,
-                            f"{gene[start + i]}>{read.query_sequence[s_start + i]}",
-                        )
+                    if start + i in gene and gene[start + i] != seq[s_start + i]:
+                        mut = (start + i, f"{gene[start + i]}>{seq[s_start + i]}")
                         dump_arr.append(mut)
                         muts[mut] += 1
                         if start + i in self.grid_columns:
@@ -726,8 +604,6 @@ class Sample:
                 s_start += size
 
         self.grid.append(grid)
-        # r0, r1 = read.query_name.split('$')
-        # self.reads.setdefault(r0, []).append((int(r1), regions))
         dump_arr_pos = {p for p, _ in dump_arr}
         for pos, op in self._multi_sites.items():
             if pos not in dump_arr_pos:
@@ -745,7 +621,7 @@ class Sample:
                             norm[pos + p] += 1
                 muts[pos, op] += 1
 
-        read_pos = (read.reference_start, start, len(read.query_sequence))
+        read_pos = (ref_start, start, len(seq))
         for data in self._insertion_reads.values():
             data[read_pos] += 1  # type: ignore
         return read_pos, dump_arr
@@ -790,190 +666,246 @@ class Sample:
             return new_cov
         return orig_cov
 
-    def _get_phases(self, gene, reference, max_insert=1000):
-        index = sorted(p for p, m in self.coverage._coverage.items() if len(m) > 1)
-        fragments = []
+    def _load_pacbio_sam(self, sam_path: str, gene: Gene, reference=None, debug=None):
+        """
+        Load the read, mutation and coverage data from a PacBio SAM/BAM/CRAM file.
+        This function remaps long PacBio reads for selected genes.
+        Tested on PacBio HIFI data only.
 
-        def add(lo, extra, *args):
-            frag = {}
-            for r in args:
-                start, s_start = r.reference_start, 0
-                for op, size in r.cigartuples:
-                    if op == 2:  # Deletion
-                        start += size
-                    elif op == 1:  # Insertion
-                        s_start += size
-                    elif op == 4:  # Soft-clip
-                        s_start += size
-                    elif op in [0, 7, 8]:  # M, X and =
-                        for i in range(size):
-                            while lo < len(index) and index[lo] < start + i:
-                                lo += 1
-                            if lo < len(index) and index[lo] == start + i:
-                                if r.query_qualities[s_start + i] >= 10:
-                                    frag.setdefault(start + i, set()).add(
-                                        r.query_sequence[s_start + i]
-                                    )
-                        start += size
-                        s_start += size
-            read = []
-            for pos, snps in frag.items():
-                if len(snps) == 1:  # avoid contradicting pairs
-                    read.append((pos, snps.pop()))
-            if len(read) > 1:  # links at least 2 mutations
-                fragments.append((extra, read))
+        :param sam_path: Path to a PacBio SAM/BAM/CRAM file.
+        :param gene: Gene instance.
+        :param threshold:
+            Threshold for filtering out low quality mutations. Ranges from 0 to 1.
+            Check :obj:`aldy.coverage.Coverage` for more information.
+        :param reference:
+            Reference genome for reading CRAM files.
+            Default is None.
+        :param debug:
+            If set, create a "`debug`.dump" file for debug purposes.
+            Default is None.
 
-        with pysam.AlignmentFile(self.path, reference_filename=reference) as sam:
-            sam.check_index()
+        :raise: :obj:`aldy.common.AldyException` if a BAM/CRAM file lacks an index.
+        """
+        log.debug("[sam] pacbio_path= {}", os.path.abspath(sam_path))
+        self.sample_name = os.path.basename(sam_path).split(".")[0]
 
-            vlo = 0
-            seen = {}
-            # Fetch the reads
-            for r in sam.fetch(
-                region=gene.get_wide_region().samtools(prefix=self._prefix)
-            ):
-                if not r.cigartuples:  # only valid alignments
-                    continue
-                if r.is_supplementary or r.is_secondary or r.is_duplicate:
-                    continue
-                if "H" in r.cigarstring:  # avoid hard-clipped reads
-                    continue
-                if not _in_region(gene.get_wide_region(), r, self._prefix):
-                    continue  # ensure that it is a proper gene read
+        norm: dict = defaultdict(int)
+        muts: dict = defaultdict(int)
 
-                # any SNPs here?
-                while vlo < len(index) and index[vlo] < r.reference_start:
-                    vlo += 1
-                if vlo == len(index) or index[vlo] >= r.reference_end:
-                    continue
+        self._index = None
+        if gene.name == "CYP2D6":
+            import mappy
 
-                name = r.query_name
-                if len(name) > 2 and (name[-2] == "#" or name[-2] == "/"):
-                    name = name[:-2]
+            ref = script_path(f"aldy.resources.genes/{gene.name}.fa.gz")
+            self._index = mappy.Aligner(ref, preset="map-hifi")
+            seq_name = self._index.seq_names[0]
+            self._seq_range = list(map(int, seq_name.split(":")[1].split("-")))
+            self._index_gene = []
+            for _, g in enumerate(gene.regions):
+                st = min(r.start for r in g.values())
+                ed = max(r.end for r in g.values())
+                idx = mappy.Aligner(
+                    seq=self._index.seq(seq_name)[
+                        st - self._seq_range[0] : ed - self._seq_range[0]
+                    ],
+                    preset="map-hifi",
+                )
+                self._index_gene.append((idx, st))
 
-                # 10X data support
-                extra = name
-                if r.has_tag("BX"):
-                    extra = r.get_tag("BX")
-                if extra and r.has_tag("XC"):
-                    extra = f"{extra}:{r.get_tag('XC')}"
-                elif extra and r.has_tag("MI"):
-                    extra = f"{extra}:{r.get_tag('MI')}"
-
-                if (
-                    r.mate_is_unmapped
-                    or r.reference_id != r.next_reference_id
-                    or r.template_length > max_insert
-                ):
-                    add(vlo, extra, r)
-                elif name in seen:  # Paired reads
-                    add(vlo, extra, seen[name][0], r)
-                    del seen[name]
-                elif (
-                    r.next_reference_start < r.reference_start
-                ):  # already seen but not added
-                    add(vlo, extra, r)
+            self._fusion_signatures = {}
+            self._fusion_counter = {}
+            for n, cn in gene.cn_configs.items():
+                if cn.kind == CNConfigType.LEFT_FUSION:
+                    sig, pos = 0, next(i for i, j in cn.cn[0].items() if j == 1)
+                elif cn.kind == CNConfigType.RIGHT_FUSION:
+                    sig, pos = 1, next(i for i, j in cn.cn[0].items() if j == 0)
                 else:
-                    seen[name] = (r, vlo, extra)
-            for name, (r, vlo, extra) in seen.items():
-                add(vlo, extra, r)
+                    continue
+                sig = (
+                    (1 - sig, list(cn.cn[0])[list(cn.cn[0]).index(pos) - 1]),
+                    (sig, pos),
+                )
+                self._fusion_counter[n] = [0, 0]
+                if sig[0][1] in gene.unique_regions or sig[1][1] in gene.unique_regions:
+                    self._fusion_signatures[sig] = n
 
-        fragments.sort(key=lambda x: x[0])
-        new_fragments = []
-        prev_fid, prev_read = "", []
-        for fid, read in fragments:
-            if fid != prev_fid:
-                if prev_read:
-                    new_fragments.append(prev_read)
-                prev_fid, prev_read = fid, read
-            else:
-                prev_read += read
-        if prev_read:
-            new_fragments.append(prev_read)
-        for r in new_fragments:
-            r.sort()
+            log.debug("[sam] PacBio remapping enabled")
 
-        self._dump_phase = new_fragments
-        return new_fragments
+        with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam, Timing(
+            "[sam] Remap"
+        ):
+            # Assumes SAM index exists
+            self._prefix = _chr_prefix(gene.chr, [x["SN"] for x in sam.header["SQ"]])
+
+            rng = [*gene.get_wide_region()]
+            if gene.name == "CYP2D6":
+                rng[2] = 42_155_000  # include CYP2D8
+            rng = GRange(*rng)
+            iter = sam.fetch(region=rng.samtools(prefix=self._prefix))
+            for read in iter:
+                if not read.cigartuples or "H" in read.cigarstring:
+                    continue
+                if read.reference_start >= rng.end or read.reference_end < rng.start:
+                    continue
+
+                seq = read.query_sequence
+                if self._index:
+                    pieces = []
+                    s_start = 0
+                    while s_start < len(seq):
+                        s = seq[s_start:]
+                        h = self._map(self._index, s)
+                        if h and h.r_st <= 134_991 < h.r_en and 134_991 - h.r_st > 100:
+                            s = seq[s_start : s_start + (134_991 - h.r_st)]
+                            h = self._map(self._index, s)
+                        elif (
+                            h and h.r_st <= 148_730 < h.r_en and 148_730 - h.r_st > 100
+                        ):
+                            s = seq[s_start : s_start + (148_730 - h.r_st)]
+                            h = self._map(self._index, s)
+                        if not h:
+                            s_start += 100
+                        else:
+                            pcs, ed = self._split_read(gene, s, h)
+                            pieces += pcs
+                            s_start += ed
+                    for (ref_start, seq, cigar) in pieces:
+                        r = self._parse_read(gene, ref_start, cigar, seq, norm, muts)
+                        if r and debug:
+                            self._dump_reads.append(r)
+                else:
+                    r = self._parse_read(
+                        gene, read.reference_start, read.cigartuple, seq, norm, muts
+                    )
+                    if r and debug:
+                        self._dump_reads.append(r)
+        return True, norm, muts
+
+    def _map(self, idx, seq):
+        for hit in idx.map(seq):
+            if hit.is_primary:
+                return hit
+        return None
+
+    def _split_read(self, gene, seq, hit):
+        def _rev_cigar(c):
+            """Reverse CIGAR tuples for pysam/mappy compatibility."""
+            return [(op, size) for (size, op) in c]
+
+        regs = self._get_gene_regions(
+            gene, hit.r_st + self._seq_range[0] - 1, _rev_cigar(hit.cigar)
+        )
+        if regs:
+            splits = []
+            for fs, fn in self._fusion_signatures.items():
+                brk = [r for r in regs if r[0][1] == fs[1][1]]
+                if not brk:
+                    continue
+                self._fusion_counter[fn][1] += 1
+                brk = brk[0]
+                lg, brk, rg = fs[1][0], brk[1] + brk[2], fs[0][0]
+                lh = self._map(self._index_gene[lg][0], seq[:brk])
+                rh = self._map(self._index_gene[rg][0], seq[brk:])
+                if lh and rh:
+                    unmap = len(seq) - (lh.q_en - lh.q_st) - (rh.q_en - rh.q_st)
+                    unmap += lh.NM + rh.NM
+                    splits.append([fn, unmap, brk, lh, rh, lg, rg])
+            splits.sort(key=lambda x: x[1])
+            if splits and splits[0][1] <= hit.NM:
+                fn, _, brk, lh, rh, lg, rg = splits[0]
+                self._fusion_counter[fn][0] += 1
+                return (
+                    [
+                        (
+                            lh.r_st + self._index_gene[lg][1] - 1,
+                            seq[lh.q_st : lh.q_en],
+                            _rev_cigar(lh.cigar),
+                        ),
+                        (
+                            rh.r_st + self._index_gene[rg][1] - 1,
+                            seq[brk + rh.q_st : brk + rh.q_en],
+                            _rev_cigar(rh.cigar),
+                        ),
+                    ],
+                    max(lh.q_en, brk + rh.q_en),
+                )
+        return [
+            (
+                hit.r_st + self._seq_range[0] - 1,
+                seq[hit.q_st : hit.q_en],
+                _rev_cigar(hit.cigar),
+            )
+        ], hit.q_en
+
+    def _get_gene_regions(self, gene, r_start, cigar):
+        regs = []
+        start, s_start = r_start, 0
+        for op, size in cigar:
+            if op == 1 or op == 4:
+                s_start += size
+            elif op == 2 or op == 3:
+                start += size
+            elif op == 0 or op == 7 or op == 8:
+                for i in range(size):
+                    rg = gene.region_at(start + i)
+                    # if not rg and 42_149_886 <= start + i <= 42_155_001:
+                    #     rg = (2, '2D8')
+                    if rg:
+                        if not regs or regs[-1][0] != rg:
+                            regs.append([rg, s_start + i, 0])
+                        regs[-1][2] += 1
+                start += size
+                s_start += size
+        return regs
 
     # ----------------------------------------------------------------------------------
     # Coverage-rescaling functions
     # ----------------------------------------------------------------------------------
 
-    def detect_cn(self, gene: Gene, profile: str, cn_region: GRange) -> None:
-        """
-        Rescale the ``self.coverage`` to fit the sequencing profile.
-
-        :param gene: Gene instance.
-        :param profile: Profile identifier. Can be a SAM/BAM file as well.
-        :param cn_region: Coordinates of the copy-number neutral region.
-
-        .. notes:: This function assumes that ``self.coverage`` is set and modifies it.
-        """
-
+    def load_profile(gene, profile, cn_region=None):
+        prof = None
+        is_yml = True
         if os.path.exists(profile) and os.path.isfile(profile):
             ext = os.path.splitext(profile)
-            if ext[-1] in [".bam", ".sam"]:
-                prof = self._load_profile(
-                    profile,
-                    is_bam=True,
-                    gene=gene,
+            if ext[-1] in [".bam", ".sam", ".cram"]:
+                assert gene and cn_region
+                regions = {
+                    (gene.name, r, gi): rng
+                    for gi, gr in enumerate(gene.regions)
+                    for r, rng in gr.items()
+                }
+                prof = load_sam_profile(
+                    profile_path,
+                    regions=regions,
+                    genome=gene.genome,
                     cn_region=cn_region,
                 )
+                is_yml = False
             else:
-                prof = self._load_profile(profile)
+                with open(profile_path) as f:
+                    prof = yaml.safe_load(f)
         else:
             profile_path = script_path(
                 "aldy.resources.profiles/{}.yml".format(profile.lower())
             )
-            prof = self._load_profile(profile_path)
-            if "neutral" not in prof or "cn" not in prof["neutral"]:
-                raise AldyException("Profile missing neutral region")
-            if gene.name not in prof:
-                raise AldyException(f"Profile missing {gene.name}")
-        self.coverage._normalize_coverage(
-            prof[gene.name], gene.regions, cn_region, prof["neutral"]["cn"][0]
-        )
-
-    def _load_profile(
-        self,
-        profile_path: str,
-        is_bam: bool = False,
-        gene: Optional[Gene] = None,
-        cn_region: Optional[GRange] = None,
-    ) -> Dict[str, Dict[str, List[float]]]:
-        """
-        Load a coverage profile.
-
-        :param profile_path:
-            Path to a profile file.
-            SAM/BAM files are also accepted if `is_bam` is set
-            (profile will be dynamically calculated in that case).
-        :param is_bam: A flag indicating if the `profile_path` is SAM/BAM or not.
-        :param gene_region: Region to be extracted from the profile.
-        :param cn_region: Copy-number neutral region to be extracted from the profile.
-
-        :return: A profile dictionary where keys are chromosome IDs (e.g. '7' for chr7)
-                 and values are dictionaries that map the genomic locus to the
-                 corresponding profile coverage.
-                 This is a :obj:`collections.defaultdict` that uses 0 as a placeholder
-                 for the missing loci.
-
-        :raise: :obj:`aldy.common.AldyException` if ``is_bam`` is set
-                but ``gene_region`` and ``cn_region`` are not.
-        """
-
-        if is_bam:
-            assert gene and cn_region
-            regions = {}
-            for gi, gr in enumerate(gene.regions):
-                for r, rng in gr.items():
-                    regions[gene.name, r, gi] = rng
-            regions["neutral", "cn", 0] = cn_region
-            return load_sam_profile(profile_path, regions=regions, genome=gene.genome)
-        else:
             with open(profile_path) as f:
-                return yaml.safe_load(f)
+                prof = yaml.safe_load(f)
+        if not prof:
+            raise AldyException(f"Could not load profile from {profile}")
+        if is_yml and profile != "illumina" and cn_region:
+            raise AldyException("-n is only valid with illumina or BAM profile")
+        if is_yml and profile == "illumina" and cn_region:
+            prof["neutral"]["value"] = cn_region.end - cn_region.start
+        if "neutral" not in prof or "value" not in prof["neutral"]:
+            raise AldyException("Profile missing neutral region")
+        if gene.name not in prof:
+            raise AldyException(f"Profile missing {gene.name}")
+        return Profile(
+            profile,
+            GRange(*prof["neutral"][gene.genome]),
+            prof,
+            prof["neutral"]["value"],
+        )
 
     def _dump_alignments(self, debug: str):
         with gzip.open(f"{debug}.dump", "wb") as fd:
@@ -988,12 +920,12 @@ class Sample:
                     fd.write(struct.pack("<hh", p - s, len(md)))
                     fd.write(md.encode("ascii"))
 
-            fd.write(struct.pack("<l", len(self._dump_phase)))
-            for r in self._dump_phase:
-                fd.write(struct.pack("<l", len(r)))
-                for p, md in r:
-                    fd.write(struct.pack("<ll", p, len(md)))
-                    fd.write(md.encode("ascii"))
+            # fd.write(struct.pack("<l", len(self._dump_phase)))
+            # for r in self._dump_phase:
+            #     fd.write(struct.pack("<l", len(r)))
+            #     for p, md in r:
+            #         fd.write(struct.pack("<ll", p, len(md)))
+            #         fd.write(md.encode("ascii"))
 
 
 def load_sam_profile(
@@ -1040,8 +972,13 @@ def load_sam_profile(
                     gene_regions[gg.name, r, gi] = rng
     else:
         gene_regions = regions
-    gene_regions["neutral", "cn", 0] = (
-        cn_region if cn_region else DEFAULT_CN_NEUTRAL_REGION[genome]
+
+    default_cn_neutral_region = {
+        "hg19": GRange("22", 42547463, 42548249),
+        "hg38": GRange("22", 42151472, 42152258),
+    }
+    gene_regions["neutral", "value", 0] = (
+        cn_region if cn_region else default_cn_neutral_region[genome]
     )
 
     chr_regions: Dict[str, Tuple[int, int]] = {}
@@ -1094,11 +1031,13 @@ def load_sam_profile(
         if ri >= len(d[g][r]):
             d[g][r].append(0)
         if sam_path == "<illumina>":
-            d[g][r][ri] = sum(1.0 for i in range(s, e))
+            d[g][r][ri] = e - s
         elif g == "neutral":
             d[g][r][ri] = sum(cov[c][i] for i in range(s, e))
         else:
             d[g][r][ri] = sum(cov[c][i] / factor for i in range(s, e))
+    d["neutral"]["value"] = d["neutral"]["value"][0]
+    d["neutral"][genome] = [*gene_regions["neutral", "value", 0]]
     return d
 
 

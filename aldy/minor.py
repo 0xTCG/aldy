@@ -3,12 +3,13 @@
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
+import random
 from typing import List, Set, Callable, Optional, Tuple, Dict
 
 from os import environ
 from natsort import natsorted
 from . import lpinterface
-from .common import log, json
+from .common import Timing, log, json
 from .gene import Mutation, Gene
 from .cn import MAX_CN
 from .coverage import Coverage
@@ -209,8 +210,11 @@ def solve_minor_model(
             for (vs, _), v in VA.items()
             if (vs.major, vs.added, vs.missing) == (sa.major, sa.added, sa.missing)
         )
-        model.addConstr(expr <= cnt, name=f"CCNT_{sa.major}")
-        model.addConstr(expr >= cnt, name=f"CCNT_{sa.major}")
+        print(sa, expr, cnt)
+        model.addConstr(expr <= cnt, name=f"CCNT_{sa.major}_1")
+        model.addConstr(expr >= cnt, name=f"CCNT_{sa.major}_2")
+    # Disable other alleles
+    model.addConstr(model.quicksum(VA.values()) <= sum(major_sol.solution.values()), name=f"CCNT_OTHER")
 
     # Add a binary variable for each allele/mutation pair, where mutation belongs
     # to that allele, that will indicate whether such mutation will be kept or not.
@@ -336,9 +340,7 @@ def solve_minor_model(
                     v[0] <= 0,
                     name=f"CZERO_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
                 )
-    # 4) No allele can include an extra functional mutation from the database
-    #    (retired with phasing module)
-    # 5) Avoid extra mutations if there is an existing mutation at the corresponding
+    # 4) Avoid extra mutations if there is an existing mutation at the corresponding
     #    locus (either from the definition or added via VNEW)
     for pos in set(m.pos for m in constraints):
         for a in alleles:
@@ -391,9 +393,12 @@ def solve_minor_model(
     PHASE = True
     VPHASEERR = []
     VPHASE = {}
-    if PHASE:
+    with Timing("[minor] Model setup"):
+        vars = 0
+        reads = random.sample(range(len(coverage.sam.grid)), 500)
         for ai, a in enumerate(alleles):
-            for ri, r in enumerate(coverage.sam.grid):
+            for ri in reads:
+                r = coverage.sam.grid[ri]
                 # construct e_ar
                 # e[ai,ri]
                 #  := ph[ai,ri] * sum(1 - ((mut in a & VK[a,m]) | (mut not in a & VN[a, m])) for mut in read)
@@ -402,33 +407,41 @@ def solve_minor_model(
                 for m in mutations:
                     if m.pos not in r:
                         continue
+                    if not gene.has_coverage(a[0].major, m.pos):
+                        continue
                     if m in VKEEP[a]:
                         (pos if m == r[m.pos] else neg).append(VKEEP[a][m][0])
                     elif m in VNEW[a]:
                         (pos if m == r[m.pos] else neg).append(VNEW[a][m][0])
                 if pos or neg:
-                    v = VPHASE[ai, ri] = model.addVar(vtype="B", name=f"PHASE_{ai}_{ri}")
+                    v = VPHASE[ai, ri] = model.addVar(vtype="B", name=f"PHASE_{ai}_{ri}", update=False)
+                    vars += 1
                     model.addConstr(VPHASE[ai, ri] <= VA[a], name=f"PHASE1_{ai}_{ri}")
                     e = 0
                     for i, vm in enumerate(pos):
                         v_vp = model.prod(
-                            model.addVar(vtype="B", name=f"PHASE2_{ai}_{ri}_{i}"),
+                            model.addVar(vtype="B", name=f"PHASE2_{ai}_{ri}_{i}", update=False),
                             [v, vm]
                         )
+                        vars += 1
                         e += v - v_vp
                     for i, vm in enumerate(neg):
                         v_vp = model.prod(
-                            model.addVar(vtype="B", name=f"PHASE3_{ai}_{ri}_{i}"),
+                            model.addVar(vtype="B", name=f"PHASE3_{ai}_{ri}_{i}", update=False),
                             [v, vm]
                         )
+                        vars += 1
                         e += v_vp
                     VPHASEERR.append(e)
-        for ri, _ in enumerate(coverage.sam.grid):
-            vars = [VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE]
-            if vars:
-                e = model.quicksum(vars)
+        for ri in reads:
+            r = coverage.sam.grid
+            v = [VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE]
+            if v:
+                e = model.quicksum(v)
                 model.addConstr(e <= 1, name=f"PHASE4_{ri}_1")
                 model.addConstr(e >= 1, name=f"PHASE4_{ri}_2")
+        model.update()
+        log.debug('[minor] phasing setup done, vars= {}', vars)
 
     # Objective: minimize the absolute sum of errors ...
     objective = model.abssum(v for _, v in VERR.items())
@@ -471,79 +484,80 @@ def solve_minor_model(
 
     # Solve the model
     results = {}
-    for status, opt, sol in model.solutions():
-        solution = []
-        for allele, value in VA.items():
-            if model.getValue(value) <= 0:
-                continue
-            if False: # print assignments
-                ai = next(i for i, a in enumerate(alleles) if allele == a)
-                reads = [
-                    r
-                    for ri, r in enumerate(coverage.sam.grid)
-                    if (ai, ri) in VPHASE
-                    if model.getValue(VPHASE[ai, ri])
-                ]
-                print(allele[0].minor, len(reads))
-                for m in sorted(mutations):
-                    print(f'  {m} ', end='')
-                    if m in gene.alleles[allele[0].major].func_muts: print('*', end='')
-                    elif m in gene.alleles[allele[0].major].minors[allele[0].minor].neutral_muts: print('#', end='')
-                    else: print(' ', end='')
+    with Timing("[minor] Model solution"):
+        for status, opt, sol in model.solutions():
+            solution = []
+            for allele, value in VA.items():
+                if model.getValue(value) <= 0:
+                    continue
+                if True: # print assignments
+                    ai = next(i for i, a in enumerate(alleles) if allele == a)
+                    reads = [
+                        r
+                        for ri, r in enumerate(coverage.sam.grid)
+                        if (ai, ri) in VPHASE
+                        if model.getValue(VPHASE[ai, ri])
+                    ]
+                    print(allele[0].minor, len(reads))
+                    for m in sorted(mutations):
+                        print(f'  {m} ', end='')
+                        if m in gene.alleles[allele[0].major].func_muts: print('*', end='')
+                        elif m in gene.alleles[allele[0].major].minors[allele[0].minor].neutral_muts: print('#', end='')
+                        else: print(' ', end='')
 
-                    if m in VKEEP[allele]: print('K' if model.getValue(VKEEP[allele][m][0]) else '-', end='')
-                    elif m in VNEW[allele]: print('N' if model.getValue(VNEW[allele][m][0]) else '-', end='')
-                    else: print(' ', end='')
+                        if m in VKEEP[allele]: print('K' if model.getValue(VKEEP[allele][m][0]) else '-', end='')
+                        elif m in VNEW[allele]: print('N' if model.getValue(VNEW[allele][m][0]) else '-', end='')
+                        else: print(' ', end='')
 
-                    print('  ', end='')
-                    for r in reads:
-                        if m.pos in r:
-                            c = r[m.pos][1]
-                            if '>' in c: c=c[2]
-                            elif c.startswith('del'): c=f'-{len(c)-3}'
-                            print(c, end='')
-                    print() #'', m.pos, allele[0].major)
+                        print('  ', end='')
+                        for r in reads:
+                            if m.pos in r:
+                                c = r[m.pos][1]
+                                if '>' in c: c=c[2]
+                                elif c.startswith('del'): c=f'-{len(c)-3}'
+                                print(c, end='')
+                        print() #'', m.pos, allele[0].major)
 
-            added: List[Mutation] = []
-            missing: List[Mutation] = []
-            for m, mv in VKEEP[allele].items():
-                if not model.getValue(mv[0]):
-                    missing.append(m)
-            for m, mv in VNEW[allele].items():
-                if model.getValue(mv[0]):
-                    added.append(m)
-                else:
-                    copies = coverage.single_copy(m.pos, major_sol.cn_solution)
-                    copies = coverage[m] / copies if copies > 0 else 0
-                    if abs(copies - major_sol.cn_solution.max_cn()) > 1e-5:
-                        continue
-                    # HACK: add homozygous mutation to _all_ alleles
-                    # Works only if a mutation is unambiguiusly homozygous;
-                    # otherwise, it will fall back to the model defaults
-                    if m not in alleles[allele]:
+                added: List[Mutation] = []
+                missing: List[Mutation] = []
+                for m, mv in VKEEP[allele].items():
+                    if not model.getValue(mv[0]):
+                        missing.append(m)
+                for m, mv in VNEW[allele].items():
+                    if model.getValue(mv[0]):
                         added.append(m)
-            solution.append(
-                SolvedAllele(
-                    gene,
-                    allele[0].major,
-                    allele[0].minor,
-                    allele[0].added + added,
-                    missing,
+                    else:
+                        copies = coverage.single_copy(m.pos, major_sol.cn_solution)
+                        copies = coverage[m] / copies if copies > 0 else 0
+                        if abs(copies - major_sol.cn_solution.max_cn()) > 1e-5:
+                            continue
+                        # HACK: add homozygous mutation to _all_ alleles
+                        # Works only if a mutation is unambiguiusly homozygous;
+                        # otherwise, it will fall back to the model defaults
+                        if m not in alleles[allele]:
+                            added.append(m)
+                solution.append(
+                    SolvedAllele(
+                        gene,
+                        allele[0].major,
+                        allele[0].minor,
+                        allele[0].added + added,
+                        missing,
+                    )
                 )
-            )
 
-        sol = MinorSolution(score=opt, solution=solution, major_solution=major_sol)
-        _ = estimate_diplotype(gene, sol)
-        debug_info["sol"] = [(s.minor, s.added, s.missing) for s in solution]
-        debug_info["diplotype"] = sol.diplotype
-        log.debug(
-            f"[minor] status= {status}; opt= {opt:.2f} "
-            + f"solution= {sol._solution_nice()}"
-        )
-        if str(sol) not in results:
-            results[str(sol)] = sol
-        if len(results) >= max_solutions:
-            break
+            sol = MinorSolution(score=opt, solution=solution, major_solution=major_sol)
+            _ = estimate_diplotype(gene, sol)
+            debug_info["sol"] = [(s.minor, s.added, s.missing) for s in solution]
+            debug_info["diplotype"] = sol.diplotype
+            log.debug(
+                f"[minor] status= {status}; opt= {opt:.2f} "
+                + f"solution= {sol._solution_nice()}"
+            )
+            if str(sol) not in results:
+                results[str(sol)] = sol
+            if len(results) >= max_solutions:
+                break
     if not results:
         log.debug("[minor] solution= []")
         debug_info["sol"] = []

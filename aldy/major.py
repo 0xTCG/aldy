@@ -57,20 +57,8 @@ def estimate_major(
     log.debug("*" * 80)
     log.debug("[major] struct= {}", cn_solution._solution_nice())
 
-    # if sum(cn_solution.solution.values()) < 2:
-    #     raise AldyException(
-    #         "estimate_major requires at least two valid gene configurations"
-    #     )
-
     alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
-    if (
-        len(cn_solution.solution) == 1
-        and "1" in cn_solution.solution
-        and cn_solution.solution["1"] == 2
-    ):
-        coverage.load_phase(gene, ploidy=cn_solution.solution["1"])
-
-    coverage.dump(gene, log.trace)
+    coverage.dump(log.trace)
 
     # Check if some CN solution has no matching allele
     if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):

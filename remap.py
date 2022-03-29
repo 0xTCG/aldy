@@ -5,7 +5,9 @@ from collections import *
 from pprint import pprint
 from natsort import natsorted
 from imp import reload
+import pandas as pd
 import tqdm
+import math
 from tqdm.contrib.concurrent import process_map
 import aldy.gene, aldy.coverage, aldy.sam, aldy.common, aldy.cn, aldy.lpinterface
 import logbook, logbook.more
@@ -29,7 +31,8 @@ def timing(description: str) -> None:
     print(f"{description}: {ellapsed_time}")
 
 gene = aldy.gene.Gene('aldy/resources/genes/cyp2d6.yml', genome='hg38')
-cn_region = aldy.common.GRange('1', 169511951, 169586630)
+cn_region = aldy.common.GRange('1', 169511951, 169586630) # F5
+cn_region_19 = aldy.common.GRange('1', 169481189, 169555868)
 
 def best_map(idx, seq):
     for hit in idx.map(seq):
@@ -37,7 +40,16 @@ def best_map(idx, seq):
             return hit
     return None
 
-#%% (1) Construct new reference
+truth = {}
+cn_truth = {}
+with open("temp/genotypes.dat") as f:
+    for l in f:
+        l = l.split()
+        truth[l[0]] = l[2]
+        cn_truth[l[0]] = l[3].strip().split(',')
+
+#%% Construct new reference
+########################################################################################################################
 full_index = mappy.Aligner("temp/chr22_small.fa", preset="map-hifi")
 off = 42_000_000
 index_gene = []
@@ -62,29 +74,13 @@ for n, cn in gene.cn_configs.items():
         print('skip', n)
 fusion_signatures
 
-#%% (2) Remap a file
+#%% Remap files
+########################################################################################################################
 reload(sys.modules['aldy.sam'])
 def remap_mappy(*args):
     gene, file = args[0]
     sample = os.path.basename(file).split('.')[0]
-    def get_regions(r_start, cigar):
-        regs = []
-        start, s_start = r_start, 0
-        for size, op in cigar:
-            if op == 1 or op == 4: s_start += size
-            elif op == 2 or op == 3: start += size
-            elif op == 0 or op == 7 or op == 8:
-                for i in range(size):
-                    rg = gene.region_at(start + i)
-                    if not rg and 42_149_886 <= start + i <= 42_155_001:
-                        rg = (2, '2D8')
-                    if rg:
-                        if not regs or regs[-1][0] != rg:
-                            regs.append([rg, s_start + i, 0])
-                        regs[-1][2] += 1
-                start += size
-                s_start += size
-        return regs
+
     def fix_piece(seq, h, cnt, cnt2):
         regs = get_regions(h.r_st + off - 1, h.cigar)
         if regs:
@@ -159,29 +155,252 @@ def remap_mappy(*args):
             for p in range(rng.start, rng.end):
                 cov[(gi, region), p] = int(s.coverage.total(p))
     return sample, (cov, reads, s, (cnt,cnt2))
-# zp = remap_mappy((gene, "temp/pacbio/HG00437.bam"))[1]
-# results = {'HG00437': zp}
 pool = multiprocess.Pool(8)
 data = [(gene, i) for i in sorted(glob.glob("temp/pacbio/???????.bam"))]
 with timing("Map"):
     results = dict(pool.map(remap_mappy, data))
 print('done')
-# zp=results['HG02087']
-# d = []
-# for gi, g in enumerate(gene.regions):
-#     st = min(r.start for r in g.values())
-#     ed = max(r.end for r in g.values())
-#     d.append([zp[2].coverage.total(i) for i in range(st,ed)])
-# for gi, g in enumerate(gene.regions):
-#     st = min(r.start for r in g.values())
-#     ed = max(r.end for r in g.values())
-#     d.append([zp[3].coverage.total(i) for i in range(st,ed)])
-# d[0] = [0]*1600+d[0]
-# d[2] = [2]*1600+d[2]
-# for dx in d:
-#     plt.plot(dx)
+
+
+#%% Fusion calculation & Copy number calculation
+########################################################################################################################
+def get_data(gene, ref, sample):
+    profile_cn = sum(ref.get(((-1, 'cn'), i), 0) for i in range(cn_region.start, cn_region.end))
+    sample_cn = sum(sample.get(((-1, 'cn'), i), 0) for i in range(cn_region.start, cn_region.end))
+    cn_ratio = 2 * float(profile_cn) / sample_cn
+    data = {}
+    for gi, gr in enumerate(gene.regions):
+        for region, rng in gr.items():
+            s = sum(sample.get(((gi, region), i), 0) for i in range(rng.start, rng.end))
+            p = sum(ref.get(((gi, region), i), 0) for i in range(rng.start, rng.end))
+            data[gi, region] = (cn_ratio * float(s) / p) if p != 0 else 0.0
+    return data
+def plot(data):
+    h = sorted(set(k for _, k in data), key=lambda x: -gene.regions[0][x].start)
+    r = [[f'*{k}*' if k in gene.unique_regions else k for k in h]] + [[round(data.get((j, i)), 1) for i in h] for j in range(2)]
+    r += [[round((r[1][i] - r[2][i])/(max(r[1][i], r[2][i]) + 1),1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
+    # r += [[round(r[1][i] / r[2][i],1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
+    tab = tabulate(r[1:], tablefmt="plain", stralign="right", numalign="right")
+    print(tab)
+
+def model(data, fusion_support=None):
+    max_cn = 1 + max(int(math.ceil(data.get((gi, r)))) for gi, g in enumerate(gene.regions) for r in g)
+    structures = {(name, 0): structure
+        for name, structure in gene.cn_configs.items()
+        if not fusion_support
+        or name in ['1', '5']
+        or (name in fus_sup and fus_sup[name] >= 1/(2*max_cn))
+    }
+    for a, ai in list(structures.keys()):
+        structures[a, -1] = copy.deepcopy(structures[a, 0])
+        if a not in gene.cn_configs or str(gene.cn_configs[a].kind) != str(aldy.gene.CNConfigType.DEFAULT):
+            continue
+        for i in range(1, max_cn):
+            structures[a, i] = copy.deepcopy(structures[a, 0])
+            for g in range(1, len(structures[a, i].cn)):
+                structures[a, i].cn[g] = { r: v - 1 for r, v in structures[a, i].cn[g].items() }
+    for i in range(max_cn):
+        structures['2D7', i + 1] = aldy.gene.CNConfig(
+            copy.deepcopy(structures['5', 0].cn), aldy.gene.CNConfigType.DELETION,
+            {}, "extra 2D7 copy"
+        )
+    region_cov = {
+        r: (data.get((0, r), 0), data.get((1, r), 0) if len(gene.regions) > 1 else 0)
+        for r in gene.regions[1]
+    }
+
+    model = aldy.lpinterface.model("AldyCN", 'gurobi')
+    VCN = { (a, ai): model.addVar(vtype="B", name=f"CN_{a}_{ai}") for a, ai in structures }
+    diplo_inducing = model.quicksum(VCN[a] for a in VCN if a[1] <= 0)
+    model.addConstr(diplo_inducing <= 2, name="CDIPLO")
+    model.addConstr(diplo_inducing >= 2, name="CDIPLO")
+    del_allele = gene.deletion_allele()
+    if del_allele:
+        for (a, ai), v in VCN.items():
+            if a != del_allele:
+                model.addConstr(v + VCN[del_allele, -1] <= 1, name=f"CDEL_{a}_{ai}")
+    for a, ai in structures:
+        if ai == -1:
+            model.addConstr(VCN[a, ai] <= VCN[a, 0], name=f"CORD_{a}_{ai}")
+        elif ai > 1:
+            model.addConstr(VCN[a, ai] <= VCN[a, ai - 1], name=f"CORD_{a}_{ai}")
+
+    VERR = {}
+    VEPR = {}
+    regs = 0
+    for r, (exp_cov0, exp_cov1) in region_cov.items():
+        expr = 0
+        expr6 = 0
+        scale = max(exp_cov0, exp_cov1) + 1
+        for s, structure in structures.items():
+            if r in structure.cn[0]:
+                expr += structure.cn[0][r] * VCN[s]
+                expr6 += structure.cn[0][r] * VCN[s]
+            if len(structure.cn) > 1 and r in structure.cn[1]:
+                expr -= structure.cn[1][r] * VCN[s]
+
+        if r not in gene.unique_regions: continue
+        regs += 1
+
+        VEPR[r] = model.addVar(name=f"EX_{r}", lb=-aldy.cn.MAX_CN_ERROR, ub=aldy.cn.MAX_CN_ERROR)
+        model.addConstr(expr6 + VEPR[r] <= exp_cov0, name=f"C6COV_{r}")
+        model.addConstr(expr6 + VEPR[r] >= exp_cov0, name=f"C6COV_{r}")
+
+        VERR[r] = model.addVar(name=f"E_{r}", lb=-aldy.cn.MAX_CN_ERROR, ub=aldy.cn.MAX_CN_ERROR)
+        model.addConstr(expr / scale + VERR[r] <= (exp_cov0 - exp_cov1) / scale, name=f"CCOV_{r}")
+        model.addConstr(expr / scale + VERR[r] >= (exp_cov0 - exp_cov1) / scale, name=f"CCOV_{r}")
+
+    PCE_COEFF = 2
+    DIFF_COEFF = 10 / regs
+    o1 = DIFF_COEFF * model.abssum(VERR.values(), coeffs={"E_pce": PCE_COEFF})  # 0-10
+
+    FIT_COEFF = DIFF_COEFF/3
+    o2 = FIT_COEFF * model.abssum(VEPR.values())
+
+    PARS = 10 / regs
+    PARS /= 2
+    penalty = {s: PARS for s, _ in VCN}
+    for n, s in gene.cn_configs.items():
+        if n in penalty and str(s.kind) == str(aldy.gene.CNConfigType.LEFT_FUSION):
+            penalty[n] += PARS/2
+    penalty['2D7'] += PARS/2
+    # penalty
+    o3 = model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
+
+    model.setObjective(o1 + o2 + o3)
+    lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
+    result: dict = {}
+    found = {}
+    best_opt = None
+    for status, opt, sol in model.solutions(0.2): # gap = 0
+        if best_opt is not None and abs(opt-best_opt) > 0.5: continue
+        if best_opt is None: best_opt = opt
+        sol_tuple = tuple(sorted(lookup[v] for v in sol if lookup[v] not in ['5', '2D7']))
+        sol_tuple_x = tuple(sorted(lookup[v] for v in sol))
+        if sol_tuple not in result:
+            result[sol_tuple] = aldy.cn.CNSolution(gene, opt, list(sol_tuple))
+            s = tuple(natsorted( '36' if s == '36.ALDY' else s for s in sol_tuple_x ))
+            found[s] = (round(opt, 2), round(o1.getValue(),2), round(o2.getValue(),2), round(o3.getValue(),2))
+    if False:
+        q = [[c.region_cn[g][r] for r in c.gene.regions[0]] for g, _ in enumerate(c.region_cn)]
+        h = sorted(set(k for _, k in data), key=lambda x: -gene.regions[0][x].start)
+        r = [[f'*{k}*' if k in gene.unique_regions else k for k in h]] + \
+            [[round(data.get((j, i)), 1) for i in h] for j in range(2)]
+        r += [[round(r[1][i] - r[2][i],1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
+        r += [[round(r[1][i] / r[2][i],1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
+        r += [["---" for i in range(len(r[0]))]]
+        r += [[c.region_cn[g].get(r, 0) for r in h] for g, _ in enumerate(c.region_cn)]
+        r += [[round(r[-2][i] / r[-1][i],1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
+        r += [["---" for i in range(len(r[0]))],
+                [round(abs(r[-1][i] - r[-5][i]),1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
+        tab = tabulate(r, tablefmt="plain", stralign="right", numalign="right")
+        print(s,opt); print(tab)
+    return found
+    major_sols = []
+    for i, cn_sol in enumerate(result.values()):
+        major_sols += aldy.major.estimate_major(
+            gene,
+            sample_sam.coverage,
+            cn_sol,
+            solver='gurobi',
+            identifier=i,
+        )
+    major_sols.sort(key=lambda x:x.score)
+    for m in major_sols:
+        print(m.cn_solution._solution_nice(), m.score, m._solution_nice())
+
+    return found
+
+# import aldy.major
+# reload(sys.modules['aldy.major'])
+
+r = 'NA19315'
+# r = 'HG00332'
+ref = results[r][0]
+for i in sorted(results):
+    sample, _, sample_sam, cx = results[i]
+    data = get_data(gene, ref, sample)
+    fus_sup = {n: cx[0][n] / cx[1][n] for n in cx[0] if cx[1][n] > 0}
+    found = model(data, fus_sup)
+    print(i, truth[i], cn_truth[i], 'vs', found)
+    # print(tuple(cn_truth[i]) in found, {i: (cx[0][i],cx[1][i]) for i in cx[0]})
+    plot(data)
+    print()
+
+
+#%% Load all data
+########################################################################################################################
+gene_hg19 = aldy.gene.Gene('aldy/resources/genes/cyp2d6.yml', genome='hg19')
+def process(path):
+    sample = os.path.basename(path)
+    ds = {}
+    dp = {}
+    cn_ratio = 0
+    with open(path) as f:
+        for l in f:
+            l = l.strip().split()
+            ds[(int(l[0]), l[1]), int(l[2])] = int(l[3])
+            dp[(int(l[0]), l[1]), int(l[2])] = int(l[4])
+            cn_ratio = float(l[5])
+    data = {}
+    for gi, gr in enumerate(gene.regions if sample.startswith('P0') else gene_hg19.regions):
+        for region, rng in gr.items():
+            s = sum(ds.get(((gi, region), i), 0) for i in range(rng.start, rng.end))
+            p = sum(dp.get(((gi, region), i), 0) for i in range(rng.start, rng.end))
+            data[gi, region] = (cn_ratio * float(s) / p) if p != 0 else 0.0
+    return sample, data
+cn_library = {}
+for t in "pgx3 wgs wgs1 wgs2 n10x".split():
+    for i in sorted(glob.glob(f"temp/cns/*.{t}")):
+        s, d = process(i)
+        cn_library[s] = d
+sample_cn_truth = {}
+with open("temp/cn_truth.txt") as f:
+    for l in f:
+        l = l.split()
+        sample_cn_truth[l[0]] = l[1].strip().split(';')
 
 #%%
+########################################################################################################################
+tech = "real pgx3 wgs wgs1 wgs2 n10x".split()
+df = {}
+for sp in cn_library:
+    if not (sp.startswith('NA') or sp.startswith('HG')):
+        continue
+    s, t = sp.split('.')
+    t = tech.index(t)
+    sol = model(cn_library[sp])
+    sol_keys = [','.join(i for i in k if i != '2D7' if i != '5') for k in sol.keys()]
+    if len(set(sample_cn_truth[s]) & set(sol_keys)) >= 1:
+        df.setdefault(s, [''] * len(tech))[t] = (
+            '🆗'
+            if sol_keys[0] == sample_cn_truth[s][0]
+            else '❓' + '; '.join(sol_keys)
+        )
+    else:
+        df.setdefault(s, [''] * len(tech))[t] = '❌' + '; '.join(sol_keys)
+    df[s][0] = '; '.join(sample_cn_truth[s])
+df = pd.DataFrame.from_dict(df, orient='index', columns=tech)
+
+pd.set_option('display.max_rows', 500)
+df
+
+
+#%% Single testing area
+########################################################################################################################
+for i in 'NA10851 HG01190 NA17454 NA17642 NA18540 NA19003'.split(): # HG01190(68/1) NA17454(1x4) NA17642(1/1) NA18540(1x2,36x2) NA19003(1/1)
+    _, data = process(f'temp/cns/{i}.10x')
+    found = model(data)
+    print(i, sample_cn_truth[i], 'vs', found)
+    plot(data)
+    _, data = process(f'temp/cns/{i}.n10x')
+    found = model(data)
+    print(i, sample_cn_truth[i], 'vs', found)
+    plot(data)
+    print()
+
+#%% Bin mutations & VAF CN model
+########################################################################################################################
 truth = {}
 with open("temp/genotypes.dat") as f:
     for l in f:
@@ -222,8 +441,7 @@ for ri, r in enumerate(rs):
 plt.gcf().set_figwidth(8)
 plt.gcf().set_figheight(3 * len(rs))
 
-#%%
-def hoho(sx):
+def vaf_model(sx):
     structures = {(name, 0): structure for name, structure in gene.cn_configs.items()}
     for a, ai in list(structures.keys()):
         structures[a, -1] = copy.deepcopy(structures[a, 0])
@@ -274,329 +492,4 @@ def hoho(sx):
         print(sx, status, opt, sol)
         break
 for i in results:
-    hoho(i)
-
-#%% Fusion calculation & Copy number calculation
-# HG01089 *1/*4 / 1/5
-# HG02649 *1/*2
-# NA12762 *1/*3
-# NA19466 *1/*17
-# HG02087 *36+*10/*36+*10  36/36+10
-import aldy.major
-reload(sys.modules['aldy.major'])
-truth = {}
-cn_truth = {}
-with open("temp/genotypes.dat") as f:
-    for l in f:
-        l = l.split()
-        truth[l[0]] = l[2]
-        cn_truth[l[0]] = l[3].strip().split(',')
-def plot(gene, ref, sample, plot=True):
-    profile_cn = sum(ref.get(((-1, 'cn'), i), 0) for i in range(cn_region.start, cn_region.end))
-    sample_cn = sum(sample.get(((-1, 'cn'), i), 0) for i in range(cn_region.start, cn_region.end))
-    cn_ratio = 2 * float(profile_cn) / sample_cn
-    data = {}
-    for gi, gr in enumerate(gene.regions):
-        for region, rng in gr.items():
-            s = sum(sample.get(((gi, region), i), 0) for i in range(rng.start, rng.end))
-            p = sum(ref.get(((gi, region), i), 0) for i in range(rng.start, rng.end))
-            data[gi, region] = (cn_ratio * float(s) / p) if p != 0 else 0.0
-    h = sorted(set(k for _, k in data), key=lambda x: -gene.regions[0][x].start)
-    r = [[f'*{k}*' if k in gene.unique_regions else k for k in h]] + [[round(data.get((j, i)), 1) for i in h] for j in range(2)]
-    r += [[round((r[1][i] - r[2][i])/(max(r[1][i], r[2][i]) + 1),1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
-    # r += [[round(r[1][i] / r[2][i],1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
-    tab = tabulate(r, tablefmt="plain", stralign="right", numalign="right")
-    if plot: print(tab)
-    return data
-def model(rs):
-    import math
-    (ref, _, _, _), (sample, _, sample_sam, cx) = results[rs[0]], results[rs[1]]
-    data = plot(gene, ref, sample, False)
-    max_cn = 1 + max(int(math.ceil(data.get((gi, r)))) for gi, g in enumerate(gene.regions) for r in g)
-
-    fus_sup = {n: cx[0][n] / cx[1][n] for n in cx[0] if cx[1][n]>0}
-    print(max_cn, fus_sup)
-    structures = {(name, 0): structure
-        for name, structure in gene.cn_configs.items()
-        if name in ['1', '5']
-        or (name in fus_sup and fus_sup[name] >= 1/(2*max_cn))
-    }
-    for a, ai in list(structures.keys()):
-        structures[a, -1] = copy.deepcopy(structures[a, 0])
-        if a not in gene.cn_configs or str(gene.cn_configs[a].kind) != str(aldy.gene.CNConfigType.DEFAULT):
-            continue
-        for i in range(1, max_cn):
-            structures[a, i] = copy.deepcopy(structures[a, 0])
-            for g in range(1, len(structures[a, i].cn)):
-                structures[a, i].cn[g] = { r: v - 1 for r, v in structures[a, i].cn[g].items() }
-    for i in range(max_cn):
-        structures['2D7', i+1] = aldy.gene.CNConfig(
-            copy.deepcopy(structures['5', 0].cn), aldy.gene.CNConfigType.DELETION,
-            {}, "extra 2D7 copy"
-        )
-    region_cov = {
-        r: (data.get((0, r), 0), data.get((1, r), 0) if len(gene.regions) > 1 else 0)
-        for r in gene.regions[1]
-    }
-    ## BEGIN cn code
-    VERR, VCN = {}, {}
-
-    model = aldy.lpinterface.model("AldyCN", 'gurobi')
-    VCN.clear()
-    VCN.update({ (a, ai): model.addVar(vtype="B", name=f"CN_{a}_{ai}") for a, ai in structures })
-    diplo_inducing = model.quicksum(VCN[a] for a in VCN if a[1] <= 0)
-    model.addConstr(diplo_inducing <= 2, name="CDIPLO")
-    model.addConstr(diplo_inducing >= 2, name="CDIPLO")
-    del_allele = gene.deletion_allele()
-    if del_allele:
-        for (a, ai), v in VCN.items():
-            if a != del_allele:
-                model.addConstr(v + VCN[del_allele, -1] <= 1, name=f"CDEL_{a}_{ai}")
-    for a, ai in structures:
-        if ai == -1:
-            model.addConstr(VCN[a, ai] <= VCN[a, 0], name=f"CORD_{a}_{ai}")
-        elif ai > 1:
-            model.addConstr(VCN[a, ai] <= VCN[a, ai - 1], name=f"CORD_{a}_{ai}")
-
-    # def diff_model(model):
-    VERR = {}
-    VEPR = {}
-
-    CYP6_COEFF = 1 # model.addVar(name=f"C6C", lb=0.75, ub=1.25)
-    regs = 0
-    for r, (exp_cov0, exp_cov1) in region_cov.items():
-        expr = 0
-        expr6 = 0
-        scale = max(exp_cov0, exp_cov1) + 1
-        for s, structure in structures.items():
-            if r in structure.cn[0]:
-                expr += structure.cn[0][r] * VCN[s]
-                expr6 += structure.cn[0][r] * VCN[s]
-            if len(structure.cn) > 1 and r in structure.cn[1]:
-                expr -= structure.cn[1][r] * VCN[s]
-
-        if r not in gene.unique_regions: continue
-        regs += 1
-
-        VEPR[r] = model.addVar(name=f"EX_{r}", lb=-aldy.cn.MAX_CN_ERROR, ub=aldy.cn.MAX_CN_ERROR)
-        model.addConstr(expr6 + VEPR[r] <= CYP6_COEFF * exp_cov0, name=f"C6COV_{r}")
-        model.addConstr(expr6 + VEPR[r] >= CYP6_COEFF * exp_cov0, name=f"C6COV_{r}")
-
-        VERR[r] = model.addVar(name=f"E_{r}", lb=-aldy.cn.MAX_CN_ERROR, ub=aldy.cn.MAX_CN_ERROR)
-        model.addConstr(expr / scale + VERR[r] <= (exp_cov0 - exp_cov1) / scale, name=f"CCOV_{r}")
-        model.addConstr(expr / scale + VERR[r] >= (exp_cov0 - exp_cov1) / scale, name=f"CCOV_{r}")
-
-    PCE_COEFF = 2
-    DIFF_COEFF = 10 / regs
-    o1 = DIFF_COEFF * model.abssum(VERR.values(), coeffs={"E_pce": PCE_COEFF})  # 0-10
-    objective = 0
-    objective += o1
-
-    FIT_COEFF = DIFF_COEFF/3
-    o2 = FIT_COEFF * model.abssum(VEPR.values())
-    objective += o2
-
-    # CYP6_ABS = model.addVar(lb=0, name=f"ABS_C6C")
-    # model.addConstr(CYP6_ABS + (1 - CYP6_COEFF) >= 0, name=f"CABSL_C6C")
-    # model.addConstr(CYP6_ABS - (1 - CYP6_COEFF) >= 0, name=f"CABSR_C6C")
-    # objective += 5 * CYP6_ABS
-
-    PARS = 10 / regs
-    PARS /= 2
-    penalty = {s: PARS for s, _ in VCN}
-    for n, s in gene.cn_configs.items():
-        if n in penalty and str(s.kind) == str(aldy.gene.CNConfigType.LEFT_FUSION):
-            penalty[n] += PARS/2
-    penalty['2D7'] += PARS/2
-    # penalty
-    o3 = model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
-    objective += o3
-        # VVAF = {}
-        # ocov = sample_sam.coverage.filtered(
-        #     lambda mut, cov, total, thres: aldy.coverage.Coverage.basic_filter(
-        #         mut, cov, total, thres / 10, results['HG03624'][2].coverage.min_cov
-        #     )
-        # )
-        # for (pos, _) in gene.mutations:
-        #     if pos in ocov._coverage:
-        #         reg = gene.region_at(pos)
-        #         if reg and len(ocov._coverage[pos]) > 1:
-        #             tot = ocov.total(pos)
-        #             for ii, i in enumerate(ocov._coverage[pos].values()):
-        #                 als = (i / tot) * model.quicksum(
-        #                     v for s, v in VCN.items()
-        #                     if s in structures and structures[s].cn[reg[0]][reg[1]] == 1
-        #                 )
-        #                 v = model.addVar(name=f"VAF_{pos}_{ii}", vtype='I')
-        #                 model.addConstr(als - 0.5 <= v)
-        #                 model.addConstr(als + 0.5 >= v)
-
-        #                 VVAF[pos,ii] = model.addVar(lb=0, name=f"ABSVAF_{pos}_{ii}")
-        #                 model.addConstr(VVAF[pos,ii] + (v - als) >= 0)
-        #                 model.addConstr(VVAF[pos,ii] - (v - als) >= 0)
-        #                 print('adjusting', round(i/tot, 2))
-        # objective += 0.1 * model.quicksum(VVAF.values())
-    model.setObjective(objective)
-    # Solve the model
-    # model.addConstr(VCN['1', 0] >= 1)
-    # model.addConstr(VCN['1', -1] >= 1)
-    # model.addConstr(VCN['2D7', 0] >= 1)
-    # model.addConstr(VCN['36.ALDY', 0] >= 1)
-    # model.addConstr(VCN['36.ALDY', -1] >= 1)
-    lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
-    result: dict = {}
-    found = {}
-    best_opt = None
-    for status, opt, sol in model.solutions(0.2): # gap = 0
-        if best_opt is not None and abs(opt-best_opt) > 0.5: continue
-        if best_opt is None: best_opt = opt
-        sol_tuple = tuple(sorted(lookup[v] for v in sol if lookup[v] not in ['5', '2D7']))
-        sol_tuple_x = tuple(sorted(lookup[v] for v in sol))
-        if sol_tuple not in result:
-            result[sol_tuple] = aldy.cn.CNSolution(gene, opt, list(sol_tuple))
-            s = tuple(natsorted( '36' if s == '36.ALDY' else s for s in sol_tuple_x ))
-            found[s] = (round(opt - best_opt,2), round(o1.getValue(),2), round(o2.getValue(),2), round(o3.getValue(),2))
-    if False:
-        q = [[c.region_cn[g][r] for r in c.gene.regions[0]] for g, _ in enumerate(c.region_cn)]
-        h = sorted(set(k for _, k in data), key=lambda x: -gene.regions[0][x].start)
-        r = [[f'*{k}*' if k in gene.unique_regions else k for k in h]] + \
-            [[round(data.get((j, i)), 1) for i in h] for j in range(2)]
-        r += [[round(r[1][i] - r[2][i],1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
-        r += [[round(r[1][i] / r[2][i],1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
-        r += [["---" for i in range(len(r[0]))]]
-        r += [[c.region_cn[g].get(r, 0) for r in h] for g, _ in enumerate(c.region_cn)]
-        r += [[round(r[-2][i] / r[-1][i],1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
-        r += [["---" for i in range(len(r[0]))],
-                [round(abs(r[-1][i] - r[-5][i]),1) if r[0][i].startswith('*') else '' for i in range(len(r[0]))]]
-        tab = tabulate(r, tablefmt="plain", stralign="right", numalign="right")
-        print(s,opt); print(tab)
-    print(rs[1], truth[rs[1]], cn_truth[rs[1]], 'vs', found, round(best_opt,2))
-    print(tuple(cn_truth[rs[1]]) in found, {i: (cx[0][i],cx[1][i]) for i in cx[0]})
-    plot(gene, ref, sample, True)
-    # return tuple(cn_truth[rs[1]]) in found
-
-    major_sols = []
-    for i, cn_sol in enumerate(result.values()):
-        major_sols += aldy.major.estimate_major(
-            gene,
-            sample_sam.coverage,
-            cn_sol,
-            solver='gurobi',
-            identifier=i,
-        )
-    major_sols.sort(key=lambda x:x.score)
-    for m in major_sols:
-        print(m.cn_solution._solution_nice(), m.score, m._solution_nice())
-
-    return found
-
-# HG00185 HG02087? HG03624?
-
-# print(model(results['HG00332'], results['HG01089']))
-# for r in 'HG02649 NA19315 NA19466'.split():
-r = 'NA19315'
-for i in sorted(results):
-# for i in ['HG00437', 'HG03624']:
-# for i in "HG01089 HG02087 HG02649 HG03624 NA12762 NA19452 NA19466".split():
-# for i in "HG00118 HG00437 HG02087 HG03624".split():
-        # model(('HG00332', i))
-    model((r, i))
-    print()
-# HG01089 *1/*4 vs {('1', '2D7'), ('1', '5')} 15.422513442593278
-
-
-#%%
-# majors
-func_muts = { m[0] for m in gene.mutations if gene.is_functional(m) }
-len(func_muts)
-
-# for a in alleles:
-#         for m in alleles[a].func_muts:
-#             constraints[m] += VA[a]
-
-#%%
-alleles = {}
-for an, a in gene.alleles.items():
-    # print(a)
-    va = {p: 'X' for p in func_muts}
-    for p, op in a.func_muts:
-        if op[1] == '>':
-            va[p] = op[2]
-        elif op.startswith('ins'):
-            pass
-            # va[p] = '+' + op[3:]
-        elif op.startswith('del'):
-            for l in range(len(op) - 3):
-                va[p] = '-'
-    alleles[an] = va
-
-
-ch = results['HG01845'][2].choices
-ch_i = list(ch.keys())
-for gi, g in results['HG01845'][2].grid.items():
-    l = {ch_i[i]: sig for i, sig in enumerate(g) if ch_i[i] in func_muts if sig != ''}
-    sup = set()
-    if l:
-        for an, aa in alleles.items():
-            ok = True
-            for p, o in l.items():
-                if p in aa and o != aa[p]:
-                    ok = False
-                    break
-            if ok: sup.add(an)
-        print(sup)
-        break
-
-
-#%%
-import matplotlib.pyplot as plt
-
-r = plot(gene, results['HG00332'][0], results['NA19466'][0])
-
-f = plt.figure()
-f.set_figwidth(12)
-f.set_figheight(5)
-plt.plot(r[0], r[1], color='blue')
-plt.plot(r[0], r[2], color='red')
-plt.plot(r[0], [2 for _ in r[1]], linestyle='dashed')
-
-#%%
-# Remap the file
-
-#%%
-fusions = {}
-for rn, rp in r.items():
-    regs = [rg[0] for rr in rp for rg in get_regions(*rr)]
-    for (s1, s2), fn in fusion_signatures.items():
-        try:
-            z = regs.index(s2)
-            if z+1 < len(regs) and regs[z+1] == s1:
-                fusions.setdefault(fn, set()).add(rn)
-        except:
-            continue
-for f in fusions:
-    print(f, len(fusions[f]))
-print()
-
-#%%
-
-
-
-#%%
-
-for fl in sorted(glob.glob("temp/pacbio/???????.bam")):
-    with timing(f"Remap {fl}"):
-        # rds = remap_mappy((gene, "temp/pacbio/HG00437.bam"))
-        # rds, _, dx = remap_mappy((gene, "temp/pacbio/HG00185.bam"))
-        rds, _, dx = remap_mappy((gene, fl))
-        fus, ms = cluster(rds)
-    fs = {y:x for x,y in fusion_signatures.items()}
-    zz = dict(greedy_set_cover(fus))
-    for n, s in zz.items():
-        print(n, fs[n], round(100.0*len(s)/ms[n],0))
-    print()
-
-
-
-
-# %%
+    vaf_model(i)

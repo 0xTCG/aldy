@@ -9,7 +9,7 @@ from typing import Dict, Tuple, Callable, List
 import collections
 
 from .common import log, AldyException, script_path
-from .gene import Mutation, GRange
+from .gene import Mutation, Gene
 
 
 class Coverage:
@@ -19,12 +19,13 @@ class Coverage:
 
     def __init__(
         self,
+        gene: Gene,
+        profile,
+        sam,
         coverage: Dict[int, Dict[str, int]],
-        threshold: float,
         cnv_coverage: Dict[int, int],
-        sample: str = "sample",
+        threshold: float,
         min_cov: float = 1.0,
-        sam = None
     ) -> None:
         """
         Coverage initialization.
@@ -45,16 +46,16 @@ class Coverage:
             Used for coverage rescaling.
         :param sample: Sample name. Default: 'sample'.
         """
+        self.gene = gene
+        self.profile = profile
+        self.sam = sam
+
         self._coverage = coverage
-        self._threshold = threshold
         self._cnv_coverage = cnv_coverage
-        self.sample = sample
+        self._threshold = threshold
         self.min_cov = min_cov
 
         self._region_coverage: Dict[Tuple[int, str], float] = {}
-        self.fragments = []
-        self.phases = []
-        self.sam = sam
 
     def __getitem__(self, mut: Mutation) -> float:
         """:return: Coverage of the mutation ``mut``."""
@@ -100,19 +101,19 @@ class Coverage:
             len(self._coverage) + 0.1
         )
 
-    def dump(self, gene, out):
+    def dump(self, out):
         for pos, pos_mut in sorted(self._coverage.items()):
             if not (len(pos_mut) == 1 and "_" in pos_mut):
                 for i, (op, cov) in enumerate(sorted(pos_mut.items(), reverse=True)):
                     p = self.percentage(Mutation(pos, op))
-                    if pos in gene:
-                        x = gene.get_functional((pos, op))
+                    if pos in self.gene:
+                        x = self.gene.get_functional((pos, op))
                         if op == "_":
                             x = ""
-                        if x and (pos, op) not in gene.mutations:
+                        if x and (pos, op) not in self.gene.mutations:
                             x += "**"
-                        t = f"{x if x else ''}\t{gene.region_at(pos)[1]}"
-                        t += "\t" + gene.get_rsid((pos, op))
+                        t = f"{x if x else ''}\t{self.gene.region_at(pos)[1]}"
+                        t += "\t" + self.gene.get_rsid((pos, op))
                     else:
                         t = "\t\t"
                     # out(
@@ -157,62 +158,50 @@ class Coverage:
         )
 
         new_cov = Coverage(
-            cov,  # type: ignore
-            self._threshold,
+            self.gene,
+            self.profile,
+            self.sam,
+            cov,
             self._cnv_coverage,
-            self.sample,
+            self._threshold,
             self.min_cov,
-            sam=self.sam
         )
         new_cov._region_coverage = self._region_coverage
-        new_cov.fragments = self.fragments[:]
-        new_cov.phases = self.phases[:]
         return new_cov
 
     def diploid_avg_coverage(self) -> float:
         """:return: Average coverage of the copy-number neutral region."""
         return float(sum(self._cnv_coverage.values())) / abs(
-            self._cn_region.end - self._cn_region.start
+            self.profile.cn_region.end - self.profile.cn_region.start
         )
 
-    def _normalize_coverage(
-        self,
-        profile: Dict[str, List[float]],
-        gene_regions: List[Dict[str, GRange]],
-        cn_region: GRange,
-        profile_cn: float,
-    ) -> None:
+    def _normalize_coverage(self) -> None:
         """
         Normalize the sample coverage to match the profile coverage.
-
-        :param profile:
-            Profile coverage in the form `chromosome: (position -> coverage)`.
-        :param gene_regions: List of genic regions for each gene.
-        :param cn_region: Copy-number neutral region.
         """
 
-        self._cn_region: GRange = cn_region  #: GRange: store the CN-neutral region
         sam_ref = sum(
-            self._cnv_coverage[i] for i in range(cn_region.start, cn_region.end)
+            self._cnv_coverage[i]
+            for i in range(self.profile.cn_region.start, self.profile.cn_region.end)
         )
         # print(self._cnv_coverage, cn_region, sam_ref)
 
         if sam_ref == 0:
             raise AldyException(
-                f"CN-neutral region {cn_region} has no reads. "
+                f"CN-neutral region {self.profile.cn_region} has no reads. "
                 + "Double check your input file for CYP2D8 (are you using hg19?), "
                 + "or pass an alternative CN-neutral region via -n parameter."
             )
-        cn_ratio = float(profile_cn) / sam_ref
+        cn_ratio = self.profile.neutral_value / sam_ref
         if cn_ratio == 0:
             raise AldyException("Invalid CN-neutral region in the provided profile.")
         log.debug("[coverage] scale_ratio: {:.1f}", 1 / cn_ratio)
 
         self._region_coverage = {}
-        for gene, gr in enumerate(gene_regions):
+        for gene, gr in enumerate(self.gene.regions):
             for region, rng in gr.items():
                 s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT
-                p = profile[region][gene]
+                p = self.profile.data[self.gene.name][region][gene]
                 self._region_coverage[gene, region] = (
                     (cn_ratio * float(s) / p) if p != 0 else 0.0
                 )
@@ -243,66 +232,7 @@ class Coverage:
 
         return mut.op == "_" or cov >= max(min_cov, total * thres)
 
-
-    def load_phase(self, gene, ploidy=2):
-        log.debug("[phase] Phasing {} copies...", ploidy)
-        return self._load_phase(gene, ploidy)
-
-        # from .phase import Read, Graph, phase
-        # from .common import Timing
-        # from pprint import pprint
-
-        # snps = {}
-        # for read in self.fragments:
-        #     for pos, op in read:
-        #         snps.setdefault(pos, set()).add(op)
-        # snps = {
-        #     pos: (id, list(ops)) for id, (pos, ops) in enumerate(snps.items()) if len(ops) > 1
-        # }
-        # frags = {}
-        # for read in self.fragments:
-        #     key = tuple(sorted([(pos, op) for pos, op in read if pos in snps]))
-        #     if len(key) > 1:
-        #         if key not in frags:
-        #             frags[key] = 0
-        #         frags[key] += 1
-
-        # reads = []
-        # for pairs, cov in frags.items():
-        #     assert len(pairs) >= 2
-        #     items = {}
-        #     for pos, al in pairs:
-        #         assert pos in snps
-        #         id = snps[pos][0]
-        #         al = snps[pos][1].index(al)
-        #         items[id] = al
-        #     reads.append(Read(items, cov, len(reads)))
-        #     reads[-1].special_snp = sorted(reads[-1].snps)[1]
-        #     reads[-1].rates = [1.0 / ploidy] * ploidy
-
-        # with Timing("[phase] HapTree-X"):
-        #     g = Graph(reads, ploidy)
-        #     phases = phase(g)
-
-        # haplotypes = [[] for _ in range(ploidy)]
-        # id_snp = {id: (pos, alleles) for pos, (id, alleles) in snps.items()}
-        # for root in sorted(g.components.keys()):
-        #     if root not in phases: continue
-        #     comp = g.components[root]
-        #     reads = sum(len(x) for x in comp.reads)
-        #     haps = sorted([(h[root], i) for i, h in enumerate(phases[root].haplotypes)])
-        #     for snp in comp.nodes:
-        #         pos, alleles = id_snp[snp]
-        #         for i, (_, hap) in enumerate(haps):
-        #             idx = phases[root].haplotypes[hap][snp]
-        #             al = alleles[idx]
-        #             haplotypes[i].append((pos, ))
-        #             if al == gene[pos]:
-        #                 haplotypes[i].append(Mutation(pos, "_"))
-        #             else:
-        #                 haplotypes[i].append(Mutation(pos, f"{gene[pos]}>{al}"))
-        # return haplotypes
-
+    # @deprecated
     def _load_phase(self, gene, ploidy=2):
         """Loads a HapTree-X/HapCUT2 phase file."""
 

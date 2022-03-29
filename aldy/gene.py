@@ -700,7 +700,7 @@ class Gene:
                 name = alleles[an].alt_name if alleles[an].alt_name else an
             if name in used_names:  # Append letter
                 used_names[name] += 1
-                log.info(f"Renaming {name} -> {name}:{used_names[name]}")
+                log.debug(f"[gene] renaming {name} -> {name}:{used_names[name]}")
                 name += f":{used_names[name]}"
                 used_names[name] = 1
             else:

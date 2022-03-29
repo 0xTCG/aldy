@@ -8,6 +8,7 @@ from typing import Dict, List, Tuple, Optional
 
 import copy
 import re
+from math import ceil
 from natsort import natsorted
 
 from . import lpinterface
@@ -16,6 +17,7 @@ from .common import log, json, sorted_tuple, AldyException
 from .gene import CNConfig, CNConfigType, Gene
 from .coverage import Coverage
 from .solutions import CNSolution
+from aldy import coverage
 
 
 MAX_CN = 20.0
@@ -23,17 +25,11 @@ MAX_CN = 20.0
 
 # Model parameters
 
-LEFT_FUSION_PENALTY = 0.1
-"""Penalty for left fusions to account for their rarity (0 for no penalty)."""
-
-PCE_PENALTY_COEFF = 1.5
+PCE_PENALTY_COEFF = 2
 """Error penalty applied to the PCE region (1 for no penalty)."""
 
 MAX_CN_ERROR = MAX_CN
 """Upper bound for absolute error."""
-
-PARSIMONY_PENALTY = 0.5
-"""Penalty for each gene copy to control the parsimony (0 for no penalty)."""
 
 
 def estimate_cn(
@@ -41,8 +37,6 @@ def estimate_cn(
     coverage: Coverage,
     solver: str,
     gap: float = 0,
-    fusion_penalty: float = LEFT_FUSION_PENALTY,
-    user_solution=None,
     debug: Optional[str] = None,
 ) -> List[CNSolution]:
     """
@@ -55,9 +49,6 @@ def estimate_cn(
     :param gap:
         Relative optimality gap. Use non-zero values to allow non-optimal solutions.
         Default is 0 (reports only optimal solutions).
-    :param fusion_penalty:
-        Fusion penalty. Use higher values to avoid fusions.
-        Default is 0.1.
     :param user_solution:
         User-specified list of copy number configurations.
         ILP solver will not run if this parameter is provided.
@@ -71,15 +62,15 @@ def estimate_cn(
 
     log.debug("\n" + "*" * 80)
 
-    if user_solution is not None:
-        return [_parse_user_solution(gene, user_solution)]
+    if coverage.profile.cn_solution:
+        return [_parse_user_solution(gene, coverage.profile.cn_solution)]
     elif not gene.do_copy_number:
         basic = list(gene.cn_configs.keys())[0]
         return [_parse_user_solution(gene, [basic, basic])]
     else:
         # TODO: filter CN configs with non-present alleles
         max_observed_cn = 1 + max(
-            int(round(coverage.region_coverage(gi, r)))
+            ceil(coverage.region_coverage(gi, r))
             for gi, g in enumerate(gene.regions)
             for r in g
         )
@@ -103,6 +94,12 @@ def estimate_cn(
         log.debug("[cn] candidates= {}", ", ".join(natsorted(configs)))
         log.debug("[cn] max_cn= {}", max_observed_cn)
         _print_coverage(gene, coverage)
+
+        fusion_support = None
+        if coverage.sam._fusion_counter:
+            fusion_support = {
+                fn: (a / b) if b else 0 for fn, [a, b] in coverage.sam._fusion_counter.items()
+            }
         sol = solve_cn_model(
             gene,
             configs,
@@ -110,8 +107,8 @@ def estimate_cn(
             region_cov,
             solver,
             gap,
-            fusion_penalty,
             debug,
+            fusion_support,
         )
 
         return sol
@@ -123,9 +120,9 @@ def solve_cn_model(
     max_cn: int,
     region_coverage: Dict[str, Tuple[float, float]],
     solver: str,
-    gap: float = 0,
-    fusion_penalty: float = LEFT_FUSION_PENALTY,
+    gap: float = 0.1,
     debug: Optional[str] = None,
+    fusion_support=None,
 ) -> List[CNSolution]:
     """
     Solve the copy number estimation problem (an instance of closest vector problem).
@@ -140,9 +137,6 @@ def solve_cn_model(
     :param gap:
         Relative optimality gap. Use non-zero values to allow non-optimal solutions.
         Default is 0 (reports only optimal solutions).
-    :param fusion_penalty:
-        Fusion penalty. Use higher values to avoid fusions.
-        Default is 0.1.
     :param debug:
         If set, create a "`debug`.cn.lp" file for debug purposes.
         Default is ``None``.
@@ -165,7 +159,17 @@ def solve_cn_model(
     # Thus a diploid genome must have exactly *2* full configurations.
     # Any `number` > 0 describes only the main gene configuration
     # (a.k.a. "weak" configurations), and there can be many such configurations.
-    structures = {(name, 0): structure for name, structure in cn_configs.items()}
+
+    # N.B. (3/2022) this step filters "weak" fusions without long-read support
+    del_allele = gene.deletion_allele()
+    structures = {
+        (name, 0): structure
+        for name, structure in cn_configs.items()
+        if not fusion_support
+        or name == "1"
+        or (del_allele and name == del_allele)
+        or (name in fusion_support and fusion_support[name] >= 1 / (2 * max_cn))
+    }
     for a, ai in list(structures.keys()):
         structures[a, -1] = copy.deepcopy(structures[a, 0])
         if cn_configs[a].kind != CNConfigType.DEFAULT:
@@ -177,6 +181,15 @@ def solve_cn_model(
                 structures[a, i].cn[g] = {
                     r: v - 1 for r, v in structures[a, i].cn[g].items()
                 }
+    # Add "fake" pseudogenes to counter pseudogene copies or CN noise
+    if len(gene.regions) > 1 and del_allele:
+        for i in range(max_cn):
+            structures["PSEUDO", i + 1] = CNConfig(
+                copy.deepcopy(structures[del_allele, 0].cn),
+                CNConfigType.DELETION,
+                {},
+                "pseudogene",
+            )
 
     # Add a binary variable for each CN structure.
     VCN = {
@@ -190,7 +203,6 @@ def solve_cn_model(
     model.addConstr(diplo_inducing >= 2, name="CDIPLO")
 
     # Ensure that we cannot link any allele to the whole-gene deletion.
-    del_allele = gene.deletion_allele()
     if del_allele:
         for (a, ai), v in VCN.items():
             if a != del_allele:
@@ -204,37 +216,57 @@ def solve_cn_model(
         # Ignore 1, because A[1] = 1 && A[0] = 0 is valid (e.g. *13/*13+*1)
         elif ai > 1:
             model.addConstr(VCN[a, ai] <= VCN[a, ai - 1], name=f"CORD_{a}_{ai}")
-    print(sorted(structures.keys()))
-    # Add error variables
-    VERR = {}
 
+    # Add error variables
+    VERR, VERR_GENE = {}, {}
     for r, (exp_cov0, exp_cov1) in region_coverage.items():
         debug_info["data"][r] = (exp_cov0, exp_cov1)
-        expr = 0
+        expr, expr_gene = 0, 0
         for s, structure in structures.items():
             if r in structure.cn[0]:
                 expr += structure.cn[0][r] * VCN[s]
+                expr_gene += structure.cn[0][r] * VCN[s]
             if len(structure.cn) > 1 and r in structure.cn[1]:
                 expr -= structure.cn[1][r] * VCN[s]
+
+        if r not in gene.unique_regions:
+            continue
+
+        VERR_GENE[r] = model.addVar(name=f"EG_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
+        model.addConstr(expr_gene + VERR_GENE[r] <= exp_cov0, name=f"CG_COV_{r}")
+        model.addConstr(expr_gene + VERR_GENE[r] >= exp_cov0, name=f"CG_COV_{r}")
+
+        scale = max(exp_cov0, exp_cov1) + 1
         VERR[r] = model.addVar(name=f"E_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
-        model.addConstr(expr + VERR[r] <= exp_cov0 - exp_cov1, name=f"CCOV_{r}")
-        model.addConstr(expr + VERR[r] >= exp_cov0 - exp_cov1, name=f"CCOV_{r}")
+        model.addConstr(
+            expr / scale + VERR[r] <= (exp_cov0 - exp_cov1) / scale, name=f"C_COV_{r}"
+        )
+        model.addConstr(
+            expr / scale + VERR[r] >= (exp_cov0 - exp_cov1) / scale, name=f"C_COV_{r}"
+        )
 
     # Objective: minimize the sum of absolute errors.
     # PCE_REGION (in CYP2D7) is penalized with an extra score as it is important
     # fusion marker.
-    objective = model.abssum(VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF})
+    DIFF_COEFF = 10 / len(gene.unique_regions)
+    o1 = DIFF_COEFF * model.abssum(VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF})
+
+    # Also minimize main gene fit
+    FIT_COEFF = DIFF_COEFF / 3
+    o2 = FIT_COEFF * model.abssum(VERR_GENE.values())
+
     # Objective: also minimize the total number of present alleles (maximum parsimony)
+    PARSIMONY_PENALTY = 10 / len(gene.unique_regions)
+    PARSIMONY_PENALTY /= 2
+    penalty = {s: PARSIMONY_PENALTY for s, _ in VCN}
     # Also penalize left fusions as they are not likely to occur.
-    objective += model.quicksum(
-        # MPICL requires only one term for each variable in the objective function,
-        # thus this ugly expression:
-        (fusion_penalty + PARSIMONY_PENALTY) * v
-        if cn_configs[s].kind == CNConfigType.LEFT_FUSION
-        else PARSIMONY_PENALTY * v
-        for (s, k), v in VCN.items()
-    )
-    model.setObjective(objective)
+    for n, s in gene.cn_configs.items():
+        if n in penalty and s.kind == CNConfigType.LEFT_FUSION:
+            penalty[n] += PARSIMONY_PENALTY / 2
+    penalty["PSEUDO"] += PARSIMONY_PENALTY / 2
+    o3 = model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
+
+    model.setObjective(o1 + o2 + o3)
     if debug:
         model.dump(f"{debug}.{gene.name}.cn.lp")
 
@@ -242,7 +274,9 @@ def solve_cn_model(
     lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
     result: dict = {}
     for status, opt, sol in model.solutions(gap):
-        sol_tuple = sorted_tuple(lookup[v] for v in sol)
+        sol_tuple = sorted_tuple(
+            lookup[v] for v in sol if lookup[v] not in [del_allele, "PSEUDO"]
+        )
         # Because A[1] can be 1 while A[0] is 0, we can have biologically
         # homologous solutions
         if sol_tuple not in result:

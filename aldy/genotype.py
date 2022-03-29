@@ -38,7 +38,6 @@ def genotype(
     cn_region: Optional[GRange] = None,
     cn_solution: Optional[List[str]] = None,
     threshold: float = 0.5,
-    fusion_penalty: float = cn.LEFT_FUSION_PENALTY,
     solver: str = "any",
     reference: Optional[str] = None,
     gap: int = 0,
@@ -81,9 +80,6 @@ def genotype(
         threshold (float):
             Mutation filtering threshold.
             Default is 0.5 (for 50%).
-        fusion_penalty (float):
-            Fusion penalty. Use higher values to avoid fusions.
-            Default is 0.1.
         solver (str):
             ILP solver. Check :obj:`aldy.lpinterface` for the list of available solvers.
             Default is ``'any'``.
@@ -155,7 +151,6 @@ def genotype(
                     cn_region,
                     cn_solution,
                     threshold,
-                    fusion_penalty,
                     solver,
                     reference,
                     gap,
@@ -184,8 +179,6 @@ def genotype(
         pass
     gene = Gene(gene_db, genome=genome)
 
-    if not cn_region:
-        cn_region = sam.DEFAULT_CN_NEUTRAL_REGION[genome]
     if profile in ["exome", "wxs"]:
         cn_region = None
         cn_solution = ["1", "1"]
@@ -203,19 +196,20 @@ def genotype(
 
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
-        cn_region = None
-        cn_solution = ["1", "1"]
-        sample = sam.Sample(gene=gene, vcf_path=sam_path, debug=debug)
+        profile = sam.Profile("user_provided", None, None, 0, ["1", "1"])
+        sample = sam.Sample(gene=gene, profile=profile, vcf_path=sam_path, debug=debug)
     else:
+        if cn_solution:
+            profile = sam.Profile("user_provided", None, None, 0, cn_solution)
+        else:
+            profile = sam.Sample.load_profile(gene, profile, cn_region)
         sample = sam.Sample(
             gene=gene,
             sam_path=sam_path,
             threshold=threshold,
             profile=profile,
             reference=reference,
-            cn_region=None if cn_solution else cn_region,
             debug=debug,
-            phase=phase,
             min_cov=float(min_cov) if min_cov else 1.0,
         )
 
@@ -227,7 +221,7 @@ def genotype(
         print(sample.coverage.sample, gene.name, sep="\t", end="\t", file=output_file)
     if kind != "vcf":
         avg_cov = sample.coverage.average_coverage()
-        if cn_region and avg_cov < 2:
+        if profile.cn_region and avg_cov < 2:
             if is_simple:
                 print(file=output_file)
             raise AldyException(
@@ -235,7 +229,7 @@ def genotype(
                 + f"skipping gene {gene.name}. "
                 + f"Please ensure that {gene.name} is present in the input SAM/BAM."
             )
-        elif cn_region and avg_cov < 20:
+        elif profile.cn_region and avg_cov < 20:
             log.warn(
                 f"Average sample coverage is {avg_cov}. "
                 + "We recommend at least 20x coverage for the best results."
@@ -247,8 +241,6 @@ def genotype(
         sample.coverage,
         solver=solver,
         gap=gap,
-        user_solution=cn_solution,
-        fusion_penalty=fusion_penalty,
         debug=debug,
     )
 
