@@ -30,6 +30,8 @@ class Profile:
         self.data = data
         self.cn_solution = cn_solution
         self.neutral_value = neutral_value
+        if name != "pacbio-hifi-targeted":
+            self.neutral_value *= 2
 
 
 @dataclass
@@ -108,10 +110,11 @@ class Sample:
         # Phasing information!
         self.grid_columns = sorted({pos for pos, _ in gene.mutations})
         self.grid_columns = {pos: i for i, pos in enumerate(self.grid_columns)}
-        self.grid = []
+        self.grid = {}
+        self.moved = {}
 
         self.profile = profile
-        self._fusion_counter = None
+        self._fusion_counter = {}
 
         with Timing("[sam] Read SAM"):
             is_sam = False
@@ -141,7 +144,9 @@ class Sample:
                     _, norm, muts = self._load_sam(sam_path, gene, reference, debug)
                     group_indels = True
                 if self.profile:
-                    self._dump_cn = self._load_cn_region(self.profile.cn_region)
+                    self._dump_cn = self._load_cn_region(
+                        self.profile.cn_region, sam_path, reference
+                    )
             self._make_coverage(gene, norm, muts, threshold, group_indels=group_indels)
             if is_sam and debug:
                 self._dump_alignments(f"{debug}.{gene.name}")
@@ -176,6 +181,8 @@ class Sample:
         """
 
         log.debug("[sam] path= {}", os.path.abspath(sam_path))
+        if reference:
+            log.debug("[sam] reference= {}", os.path.abspath(reference))
         self.sample_name = os.path.basename(sam_path).split(".")[0]
 
         norm: dict = defaultdict(int)
@@ -212,8 +219,17 @@ class Sample:
                 if not _in_region(gene.get_wide_region(), read, self._prefix):
                     continue
 
+                if read.has_tag("BX"):
+                    fragment = read.get_tag("BX")
+                    if read.has_tag("XC"):
+                        fragment = f"{fragment}:{read.get_tag('XC')}"
+                    elif read.has_tag("MI"):
+                        fragment = f"{fragment}:{read.get_tag('MI')}"
+                else:
+                    fragment = read.query_name
                 r = self._parse_read(
                     gene,
+                    fragment,
                     read.reference_start,
                     read.cigartuples,
                     read.query_sequence,
@@ -224,7 +240,7 @@ class Sample:
                     self._dump_reads.append(r)
         return has_index, norm, muts
 
-    def _load_cn_region(self, cn_region):
+    def _load_cn_region(self, cn_region, path, reference=None):
         """
         Load copy-number-neutral coverage from a SAM/BAM file.
 
@@ -234,7 +250,7 @@ class Sample:
             (and Aldy will require a ``--cn`` parameter to be user-provided).
         """
         self._dump_cn = collections.defaultdict(int)
-        with pysam.AlignmentFile(self.path) as sam:
+        with pysam.AlignmentFile(path, reference_filename=reference) as sam:
             # Check do we have proper index to speed up the queries
             try:
                 has_index = sam.check_index()
@@ -414,18 +430,18 @@ class Sample:
             for data in self._insertion_reads.values():
                 data[ref_start, ref_end, read_len] += 1
 
-        frags = []
-        ld = struct.unpack("<l", fd.read(l))[0]
-        for _ in range(ld):
-            ln = struct.unpack("<l", fd.read(l))[0]
-            frags.append([])
-            for _ in range(ln):
-                mut_start, op_len = struct.unpack("<ll", fd.read(l + l))
-                op = fd.read(op_len).decode("ascii")
-                frags[-1].append((mut_start, op))
-        fd.close()
+        # frags = []
+        # ld = struct.unpack("<l", fd.read(l))[0]
+        # for _ in range(ld):
+        #     ln = struct.unpack("<l", fd.read(l))[0]
+        #     frags.append([])
+        #     for _ in range(ln):
+        #         mut_start, op_len = struct.unpack("<ll", fd.read(l + l))
+        #         op = fd.read(op_len).decode("ascii")
+        #         frags[-1].append((mut_start, op))
+        # fd.close()
 
-        return norm, muts, frags
+        return norm, muts
 
     def _make_coverage(self, gene, norm, muts, threshold, group_indels=True):
         # Establish the coverage dictionary
@@ -504,6 +520,7 @@ class Sample:
                         coverage[new_pos][mut] = 0
                     coverage[new_pos][mut] += coverage[pos][mut]
                     coverage[pos][mut] = 0
+                    self.moved[pos, mut] = (new_pos, mut)
         # Group ambiguous insertions
         indels = defaultdict(set)
         for m in gene.mutations:
@@ -531,7 +548,7 @@ class Sample:
                 ]
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
-                    log.trace(
+                    log.debug(
                         f"[sam] relocate {coverage[pos][mut]} "
                         + f"from {pos+1}{mut} to {new_pos+1}{mut}"
                     )
@@ -542,10 +559,11 @@ class Sample:
                     L = len(mut) - 3
                     self._insertion_counts[new_pos, L] += self._insertion_counts[pos, L]
                     self._insertion_counts[pos, L] = 0
+                    self.moved[pos, mut] = (new_pos, mut)
 
                     coverage[pos][mut] = 0
 
-    def _parse_read(self, gene: Gene, ref_start, cigar, seq, norm, muts):
+    def _parse_read(self, gene: Gene, fragment, ref_start, cigar, seq, norm, muts):
         """
         Parse a :obj:`pysam.AlignedSegment` read.
 
@@ -559,8 +577,7 @@ class Sample:
         .. note:: `norm` and `muts` are modified.
         """
 
-        grid = {}
-        regions = []
+        grid = self.grid.setdefault(fragment, {})
         dump_arr = []
         start, s_start = ref_start, 0
         for op, size in cigar:
@@ -568,10 +585,6 @@ class Sample:
                 mut = (start, "del" + gene[start : start + size])
                 muts[mut] += 1
                 dump_arr.append(mut)
-                if gene.region_at(start) and (
-                    not regions or gene.region_at(start) != regions[-1]
-                ):
-                    regions.append(gene.region_at(start))
                 if start in self.grid_columns:
                     grid[start] = mut
                 start += size
@@ -581,15 +594,13 @@ class Sample:
                 # HACK: just store the length due to seq. errors
                 self._insertion_counts[start, size] += 1
                 dump_arr.append(mut)
+                if start in self.grid_columns:
+                    grid[start] = mut
                 s_start += size
             elif op == 4:  # Soft-clip
                 s_start += size
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
-                    if gene.region_at(start + i) and (
-                        not regions or gene.region_at(start + i) != regions[-1]
-                    ):
-                        regions.append(gene.region_at(start + i))
                     if start + i in gene and gene[start + i] != seq[s_start + i]:
                         mut = (start + i, f"{gene[start + i]}>{seq[s_start + i]}")
                         dump_arr.append(mut)
@@ -603,7 +614,6 @@ class Sample:
                 start += size
                 s_start += size
 
-        self.grid.append(grid)
         dump_arr_pos = {p for p, _ in dump_arr}
         for pos, op in self._multi_sites.items():
             if pos not in dump_arr_pos:
@@ -739,8 +749,9 @@ class Sample:
 
             rng = [*gene.get_wide_region()]
             if gene.name == "CYP2D6":
-                rng[2] = 42_155_000  # include CYP2D8
+                rng[2] = 42_155_000  # include CYP2D8 [hg38]
             rng = GRange(*rng)
+            counter = 0
             iter = sam.fetch(region=rng.samtools(prefix=self._prefix))
             for read in iter:
                 if not read.cigartuples or "H" in read.cigarstring:
@@ -770,13 +781,23 @@ class Sample:
                             pieces += pcs
                             s_start += ed
                     for (ref_start, seq, cigar) in pieces:
-                        r = self._parse_read(gene, ref_start, cigar, seq, norm, muts)
+                        r = self._parse_read(
+                            gene, counter, ref_start, cigar, seq, norm, muts
+                        )
+                        counter += 1
                         if r and debug:
                             self._dump_reads.append(r)
                 else:
                     r = self._parse_read(
-                        gene, read.reference_start, read.cigartuple, seq, norm, muts
+                        gene,
+                        counter,
+                        read.reference_start,
+                        read.cigartuple,
+                        seq,
+                        norm,
+                        muts,
                     )
+                    counter += 1
                     if r and debug:
                         self._dump_reads.append(r)
         return True, norm, muts

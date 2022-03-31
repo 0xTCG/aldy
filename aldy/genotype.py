@@ -9,6 +9,8 @@ from typing import List, Optional, Any, Set, Dict
 import os
 import sys
 import pkg_resources
+import datetime
+import time
 
 from . import sam
 from . import cn
@@ -104,6 +106,9 @@ def genotype(
     Raises:
         :obj:`aldy.common.AldyException` if the average coverage is too low (below 2).
     """
+
+    t1 = time.time()
+    log.debug("[genotype] gene={}; start={}", gene_db, datetime.datetime.now())
 
     # Test the existence of LP solver
     _ = lp_model("init", solver)
@@ -218,7 +223,13 @@ def genotype(
     is_simple = output_file and output_file.name.endswith(".simple")
     is_aldy = output_file and not (is_vcf or is_simple)
     if is_simple:
-        print(sample.coverage.sample, gene.name, sep="\t", end="\t", file=output_file)
+        print(
+            sample.coverage.sam.sample_name,
+            gene.name,
+            sep="\t",
+            end="\t",
+            file=output_file,
+        )
     if kind != "vcf":
         avg_cov = sample.coverage.average_coverage()
         if profile.cn_region and avg_cov < 2:
@@ -347,6 +358,7 @@ def genotype(
     )
     if is_aldy:
         print("#" + "\t".join(OUTPUT_COLS), file=output_file)
+    simple = [sample.coverage.sam.sample_name, gene.name]
     for i, minor_sol in enumerate(minor_sols):
         conf = 100 * (min_minor_score + SLACK) / (minor_sol.score + SLACK)
         log.info(
@@ -354,24 +366,22 @@ def genotype(
             + f" (confidence={conf:.0f}%)"
         )
         log.info(f"      Minor alleles: {minor_sol._solution_nice()}")
+        simple += [
+            minor_sol.get_major_diplotype().replace(" ", ""),
+            minor_sol.get_minor_diplotype(legacy=True).replace(" ", ""),
+        ]
         if is_aldy:
             print(f"#Solution {i + 1}: {minor_sol._solution_nice()}", file=output_file)
             diplotype.write_decomposition(
                 sample_name, gene, i + 1, minor_sol, output_file
             )
         elif is_simple:
-            print(
-                minor_sol.get_major_diplotype().replace(" ", ""),
-                minor_sol.get_minor_diplotype(legacy=True).replace(" ", ""),
-                sep="\t",
-                end="\t",
-                file=output_file,
-            )
+            print(simple[-2], simple[-1], sep="\t", end="\t", file=output_file)
     if is_vcf:
         diplotype.write_vcf(sample_name, gene, sample.coverage, minor_sols, output_file)
     elif is_simple:
         print(file=output_file)
-
+    log.debug("[simple]\t{}", "\t".join(simple))
     if report:
         log.info(colorize(f"{gene.name} results:"))
         reported: Set[str] = set()
@@ -406,4 +416,5 @@ def genotype(
             ", ".join(sorted(novels)),
         )
 
+    log.debug("[genotype] gene={}; took={}", gene_db, time.time() - t1)
     return {gene_db: minor_sols}

@@ -192,19 +192,17 @@ class Coverage:
                 + "Double check your input file for CYP2D8 (are you using hg19?), "
                 + "or pass an alternative CN-neutral region via -n parameter."
             )
-        cn_ratio = self.profile.neutral_value / sam_ref
-        if cn_ratio == 0:
+        ratio = self.profile.neutral_value / sam_ref
+        if ratio == 0:
             raise AldyException("Invalid CN-neutral region in the provided profile.")
-        log.debug("[coverage] scale_ratio: {:.1f}", 1 / cn_ratio)
+        log.debug("[coverage] scale_ratio: {:.1f}", 1 / ratio)
 
         self._region_coverage = {}
         for gene, gr in enumerate(self.gene.regions):
             for region, rng in gr.items():
                 s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT
                 p = self.profile.data[self.gene.name][region][gene]
-                self._region_coverage[gene, region] = (
-                    (cn_ratio * float(s) / p) if p != 0 else 0.0
-                )
+                self._region_coverage[gene, region] = ((ratio * s / p) if p != 0 else 0.0)
 
     @staticmethod
     def basic_filter(

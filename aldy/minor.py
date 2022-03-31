@@ -3,6 +3,7 @@
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
+import collections
 import random
 from typing import List, Set, Callable, Optional, Tuple, Dict
 
@@ -210,11 +211,13 @@ def solve_minor_model(
             for (vs, _), v in VA.items()
             if (vs.major, vs.added, vs.missing) == (sa.major, sa.added, sa.missing)
         )
-        print(sa, expr, cnt)
         model.addConstr(expr <= cnt, name=f"CCNT_{sa.major}_1")
         model.addConstr(expr >= cnt, name=f"CCNT_{sa.major}_2")
     # Disable other alleles
-    model.addConstr(model.quicksum(VA.values()) <= sum(major_sol.solution.values()), name=f"CCNT_OTHER")
+    model.addConstr(
+        model.quicksum(VA.values()) <= sum(major_sol.solution.values()),
+        name=f"CCNT_OTHER",
+    )
 
     # Add a binary variable for each allele/mutation pair, where mutation belongs
     # to that allele, that will indicate whether such mutation will be kept or not.
@@ -393,12 +396,26 @@ def solve_minor_model(
     PHASE = True
     VPHASEERR = []
     VPHASE = {}
+    reads = coverage.sam.grid.keys()  # random.sample(coverage.sam.grid, 500)
+    modes = collections.defaultdict(int)
+    read_mode = {}
+    mut_pos = {m.pos for m in mutations}
+    for ri, rr in enumerate(reads):
+        c = []
+        for k, v in coverage.sam.grid[rr].items():
+            if k in mut_pos:
+                c.append(v)
+            elif v in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
+                c.append(coverage.sam.moved[v])
+        c = sorted(c)
+        modes[tuple(c)] += 1
+        read_mode[rr] = tuple(c)
+    print("wooo")
     with Timing("[minor] Model setup"):
         vars = 0
-        reads = random.sample(range(len(coverage.sam.grid)), 500)
-        for ai, a in enumerate(alleles):
-            for ri in reads:
-                r = coverage.sam.grid[ri]
+        for ri, (rr, cnt) in enumerate(modes.items()):
+            r = dict(rr)
+            for ai, a in enumerate(alleles):
                 # construct e_ar
                 # e[ai,ri]
                 #  := ph[ai,ri] * sum(1 - ((mut in a & VK[a,m]) | (mut not in a & VN[a, m])) for mut in read)
@@ -413,35 +430,40 @@ def solve_minor_model(
                         (pos if m == r[m.pos] else neg).append(VKEEP[a][m][0])
                     elif m in VNEW[a]:
                         (pos if m == r[m.pos] else neg).append(VNEW[a][m][0])
-                if pos or neg:
-                    v = VPHASE[ai, ri] = model.addVar(vtype="B", name=f"PHASE_{ai}_{ri}", update=False)
+                if len(pos) + len(neg) > 1:
+                    v = VPHASE[ai, ri] = model.addVar(
+                        vtype="B", name=f"PHASE_{ai}_{ri}", update=False
+                    )
                     vars += 1
                     model.addConstr(VPHASE[ai, ri] <= VA[a], name=f"PHASE1_{ai}_{ri}")
                     e = 0
                     for i, vm in enumerate(pos):
                         v_vp = model.prod(
-                            model.addVar(vtype="B", name=f"PHASE2_{ai}_{ri}_{i}", update=False),
-                            [v, vm]
+                            model.addVar(
+                                vtype="B", name=f"PHASE2_{ai}_{ri}_{i}", update=False
+                            ),
+                            [v, vm],
                         )
                         vars += 1
                         e += v - v_vp
                     for i, vm in enumerate(neg):
                         v_vp = model.prod(
-                            model.addVar(vtype="B", name=f"PHASE3_{ai}_{ri}_{i}", update=False),
-                            [v, vm]
+                            model.addVar(
+                                vtype="B", name=f"PHASE3_{ai}_{ri}_{i}", update=False
+                            ),
+                            [v, vm],
                         )
                         vars += 1
                         e += v_vp
-                    VPHASEERR.append(e)
-        for ri in reads:
-            r = coverage.sam.grid
+                    VPHASEERR.append(cnt * e)
+        for ri, _ in enumerate(modes):
             v = [VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE]
             if v:
                 e = model.quicksum(v)
                 model.addConstr(e <= 1, name=f"PHASE4_{ri}_1")
                 model.addConstr(e >= 1, name=f"PHASE4_{ri}_2")
         model.update()
-        log.debug('[minor] phasing setup done, vars= {}', vars)
+        log.debug("[minor] phasing setup done, vars= {}", vars)
 
     # Objective: minimize the absolute sum of errors ...
     objective = model.abssum(v for _, v in VERR.items())
@@ -490,33 +512,54 @@ def solve_minor_model(
             for allele, value in VA.items():
                 if model.getValue(value) <= 0:
                     continue
-                if True: # print assignments
+                if False:  # print assignments
                     ai = next(i for i, a in enumerate(alleles) if allele == a)
-                    reads = [
+                    rds = [
                         r
-                        for ri, r in enumerate(coverage.sam.grid)
+                        for ri, r in enumerate(modes)
                         if (ai, ri) in VPHASE
                         if model.getValue(VPHASE[ai, ri])
                     ]
-                    print(allele[0].minor, len(reads))
+                    print(allele[0].minor, len(rds))
                     for m in sorted(mutations):
-                        print(f'  {m} ', end='')
-                        if m in gene.alleles[allele[0].major].func_muts: print('*', end='')
-                        elif m in gene.alleles[allele[0].major].minors[allele[0].minor].neutral_muts: print('#', end='')
-                        else: print(' ', end='')
+                        print(f"  {m} ", end="")
+                        if m in gene.alleles[allele[0].major].func_muts:
+                            print("*", end="")
+                        elif (
+                            m
+                            in gene.alleles[allele[0].major]
+                            .minors[allele[0].minor]
+                            .neutral_muts
+                        ):
+                            print("#", end="")
+                        else:
+                            print(" ", end="")
 
-                        if m in VKEEP[allele]: print('K' if model.getValue(VKEEP[allele][m][0]) else '-', end='')
-                        elif m in VNEW[allele]: print('N' if model.getValue(VNEW[allele][m][0]) else '-', end='')
-                        else: print(' ', end='')
+                        if m in VKEEP[allele]:
+                            print(
+                                "K" if model.getValue(VKEEP[allele][m][0]) else "-",
+                                end="",
+                            )
+                        elif m in VNEW[allele]:
+                            print(
+                                "N" if model.getValue(VNEW[allele][m][0]) else "-",
+                                end="",
+                            )
+                        else:
+                            print(" ", end="")
 
-                        print('  ', end='')
-                        for r in reads:
-                            if m.pos in r:
-                                c = r[m.pos][1]
-                                if '>' in c: c=c[2]
-                                elif c.startswith('del'): c=f'-{len(c)-3}'
-                                print(c, end='')
-                        print() #'', m.pos, allele[0].major)
+                        print("  ", end="")
+                        for r in rds:
+                            dr = dict(r)
+                            # rx = coverage.sam.grid[r]
+                            if m.pos in dr:
+                                c = dr[m.pos]
+                                if ">" in c:
+                                    c = c[2]
+                                elif c.startswith("del"):
+                                    c = f"-{len(c)-3}"
+                                print(c * modes[r], end="")
+                        print()  #'', m.pos, allele[0].major)
 
                 added: List[Mutation] = []
                 missing: List[Mutation] = []
@@ -584,8 +627,8 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
 
     log.debug("[minor] candidate mutations=")
     for m in sorted(muts):
-        # if coverage[m]:
-        log.debug(print_mut(m))
+        if coverage[m]:
+            log.debug(print_mut(m))
 
     log.trace("[minor] candidate alleles=")
     muts = muts.copy()

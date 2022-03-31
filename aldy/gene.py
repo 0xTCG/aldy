@@ -285,6 +285,8 @@ class Gene:
                 return "indel"
             if self.strand < 0:
                 op = reverse_op(op)
+            if op[2] == "N":
+                return None
             seq = "".join(
                 self.seq[s:pos] + op[2] + self.seq[pos + 1 : e]
                 if s <= pos < e
