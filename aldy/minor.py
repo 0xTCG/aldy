@@ -81,7 +81,7 @@ def estimate_minor(
     mutations |= gene.random_mutations
 
     # Filter out low quality mutations
-    def default_filter_fn(mut, cov, total, thres):
+    def default_filter_fn(cov, mut):
         # TODO: is this necessary?
         r = gene.region_at(mut.pos)
         if mut.op != "_" and not (
@@ -90,16 +90,18 @@ def estimate_minor(
             or (r and r[1] in ["utr3", "utr5", "up"])
         ):
             return False
-        return Coverage.basic_filter(
-            mut, cov, total, thres / MAX_CN, coverage.min_cov
-        ) and Coverage.cn_filter(
-            mut, cov, total, thres, major_sol.cn_solution, coverage.min_cov
-        )
+        cond = cov.basic_filter(mut, cn=MAX_CN)
+        if mut.op != "_":
+            cond = cond and cov.basic_filter(
+                mut, cn=major_sol.cn_solution.position_cn(mut.pos) + 0.5
+            )
+        return cond
 
+    cov = coverage.filtered(Coverage.quality_filter)
     if filter_fn:
-        cov = coverage.filtered(filter_fn)
+        cov = cov.filtered(filter_fn)
     else:
-        cov = coverage.filtered(default_filter_fn)
+        cov = cov.filtered(default_filter_fn)
 
     if novel:
         for pos, c in cov._coverage.items():
@@ -117,6 +119,7 @@ def estimate_minor(
     # Group by CN solutions
     minor_sols: List[MinorSolution] = []
     cn_sols = {m.cn_solution for m in major_sols}
+    min_score = min(m.score for m in major_sols)
     for c in sorted(cn_sols, key=lambda x: x._solution_nice()):
         log.debug("*" * 80)
         majors = [m for m in major_sols if m.cn_solution == c]
@@ -132,6 +135,7 @@ def estimate_minor(
                 i,
                 max_solutions,
                 debug,
+                major_sol.score - min_score,
             )
     return minor_sols
 
@@ -146,6 +150,7 @@ def solve_minor_model(
     identifier: int = 0,
     max_solutions: int = 1,
     debug: Optional[str] = None,
+    offset: float = 0,
 ) -> List[MinorSolution]:
     """
     Solves the minor star-allele detection problem via integer linear programming.
@@ -393,10 +398,9 @@ def solve_minor_model(
             )
 
     # 8) Respect phasing
-    PHASE = True
     VPHASEERR = []
     VPHASE = {}
-    reads = coverage.sam.grid.keys()  # random.sample(coverage.sam.grid, 500)
+    reads = coverage.sam.grid.keys()
     modes = collections.defaultdict(int)
     read_mode = {}
     mut_pos = {m.pos for m in mutations}
@@ -408,9 +412,23 @@ def solve_minor_model(
             elif v in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
                 c.append(coverage.sam.moved[v])
         c = sorted(c)
-        modes[tuple(c)] += 1
+        if len(c) > 1:
+            modes[tuple(c)] += 1
         read_mode[rr] = tuple(c)
-    print("wooo")
+    log.debug("[minor] number of phases= {}", len(modes))
+    log.debug("[minor] number of alleles= {}", len(alleles))
+    max_vars = 3_000
+    if len(modes) * len(alleles) > max_vars:
+        max_sample = len(modes) * (max_vars / (len(modes) * len(alleles)))
+        log.debug("[minor] downsampling to= {}", max_sample)
+        skip = len(modes) / max_sample
+        if max_sample < len(modes):
+            mi = list(modes.items())
+            modes = dict(mi[i] for i in range(0, len(mi), int(skip)))
+            # modes = dict(random.sample(modes.items(), int(max_sample)))
+    # random.sample(coverage.sam.grid, 500)
+    # for i in modes:
+    #     log.debug("{}", i)
     with Timing("[minor] Model setup"):
         vars = 0
         for ri, (rr, cnt) in enumerate(modes.items()):
@@ -427,9 +445,11 @@ def solve_minor_model(
                     if not gene.has_coverage(a[0].major, m.pos):
                         continue
                     if m in VKEEP[a]:
-                        (pos if m == r[m.pos] else neg).append(VKEEP[a][m][0])
+                        (pos if m.op == r[m.pos] else neg).append(VKEEP[a][m][0])
+                        # (px if m.op == r[m.pos] else nx).append(f"K:{m}")
                     elif m in VNEW[a]:
-                        (pos if m == r[m.pos] else neg).append(VNEW[a][m][0])
+                        (pos if m.op == r[m.pos] else neg).append(VNEW[a][m][0])
+                        # (px if m.op == r[m.pos] else nx).append(f"N:{m}")
                 if len(pos) + len(neg) > 1:
                     v = VPHASE[ai, ri] = model.addVar(
                         vtype="B", name=f"PHASE_{ai}_{ri}", update=False
@@ -466,12 +486,12 @@ def solve_minor_model(
         log.debug("[minor] phasing setup done, vars= {}", vars)
 
     # Objective: minimize the absolute sum of errors ...
-    objective = model.abssum(v for _, v in VERR.items())
+    objective = offset
+    o_error = model.abssum(v for _, v in VERR.items())
+    objective += o_error
     # ... and penalize the misses ...
-    objective += MISS_PENALTY_FACTOR * model.quicksum(
-        len(VKEEP[a]) * VA[a] for a in VKEEP
-    )
-    objective -= MISS_PENALTY_FACTOR * model.quicksum(
+    o_penal = MISS_PENALTY_FACTOR * model.quicksum(len(VKEEP[a]) * VA[a] for a in VKEEP)
+    o_penal -= MISS_PENALTY_FACTOR * model.quicksum(
         v[1] for a in VKEEP for _, v in VKEEP[a].items()
     )
     # ... and additions ...
@@ -480,7 +500,7 @@ def solve_minor_model(
         for _, v in VNEW[a].items():
             # HACK:
             # Add cnt/10000 to select the smallest allele if there is a tie
-            objective += ADD_PENALTY_FACTOR * (1 + cnt / 1000000) * v[0]
+            o_penal += ADD_PENALTY_FACTOR * (1 + cnt / 1000000) * v[0]
             cnt += 1
     # ... and novel functional mutations from the major model!
     for m in {m for a in VNEW for m in VNEW[a]}:
@@ -496,9 +516,12 @@ def solve_minor_model(
             model.addConstr(vo <= model.quicksum(vars), name=f"VNEWOR1_{m.pos}_{m.op}")
             for vi, v in enumerate(vars):
                 model.addConstr(vo >= v, name=f"VNEWOR2_{m.pos}_{m.op}_{vi}")
-            objective += ADD_PENALTY_FACTOR / 2 * vo
-    PHASE_ERROR = 1
-    objective += PHASE_ERROR * model.quicksum(VPHASEERR)
+            o_penal += ADD_PENALTY_FACTOR / 2 * vo
+    objective += o_penal
+
+    PHASE_ERROR = 0.5
+    o_phase = PHASE_ERROR * model.quicksum(VPHASEERR)
+    objective += o_phase
 
     model.setObjective(objective)
     if debug:
@@ -512,54 +535,53 @@ def solve_minor_model(
             for allele, value in VA.items():
                 if model.getValue(value) <= 0:
                     continue
-                if False:  # print assignments
-                    ai = next(i for i, a in enumerate(alleles) if allele == a)
-                    rds = [
-                        r
-                        for ri, r in enumerate(modes)
-                        if (ai, ri) in VPHASE
-                        if model.getValue(VPHASE[ai, ri])
-                    ]
-                    print(allele[0].minor, len(rds))
-                    for m in sorted(mutations):
-                        print(f"  {m} ", end="")
-                        if m in gene.alleles[allele[0].major].func_muts:
-                            print("*", end="")
-                        elif (
-                            m
-                            in gene.alleles[allele[0].major]
-                            .minors[allele[0].minor]
-                            .neutral_muts
-                        ):
-                            print("#", end="")
-                        else:
-                            print(" ", end="")
 
-                        if m in VKEEP[allele]:
-                            print(
-                                "K" if model.getValue(VKEEP[allele][m][0]) else "-",
-                                end="",
-                            )
-                        elif m in VNEW[allele]:
-                            print(
-                                "N" if model.getValue(VNEW[allele][m][0]) else "-",
-                                end="",
-                            )
-                        else:
-                            print(" ", end="")
+                ai = next(i for i, a in enumerate(alleles) if allele == a)
+                rds = [
+                    r
+                    for ri, r in enumerate(modes.items())
+                    if (ai, ri) in VPHASE
+                    if model.getValue(VPHASE[ai, ri])
+                ]
+                log.trace("[phase] {} (reads= {})", allele[0].minor, len(rds))
+                for m in sorted(mutations):
+                    sm = f"  {m} "
+                    if m in gene.alleles[allele[0].major].func_muts:
+                        sm += "*"
+                    elif (
+                        m
+                        in gene.alleles[allele[0].major]
+                        .minors[allele[0].minor]
+                        .neutral_muts
+                    ):
+                        sm += "#"
+                    else:
+                        sm += " "
 
-                        print("  ", end="")
-                        for r in rds:
-                            dr = dict(r)
-                            # rx = coverage.sam.grid[r]
-                            if m.pos in dr:
-                                c = dr[m.pos]
-                                if ">" in c:
-                                    c = c[2]
-                                elif c.startswith("del"):
-                                    c = f"-{len(c)-3}"
-                                print(c * modes[r], end="")
-                        print()  #'', m.pos, allele[0].major)
+                    if m in VKEEP[allele]:
+                        sm += "K" if model.getValue(VKEEP[allele][m][0]) else "-"
+                    elif m in VNEW[allele]:
+                        sm += "N" if model.getValue(VNEW[allele][m][0]) else "-"
+                    else:
+                        sm += " "
+
+                    ph = collections.defaultdict(int)
+                    for r in rds:
+                        dr = dict(r[0])
+                        if m.pos in dr:
+                            c = dr[m.pos]
+                            if ">" in c:
+                                c = c[2]
+                            elif c.startswith("del"):
+                                c = f"-{len(c)-3}"
+                            ph[c] += r[1]
+                    if len(ph):
+                        p = sorted(ph.items())
+                        log.trace(
+                            "[phase]    {}\t{}",
+                            sm,
+                            "; ".join(f"{o} ({n})" for o, n in p),
+                        )
 
                 added: List[Mutation] = []
                 missing: List[Mutation] = []
@@ -595,7 +617,11 @@ def solve_minor_model(
             debug_info["diplotype"] = sol.diplotype
             log.debug(
                 f"[minor] status= {status}; opt= {opt:.2f} "
-                + f"solution= {sol._solution_nice()}"
+                + "(error= {:.2f}, penal={:.2f}, phase= {:.2f}) "
+                + f"solution= {sol._solution_nice()}",
+                o_error.getValue(),
+                o_penal.getValue(),
+                o_phase.getValue(),
             )
             if str(sol) not in results:
                 results[str(sol)] = sol

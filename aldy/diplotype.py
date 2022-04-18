@@ -224,8 +224,12 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
         components = re.split(r"(\d+)", n)
         real = components[0] if components[0] != "" else components[1]
         major_dict[real].append(ai)
-    if len(solution.solution) == 1 and del_allele:
-        major_dict[del_allele].append(-1)
+    if del_allele:
+        if len(solution.solution) == 0:
+            major_dict[del_allele].append(-1)
+            major_dict[del_allele].append(-1)
+        elif len(solution.solution) == 1:
+            major_dict[del_allele].append(-1)
 
     diplotype: Any = [[], []]
     dc = 0
@@ -278,7 +282,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
         elif len(diplotype[0]) == 1 and isinstance(diplotype[0][0], tuple):
             diplotype = diplotype[0][0]
         else:
-            assert False
+            assert False, diplotype
 
     def key(x):
         if isinstance(x, tuple):

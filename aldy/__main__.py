@@ -401,7 +401,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             _ = genotype(
                 gene_db=gene,
                 sam_path=args.file,
-                profile=args.profile,
+                profile_name=args.profile,
                 output_file=output,
                 cn_region=cn_region,
                 cn_solution=cn_solution,

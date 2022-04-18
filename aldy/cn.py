@@ -10,6 +10,7 @@ import copy
 import re
 from math import ceil
 from natsort import natsorted
+from functools import partial
 
 from . import lpinterface
 
@@ -98,7 +99,8 @@ def estimate_cn(
         fusion_support = None
         if coverage.sam._fusion_counter:
             fusion_support = {
-                fn: (a / b) if b else 0 for fn, [a, b] in coverage.sam._fusion_counter.items()
+                fn: (a / b) if b else 0
+                for fn, [a, b] in coverage.sam._fusion_counter.items()
             }
         sol = solve_cn_model(
             gene,
@@ -109,6 +111,7 @@ def estimate_cn(
             gap,
             debug,
             fusion_support,
+            coverage,
         )
 
         return sol
@@ -123,6 +126,7 @@ def solve_cn_model(
     gap: float = 0.1,
     debug: Optional[str] = None,
     fusion_support=None,
+    coverage=None,
 ) -> List[CNSolution]:
     """
     Solve the copy number estimation problem (an instance of closest vector problem).
@@ -187,7 +191,7 @@ def solve_cn_model(
             structures["PSEUDO", i + 1] = CNConfig(
                 copy.deepcopy(structures[del_allele, 0].cn),
                 CNConfigType.DELETION,
-                {},
+                set(),
                 "pseudogene",
             )
 
@@ -249,24 +253,30 @@ def solve_cn_model(
     # PCE_REGION (in CYP2D7) is penalized with an extra score as it is important
     # fusion marker.
     DIFF_COEFF = 10 / len(gene.unique_regions)
-    o1 = DIFF_COEFF * model.abssum(VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF})
+    o_diff = DIFF_COEFF * model.abssum(
+        VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF}
+    )
 
     # Also minimize main gene fit
-    FIT_COEFF = DIFF_COEFF / 3
-    o2 = FIT_COEFF * model.abssum(VERR_GENE.values())
+    FIT_COEFF = 1 / len(gene.unique_regions)
+    o_fit = FIT_COEFF * model.abssum(VERR_GENE.values())
 
     # Objective: also minimize the total number of present alleles (maximum parsimony)
     PARSIMONY_PENALTY = 10 / len(gene.unique_regions)
-    PARSIMONY_PENALTY /= 2
+    PARSIMONY_PENALTY *= 0.75
     penalty = {s: PARSIMONY_PENALTY for s, _ in VCN}
     # Also penalize left fusions as they are not likely to occur.
     for n, s in gene.cn_configs.items():
+        if n in penalty and s.kind == CNConfigType.RIGHT_FUSION:
+            penalty[n] += PARSIMONY_PENALTY / 4
         if n in penalty and s.kind == CNConfigType.LEFT_FUSION:
             penalty[n] += PARSIMONY_PENALTY / 2
-    penalty["PSEUDO"] += PARSIMONY_PENALTY / 2
-    o3 = model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
+    PARS_COEFF = 0.5
+    if coverage and coverage.profile.name in ["10x", "illumina"]:
+        PARS_COEFF = 1
+    o_pars = PARS_COEFF * model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
 
-    model.setObjective(o1 + o2 + o3)
+    model.setObjective(o_diff + o_fit + o_pars)
     if debug:
         model.dump(f"{debug}.{gene.name}.cn.lp")
 
@@ -277,18 +287,26 @@ def solve_cn_model(
         sol_tuple = sorted_tuple(
             lookup[v] for v in sol if lookup[v] not in [del_allele, "PSEUDO"]
         )
+        # print(sorted_tuple(lookup[v] for v in sol))
         # Because A[1] can be 1 while A[0] is 0, we can have biologically
         # homologous solutions
         if sol_tuple not in result:
             result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
             log.debug(
-                f"[cn] status= {status}; opt= {opt:.2f}; "
-                + f"solution= {result[sol_tuple]}"
+                f"[cn] status= {status}; opt= {opt:.2f} "
+                + "(diff= {:.2f}, fit= {:.2f}, pars= {:.2f}) "
+                + f"solution= {result[sol_tuple]}",
+                o_diff.getValue(),
+                o_fit.getValue(),
+                o_pars.getValue(),
             )
     if not result:
         log.debug("[cn] solution= []")
 
     debug_info["sol"] = [dict(r.solution) for r in result.values()]
+    # import sys
+
+    # sys.exit(0)
     return list(result.values())
 
 
@@ -298,9 +316,7 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
     that are not supported by the remaining mutations.
     """
     cov = coverage.filtered(
-        lambda mut, cov, total, thres: Coverage.basic_filter(
-            mut, cov, total, thres / MAX_CN, coverage.min_cov
-        )
+        partial(Coverage.basic_filter, thres=coverage._threshold / MAX_CN)
     )
     configs = copy.deepcopy(gene.cn_configs)
     for an in natsorted(gene.cn_configs):

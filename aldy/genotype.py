@@ -35,7 +35,7 @@ from .lpinterface import model as lp_model
 def genotype(
     gene_db: str,
     sam_path: str,
-    profile: str,
+    profile_name: str,
     output_file: Optional[Any] = sys.stdout,
     cn_region: Optional[GRange] = None,
     cn_solution: Optional[List[str]] = None,
@@ -64,7 +64,7 @@ def genotype(
             or the location of a gene database in YML format.
         sam_path (str):
             Location of SAM/BAM/CRAM file that is to be analyzed.
-        profile (str):
+        profile_name (str):
             Coverage profile (e.g. 'illumina').
             Can be ``None`` if ``cn_solution`` is provided.
         cn_region (:obj:`aldy.common.GRange`, optional):
@@ -151,7 +151,7 @@ def genotype(
                 res[a] = genotype(
                     a,
                     sam_path,
-                    profile,
+                    profile_name,
                     output_file,
                     cn_region,
                     cn_solution,
@@ -184,20 +184,27 @@ def genotype(
         pass
     gene = Gene(gene_db, genome=genome)
 
-    if profile in ["exome", "wxs"]:
+    if "/wgs/" in sam_path:
+        profile_name = "wgs"
+    elif "/10x/" in sam_path:
+        profile_name = "10x"
+    elif "/pgx3/" in sam_path:
+        profile_name = "pgx3"
+
+    if profile_name in ["exome", "wxs"]:
         cn_region = None
         cn_solution = ["1", "1"]
-        profile = "illumina"
+        profile_name = "illumina"
         if not min_cov:
             min_cov = "5.0"
-    elif profile == "wgs":
-        profile = "illumina"
-    elif profile == "pgrnseq-v1":
-        profile = "pgx1"
-    elif profile == "pgrnseq-v2":
-        profile = "pgx2"
-    elif profile == "pgrnseq-v3":
-        profile = "pgx3"
+    elif profile_name == "wgs":
+        profile_name = "illumina"
+    elif profile_name == "pgrnseq-v1":
+        profile_name = "pgx1"
+    elif profile_name == "pgrnseq-v2":
+        profile_name = "pgx2"
+    elif profile_name == "pgrnseq-v3":
+        profile_name = "pgx3"
 
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
@@ -207,7 +214,7 @@ def genotype(
         if cn_solution:
             profile = sam.Profile("user_provided", None, None, 0, cn_solution)
         else:
-            profile = sam.Sample.load_profile(gene, profile, cn_region)
+            profile = sam.Sample.load_profile(gene, profile_name, cn_region)
         sample = sam.Sample(
             gene=gene,
             sam_path=sam_path,
@@ -215,7 +222,7 @@ def genotype(
             profile=profile,
             reference=reference,
             debug=debug,
-            min_cov=float(min_cov) if min_cov else 1.0,
+            min_cov=float(min_cov) if min_cov else 2.0,
         )
 
     json[gene.name].update({"sample": os.path.basename(sam_path).split(".")[0]})
@@ -286,6 +293,7 @@ def genotype(
             gap=gap,
             identifier=i,
             debug=debug,
+            offset=cn_sol.score - min_cn_score,
         )
     if len(major_sols) == 0:
         if is_simple:
@@ -294,7 +302,7 @@ def genotype(
 
     major_sols = [
         solutions.MajorSolution(
-            m.score * ((m.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
+            m.score,  # * ((m.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
             m.solution,
             m.cn_solution,
             m.added,

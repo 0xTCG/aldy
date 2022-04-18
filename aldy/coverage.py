@@ -4,12 +4,15 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, Tuple, Callable, List
+from typing import Dict, Tuple, Callable, List, Any
 
 import collections
+import statistics
 
 from .common import log, AldyException, script_path
 from .gene import Mutation, Gene
+
+MIN_QUAL = 10
 
 
 class Coverage:
@@ -22,7 +25,7 @@ class Coverage:
         gene: Gene,
         profile,
         sam,
-        coverage: Dict[int, Dict[str, int]],
+        coverage: Dict[int, Dict[str, List]],
         cnv_coverage: Dict[int, int],
         threshold: float,
         min_cov: float = 1.0,
@@ -63,8 +66,8 @@ class Coverage:
 
     def coverage(self, mut: Mutation) -> float:
         """:return: Coverage of the mutation ``mut``."""
-        if mut.op in self._coverage[mut.pos]:
-            return self._coverage[mut.pos][mut.op]
+        if mut.pos in self._coverage and mut.op in self._coverage[mut.pos]:
+            return len(self._coverage[mut.pos][mut.op])
         else:
             return 0
 
@@ -72,7 +75,9 @@ class Coverage:
         """:return: Total coverage at the locus ``pos``."""
         if pos not in self._coverage:
             return 0
-        return float(sum(v for p, v in self._coverage[pos].items() if p[:3] != "ins"))
+        return float(
+            sum(len(v) for p, v in self._coverage[pos].items() if p[:3] != "ins")
+        )
 
     def percentage(self, m: Mutation) -> float:
         """:return: Coverage of the mutation ``mut`` as a percentage (0-100%)."""
@@ -120,9 +125,7 @@ class Coverage:
                     #     f"[dump] {self.sample}\t{gene.name}\t{gene.chr_to_ref.get(pos, '-')+1}\t{op}\t{p:.1f}\t{t}"
                     # )
 
-    def filtered(
-        self, filter_fn: Callable[[Mutation, float, float, float], bool]
-    ):  # -> Coverage
+    def filtered(self, filter_fn: Callable[[Any, Mutation], List]):  # -> Coverage
         """
         :param filter_fn:
             Function that performs mutation filtering with the following arguments:
@@ -137,25 +140,13 @@ class Coverage:
         :return: Filtered coverage.
         """
 
-        cov = collections.defaultdict(
-            lambda: collections.defaultdict(int),
-            {
-                pos: collections.defaultdict(
-                    int,
-                    {
-                        o: c
-                        for o, c in pos_mut.items()
-                        if filter_fn(
-                            Mutation(pos, o),  # type: ignore
-                            c,
-                            self.total(pos),
-                            self._threshold,
-                        )
-                    },
-                )
-                for pos, pos_mut in self._coverage.items()
-            },
-        )
+        cov = {}
+        for pos, pos_mut in self._coverage.items():
+            cov[pos] = {}
+            for o, c in pos_mut.items():
+                f = filter_fn(self, Mutation(pos, o))
+                if f:
+                    cov[pos][o] = f
 
         new_cov = Coverage(
             self.gene,
@@ -200,35 +191,25 @@ class Coverage:
         self._region_coverage = {}
         for gene, gr in enumerate(self.gene.regions):
             for region, rng in gr.items():
-                s = sum(self.total(i) for i in range(rng.start, rng.end))  # !IMPORTANT
+                s = sum(self.total(i) for i in range(rng.start, rng.end))
                 p = self.profile.data[self.gene.name][region][gene]
-                self._region_coverage[gene, region] = ((ratio * s / p) if p != 0 else 0.0)
+                p /= 2  # profile has 2 copies, so divide it with 2 for normalization
+                self._region_coverage[gene, region] = (ratio * s / p) if p != 0 else 0.0
 
-    @staticmethod
-    def basic_filter(
-        mut: Mutation, cov: float, total: float, thres: float, min_cov: float
-    ) -> bool:
+    def basic_filter(self, mut: Mutation, cn=None, thres=None) -> List:
         """
         Basic filtering function.
         """
-        return cov >= max(min_cov, total * thres)
+        thres = thres if thres else self._threshold
+        if cn:
+            thres /= cn
+        quals = self._coverage[mut.pos][mut.op]
+        cond = len(quals) >= max(self.min_cov, self.total(mut.pos) * thres)
+        return quals if cond else []
 
-    @staticmethod
-    def cn_filter(
-        mut: Mutation,
-        cov: float,
-        total: float,
-        thres: float,
-        cn_solution,
-        min_cov: float,
-    ) -> bool:
-        """
-        Filtering function that takes into the account the copy number of the mutation.
-        """
-        cn = cn_solution.position_cn(mut.pos)
-        total = total / cn if cn > 0 else total
-
-        return mut.op == "_" or cov >= max(min_cov, total * thres)
+    def quality_filter(self, mut: Mutation) -> List:
+        quals = self._coverage[mut.pos].get(mut.op, [])
+        return [(m, q) for m, q in quals if m >= MIN_QUAL if q if q >= MIN_QUAL]
 
     # @deprecated
     def _load_phase(self, gene, ploidy=2):

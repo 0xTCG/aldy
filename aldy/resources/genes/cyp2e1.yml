@@ -39,17 +39,25 @@ alleles:
     - [12678, T>A, rs6413432, intron]
   CYP2E1*7.001:
     label: CYP2E1*7A
-    mutations: 
-    - [4701, T>A, rs2070673, upstream]
+    mutations:
+    - [4701, A>T, rs2070673, upstream]
   CYP2E1*7.002:
     label: CYP2E1*7B
     mutations:
-    - [4701, T>A, rs2070673, upstream]
+    - [4701, A>T, rs2070673, upstream]
+    - [4963, G>T, rs6413420, upstream]
+  CYP2E1*7.1002:
+    label: CYP2E1*7B.ALDY
+    mutations:
     - [4963, G>T, rs6413420, upstream]
   CYP2E1*7.003:
     label: CYP2E1*7C
     mutations:
-    - [4701, T>A, rs2070673, upstream]
+    - [4701, A>T, rs2070673, upstream]
+    - [4682, A>G, rs2070672, upstream]
+  CYP2E1*7.1003:
+    label: CYP2E1*7C.ALDY
+    mutations:
     - [4682, A>G, rs2070672, upstream]
 structure:
   genes: [CYP2E1]

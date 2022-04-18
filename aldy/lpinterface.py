@@ -16,7 +16,7 @@ SOLVER_PRECISON = 1e-5
 """float: Default solver precision"""
 
 
-def escape_name(s: str, d: collections.defaultdict = None) -> str:
+def escape_name(s: str, d: Optional[dict] = None) -> str:
     """
     Escape variable names to conform given names with the various solver requirements.
     """
@@ -26,7 +26,7 @@ def escape_name(s: str, d: collections.defaultdict = None) -> str:
         d[s] += 1
         if d[s] > 1:
             # return s + "_" + ((d[s] - 1) * "x")
-            return s + f"_{d[s]}" # + ((d[s] - 1) * "x")
+            return s + f"_{d[s]}"  # + ((d[s] - 1) * "x")
     return s
 
 
@@ -47,6 +47,9 @@ class Gurobi:  # pragma: no cover
         self.gurobipy = importlib.import_module("gurobipy")
         self.names = collections.defaultdict(int)
 
+        self.env = self.gurobipy.Env(empty=True)
+        self.env.setParam("OutputFlag", 0)
+        self.env.start()
         self.INF = self.gurobipy.GRB.INFINITY
         self.GUROBI_STATUS = {
             getattr(self.gurobipy.GRB.status, v): v
@@ -56,7 +59,7 @@ class Gurobi:  # pragma: no cover
         if prev_model:
             self.model = prev_model
         else:
-            self.model = self.gurobipy.Model(name)
+            self.model = self.gurobipy.Model(name, env=self.env)
             self.model.reset()
 
     def addConstr(self, *args, **kwargs):

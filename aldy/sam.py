@@ -18,9 +18,10 @@ import tarfile
 from dataclasses import dataclass
 from collections import defaultdict
 from natsort import natsorted
+from statistics import mean
 from .common import log, GRange, AldyException, script_path, Timing
 from .gene import Gene, Mutation, CNConfigType
-from .coverage import Coverage
+from .coverage import Coverage, MIN_QUAL
 
 
 class Profile:
@@ -30,8 +31,6 @@ class Profile:
         self.data = data
         self.cn_solution = cn_solution
         self.neutral_value = neutral_value
-        if name != "pacbio-hifi-targeted":
-            self.neutral_value *= 2
 
 
 @dataclass
@@ -185,8 +184,8 @@ class Sample:
             log.debug("[sam] reference= {}", os.path.abspath(reference))
         self.sample_name = os.path.basename(sam_path).split(".")[0]
 
-        norm: dict = defaultdict(int)
-        muts: dict = defaultdict(int)
+        norm: dict = defaultdict(list)
+        muts: dict = defaultdict(list)
 
         with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
             # Check do we have proper index to speed up the queries
@@ -215,6 +214,8 @@ class Sample:
                     continue
                 if "H" in read.cigarstring:  # avoid hard-clipped reads
                     continue
+                # if read.mapping_quality < MIN_QUAL:
+                # continue
                 # ensure that it is a proper gene read
                 if not _in_region(gene.get_wide_region(), read, self._prefix):
                     continue
@@ -235,6 +236,8 @@ class Sample:
                     read.query_sequence,
                     norm,
                     muts,
+                    read.mapping_quality,
+                    read.query_qualities,
                 )
                 if r and debug:
                     self._dump_reads.append(r)
@@ -274,6 +277,7 @@ class Sample:
                     start = read.reference_start
                     if read.cigartuples is None:
                         continue
+                    # if read.mapping_quality < MIN_QUAL: continue
                     if read.is_supplementary:
                         continue
                     for op, size in read.cigartuples:
@@ -445,13 +449,11 @@ class Sample:
 
     def _make_coverage(self, gene, norm, muts, threshold, group_indels=True):
         # Establish the coverage dictionary
-        coverage: Dict[int, Dict[str, int]] = dict()
+        coverage: Dict[int, Dict[str, List]] = dict()
         for pos, cov in norm.items():
-            if cov == 0:
+            if len(cov) == 0:
                 continue
-            if pos not in coverage:
-                coverage[pos] = {}
-            coverage[pos]["_"] = cov
+            coverage.setdefault(pos, {})["_"] = cov
         bounds = min(gene.chr_to_ref), max(gene.chr_to_ref)
         for m, cov in muts.items():
             pos, mut = m
@@ -459,25 +461,32 @@ class Sample:
                 coverage[pos] = {}
             if not bounds[0] <= pos <= bounds[1] and mut[:3] != "ins":
                 mut = "_"  # ignore mutations outside of the region of interest
-            if mut not in coverage[pos]:
-                coverage[pos][mut] = 0
-            coverage[pos][mut] += cov
+            coverage.setdefault(pos, {}).setdefault(mut, []).extend(cov)
         if group_indels:
             self._group_indels(gene, coverage)
         for pos, op in self._multi_sites.items():
             if pos in coverage and op in coverage[pos]:
-                log.debug(f"[sam] multi-SNP {pos}{op} with {coverage[pos][op]} reads")
+                log.debug(
+                    f"[sam] multi-SNP {pos}{op} with {len(coverage[pos][op])} reads"
+                )
         for mut in self._insertion_sites:
             if mut.pos in coverage and mut.op in coverage[mut.pos]:
-                total = sum(v for o, v in coverage[mut.pos].items() if o[:3] != "ins")
+                total = sum(
+                    len(v) for o, v in coverage[mut.pos].items() if o[:3] != "ins"
+                )
                 if total > 0:
-                    coverage[mut.pos][mut.op] = self._correct_ins_coverage(mut, total)
+                    corrected = self._correct_ins_coverage(mut, total)
+                    diff = corrected - len(coverage[mut.pos][mut.op])
+                    coverage[mut.pos][mut.op].extend(
+                        [(mean(mq for mq, _ in coverage[mut.pos][mut.op]), MIN_QUAL)]
+                        * diff
+                    )
 
         self.coverage = Coverage(
             self.gene,
             self.profile,
             self,
-            {p: {m: v for m, v in coverage[p].items() if v > 0} for p in coverage},
+            {p: {m: v for m, v in coverage[p].items() if len(v) > 0} for p in coverage},
             self._dump_cn,
             threshold,
             self.min_cov,
@@ -513,13 +522,11 @@ class Sample:
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
                     log.trace(
-                        f"[sam] relocate {coverage[pos][mut]} "
+                        f"[sam] relocate {len(coverage[pos][mut])} "
                         + f"from {pos+1}{mut} to {new_pos+1}{mut}"
                     )
-                    if mut not in coverage[new_pos]:
-                        coverage[new_pos][mut] = 0
-                    coverage[new_pos][mut] += coverage[pos][mut]
-                    coverage[pos][mut] = 0
+                    coverage[new_pos].setdefault(mut, []).extend(coverage[pos][mut])
+                    coverage[pos][mut] = []
                     self.moved[pos, mut] = (new_pos, mut)
         # Group ambiguous insertions
         indels = defaultdict(set)
@@ -549,21 +556,29 @@ class Sample:
                 if len(potential) == 1 and potential[0] != pos:
                     new_pos = potential[0]
                     log.debug(
-                        f"[sam] relocate {coverage[pos][mut]} "
+                        f"[sam] relocate {len(coverage[pos][mut])} "
                         + f"from {pos+1}{mut} to {new_pos+1}{mut}"
                     )
-                    if mut not in coverage[new_pos]:
-                        coverage[new_pos][mut] = 0
-                    coverage[new_pos][mut] += coverage[pos][mut]
+                    coverage[new_pos].setdefault(mut, []).extend(coverage[pos][mut])
+                    coverage[pos][mut] = []
 
                     L = len(mut) - 3
                     self._insertion_counts[new_pos, L] += self._insertion_counts[pos, L]
                     self._insertion_counts[pos, L] = 0
                     self.moved[pos, mut] = (new_pos, mut)
 
-                    coverage[pos][mut] = 0
-
-    def _parse_read(self, gene: Gene, fragment, ref_start, cigar, seq, norm, muts):
+    def _parse_read(
+        self,
+        gene: Gene,
+        fragment,
+        ref_start,
+        cigar,
+        seq,
+        norm,
+        muts,
+        mq=None,
+        qual=None,
+    ):
         """
         Parse a :obj:`pysam.AlignedSegment` read.
 
@@ -580,17 +595,20 @@ class Sample:
         grid = self.grid.setdefault(fragment, {})
         dump_arr = []
         start, s_start = ref_start, 0
+        prev_q = MIN_QUAL
         for op, size in cigar:
             if op == 2:  # Deletion
                 mut = (start, "del" + gene[start : start + size])
-                muts[mut] += 1
+                muts[mut].append((mq, prev_q))
                 dump_arr.append(mut)
                 if start in self.grid_columns:
                     grid[start] = mut
                 start += size
             elif op == 1:  # Insertion
                 mut = (start, "ins" + seq[s_start : s_start + size])
-                muts[mut] += 1
+                q = mean(qual[s_start : s_start + size]) if qual else prev_q
+                muts[mut].append((mq, q))
+                prev_q = q
                 # HACK: just store the length due to seq. errors
                 self._insertion_counts[start, size] += 1
                 dump_arr.append(mut)
@@ -601,16 +619,18 @@ class Sample:
                 s_start += size
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
+                    q = qual[s_start + i] if qual else prev_q
                     if start + i in gene and gene[start + i] != seq[s_start + i]:
                         mut = (start + i, f"{gene[start + i]}>{seq[s_start + i]}")
                         dump_arr.append(mut)
-                        muts[mut] += 1
+                        muts[mut].append((mq, q))
                         if start + i in self.grid_columns:
                             grid[start + i] = mut
                     else:  # We ignore all mutations outside the RefSeq region
-                        norm[start + i] += 1
+                        norm[start + i].append((mq, q))
                         if start + i in self.grid_columns:
                             grid[start + i] = (start + i, "_")
+                    prev_q = q
                 start += size
                 s_start += size
 
@@ -624,19 +644,22 @@ class Sample:
                 for p in range(len(l))
                 if l[p] != "."
             ):
+                items = []
                 for p in range(len(l)):
                     if l[p] != ".":
-                        muts[pos + p, f"{l[p]}>{r[p]}"] -= 1
-                        if p:
-                            norm[pos + p] += 1
-                muts[pos, op] += 1
-
+                        items.append(muts[pos + p, f"{l[p]}>{r[p]}"].pop())
+                        if p:  # no idea why...
+                            norm[pos + p].append(items[-1])
+                # TODO: use sth else instead of mean?
+                muts[pos, op].append(
+                    (mean(mq for mq, _ in items), mean(q for _, q in items))
+                )
         read_pos = (ref_start, start, len(seq))
         for data in self._insertion_reads.values():
             data[read_pos] += 1  # type: ignore
         return read_pos, dump_arr
 
-    def _correct_ins_coverage(self, mut: Mutation, total) -> int:
+    def _correct_ins_coverage(self, mut: Mutation, total):
         """
         Fix low coverage of large tandem insertions.
 
@@ -699,14 +722,14 @@ class Sample:
         log.debug("[sam] pacbio_path= {}", os.path.abspath(sam_path))
         self.sample_name = os.path.basename(sam_path).split(".")[0]
 
-        norm: dict = defaultdict(int)
-        muts: dict = defaultdict(int)
+        norm: dict = defaultdict(list)
+        muts: dict = defaultdict(list)
 
         self._index = None
-        if gene.name == "CYP2D6":
+        ref = script_path(f"aldy.resources.genes/{gene.name.lower()}.fa.gz")
+        if os.path.exists(ref):
             import mappy
 
-            ref = script_path(f"aldy.resources.genes/{gene.name}.fa.gz")
             self._index = mappy.Aligner(ref, preset="map-hifi")
             seq_name = self._index.seq_names[0]
             self._seq_range = list(map(int, seq_name.split(":")[1].split("-")))
@@ -760,29 +783,41 @@ class Sample:
                     continue
 
                 seq = read.query_sequence
+                qual = read.query_qualities
                 if self._index:
                     pieces = []
                     s_start = 0
                     while s_start < len(seq):
                         s = seq[s_start:]
+                        q = qual[s_start:]
                         h = self._map(self._index, s)
                         if h and h.r_st <= 134_991 < h.r_en and 134_991 - h.r_st > 100:
                             s = seq[s_start : s_start + (134_991 - h.r_st)]
+                            q = qual[s_start : s_start + (134_991 - h.r_st)]
                             h = self._map(self._index, s)
                         elif (
                             h and h.r_st <= 148_730 < h.r_en and 148_730 - h.r_st > 100
                         ):
                             s = seq[s_start : s_start + (148_730 - h.r_st)]
+                            q = qual[s_start : s_start + (148_730 - h.r_st)]
                             h = self._map(self._index, s)
                         if not h:
                             s_start += 100
                         else:
-                            pcs, ed = self._split_read(gene, s, h)
+                            pcs, ed = self._split_read(gene, s, q, h)
                             pieces += pcs
                             s_start += ed
-                    for (ref_start, seq, cigar) in pieces:
+                    for (ref_start, seq, qual, cigar) in pieces:
                         r = self._parse_read(
-                            gene, counter, ref_start, cigar, seq, norm, muts
+                            gene,
+                            counter,
+                            ref_start,
+                            cigar,
+                            seq,
+                            norm,
+                            muts,
+                            read.mapping_quality,
+                            qual,
                         )
                         counter += 1
                         if r and debug:
@@ -792,10 +827,12 @@ class Sample:
                         gene,
                         counter,
                         read.reference_start,
-                        read.cigartuple,
+                        read.cigartuples,
                         seq,
                         norm,
                         muts,
+                        read.mapping_quality,
+                        read.query_qualities,
                     )
                     counter += 1
                     if r and debug:
@@ -808,7 +845,7 @@ class Sample:
                 return hit
         return None
 
-    def _split_read(self, gene, seq, hit):
+    def _split_read(self, gene, seq, qual, hit):
         def _rev_cigar(c):
             """Reverse CIGAR tuples for pysam/mappy compatibility."""
             return [(op, size) for (size, op) in c]
@@ -840,11 +877,13 @@ class Sample:
                         (
                             lh.r_st + self._index_gene[lg][1] - 1,
                             seq[lh.q_st : lh.q_en],
+                            qual[lh.q_st : lh.q_en],
                             _rev_cigar(lh.cigar),
                         ),
                         (
                             rh.r_st + self._index_gene[rg][1] - 1,
                             seq[brk + rh.q_st : brk + rh.q_en],
+                            qual[brk + rh.q_st : brk + rh.q_en],
                             _rev_cigar(rh.cigar),
                         ),
                     ],
@@ -854,6 +893,7 @@ class Sample:
             (
                 hit.r_st + self._seq_range[0] - 1,
                 seq[hit.q_st : hit.q_en],
+                qual[hit.q_st : hit.q_en],
                 _rev_cigar(hit.cigar),
             )
         ], hit.q_en
@@ -869,8 +909,6 @@ class Sample:
             elif op == 0 or op == 7 or op == 8:
                 for i in range(size):
                     rg = gene.region_at(start + i)
-                    # if not rg and 42_149_886 <= start + i <= 42_155_001:
-                    #     rg = (2, '2D8')
                     if rg:
                         if not regs or regs[-1][0] != rg:
                             regs.append([rg, s_start + i, 0])
@@ -883,6 +921,7 @@ class Sample:
     # Coverage-rescaling functions
     # ----------------------------------------------------------------------------------
 
+    @staticmethod
     def load_profile(gene, profile, cn_region=None):
         prof = None
         is_yml = True
@@ -896,14 +935,14 @@ class Sample:
                     for r, rng in gr.items()
                 }
                 prof = load_sam_profile(
-                    profile_path,
+                    profile,
                     regions=regions,
                     genome=gene.genome,
                     cn_region=cn_region,
                 )
                 is_yml = False
             else:
-                with open(profile_path) as f:
+                with open(profile) as f:
                     prof = yaml.safe_load(f)
         else:
             profile_path = script_path(
@@ -1013,7 +1052,9 @@ def load_sam_profile(
     for c, (s, e) in natsorted(chr_regions.items()):
         if sam_path == "<illumina>":
             continue
-        with pysam.AlignmentFile(sam_path) as sam:
+        with pysam.AlignmentFile(
+            sam_path, reference_filename="../data/ref/hg19.fa"
+        ) as sam:
             region = GRange(c, s, e).samtools(
                 pad_left=1000,
                 pad_right=1000,
@@ -1053,10 +1094,8 @@ def load_sam_profile(
             d[g][r].append(0)
         if sam_path == "<illumina>":
             d[g][r][ri] = e - s
-        elif g == "neutral":
-            d[g][r][ri] = sum(cov[c][i] for i in range(s, e))
         else:
-            d[g][r][ri] = sum(cov[c][i] / factor for i in range(s, e))
+            d[g][r][ri] = sum(cov[c][i] for i in range(s, e))
     d["neutral"]["value"] = d["neutral"]["value"][0]
     d["neutral"][genome] = [*gene_regions["neutral", "value", 0]]
     return d

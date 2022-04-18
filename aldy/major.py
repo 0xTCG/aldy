@@ -9,6 +9,7 @@ from typing import List, Dict, Tuple, Any, Optional
 import collections
 import copy
 
+from functools import partial
 from natsort import natsorted
 
 from . import lpinterface
@@ -33,6 +34,7 @@ def estimate_major(
     gap: float = 0,
     identifier: int = 0,
     debug: Optional[str] = None,
+    offset: float = 0,
 ) -> List[MajorSolution]:
     """
     Estimate optimal major star-alleles.
@@ -65,7 +67,7 @@ def estimate_major(
         results: List[MajorSolution] = []
     else:
         results = solve_major_model(
-            gene, alleles, coverage, cn_solution, solver, gap, identifier, debug
+            gene, alleles, coverage, cn_solution, solver, gap, identifier, debug, offset
         )
     # TODO: Check for novel functional mutations and do something with them
 
@@ -81,6 +83,7 @@ def solve_major_model(
     gap: float = 0,
     identifier: int = 0,
     debug: Optional[str] = None,
+    offset: float = 0,
 ) -> List[MajorSolution]:
     """
     Solves the major star-allele detection problem via integer linear programming.
@@ -208,7 +211,8 @@ def solve_major_model(
         model.addConstr(VXOR >= 1, name="CXOR")
 
     # Objective: minimize the absolute sum of errors and the number of novel mutations
-    objective = model.abssum(e for e in VERR.values())
+    objective = offset
+    objective += model.abssum(e for e in VERR.values())
 
     z = model.addVar(vtype="B", name="NOVEL")
     for m in VNEW:
@@ -267,13 +271,16 @@ def _filter_alleles(
              and the coverage description of high-confidence variants.
     """
 
-    def filter_fns(mut, cov, total, thres):
-        z = Coverage.basic_filter(
-            mut, cov, total, thres / MAX_CN, coverage.min_cov
-        ) and Coverage.cn_filter(mut, cov, total, thres, cn_solution, coverage.min_cov)
-        return z
+    def filter_fns(cov, mut):
+        cond = cov.basic_filter(mut, cn=MAX_CN)
+        if mut.op != "_":
+            cond = cond and cov.basic_filter(
+                mut, cn=cn_solution.position_cn(mut.pos) + 0.5
+            )
+        return cond
 
-    cov = coverage.filtered(filter_fns)
+    cov = coverage.filtered(Coverage.quality_filter)
+    cov = cov.filtered(filter_fns)
     alleles = copy.deepcopy(gene.alleles)
     for an, a in natsorted(gene.alleles.items()):
         if a.cn_config not in cn_solution.solution:
@@ -303,11 +310,15 @@ def _print_candidates(
             if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
             else 0
         )
+        g = gene.region_at(m.pos)
         return (
             f"  {gene.get_rsid(m):12} {str(m):15} "
             + f"{gene.get_refseq(m, from_atg=True):10} "
             + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
-            + f"impact={gene.get_functional(m)})"
+            + f"region={g[1] if g else '?'}; "
+            + f"impact={gene.get_functional(m)}; "
+            # + f"qual=[{q}]"
+            + f")"
         )
 
     log.debug("[major] candidate mutations=")

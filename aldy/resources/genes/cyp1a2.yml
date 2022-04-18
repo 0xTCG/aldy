@@ -4,10 +4,10 @@ generated: '2020-07-20'
 ensembl: ENSG00000140505
 alleles:
   CYP1A2*1.001:
-    label: CYP1A2*1A
+    label: CYP1A2*1B
     mutations: []
   CYP1A2*1.002:
-    label: CYP1A2*1B
+    label: CYP1A2*1A
     mutations:
     - [11241, T>C, rs2470890, N516N]
   CYP1A2*1.003:
