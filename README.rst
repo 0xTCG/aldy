@@ -1,4 +1,4 @@
-    **If you are looking for a pre-release of Aldy 4 (beta), please** `go here <https://github.com/0xTCG/aldy/pull/31>`_
+    **If you are looking for a pre-release of Aldy 4 (beta), please** `go here <https://github.com/0xTCG/aldy/tree/aldy-4>`_
     
 .. raw:: html
 
