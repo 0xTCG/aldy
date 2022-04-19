@@ -25,12 +25,9 @@ Algorithm details
 TL;DR: Aldy uses star-allele databases to guide the process of detecting the most likely genotype.
 The optimization is done in three stages via integer linear programming.
 
-Aldy has been published in `Nature Communications <https://www.nature.com/articles/s41467-018-03273-1>`_
-(`doi:10.1038/s41467-018-03273-1 <http://doi.org/10.1038/s41467-018-03273-1>`_).
-Preprint `is available here <https://github.com/inumanag/aldy/blob/master/docs/preprint.pdf>`_.
-Full experimental pipeline `is available here <https://github.com/inumanag/aldy-paper-resources>`_.
-
 Documentation is available `at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
+
+Experimental data is available `here <paper>`_.
 
 
 Gene Support
