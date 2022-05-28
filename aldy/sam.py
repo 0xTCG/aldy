@@ -142,7 +142,7 @@ class Sample:
                 else:
                     _, norm, muts = self._load_sam(sam_path, gene, reference, debug)
                     group_indels = True
-                if self.profile:
+                if self.profile and self.profile.cn_region:
                     self._dump_cn = self._load_cn_region(
                         self.profile.cn_region, sam_path, reference
                     )
@@ -153,7 +153,7 @@ class Sample:
         if self.profile and self.profile.cn_region:
             self.coverage._normalize_coverage()
         log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
-        if self.profile and self.coverage.diploid_avg_coverage() < 2:
+        if self.profile and self.profile.cn_region and self.coverage.diploid_avg_coverage() < 2:
             raise AldyException(
                 "The average coverage of the sample is too low ({:.1f}).".format(
                     self.coverage.diploid_avg_coverage()
@@ -213,6 +213,8 @@ class Sample:
                 if read.is_supplementary:  # avoid supplementary alignments
                     continue
                 if "H" in read.cigarstring:  # avoid hard-clipped reads
+                    continue
+                if not read.query_sequence:
                     continue
                 # if read.mapping_quality < MIN_QUAL:
                 # continue

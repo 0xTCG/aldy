@@ -86,10 +86,10 @@ def estimate_cn(
         min_cov = min(
             sum(sum(v.values()) for v in gene.cn_configs[c].cn) for c in gene.cn_configs
         )
-        if total_cov < min_cov / 2.0:
-            raise AldyException(
-                f"Coverage for {gene.name} too low for copy number calling."
-            )
+        # if total_cov < min_cov / 2.0:
+        #     raise AldyException(
+        #         f"Coverage for {gene.name} too low for copy number calling."
+        #     )
 
         configs = _filter_configs(gene, coverage)
         log.debug("[cn] candidates= {}", ", ".join(natsorted(configs)))

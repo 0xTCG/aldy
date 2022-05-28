@@ -187,7 +187,6 @@ def _get_args(argv):
     genotype_parser.add_argument(
         "--profile",
         "-p",
-        required=True,
         help=td(
             """Sequencing profile. The following profiles are supported:
                - illumina

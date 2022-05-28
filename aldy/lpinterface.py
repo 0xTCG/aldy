@@ -487,9 +487,9 @@ def model(name: str, solver: str):
         return model
 
     if solver == "any":
-        model = test_cbc(name)
+        model = test_gurobi(name)
         if model is None:
-            model = test_gurobi(name)
+            model = test_cbc(name)
         if model is None:
             model = test_scip(name)
         if model is None:
