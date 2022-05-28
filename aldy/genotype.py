@@ -117,7 +117,6 @@ def genotype(
     with open(sam_path):  # Check if file exists
         pass
     kind, g = sam.detect_genome(sam_path)
-    # assert kind in ["vcf", "sam", "dump"]
     if genome is None:
         genome = g
         if not genome:

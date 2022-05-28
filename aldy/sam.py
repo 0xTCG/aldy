@@ -14,6 +14,8 @@ import yaml
 import gzip
 import struct
 import tarfile
+import pickle
+
 
 from dataclasses import dataclass
 from collections import defaultdict
@@ -148,12 +150,16 @@ class Sample:
                     )
             self._make_coverage(gene, norm, muts, threshold, group_indels=group_indels)
             if is_sam and debug:
-                self._dump_alignments(f"{debug}.{gene.name}")
+                self._dump_alignments(f"{debug}.{gene.name}", norm, muts)
 
         if self.profile and self.profile.cn_region:
             self.coverage._normalize_coverage()
         log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
-        if self.profile and self.profile.cn_region and self.coverage.diploid_avg_coverage() < 2:
+        if (
+            self.profile
+            and self.profile.cn_region
+            and self.coverage.diploid_avg_coverage() < 2
+        ):
             raise AldyException(
                 "The average coverage of the sample is too low ({:.1f}).".format(
                     self.coverage.diploid_avg_coverage()
@@ -379,73 +385,16 @@ class Sample:
         else:
             fd = gzip.open(dump_path, "rb")
 
-        self.sample_name = "DUMP"
-        self.sample_name = os.path.basename(dump_path)
-        norm: dict = defaultdict(int)
-        muts: dict = defaultdict(int)
-
         log.warn("Loading debug dump from {}", dump_path)
-        l, h, i = (
-            struct.calcsize("<l"),
-            struct.calcsize("<h"),
-            struct.calcsize("<i"),
-        )
-        cn_len = struct.unpack("<l", fd.read(l))[0]
-        for _ in range(cn_len):
-            i, v = struct.unpack("<ll", fd.read(l + l))
-            self._dump_cn[i] = v
-
-        ld = struct.unpack("<l", fd.read(l))[0]
-        for _ in range(ld):
-            ref_start, ref_end, read_len, num_mutations = struct.unpack(
-                "<llhh", fd.read(l + l + h + h)
-            )
-            ref_end += ref_start
-            for j in range(ref_start, ref_end):
-                norm[j] += 1
-            mut_set = set()
-            for _ in range(num_mutations):
-                mut_start, op_len = struct.unpack("<hh", fd.read(h + h))
-                mut_start += ref_start
-                op = fd.read(op_len).decode("ascii")
-                muts[mut_start, op] += 1
-                mut_set.add((mut_start, op))
-                if op[:3] == "del":
-                    for j in range(0, len(op) - 3):
-                        norm[mut_start + j] -= 1
-                elif op[:3] == "ins":
-                    self._insertion_counts[mut_start, len(op) - 3] += 1
-                else:
-                    norm[mut_start] -= 1
-            mut_set_pos = {p for p, _ in mut_set}
-            for pos, op in self._multi_sites.items():
-                if pos not in mut_set_pos:
-                    continue
-                ll, r = op.split(">")
-                if all(
-                    (pos + p, f"{ll[p]}>{r[p]}") in mut_set
-                    for p in range(len(ll))
-                    if ll[p] != "."
-                ):
-                    for p in range(len(ll)):
-                        if ll[p] != ".":
-                            muts[pos + p, f"{ll[p]}>{r[p]}"] -= 1
-                            if p:
-                                norm[pos + p] += 1
-                    muts[pos, op] += 1
-            for data in self._insertion_reads.values():
-                data[ref_start, ref_end, read_len] += 1
-
-        # frags = []
-        # ld = struct.unpack("<l", fd.read(l))[0]
-        # for _ in range(ld):
-        #     ln = struct.unpack("<l", fd.read(l))[0]
-        #     frags.append([])
-        #     for _ in range(ln):
-        #         mut_start, op_len = struct.unpack("<ll", fd.read(l + l))
-        #         op = fd.read(op_len).decode("ascii")
-        #         frags[-1].append((mut_start, op))
-        # fd.close()
+        (
+            self.sample_name,
+            self._dump_cn,
+            norm,
+            muts,
+            self.grid,
+            self.moved,
+            self._fusion_counter,
+        ) = pickle.load(fd)
 
         return norm, muts
 
@@ -969,25 +918,22 @@ class Sample:
             prof["neutral"]["value"],
         )
 
-    def _dump_alignments(self, debug: str):
+    def _dump_alignments(self, debug: str, norm, muts):
+        with open(f"{debug}.genome", "w") as fd:
+            print(self.gene.genome, file=fd)
         with gzip.open(f"{debug}.dump", "wb") as fd:
-            fd.write(struct.pack("<l", len(self._dump_cn)))
-            for i, v in self._dump_cn.items():
-                fd.write(struct.pack("<ll", i, v))
-
-            fd.write(struct.pack("<l", len(self._dump_reads)))
-            for (s, e, l), m in self._dump_reads:
-                fd.write(struct.pack("<llhh", s, e - s, l, len(m)))
-                for p, md in m:
-                    fd.write(struct.pack("<hh", p - s, len(md)))
-                    fd.write(md.encode("ascii"))
-
-            # fd.write(struct.pack("<l", len(self._dump_phase)))
-            # for r in self._dump_phase:
-            #     fd.write(struct.pack("<l", len(r)))
-            #     for p, md in r:
-            #         fd.write(struct.pack("<ll", p, len(md)))
-            #         fd.write(md.encode("ascii"))
+            pickle.dump(
+                (
+                    self.sample_name,
+                    self._dump_cn,
+                    norm,
+                    muts,
+                    self.grid,
+                    self.moved,
+                    self._fusion_counter,
+                ),
+                fd,
+            )
 
 
 def load_sam_profile(
@@ -1136,6 +1082,13 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
             with pysam.VariantFile(sam_path):
                 return "vcf", None
         except (ValueError, OSError):
+            if sam_path.endswith(".tar.gz"):
+                tar = tarfile.open(sam_path, "r:gz")
+                f = [i for i in tar.getnames() if i.endswith(f".genome")]
+                if not f:
+                    raise AldyException("Invalid dump file")
+                genome = tar.extractfile(f[0]).read().decode("utf-8").strip()
+                return "dump", genome
             pass
     return "", None
 
