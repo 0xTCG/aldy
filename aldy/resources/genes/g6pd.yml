@@ -222,13 +222,13 @@ alleles:
     - [17296, A>G, rs1050829, N126D]
     - [19451, G>A, rs137852327, V291M]
   G6PD*A-.002:
-    label: G6PD A- 680T_376G
+    label: A- 680T_376G
     activity: III/Deficient
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [18448, G>T, rs137852328, R227L]
   G6PD*A-.003:
-    label: G6PD A- 968C_376G
+    label: A- 968C_376G
     activity: III/Deficient
     mutations:
     - [17296, A>G, rs1050829, N126D]
@@ -305,7 +305,7 @@ alleles:
     mutations:
     - [18079, G>A, '-', G163D]
   G6PD*taipei:
-    label: "Taipei / Chinese-3"
+    label: "Taipei‚ Chinese-3"
     activity: II/Deficient
     mutations:
     - [18084, A>G, rs137852331, N165D]
@@ -355,7 +355,7 @@ alleles:
     mutations:
     - [18152, delCTC, '-', S188del]
   G6PD*mediterranean.002:
-    label: "Mediterranean, Dallas, Panama / Sassari, Cagliari, Birmingham"
+    label: "Mediterranean, Dallas, Panama‚ Sassari, Cagliari, Birmingham"
     activity: II/Deficient
     mutations:
     - [18154, C>T, rs5030868, S188F]
@@ -894,7 +894,7 @@ alleles:
     mutations:
     - [20304, G>T, rs72554665, R459L]
   G6PD*nice:
-    label: G6PD-Nice
+    label: Nice
     activity: III/Deficient
     mutations:
     - [20308, G>C, '-', E460D]
