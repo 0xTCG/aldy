@@ -615,13 +615,14 @@ def solve_minor_model(
             _ = estimate_diplotype(gene, sol)
             debug_info["sol"] = [(s.minor, s.added, s.missing) for s in solution]
             debug_info["diplotype"] = sol.diplotype
+            print(o_error.solution_value())
             log.debug(
                 f"[minor] status= {status}; opt= {opt:.2f} "
                 + "(error= {:.2f}, penal={:.2f}, phase= {:.2f}) "
                 + f"solution= {sol._solution_nice()}",
-                o_error.getValue(),
-                o_penal.getValue(),
-                o_phase.getValue(),
+                model.getValue(o_error),
+                model.getValue(o_penal),
+                model.getValue(o_phase),
             )
             if str(sol) not in results:
                 results[str(sol)] = sol

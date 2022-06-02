@@ -416,7 +416,7 @@ class CBC(SCIP):
 
     def getValue(self, var):
         x = var.solution_value()
-        if var.integer():
+        if hasattr(var, "integer") and var.integer():
             x = int(round(x))
             if (
                 abs(var.lb()) < SOLUTION_PRECISION
@@ -487,9 +487,9 @@ def model(name: str, solver: str):
         return model
 
     if solver == "any":
-        model = test_gurobi(name)
+        model = test_cbc(name)
         if model is None:
-            model = test_cbc(name)
+            model = test_gurobi(name)
         if model is None:
             model = test_scip(name)
         if model is None:
