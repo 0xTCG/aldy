@@ -296,9 +296,9 @@ def solve_cn_model(
                 f"[cn] status= {status}; opt= {opt:.2f} "
                 + "(diff= {:.2f}, fit= {:.2f}, pars= {:.2f}) "
                 + f"solution= {result[sol_tuple]}",
-                o_diff.getValue(),
-                o_fit.getValue(),
-                o_pars.getValue(),
+                model.getValue(o_diff),
+                model.getValue(o_fit),
+                model.getValue(o_pars),
             )
     if not result:
         log.debug("[cn] solution= []")
