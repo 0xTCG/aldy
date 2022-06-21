@@ -279,6 +279,10 @@ def _filter_alleles(
             )
         return cond
 
+    # for c, d in coverage._coverage.items():
+    #     if len(d) > 1 and any(x.startswith("ins") or x.startswith("del") for x in d):
+    #         print(c + 1, {x: len(y) for x, y in d.items()})
+
     cov = coverage.filtered(Coverage.quality_filter)
     cov = cov.filtered(filter_fns)
     alleles = copy.deepcopy(gene.alleles)

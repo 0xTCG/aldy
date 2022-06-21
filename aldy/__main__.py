@@ -92,7 +92,7 @@ def main(argv):
                 db_file = gene
             with open(db_file):  # Check if file exists
                 pass
-            query(Gene(db_file), q)
+            query(Gene(db_file, genome=args.genome), q)
         elif args.subparser == "profile":
             p = load_sam_profile(
                 args.file,
@@ -314,6 +314,7 @@ def _get_args(argv):
         help="Query database definitions for a given gene.",
     )
     show_parser.add_argument("--gene", "-g", default=None, help="Gene file.")
+    show_parser.add_argument("--genome", default="hg19", help="Reference genome.")
     show_parser.add_argument("query", help="Gene or allele to show.")
 
     profile_parser = subparsers.add_parser(
