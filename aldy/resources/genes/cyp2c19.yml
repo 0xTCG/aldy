@@ -1,15 +1,9 @@
 name: CYP2C19
-version: pharmvar-4.1.7
-generated: '2020-07-11'
+version: pharmvar-5.1.15
+generated: '2022-06-20'
 pharmvar: 18207
 ensembl: ENSG00000165841
 alleles:
-  CYP2C19*1.001:
-    pharmvar: https://www.pharmvar.org/haplotype/81
-    activity: normal function
-    label: CYP2C19*38
-    evidence: D
-    mutations: []
   CYP2C19*1.002:
     pharmvar: https://www.pharmvar.org/haplotype/76
     activity: normal function
@@ -52,6 +46,40 @@ alleles:
     - [3985, G>A, rs7902257]
     - [5124, C>T, rs17885098]
     - [85186, A>G, rs3758581, I331V]
+  CYP2C19*1.007:
+    pharmvar: https://www.pharmvar.org/haplotype/1541
+    activity: normal function
+    evidence: D
+    mutations:
+    - [3608, C>T, rs3814637]
+    - [3635, T>G, rs11568730]
+    - [4137, T>G, rs11568732]
+    - [85186, A>G, rs3758581, I331V]
+    - [92338, A>C, rs17886522]
+  CYP2C19*1.008:
+    pharmvar: https://www.pharmvar.org/haplotype/1531
+    activity: normal function
+    evidence: D
+    mutations:
+    - [4251, T>A, rs185375194]
+    - [5124, C>T, rs17885098]
+    - [85186, A>G, rs3758581, I331V]
+  CYP2C19*1.009:
+    pharmvar: https://www.pharmvar.org/haplotype/1542
+    activity: normal function
+    evidence: D
+    mutations:
+    - [3854, delT, rs771491246]
+    - [5124, C>T, rs17885098]
+    - [85186, A>G, rs3758581, I331V]
+  CYP2C19*1.010:
+    pharmvar: https://www.pharmvar.org/haplotype/1537
+    activity: normal function
+    evidence: D
+    mutations:
+    - [3098, G>A, rs141540628]
+    - [5124, C>T, rs17885098]
+    - [85186, A>G, rs3758581, I331V]
   CYP2C19*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/111
     activity: no function
@@ -59,8 +87,8 @@ alleles:
     evidence: L
     mutations:
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*2.002:
@@ -72,8 +100,8 @@ alleles:
     - [4928, T>C, rs4986894]
     - [5124, C>T, rs17885098]
     - [17485, G>C, rs17878459, E92D]
-    - [17687, A>G, rs12769205, splicing defect]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*2.003:
@@ -84,9 +112,9 @@ alleles:
     mutations:
     - [4928, T>C, rs4986894]
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
     - [17859, G>C, rs181297724, A161P]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*2.004:
@@ -97,8 +125,8 @@ alleles:
     mutations:
     - [4928, T>C, rs4986894]
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
     - [92300, G>A, rs780225316]
@@ -109,8 +137,8 @@ alleles:
     evidence: L
     mutations:
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [24311, G>A, rs778258371]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
@@ -121,8 +149,8 @@ alleles:
     evidence: L
     mutations:
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
     - [85216, G>A, rs770829708]
@@ -133,8 +161,8 @@ alleles:
     evidence: L
     mutations:
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
     - [85274, A>T, rs550527959]
@@ -145,11 +173,11 @@ alleles:
     evidence: L
     mutations:
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
-    - [92273, C>G, '-']
+    - [92273, C>G, rs1564686367]
   CYP2C19*2.009:
     pharmvar: https://www.pharmvar.org/haplotype/108
     activity: no function
@@ -157,8 +185,8 @@ alleles:
     evidence: L
     mutations:
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
     - [92348, A>C, '-']
@@ -170,9 +198,32 @@ alleles:
     - [4928, T>C, rs4986894]
     - [5124, C>T, rs17885098]
     - [17485, G>C, rs17878459, E92D]
-    - [17687, A>G, rs12769205, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
     - [17827, G>A, rs58973490, R150H]
-    - [24179, G>A, rs4244285, splicing defect]
+    - [24179, G>A, rs4244285, splice defect]
+    - [85185, C>T, rs3758580]
+    - [85186, A>G, rs3758581, I331V]
+  CYP2C19*2.011:
+    pharmvar: https://www.pharmvar.org/haplotype/1529
+    activity: no function
+    evidence: D
+    mutations:
+    - [4928, T>C, rs4986894]
+    - [5124, C>T, rs17885098]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
+    - [85185, C>T, rs3758580]
+    - [85186, A>G, rs3758581, I331V]
+  CYP2C19*2.012:
+    pharmvar: https://www.pharmvar.org/haplotype/1543
+    activity: no function
+    evidence: D
+    mutations:
+    - [4928, T>C, rs4986894]
+    - [5124, C>T, rs17885098]
+    - [17485, G>C, rs17878459, E92D]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*3.001:
@@ -206,6 +257,16 @@ alleles:
     - [22973, G>A, rs4986893, W212X]
     - [85186, A>G, rs3758581, I331V]
     - [92338, A>C, rs17886522]
+  CYP2C19*3.004:
+    pharmvar: https://www.pharmvar.org/haplotype/1539
+    activity: no function
+    evidence: D
+    mutations:
+    - [3608, C>T, rs3814637]
+    - [4137, T>G, rs11568732]
+    - [22973, G>A, rs4986893, W212X]
+    - [85186, A>G, rs3758581, I331V]
+    - [92338, A>C, rs17886522]
   CYP2C19*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/113
     activity: no function
@@ -221,8 +282,7 @@ alleles:
     label: CYP2C19*4B
     evidence: L
     mutations:
-    - [1624, C>T, rs11188072]
-    - [4220, C>T, rs12248560, downstream effect]
+    - [4220, C>T, rs12248560, expression]
     - [5026, A>G, rs28399504, M1V]
     - [5124, C>T, rs17885098]
     - [85186, A>G, rs3758581, I331V]
@@ -246,7 +306,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/89
     activity: no function
     label: CYP2C19*6
-    evidence: L
+    evidence: D
     mutations:
     - [5124, C>T, rs17885098]
     - [17773, G>A, rs72552267, R132Q]
@@ -257,7 +317,7 @@ alleles:
     label: CYP2C19*7
     evidence: L
     mutations:
-    - [24319, T>A, rs72558186, splicing defect]
+    - [24319, T>A, rs72558186, splice defect]
   CYP2C19*8.001:
     pharmvar: https://www.pharmvar.org/haplotype/80
     activity: no function
@@ -265,9 +325,14 @@ alleles:
     evidence: L
     mutations:
     - [17736, T>C, rs41291556, W120R]
-  CYP2C19*8.1001:
-    label: CYP2C19*8.ALDY
+  CYP2C19*8.002:
+    pharmvar: https://www.pharmvar.org/haplotype/1538
+    activity: no function
+    evidence: D
     mutations:
+    - [3041, C>T, rs117673124]
+    - [3608, C>T, rs3814637]
+    - [4120, A>G, rs186694202]
     - [17736, T>C, rs41291556, W120R]
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*9.001:
@@ -276,6 +341,15 @@ alleles:
     label: CYP2C19*9
     evidence: M
     mutations:
+    - [5124, C>T, rs17885098]
+    - [17809, G>A, rs17884712, R144H]
+    - [85186, A>G, rs3758581, I331V]
+  CYP2C19*9.002:
+    pharmvar: https://www.pharmvar.org/haplotype/1533
+    activity: decreased function
+    evidence: D
+    mutations:
+    - [4243, C>T, rs11568729]
     - [5124, C>T, rs17885098]
     - [17809, G>A, rs17884712, R144H]
     - [85186, A>G, rs3758581, I331V]
@@ -314,6 +388,15 @@ alleles:
     mutations:
     - [85186, A>G, rs3758581, I331V]
     - [92315, C>T, rs17879685, R410C]
+  CYP2C19*13.002:
+    pharmvar: https://www.pharmvar.org/haplotype/1530
+    activity: normal function
+    evidence: D
+    mutations:
+    - [3041, C>T, rs117673124]
+    - [3608, C>T, rs3814637]
+    - [85186, A>G, rs3758581, I331V]
+    - [92315, C>T, rs17879685, R410C]
   CYP2C19*14.001:
     pharmvar: https://www.pharmvar.org/haplotype/87
     activity: uncertain function
@@ -333,6 +416,19 @@ alleles:
     - [3608, C>T, rs3814637]
     - [5080, A>C, rs17882687, I19L]
     - [85186, A>G, rs3758581, I331V]
+  CYP2C19*15.002:
+    pharmvar: https://www.pharmvar.org/haplotype/1535
+    activity: normal function
+    evidence: D
+    mutations:
+    - [3123, G>T, rs150732393]
+    - [3587, T>C, rs17878739]
+    - [3608, C>T, rs3814637]
+    - [3918, G>C, rs140164087]
+    - [4193, delT, rs17880036]
+    - [4243, C>T, rs11568729]
+    - [5080, A>C, rs17882687, I19L]
+    - [85186, A>G, rs3758581, I331V]
   CYP2C19*16.001:
     pharmvar: https://www.pharmvar.org/haplotype/96
     activity: decreased function
@@ -346,8 +442,7 @@ alleles:
     label: CYP2C19*17
     evidence: D
     mutations:
-    - [1624, C>T, rs11188072]
-    - [4220, C>T, rs12248560, downstream effect]
+    - [4220, C>T, rs12248560, expression]
     - [5124, C>T, rs17885098]
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*18.001:
@@ -419,8 +514,6 @@ alleles:
     label: CYP2C19*28
     evidence: M
     mutations:
-    - [2996, C>T, rs113164681]
-    - [3006, C>A, rs111490789]
     - [3587, T>C, rs17878739]
     - [5080, A>C, rs17882687, I19L]
     - [85186, A>G, rs3758581, I331V]
@@ -485,15 +578,53 @@ alleles:
     mutations:
     - [4113, G>A, rs76822098]
     - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splicing defect]
+    - [17687, A>G, rs12769205, splice defect]
     - [85186, A>G, rs3758581, I331V]
-  # CYP2C19*36.001:
-  #   pharmvar: https://www.pharmvar.org/haplotype/81
-  #   activity: normal function
-  #   label: CYP2C19*1A
-  #   evidence: D
-  #   mutations:
-  #   - [CYP2C19, deletion]
+  CYP2C19*35.002:
+    pharmvar: https://www.pharmvar.org/haplotype/1540
+    activity: no function
+    evidence: D
+    mutations:
+    - [5080, A>C, rs17882687, I19L]
+    - [5124, C>T, rs17885098]
+    - [17687, A>G, rs12769205, splice defect]
+    - [85186, A>G, rs3758581, I331V]
+  CYP2C19*38.001:
+    pharmvar: https://www.pharmvar.org/haplotype/81
+    activity: normal function
+    label: CYP2C19*1A
+    evidence: D
+    mutations: []
+  CYP2C19*38.002:
+    pharmvar: https://www.pharmvar.org/haplotype/1534
+    activity: normal function
+    evidence: D
+    mutations:
+    - [3608, C>T, rs3814637]
+    - [4137, T>G, rs11568732]
+    - [4956, T>C, rs17886301]
+  CYP2C19*38.003:
+    pharmvar: https://www.pharmvar.org/haplotype/1536
+    activity: normal function
+    evidence: D
+    mutations:
+    - [3608, C>T, rs3814637]
+    - [4137, T>G, rs11568732]
+  CYP2C19*39.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1532
+    activity: function not assigned
+    evidence: D
+    mutations:
+    - [3587, T>C, rs17878739]
+    - [3608, C>T, rs3814637]
+    - [4193, delT, rs17880036]
+    - [5080, A>C, rs17882687, I19L]
+    - [17743, A>C, rs17885179, E122A]
+    - [17768, G>T, rs17882291]
+    - [62899, A>G, rs17879239]
+    - [85186, A>G, rs3758581, I331V]
+    - [85254, C>T, rs17882744]
+    - [95316, T>C, rs17882796]
 structure:
   genes: [CYP2C19]
   regions:

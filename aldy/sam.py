@@ -396,6 +396,10 @@ class Sample:
             self._fusion_counter,
         ) = pickle.load(fd)
 
+        for start, op in muts:
+            if op.startswith("ins"):
+                self._insertion_counts[start, len(op) - 3] += 1
+
         return norm, muts
 
     def _make_coverage(self, gene, norm, muts, threshold, group_indels=True):

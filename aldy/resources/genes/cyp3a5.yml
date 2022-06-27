@@ -1,6 +1,6 @@
 name: CYP3A5
-version: pharmvar-4.2.4
-generated: '2020-11-27'
+version: pharmvar-5.1.15
+generated: '2022-06-20'
 pharmvar: 13724
 ensembl: ENSG00000106258
 alleles:
@@ -38,13 +38,6 @@ alleles:
     - [4394, T>C, rs28365073]
     - [19817, A>G, rs28383472]
     - [36708, T>C, rs15524]
-  CYP3A5*2.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1360
-    activity: unknown function
-    label: CYP3A5*2
-    evidence: L
-    mutations:
-    - [32386, C>A, rs28365083, T398N]
   CYP3A5*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/1340
     activity: no function
@@ -81,8 +74,8 @@ alleles:
   CYP3A5*3.005:
     pharmvar: https://www.pharmvar.org/haplotype/1344
     activity: no function
-    label: CYP3A5*3G
-    evidence: L
+    label: CYP3A5*3G, CYP3A5*5
+    evidence: D
     mutations:
     - [12083, A>G, rs776746, splice defect]
     - [18049, T>C, rs55965422, splice defect]
@@ -113,24 +106,19 @@ alleles:
   CYP3A5*3.009:
     pharmvar: https://www.pharmvar.org/haplotype/1342
     activity: no function
-    evidence: L
+    label: CYP3A5*4
+    evidence: D
     mutations:
     - [12083, A>G, rs776746, splice defect]
     - [19762, A>G, rs56411402, Q200R]
   CYP3A5*3.010:
     pharmvar: https://www.pharmvar.org/haplotype/1352
     activity: no function
-    evidence: L
+    label: CYP3A5*2
+    evidence: D
     mutations:
     - [12083, A>G, rs776746, splice defect]
     - [32386, C>A, rs28365083, T398N]
-  CYP3A5*3.011:
-    pharmvar: https://www.pharmvar.org/haplotype/1345
-    activity: no function
-    evidence: L
-    mutations:
-    - [12083, A>G, rs776746, splice defect]
-    - [24483, G>A, rs28383479, A337T]
   CYP3A5*3.012:
     pharmvar: https://www.pharmvar.org/haplotype/1347
     activity: no function
@@ -172,21 +160,7 @@ alleles:
     evidence: D
     mutations:
     - [12083, A>G, rs776746, splice defect]
-    - [19771, T>G, rs147489136]
-  CYP3A5*4.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1351
-    activity: unknown function
-    label: CYP3A5*4
-    evidence: L
-    mutations:
-    - [19762, A>G, rs56411402, Q200R]
-  CYP3A5*5.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1359
-    activity: unknown function
-    label: CYP3A5*5
-    evidence: L
-    mutations:
-    - [18049, T>C, rs55965422, splice defect]
+    - [19771, T>G, rs147489136, F203C]
   CYP3A5*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/1337
     activity: no function

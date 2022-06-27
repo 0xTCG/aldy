@@ -1,145 +1,170 @@
 name: NUDT15
-version: pharmvar-4.1.7
-generated: '2020-07-11'
+version: pharmvar-5.1.15
+generated: '2022-06-20'
 pharmvar: 22812
 ensembl: ENSG00000136159
 alleles:
   NUDT15*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/358
     activity: normal function
+    evidence: D
     mutations: []
   NUDT15*1.002:
     pharmvar: https://www.pharmvar.org/haplotype/362
     activity: normal function
+    evidence: D
     mutations:
     - [5216, A>C, rs61746486]
   NUDT15*1.003:
     pharmvar: https://www.pharmvar.org/haplotype/361
     activity: normal function
+    evidence: D
     mutations:
     - [5102, G>A, rs181638201]
   NUDT15*1.004:
     pharmvar: https://www.pharmvar.org/haplotype/356
     activity: normal function
+    evidence: D
     mutations:
     - [5161, G>A, rs368390627]
   NUDT15*1.005:
     pharmvar: https://www.pharmvar.org/haplotype/355
     activity: normal function
+    evidence: D
     mutations:
     - [13240, G>A, rs61973267]
   NUDT15*1.006:
     pharmvar: https://www.pharmvar.org/haplotype/357
     activity: normal function
+    evidence: D
     mutations:
     - [5303, C>A, rs138959770]
   NUDT15*1.007:
     pharmvar: https://www.pharmvar.org/haplotype/1316
     activity: normal function
-    label: ''
+    evidence: D
     mutations:
     - [5060, G>A, rs544736228]
     - [5102, G>A, rs181638201]
+  NUDT15*1.008:
+    pharmvar: https://www.pharmvar.org/haplotype/1617
+    activity: normal function
+    evidence: D
+    mutations:
+    - [5130, G>A, rs113950881]
   NUDT15*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/349
     activity: no function
+    evidence: D
     mutations:
     - [5235, insGAGTCG, rs746071566, V18_V19insGV]
-    - [13153, C>T, rs116855232, R139C]
-  NUDT15*2.002:
-    pharmvar: https://www.pharmvar.org/haplotype/349
-    activity: no function
-    mutations:
-    - [5235, insGGAGTC, rs746071566, V18_V19insGV]
     - [13153, C>T, rs116855232, R139C]
   NUDT15*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/364
     activity: no function
+    evidence: D
     mutations:
     - [13153, C>T, rs116855232, R139C]
   NUDT15*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/343
     activity: uncertain function
+    evidence: D
     mutations:
     - [13154, G>A, rs147390019, R139H]
   NUDT15*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/366
     activity: uncertain function
+    evidence: D
     mutations:
     - [5232, G>A, rs186364861, V18I]
   NUDT15*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/351
     activity: uncertain function
+    evidence: D
     mutations:
     - [5235, insGAGTCG, rs746071566, V18_V19insGV]
-  NUDT15*6.002:
-    pharmvar: https://www.pharmvar.org/haplotype/351
-    activity: no function
-    mutations:
-    - [5235, insGGAGTC, rs746071566, V18_V19insGV]
   NUDT15*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/360
     activity: uncertain function
+    evidence: D
     mutations:
     - [5281, G>C, rs766023281, R34T]
   NUDT15*8.001:
     pharmvar: https://www.pharmvar.org/haplotype/348
     activity: uncertain function
+    evidence: D
     mutations:
     - [5283, A>G, '-', K35E]
   NUDT15*9.001:
     pharmvar: https://www.pharmvar.org/haplotype/345
     activity: no function
+    evidence: D
     mutations:
-    - [5217, delGAGTCG, rs746071566, del17_18GV]
-  NUDT15*9.002:
-    pharmvar: https://www.pharmvar.org/haplotype/345
-    activity: no function
-    mutations:
-    - [5217, delGGAGTC, rs746071566, del17_18GV]
+    - [5230, delGAGTCG, rs746071566, del17_18GV]
   NUDT15*10.001:
     pharmvar: https://www.pharmvar.org/haplotype/346
+    activity: function not assigned
+    evidence: M
     mutations:
     - [5182, T>C, rs769369441, M1T]
   NUDT15*11.001:
     pharmvar: https://www.pharmvar.org/haplotype/354
+    activity: function not assigned
+    evidence: M
     mutations:
-    - [5319, G>A, '-', G47R]
+    - [5319, G>A, rs1950545307, G47R]
   NUDT15*12.001:
     pharmvar: https://www.pharmvar.org/haplotype/344
+    activity: function not assigned
+    evidence: D
     mutations:
     - [5336, C>G, rs149436418, F52L]
   NUDT15*13.001:
-    pharmvar: https://www.pharmvar.org/haplotype/347
+    pharmvar: https://www.pharmvar.org/haplotype/1590
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [8537, insG, rs761191455, 115frameshift]
+    - [8538, insG, rs761191455, 115frameshift]
   NUDT15*14.001:
     pharmvar: https://www.pharmvar.org/haplotype/359
+    activity: function not assigned
+    evidence: M
     mutations:
     - [5260, insCGGG, rs777311140, 28frameshift]
   NUDT15*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/350
+    activity: function not assigned
+    evidence: M
     mutations:
     - [13205, T>A, rs139551410, L156Q]
   NUDT15*16.001:
     pharmvar: https://www.pharmvar.org/haplotype/365
+    activity: function not assigned
+    evidence: M
     mutations:
-    - [5268, C>T, '-', L30V]
+    - [5268, C>T, rs1202487323, L30V]
   NUDT15*17.001:
     pharmvar: https://www.pharmvar.org/haplotype/353
+    activity: function not assigned
+    evidence: M
     mutations:
     - [8547, G>T, rs1368252918, E118X]
   NUDT15*18.001:
     pharmvar: https://www.pharmvar.org/haplotype/363
+    activity: function not assigned
+    evidence: D
     mutations:
     - [8416, delA, rs1457579126, 74frameshift]
   NUDT15*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/352
+    activity: function not assigned
+    evidence: D
     mutations:
     - [5183, G>C, '-', M1I]
-  NUDT*20.001:
+  NUDT15*20.001:
     pharmvar: https://www.pharmvar.org/haplotype/1317
-    label: ''
+    activity: function not assigned
+    evidence: D
     mutations:
     - [13124, C>G, rs768324690, P129R]
     - [13240, G>A, rs61973267]
@@ -153,7 +178,7 @@ structure:
       e2: [48615056, 48615253]
       e3: [48619796, 48619936]
       utr3: [48619936, 48621359]
-      down: [48621359,  48628879]
+      down: [48621359, 48628879]
     hg38:
       up: [48032567, 48037726]
       utr5: [48037726, 48037747]
@@ -161,7 +186,7 @@ structure:
       e2: [48040920, 48041117]
       e3: [48045660, 48045800]
       utr3: [48045800, 48047222]
-      down: [48047222,  48054743]
+      down: [48047222, 48054743]
   cn_regions: [e1, e2, e3]
 reference:
   name: NG_047021.1

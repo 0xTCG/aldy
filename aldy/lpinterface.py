@@ -191,12 +191,14 @@ class Gurobi:  # pragma: no cover
         Get the value of the solved variable.
         Automatically adjusts the return type based on the variable type.
         """
-        if var.vtype == self.gurobipy.GRB.BINARY:
+        if hasattr(var, 'vtype') and var.vtype == self.gurobipy.GRB.BINARY:
             return round(var.x) > 0
-        if var.vtype == self.gurobipy.GRB.INTEGER:
+        if hasattr(var, 'vtype') and var.vtype == self.gurobipy.GRB.INTEGER:
             return int(round(var.x))
-        else:
+        elif hasattr(var, 'x'):
             return var.x
+        else:
+            return var.getValue()
 
     def dump(self, file):
         """
