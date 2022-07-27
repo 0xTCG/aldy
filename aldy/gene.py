@@ -505,7 +505,7 @@ class Gene:
         }
         for i in self.chr_to_ref:
             if i not in self._region_at:
-                raise AldyException(f"Position {i} not within a named region")
+                raise AldyException(f"Position {i} not within a named region of {self.name}")
         self.unique_regions = yml["structure"]["cn_regions"]
 
     def _init_alleles(self, yml) -> None:

@@ -19,8 +19,9 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
 
     cov = collections.defaultdict(dict)
     for (pos, op), c in data["data"].items():
-        cov[pos][op] = c
-    cov = Coverage(cov, 0.5, {})
+        cov[pos][op] = [(60, 60)] * c
+
+    cov = Coverage(gene, None, None, cov, {}, 0.5)
 
     if isinstance(data["major"], tuple):
         major = MajorSolution(
@@ -38,9 +39,7 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
         )
 
     phase = None
-    if "phase" in data:
-        phase = [[Mutation(*i) for i in ll] for ll in data["phase"]]
-    sols = estimate_minor(gene, cov, [major], solver, phases=phase)
+    sols = estimate_minor(gene, cov, [major], solver)
     if skip_check:
         return sols
 

@@ -400,90 +400,91 @@ def solve_minor_model(
     # 8) Respect phasing
     VPHASEERR = []
     VPHASE = {}
-    reads = coverage.sam.grid.keys()
     modes = collections.defaultdict(int)
-    read_mode = {}
-    mut_pos = {m.pos for m in mutations}
-    for ri, rr in enumerate(reads):
-        c = []
-        for k, v in coverage.sam.grid[rr].items():
-            if k in mut_pos:
-                c.append(v)
-            elif v in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
-                c.append(coverage.sam.moved[v])
-        c = sorted(c)
-        if len(c) > 1:
-            modes[tuple(c)] += 1
-        read_mode[rr] = tuple(c)
-    log.debug("[minor] number of phases= {}", len(modes))
-    log.debug("[minor] number of alleles= {}", len(alleles))
-    max_vars = 3_000
-    if len(modes) * len(alleles) > max_vars:
-        max_sample = len(modes) * (max_vars / (len(modes) * len(alleles)))
-        log.debug("[minor] downsampling to= {}", max_sample)
-        skip = len(modes) / max_sample
-        if max_sample < len(modes):
-            mi = list(modes.items())
-            modes = dict(mi[i] for i in range(0, len(mi), int(skip)))
-            # modes = dict(random.sample(modes.items(), int(max_sample)))
-    # random.sample(coverage.sam.grid, 500)
-    # for i in modes:
-    #     log.debug("{}", i)
-    with Timing("[minor] Model setup"):
-        vars = 0
-        for ri, (rr, cnt) in enumerate(modes.items()):
-            r = dict(rr)
-            for ai, a in enumerate(alleles):
-                # construct e_ar
-                # e[ai,ri]
-                #  := ph[ai,ri] * sum(1 - ((mut in a & VK[a,m]) | (mut not in a & VN[a, m])) for mut in read)
-                #  := ph[ai,ri] * len(mut in read) - sum
-                pos, neg, e = [], [], 0
-                for m in mutations:
-                    if m.pos not in r:
-                        continue
-                    if not gene.has_coverage(a[0].major, m.pos):
-                        continue
-                    if m in VKEEP[a]:
-                        (pos if m.op == r[m.pos] else neg).append(VKEEP[a][m][0])
-                        # (px if m.op == r[m.pos] else nx).append(f"K:{m}")
-                    elif m in VNEW[a]:
-                        (pos if m.op == r[m.pos] else neg).append(VNEW[a][m][0])
-                        # (px if m.op == r[m.pos] else nx).append(f"N:{m}")
-                if len(pos) + len(neg) > 1:
-                    v = VPHASE[ai, ri] = model.addVar(
-                        vtype="B", name=f"PHASE_{ai}_{ri}", update=False
-                    )
-                    vars += 1
-                    model.addConstr(VPHASE[ai, ri] <= VA[a], name=f"PHASE1_{ai}_{ri}")
-                    e = 0
-                    for i, vm in enumerate(pos):
-                        v_vp = model.prod(
-                            model.addVar(
-                                vtype="B", name=f"PHASE2_{ai}_{ri}_{i}", update=False
-                            ),
-                            [v, vm],
+    if coverage.sam:
+        reads = coverage.sam.grid.keys()
+        read_mode = {}
+        mut_pos = {m.pos for m in mutations}
+        for ri, rr in enumerate(reads):
+            c = []
+            for k, v in coverage.sam.grid[rr].items():
+                if k in mut_pos:
+                    c.append(v)
+                elif v in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
+                    c.append(coverage.sam.moved[v])
+            c = sorted(c)
+            if len(c) > 1:
+                modes[tuple(c)] += 1
+            read_mode[rr] = tuple(c)
+        log.debug("[minor] number of phases= {}", len(modes))
+        log.debug("[minor] number of alleles= {}", len(alleles))
+        max_vars = 3_000
+        if len(modes) * len(alleles) > max_vars:
+            max_sample = len(modes) * (max_vars / (len(modes) * len(alleles)))
+            log.debug("[minor] downsampling to= {}", max_sample)
+            skip = len(modes) / max_sample
+            if max_sample < len(modes):
+                mi = list(modes.items())
+                modes = dict(mi[i] for i in range(0, len(mi), int(skip)))
+                # modes = dict(random.sample(modes.items(), int(max_sample)))
+        # random.sample(coverage.sam.grid, 500)
+        # for i in modes:
+        #     log.debug("{}", i)
+        with Timing("[minor] Model setup"):
+            vars = 0
+            for ri, (rr, cnt) in enumerate(modes.items()):
+                r = dict(rr)
+                for ai, a in enumerate(alleles):
+                    # construct e_ar
+                    # e[ai,ri]
+                    #  := ph[ai,ri] * sum(1 - ((mut in a & VK[a,m]) | (mut not in a & VN[a, m])) for mut in read)
+                    #  := ph[ai,ri] * len(mut in read) - sum
+                    pos, neg, e = [], [], 0
+                    for m in mutations:
+                        if m.pos not in r:
+                            continue
+                        if not gene.has_coverage(a[0].major, m.pos):
+                            continue
+                        if m in VKEEP[a]:
+                            (pos if m.op == r[m.pos] else neg).append(VKEEP[a][m][0])
+                            # (px if m.op == r[m.pos] else nx).append(f"K:{m}")
+                        elif m in VNEW[a]:
+                            (pos if m.op == r[m.pos] else neg).append(VNEW[a][m][0])
+                            # (px if m.op == r[m.pos] else nx).append(f"N:{m}")
+                    if len(pos) + len(neg) > 1:
+                        v = VPHASE[ai, ri] = model.addVar(
+                            vtype="B", name=f"PHASE_{ai}_{ri}", update=False
                         )
                         vars += 1
-                        e += v - v_vp
-                    for i, vm in enumerate(neg):
-                        v_vp = model.prod(
-                            model.addVar(
-                                vtype="B", name=f"PHASE3_{ai}_{ri}_{i}", update=False
-                            ),
-                            [v, vm],
-                        )
-                        vars += 1
-                        e += v_vp
-                    VPHASEERR.append(cnt * e)
-        for ri, _ in enumerate(modes):
-            v = [VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE]
-            if v:
-                e = model.quicksum(v)
-                model.addConstr(e <= 1, name=f"PHASE4_{ri}_1")
-                model.addConstr(e >= 1, name=f"PHASE4_{ri}_2")
-        model.update()
-        log.debug("[minor] phasing setup done, vars= {}", vars)
+                        model.addConstr(VPHASE[ai, ri] <= VA[a], name=f"PHASE1_{ai}_{ri}")
+                        e = 0
+                        for i, vm in enumerate(pos):
+                            v_vp = model.prod(
+                                model.addVar(
+                                    vtype="B", name=f"PHASE2_{ai}_{ri}_{i}", update=False
+                                ),
+                                [v, vm],
+                            )
+                            vars += 1
+                            e += v - v_vp
+                        for i, vm in enumerate(neg):
+                            v_vp = model.prod(
+                                model.addVar(
+                                    vtype="B", name=f"PHASE3_{ai}_{ri}_{i}", update=False
+                                ),
+                                [v, vm],
+                            )
+                            vars += 1
+                            e += v_vp
+                        VPHASEERR.append(cnt * e)
+            for ri, _ in enumerate(modes):
+                v = [VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE]
+                if v:
+                    e = model.quicksum(v)
+                    model.addConstr(e <= 1, name=f"PHASE4_{ri}_1")
+                    model.addConstr(e >= 1, name=f"PHASE4_{ri}_2")
+            model.update()
+            log.debug("[minor] phasing setup done, vars= {}", vars)
 
     # Objective: minimize the absolute sum of errors ...
     objective = offset
@@ -615,7 +616,6 @@ def solve_minor_model(
             _ = estimate_diplotype(gene, sol)
             debug_info["sol"] = [(s.minor, s.added, s.missing) for s in solution]
             debug_info["diplotype"] = sol.diplotype
-            print(o_error.solution_value())
             log.debug(
                 f"[minor] status= {status}; opt= {opt:.2f} "
                 + "(error= {:.2f}, penal={:.2f}, phase= {:.2f}) "

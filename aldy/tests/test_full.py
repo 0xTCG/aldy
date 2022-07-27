@@ -15,7 +15,6 @@ from tempfile import NamedTemporaryFile as tmpfile
 
 from aldy.__main__ import get_version, main
 from aldy.common import script_path, log
-from aldy.cn import LEFT_FUSION_PENALTY
 from aldy.version import __version__
 
 
@@ -53,7 +52,6 @@ def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
             "--threshold": "50",
             "--gap": "0",
             "--solver": solver,
-            "--fusion-penalty": f"{LEFT_FUSION_PENALTY}",
             "--max-minor-solutions": "3",
         },
         **(params or {}),

@@ -71,25 +71,14 @@ def test_normal(real_gene, solver):  # NA07439/v1 : currently test only one solu
             },
             "sol": [
                 (
-                    "4.005",
-                    [],
-                    [
-                        (42523408, "T>G"),
-                        (42525951, "A>C"),
-                        (42526048, "G>C"),
-                        (42526483, "C>A"),
-                        (42528027, "T>C"),
-                    ],
+                    "4.004",
+                    [(42528223, "G>A")],
+                    [(42528027, "T>C")],
                 ),
                 (
-                    "4.005",
-                    [],
-                    [
-                        (42523408, "T>G"),
-                        (42525951, "A>C"),
-                        (42526483, "C>A"),
-                        (42528027, "T>C"),
-                    ],
+                   "4.004",
+                    [(42528223, "G>A")],
+                    [(42526048, "G>C"), (42528027, "T>C")],
                 ),
                 (
                     "41.001",
@@ -459,7 +448,7 @@ def test_comparison(real_gene, solver):  # NA10846/v1
     cn_sol = CNSolution(real_gene, 0, list(collections.Counter({"1": 2}).elements()))
     cov = collections.defaultdict(dict)
     for (pos, op), c in data.items():
-        cov[pos][op] = c
+        cov[pos][op] = [(60, 60)] * c
 
     majors = [
         MajorSolution(
@@ -472,7 +461,7 @@ def test_comparison(real_gene, solver):  # NA10846/v1
         )
         for major in [{"1": 1, "4": 1}, {"10": 1, "4M": 1}, {"39": 1, "4J": 1}]
     ]
-    sols = estimate_minor(real_gene, Coverage(cov, 0.5, {}), majors, solver)
+    sols = estimate_minor(real_gene, Coverage(real_gene, None, None, cov, {}, 0.5), majors, solver)
     assert len(sols) == 3
     sols.sort(key=lambda x: x.score)
 
@@ -599,6 +588,7 @@ def test_major_novel(real_gene, solver):
                 (
                     "35.001",
                     [
+                        (42525755, "G>A"),
                         (42526579, "C>G"),
                         (42526572, "G>T"),
                         (42526548, "T>C"),
@@ -606,19 +596,18 @@ def test_major_novel(real_gene, solver):
                         (42526566, "A>G"),
                         (42526560, "T>G"),
                         (42526561, "C>G"),
+                        (42528223, "G>A")
                     ],
                     [],
                 ),
                 (
-                    "4.011",
+                    "4.004",
                     [],
                     [
                         (42525810, "T>C"),
                         (42526048, "G>C"),
-                        (42523408, "T>G"),
-                        (42525951, "A>C"),
                         (42528027, "T>C"),
-                        (42526483, "C>A"),
+                        (42525797, "G>C")
                     ],
                 ),
             ],

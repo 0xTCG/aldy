@@ -19,8 +19,8 @@ def assert_major(gene, solver, major):
 
     cov = collections.defaultdict(dict)
     for (pos, op), c in major["data"].items():
-        cov[pos][op] = c
-    cov = Coverage(cov, 0.5, {})
+        cov[pos][op] = [(60, 60)] * c
+    cov = Coverage(gene, None, None, cov, {}, 0.5)
     sols = estimate_major(gene, cov, cn_sol, solver)
 
     if "score" in major:
@@ -114,8 +114,8 @@ def test_two_copies(toy_gene, solver):
                 (100_000_110, "delAC"): 9,
                 (100_000_118, "_"): 22,
                 (100_000_118, "insTT"): 8,
-                (100_000_150, "_"): 10.5,
-                (100_000_150, "C>T"): 9.5,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 9,
             },
             "sol": [{"2": 1, "3": 1}],
             "score": 2 / 10 + 3 / 11 + 1 / 10,

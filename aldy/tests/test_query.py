@@ -6,16 +6,10 @@
 # flake8: noqa
 
 import pytest  # noqa
-import re
-import subprocess
-import platform
-import datetime
 
-from tempfile import NamedTemporaryFile as tmpfile
 
-from aldy.__main__ import get_version, main
+from aldy.__main__ import main
 from aldy.common import script_path, log
-from aldy.cn import LEFT_FUSION_PENALTY
 from aldy.version import __version__
 from .test_full import HEADER, escape_ansi
 
