@@ -3,92 +3,89 @@ version: pharmgkb-karolinska
 generated: '2020-07-20'
 ensembl: ENSG00000130649
 alleles:
-  CYP2E1*1B:
-    label: CYP2E1*1B
-    mutations: []
   CYP2E1*1A:
     label: CYP2E1*1A
+    mutations: []
+  CYP2E1*1B:
+    label: CYP2E1*1B
     mutations:
-    - [15271, C>G, rs2070676, intron]
-  CYP2E1*2^1B:
-    label: CYP2E1*2^1B
-    mutations:
-    - [6168, G>A, rs72559710, R76H]
+    - [15271, G>C, rs2070676, intron]
   CYP2E1*2.001:
     label: CYP2E1*2
     mutations:
     - [6168, G>A, rs72559710, R76H]
-    - [15271, C>G, rs2070676, intron]
+  CYP2E1*2^1B:
+    label: CYP2E1*2^1B
+    mutations:
+    - [6168, G>A, rs72559710, R76H]
+    - [15271, G>C, rs2070676, intron]
   CYP2E1*3.001:
     label: CYP2E1*3
     mutations:
     - [15398, G>A, rs55897648, V389I]
-    - [15271, C>G, rs2070676, intron]
   CYP2E1*4.001:
     label: CYP2E1*4
     mutations:
     - [9809, G>A, rs6413419, V179I]
-    - [15271, C>G, rs2070676, intron]
   CYP2E1*4^7A:
     label: CYP2E1*4^7A
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
     - [9809, G>A, rs6413419, V179I]
-    - [15271, C>G, rs2070676, intron]
   CYP2E1*4^5^7A:
     label: CYP2E1*4^5^7A
     mutations:
     - [3739, G>C, rs3813867, 5'UTR]
     - [4701, T>A, rs2070673, 5'UTR]
     - [9809, G>A, rs6413419, V179I]
-    - [15271, C>G, rs2070676, intron]
   CYP2E1*4^7A^1B:
     label: CYP2E1*4^7A^1B
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
     - [9809, G>A, rs6413419, V179I]
+    - [15271, G>C, rs2070676, intron]
   CYP2E1*5.001:
     label: CYP2E1*5
     mutations:
     - [3739, G>C, rs3813867, 5'UTR]
     - [3979, C>T, rs2031920, 5'UTR]
-    - [15271, C>G, rs2070676, intron]
   CYP2E1*5^1B:
     label: CYP2E1*5^1B
     mutations:
     - [3739, G>C, rs3813867, 5'UTR]
+    - [15271, G>C, rs2070676, intron]
   CYP2E1*5B^7A^1B:
     label: CYP2E1*5B^7A^1B
     mutations:
     - [3739, G>C, rs3813867, 5'UTR]
     - [3979, C>T, rs2031920, 5'UTR]
     - [4701, T>A, rs2070673, 5'UTR]
+    - [15271, G>C, rs2070676, intron]
   CYP2E1*7A:
     label: CYP2E1*7A
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
-    - [15271, C>G, rs2070676, intron]
   CYP2E1*7A^1B:
     label: CYP2E1*7A^1B
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
+    - [15271, G>C, rs2070676, intron]
   CYP2E1*7B:
     label: CYP2E1*7B
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
     - [4963, G>T, rs6413420, 5'UTR]
-    - [15271, C>G, rs2070676, intron]
   CYP2E1*7C:
     label: CYP2E1*7C
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
     - [4682, A>G, rs2070672, 5'UTR]
-    - [15271, C>G, rs2070676, intron]
   CYP2E1*7C^1B:
     label: CYP2E1*7C^1B
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
     - [4682, A>G, rs2070672, 5'UTR]
+    - [15271, G>C, rs2070676, intron]
 structure:
   genes: [CYP2E1]
   regions:

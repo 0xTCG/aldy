@@ -190,7 +190,7 @@ def genotype(
     elif "/pgx3/" in sam_path:
         profile_name = "pgx3"
 
-    if profile_name in ["exome", "wxs"]:
+    if profile_name in ["exome", "wxs", "wes"]:
         cn_region = None
         cn_solution = ["1", "1"]
         profile_name = "illumina"

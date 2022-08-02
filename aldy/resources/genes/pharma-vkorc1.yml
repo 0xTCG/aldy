@@ -9,35 +9,35 @@ alleles:
   VKORC1*H1:
     label: VKORC1*2
     mutations:
+    # - [296, T>C, rs7196161, 5'UTR]
     - [3588, G>A, rs9923231, 5'UTR]
     - [6399, C>T, rs9934438, intron]
     - [6768, G>C, rs8050894, intron]
     - [7481, C>T, rs2359612, intron]
-    - [296, T>C, rs7196161, 5'UTR]
   VKORC1*H2:
     mutations:
     - [3588, G>A, rs9923231, 5'UTR]
     - [5723, T>G, rs2884737, intron]
     - [6399, C>T, rs9934438, intron]
-    - [7481, C>T, rs2359612, intron]
-    - [296, T>C, rs7196161, 5'UTR]
     - [6768, G>C, rs8050894, intron]
+    - [7481, C>T, rs2359612, intron]
+    # - [296, T>C, rs7196161, 5'UTR]
   VKORC1*H3:
     mutations:
-    - [296, T>C, rs7196161, 5'UTR]
+    # - [296, T>C, rs7196161, 5'UTR]
     - [6768, G>C, rs8050894, intron]
   VKORC1*H4:
     mutations:
-    - [296, T>C, rs7196161, 5'UTR]
+    # - [296, T>C, rs7196161, 5'UTR]
     - [7481, C>T, rs2359612, intron]
   VKORC1*H7:
     mutations:
     - [8956, G>A, rs7294, 3'UTR]
   VKORC1*H9:
     mutations:
-    - [776, C>A, rs17880887, 5'UTR]
+    # - [776, C>A, rs17880887, 5'UTR]
+    # - [2568, G>C, rs17881535, 5'UTR]
     - [5924, C>T, rs17708472, intron]
-    - [2568, G>C, rs17881535, 5'UTR]
 structure:
   genes: [VKORC1]
   regions:
