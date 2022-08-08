@@ -52,7 +52,7 @@ alleles:
     - [47246, T>C, rs7439366, Y268H]
   UGT2B7*2a:
     label: UGT2B7*2a
-    mutations:
+    mutations: []
   UGT2B7*2g:
     label: UGT2B7*2g
     mutations:
