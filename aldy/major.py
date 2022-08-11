@@ -9,11 +9,10 @@ from typing import List, Dict, Tuple, Any, Optional
 import collections
 import copy
 
-from functools import partial
 from natsort import natsorted
 
 from . import lpinterface
-from .common import log, AldyException, json, sorted_tuple
+from .common import log, json, sorted_tuple
 from .cn import MAX_CN
 from .gene import MajorAllele, Mutation, Gene
 from .coverage import Coverage
@@ -279,12 +278,9 @@ def _filter_alleles(
             )
         return cond
 
-    # for c, d in coverage._coverage.items():
-    #     if len(d) > 1 and any(x.startswith("ins") or x.startswith("del") for x in d):
-    #         print(c + 1, {x: len(y) for x, y in d.items()})
-
     cov = coverage.filtered(Coverage.quality_filter)
     cov = cov.filtered(filter_fns)
+
     alleles = copy.deepcopy(gene.alleles)
     for an, a in natsorted(gene.alleles.items()):
         if a.cn_config not in cn_solution.solution:

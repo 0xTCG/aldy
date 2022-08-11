@@ -12,7 +12,6 @@ import os
 import os.path
 import yaml
 import gzip
-import struct
 import tarfile
 import pickle
 
@@ -23,16 +22,34 @@ from natsort import natsorted
 from statistics import mean
 from .common import log, GRange, AldyException, script_path, Timing
 from .gene import Gene, Mutation, CNConfigType
-from .coverage import Coverage, MIN_QUAL
+from .coverage import Coverage
 
 
 class Profile:
-    def __init__(self, name, cn_region, data, neutral_value=0, cn_solution=None):
+    def __init__(self, name, cn_region=None, data=None, **params):
         self.name = name
         self.cn_region = cn_region
         self.data = data
-        self.cn_solution = cn_solution
-        self.neutral_value = neutral_value
+
+        params = {k: v for k, v in params.items() if v is not None}
+        self.cn_solution = params.get("cn_solution")
+        self.neutral_value = float(params.get("neutral_value", 0))
+        self.threshold = float(params.get("threshold", 0.5))
+        self.min_coverage = float(
+            params.get("min_coverage", 5.0 if name == "illumina" else 2.0)
+        )
+        self.min_quality = float(params.get("min_quality", 10.0))
+        self.min_mapq = float(params.get("min_mapq", 10.0))
+        self.phase = bool(params.get("phase", True))
+        log.debug(
+            f"[params] "
+            f"neutral={self.neutral_value}; "
+            f"threshold={self.threshold}; "
+            f"min_coverage={self.min_coverage}; "
+            f"min_quality={self.min_quality}; "
+            f"min_mapq={self.min_mapq}; "
+            f"phase={self.phase}"
+        )
 
 
 @dataclass
@@ -42,8 +59,7 @@ class Sample:
     """
 
     coverage: Coverage
-    sample_name: str
-    min_cov: float
+    name: str
     _prefix: str
     _insertion_sites: Set[Mutation]
     _insertion_counts: Dict[Tuple[int, int], int]
@@ -58,21 +74,16 @@ class Sample:
         self,
         gene: Gene,
         sam_path: Optional[str] = None,
-        threshold: float = 0.5,
         profile: Optional[Profile] = None,
         reference: Optional[str] = None,
         debug: Optional[str] = None,
         vcf_path: Optional[str] = None,
-        min_cov: float = 1.0,
     ):
         """
         Initialize a :obj:`Sample` object.
 
         :param sam_path: Path to a SAM/BAM/CRAM file.
         :param gene: Gene instance.
-        :param threshold:
-            Threshold for filtering out low quality mutations. Ranges from 0 to 1.
-            Check :obj:`aldy.coverage.Coverage` for more information.
         :param profile:
             Profile data (:obj:`Profile`) loaded from a YML profile (e.g. 'prgnseq-v1')
             or a profile SAM/BAM file.
@@ -87,10 +98,14 @@ class Sample:
                 copy-number neutral region is too low (less than 2).
         """
 
+        if sam_path:
+            self.name = os.path.basename(sam_path).split(".")[0]
+        else:
+            self.name = ""
+
         # Get the list of indel sites that should be corrected
         # TODO: currently uses only functional indels;
         #       other indels should be corrected as well
-        self.min_cov = min_cov
         self._dump_cn = defaultdict(int)
         self._dump_reads = []
         self._insertion_sites = {
@@ -148,7 +163,7 @@ class Sample:
                     self._dump_cn = self._load_cn_region(
                         self.profile.cn_region, sam_path, reference
                     )
-            self._make_coverage(gene, norm, muts, threshold, group_indels=group_indels)
+            self._make_coverage(gene, norm, muts, group_indels=group_indels)
             if is_sam and debug:
                 self._dump_alignments(f"{debug}.{gene.name}", norm, muts)
 
@@ -172,9 +187,6 @@ class Sample:
 
         :param sam_path: Path to a SAM/BAM/CRAM file.
         :param gene: Gene instance.
-        :param threshold:
-            Threshold for filtering out low quality mutations. Ranges from 0 to 1.
-            Check :obj:`aldy.coverage.Coverage` for more information.
         :param reference:
             Reference genome for reading CRAM files.
             Default is None.
@@ -188,7 +200,6 @@ class Sample:
         log.debug("[sam] path= {}", os.path.abspath(sam_path))
         if reference:
             log.debug("[sam] reference= {}", os.path.abspath(reference))
-        self.sample_name = os.path.basename(sam_path).split(".")[0]
 
         norm: dict = defaultdict(list)
         muts: dict = defaultdict(list)
@@ -222,8 +233,6 @@ class Sample:
                     continue
                 if not read.query_sequence:
                     continue
-                # if read.mapping_quality < MIN_QUAL:
-                # continue
                 # ensure that it is a proper gene read
                 if not _in_region(gene.get_wide_region(), read, self._prefix):
                     continue
@@ -285,7 +294,6 @@ class Sample:
                     start = read.reference_start
                     if read.cigartuples is None:
                         continue
-                    # if read.mapping_quality < MIN_QUAL: continue
                     if read.is_supplementary:
                         continue
                     for op, size in read.cigartuples:
@@ -330,7 +338,7 @@ class Sample:
             self._prefix = _chr_prefix(gene.chr, list(vcf.header.contigs))
 
             samples = list(vcf.header.samples)
-            self.sample_name = sample = samples[0]
+            self.name = sample = samples[0]
             if len(samples) > 1:
                 log.warn("WARNING: Multiple VCF samples found; using the first one.")
             log.info("Using VCF sample {}", sample)
@@ -387,7 +395,7 @@ class Sample:
 
         log.warn("Loading debug dump from {}", dump_path)
         (
-            self.sample_name,
+            self.name,
             self._dump_cn,
             norm,
             muts,
@@ -402,7 +410,7 @@ class Sample:
 
         return norm, muts
 
-    def _make_coverage(self, gene, norm, muts, threshold, group_indels=True):
+    def _make_coverage(self, gene, norm, muts, group_indels=True):
         # Establish the coverage dictionary
         coverage: Dict[int, Dict[str, List]] = dict()
         for pos, cov in norm.items():
@@ -433,8 +441,7 @@ class Sample:
                     corrected = self._correct_ins_coverage(mut, total)
                     diff = corrected - len(coverage[mut.pos][mut.op])
                     coverage[mut.pos][mut.op].extend(
-                        [(mean(mq for mq, _ in coverage[mut.pos][mut.op]), MIN_QUAL)]
-                        * diff
+                        [(mean(mq for mq, _ in coverage[mut.pos][mut.op]), 10)] * diff
                     )
 
         self.coverage = Coverage(
@@ -443,8 +450,6 @@ class Sample:
             self,
             {p: {m: v for m, v in coverage[p].items() if len(v) > 0} for p in coverage},
             self._dump_cn,
-            threshold,
-            self.min_cov,
         )
 
     def _group_indels(self, gene, coverage):
@@ -550,7 +555,7 @@ class Sample:
         grid = self.grid.setdefault(fragment, {})
         dump_arr = []
         start, s_start = ref_start, 0
-        prev_q = MIN_QUAL
+        prev_q = 10
         for op, size in cigar:
             if op == 2:  # Deletion
                 mut = (start, "del" + gene[start : start + size])
@@ -662,9 +667,6 @@ class Sample:
 
         :param sam_path: Path to a PacBio SAM/BAM/CRAM file.
         :param gene: Gene instance.
-        :param threshold:
-            Threshold for filtering out low quality mutations. Ranges from 0 to 1.
-            Check :obj:`aldy.coverage.Coverage` for more information.
         :param reference:
             Reference genome for reading CRAM files.
             Default is None.
@@ -675,7 +677,6 @@ class Sample:
         :raise: :obj:`aldy.common.AldyException` if a BAM/CRAM file lacks an index.
         """
         log.debug("[sam] pacbio_path= {}", os.path.abspath(sam_path))
-        self.sample_name = os.path.basename(sam_path).split(".")[0]
 
         norm: dict = defaultdict(list)
         muts: dict = defaultdict(list)
@@ -877,7 +878,7 @@ class Sample:
     # ----------------------------------------------------------------------------------
 
     @staticmethod
-    def load_profile(gene, profile, cn_region=None):
+    def load_profile(gene, profile, cn_region=None, **params):
         prof = None
         is_yml = True
         if os.path.exists(profile) and os.path.isfile(profile):
@@ -919,7 +920,8 @@ class Sample:
             profile,
             GRange(*prof["neutral"][gene.genome]),
             prof,
-            prof["neutral"]["value"],
+            neutral_value=prof["neutral"].get("value"),
+            **dict(prof.get("options", {}), **params),
         )
 
     def _dump_alignments(self, debug: str, norm, muts):
@@ -928,7 +930,7 @@ class Sample:
         with gzip.open(f"{debug}.dump", "wb") as fd:
             pickle.dump(
                 (
-                    self.sample_name,
+                    self.name,
                     self._dump_cn,
                     norm,
                     muts,

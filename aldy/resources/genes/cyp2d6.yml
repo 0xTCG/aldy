@@ -1386,7 +1386,7 @@ alleles:
     - [8602, A>G, rs2004511]
     - [CYP2D7, e9+]
     - [9421, C>T, rs28371738]
-  CYP2D6*4.1022:
+  CYP2D6*4.2021:
     pharmvar: https://www.pharmvar.org/haplotype/250
     activity: no function
     label: CYP2D6*4.021.ALDY_2

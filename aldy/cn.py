@@ -18,7 +18,6 @@ from .common import log, json, sorted_tuple, AldyException
 from .gene import CNConfig, CNConfigType, Gene
 from .coverage import Coverage
 from .solutions import CNSolution
-from aldy import coverage
 
 
 MAX_CN = 20.0
@@ -86,10 +85,10 @@ def estimate_cn(
         min_cov = min(
             sum(sum(v.values()) for v in gene.cn_configs[c].cn) for c in gene.cn_configs
         )
-        # if total_cov < min_cov / 2.0:
-        #     raise AldyException(
-        #         f"Coverage for {gene.name} too low for copy number calling."
-        #     )
+        if total_cov < min_cov / 2.0:
+            raise AldyException(
+                f"Coverage for {gene.name} too low for copy number calling."
+            )
 
         configs = _filter_configs(gene, coverage)
         log.debug("[cn] candidates= {}", ", ".join(natsorted(configs)))
@@ -166,7 +165,7 @@ def solve_cn_model(
 
     # N.B. (3/2022) this step filters "weak" fusions without long-read support
     del_allele = gene.deletion_allele()
-    structures = {
+    structures: Dict[Tuple[str, int], CNConfig] = {
         (name, 0): structure
         for name, structure in cn_configs.items()
         if not fusion_support
@@ -281,7 +280,7 @@ def solve_cn_model(
         model.dump(f"{debug}.{gene.name}.cn.lp")
 
     # Solve the model
-    lookup = {model.varName(v): a for (a, ai), v in VCN.items()}
+    lookup = {model.varName(v): a for (a, _), v in VCN.items()}
     result: dict = {}
     for status, opt, sol in model.solutions(gap):
         sol_tuple = sorted_tuple(
@@ -304,9 +303,6 @@ def solve_cn_model(
         log.debug("[cn] solution= []")
 
     debug_info["sol"] = [dict(r.solution) for r in result.values()]
-    # import sys
-
-    # sys.exit(0)
     return list(result.values())
 
 
@@ -316,7 +312,7 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
     that are not supported by the remaining mutations.
     """
     cov = coverage.filtered(
-        partial(Coverage.basic_filter, thres=coverage._threshold / MAX_CN)
+        partial(Coverage.basic_filter, thres=coverage.profile.threshold / MAX_CN)
     )
     configs = copy.deepcopy(gene.cn_configs)
     for an in natsorted(gene.cn_configs):

@@ -7,7 +7,9 @@
 
 from typing import Optional, Any
 
+import logbook
 import logbook.more
+import logbook.base
 import argparse
 import os
 import sys
@@ -15,7 +17,6 @@ import platform
 import yaml
 import datetime
 import tempfile
-import pkg_resources
 import traceback
 import pytest
 
@@ -191,12 +192,14 @@ def _get_args(argv):
         "-p",
         help=td(
             """Sequencing profile. The following profiles are supported:
-               - illumina
-               - wgs (same as illumina)
-               - pgrnseq-v1
+               - illumina (also: wgs),
+               - pgrnseq-v1,
                - pgrnseq-v2,
-               - pgrnseq-v3, and
-               - exome.
+               - pgrnseq-v3,
+               - 10x,
+               - pacbio-hifi-targeted,
+               - pacbio-hifi-targeted-twist,
+               - exome (also: wxs, wes).
                You can also provide a custom SAM/BAM file as a profile.
                Please check documentation for more details."""
         ),
@@ -205,6 +208,7 @@ def _get_args(argv):
         "--threshold",
         "-T",
         default=50,
+        type=float,
         help="Cut-off rate for variations (percent per copy). Default is 50.",
     )
     genotype_parser.add_argument(
@@ -250,6 +254,7 @@ def _get_args(argv):
         "--gap",
         "-G",
         default=0,
+        type=float,
         help=td(
             """Solver optimality gap.
                Any solution whose score is less than (1+gap) times the optimal solution
@@ -270,6 +275,7 @@ def _get_args(argv):
     genotype_parser.add_argument(
         "--max-minor-solutions",
         default=1,
+        type=int,
         help="Maximum number of minor solutions to report for each major solution. "
         + "Default is 1.",
     )
@@ -289,6 +295,7 @@ def _get_args(argv):
         "--multiple-warn-level",
         "-W",
         default=1,
+        type=int,
         help="Show warning if multiple solutions are found. "
         + "Can be 1 (warn after genotyping) or 2 "
         + "(also warn if there are multiple major solutions)."
@@ -297,8 +304,28 @@ def _get_args(argv):
     genotype_parser.add_argument(
         "--min-coverage",
         default=None,
+        type=int,
         help=td("""Minimum mutation read coverage. Default is 1."""),
     )
+    genotype_parser.add_argument(
+        "--min-mapq",
+        default=None,
+        type=int,
+        help=td("""Minimum read mapping quality. Default is 10."""),
+    )
+    genotype_parser.add_argument(
+        "--min-quality",
+        default=None,
+        type=int,
+        help=td("""Minimum quality score. Default is 10."""),
+    )
+    genotype_parser.add_argument(
+        "--simple",
+        action="store_true",
+        default=False,
+        help=td("""Print one-line result per gene (debug). Default is off."""),
+    )
+
     genotype_parser.add_argument("--phase", action="store_true", help="Use phase file.")
 
     _ = subparsers.add_parser(
@@ -378,7 +405,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
     if cn_solution:
         cn_solution = cn_solution.split(",")
 
-    threshold = float(args.threshold) / 100
+    args.threshold = float(args.threshold) / 100
 
     def run(debug):
         log.trace(
@@ -400,6 +427,8 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             log.warn("         Results might not be biologically relevant!")
 
         try:
+            params = vars(args).copy()
+            del params["gene"], params["file"], params["profile"], params["debug"]
             _ = genotype(
                 gene_db=gene,
                 sam_path=args.file,
@@ -407,17 +436,10 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 output_file=output,
                 cn_region=cn_region,
                 cn_solution=cn_solution,
-                threshold=threshold,
-                solver=args.solver,
-                reference=args.reference,
-                gap=float(args.gap),
-                max_minor_solutions=int(args.max_minor_solutions),
-                debug=debug,
-                multiple_warn_level=int(args.multiple_warn_level),
-                phase=args.phase,
                 report=True,
-                genome=args.genome,
-                min_cov=args.min_coverage,
+                is_simple=args.simple,
+                debug=debug,
+                **{k: v for k, v in params.items() if v is not None},
             )
         except AldyException as ex:
             log.critical(
@@ -426,8 +448,8 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             log.error(str(ex))
 
     if args.log:
-        fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="TRACE")
-        fh.formatter = lambda record, _: record.message
+        fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="TRACE")  # type: ignore
+        fh.formatter = lambda record, _: record.message  # type: ignore
         fh.push_application()
     if args.debug:
         with tempfile.TemporaryDirectory() as tmp:
@@ -436,9 +458,9 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 prefix = f"{tmp}/{os.path.splitext(os.path.basename(args.file))[0]}"
                 log_output = f"{prefix}.log"
                 fh = logbook.FileHandler(
-                    log_output, mode="w", bubble=True, level="TRACE"
+                    log_output, mode="w", bubble=True, level="TRACE"  # type: ignore
                 )
-                fh.formatter = lambda record, _: "[{}:{}/{}] {}".format(
+                fh.formatter = lambda record, _: "[{}:{}/{}] {}".format(  # type: ignore
                     record.level_name[0],
                     os.path.splitext(os.path.basename(record.filename))[0],
                     record.func_name,
@@ -451,7 +473,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 if prefix:
                     log.info("Preparing debug archive...")
                     with open(f"{prefix}.yml", "w") as f:
-                        yaml.Dumper.ignore_aliases = lambda *args: True  # type: ignore
+                        yaml.Dumper.ignore_aliases = lambda *_: True  # type: ignore
                         yaml.dump(common.json, f, default_flow_style=None)
                     os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
     else:

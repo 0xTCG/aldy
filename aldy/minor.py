@@ -4,13 +4,12 @@
 #   file 'LICENSE', which is part of this source code package.
 
 import collections
-import random
+import os
 from typing import List, Set, Callable, Optional, Tuple, Dict
 
-from os import environ
 from natsort import natsorted
 from . import lpinterface
-from .common import Timing, log, json
+from .common import log, json, Timing
 from .gene import Mutation, Gene
 from .cn import MAX_CN
 from .coverage import Coverage
@@ -317,6 +316,17 @@ def solve_minor_model(
         model.addConstr(expr + VERR[m] <= cov, name=f"CCOV_{m.pos}_{m.op}")
         debug_info["data"].append((m.pos, m.op, coverage[m]))
 
+    score = {}
+    for m, v in VERR.items():
+        s = 1
+        # TODO: downscale ambiguous mutations
+        # ops = coverage._coverage[m.pos].get(m.op, [])
+        # if ops:
+        #     mx = max(mq for mq, _ in ops)
+        #     sx = sum(math.log(1 + mq) / math.log(1 + mx) for mq, _ in ops) / len(ops)
+        #     s += 1 - sx
+        score[model.varName(v)] = s
+
     # Enforce the following rules:
     # 1) Each mutation is assigned only to alleles that are present in the solution
     for a, mv in VKEEP.items():
@@ -426,10 +436,6 @@ def solve_minor_model(
             if max_sample < len(modes):
                 mi = list(modes.items())
                 modes = dict(mi[i] for i in range(0, len(mi), int(skip)))
-                # modes = dict(random.sample(modes.items(), int(max_sample)))
-        # random.sample(coverage.sam.grid, 500)
-        # for i in modes:
-        #     log.debug("{}", i)
         with Timing("[minor] Model setup"):
             vars = 0
             for ri, (rr, cnt) in enumerate(modes.items()):
@@ -456,12 +462,16 @@ def solve_minor_model(
                             vtype="B", name=f"PHASE_{ai}_{ri}", update=False
                         )
                         vars += 1
-                        model.addConstr(VPHASE[ai, ri] <= VA[a], name=f"PHASE1_{ai}_{ri}")
+                        model.addConstr(
+                            VPHASE[ai, ri] <= VA[a], name=f"PHASE1_{ai}_{ri}"
+                        )
                         e = 0
                         for i, vm in enumerate(pos):
                             v_vp = model.prod(
                                 model.addVar(
-                                    vtype="B", name=f"PHASE2_{ai}_{ri}_{i}", update=False
+                                    vtype="B",
+                                    name=f"PHASE2_{ai}_{ri}_{i}",
+                                    update=False,
                                 ),
                                 [v, vm],
                             )
@@ -470,7 +480,9 @@ def solve_minor_model(
                         for i, vm in enumerate(neg):
                             v_vp = model.prod(
                                 model.addVar(
-                                    vtype="B", name=f"PHASE3_{ai}_{ri}_{i}", update=False
+                                    vtype="B",
+                                    name=f"PHASE3_{ai}_{ri}_{i}",
+                                    update=False,
                                 ),
                                 [v, vm],
                             )
@@ -478,7 +490,9 @@ def solve_minor_model(
                             e += v_vp
                         VPHASEERR.append(cnt * e)
             for ri, _ in enumerate(modes):
-                v = [VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE]
+                v = [
+                    VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE
+                ]
                 if v:
                     e = model.quicksum(v)
                     model.addConstr(e <= 1, name=f"PHASE4_{ri}_1")
@@ -488,7 +502,7 @@ def solve_minor_model(
 
     # Objective: minimize the absolute sum of errors ...
     objective = offset
-    o_error = model.abssum(v for _, v in VERR.items())
+    o_error = model.abssum((v for v in VERR.values()), coeffs=score)
     objective += o_error
     # ... and penalize the misses ...
     o_penal = MISS_PENALTY_FACTOR * model.quicksum(len(VKEEP[a]) * VA[a] for a in VKEEP)
@@ -520,7 +534,7 @@ def solve_minor_model(
             o_penal += ADD_PENALTY_FACTOR / 2 * vo
     objective += o_penal
 
-    PHASE_ERROR = 0.5
+    PHASE_ERROR = 0.4
     o_phase = PHASE_ERROR * model.quicksum(VPHASEERR)
     objective += o_phase
 
@@ -631,7 +645,7 @@ def solve_minor_model(
     if not results:
         log.debug("[minor] solution= []")
         debug_info["sol"] = []
-        if debug and "ALDY_IIS" in environ:  # Enable to debug infeasible models
+        if debug and "ALDY_IIS" in os.environ:  # Enable to debug infeasible models
             model.model.computeIIS()
             model.dump(f"{debug}.iis.ilp")
     return sorted(results.values(), key=lambda x: str(x.get_minor_diplotype()))

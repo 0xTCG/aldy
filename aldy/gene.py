@@ -127,7 +127,7 @@ class CNConfig:
     description: str = ""
 
     def __str__(self):
-        cov = "|".join("".join(str(self.cn[g][r]) for r in self.cn[0]) for g in self.cn)
+        cov = "|".join("".join(str(g[r]) for r in self.cn[0]) for g in self.cn)
         alleles = " ".join(natsorted(self.alleles))
         return f"CNConfig({str(self.kind)[13:]}; vector={cov}; alleles=[{alleles}])"
 
@@ -247,7 +247,7 @@ class Gene:
             self.genome = genome
         else:
             self.genome = list(yml["reference"]["mappings"].keys())[0]  # type: ignore
-        self._init_basic(name, yml)
+        self._init_basic(yml)
         self._init_regions(yml)
         self._init_alleles(yml)
         self._init_partials()
@@ -400,7 +400,7 @@ class Gene:
     def __repr__(self):
         return f"Gene({self.name})"
 
-    def _init_basic(self, gene: str, yml) -> None:
+    def _init_basic(self, yml) -> None:
         """
         Read basic gene properties (``name``, ``seq`` and ``region``).
 
@@ -505,7 +505,9 @@ class Gene:
         }
         for i in self.chr_to_ref:
             if i not in self._region_at:
-                raise AldyException(f"Position {i} not within a named region of {self.name}")
+                raise AldyException(
+                    f"Position {i} not within a named region of {self.name}"
+                )
         self.unique_regions = yml["structure"]["cn_regions"]
 
     def _init_alleles(self, yml) -> None:
@@ -665,7 +667,7 @@ class Gene:
         default_cn = [
             {r: 1 for r in self.regions[g]} for g in range(1 + has_pseudogenes)
         ]
-        self.cn_configs = {min(v.alleles): v for k, v in self.cn_configs.items()}
+        self.cn_configs = {min(v.alleles): v for v in self.cn_configs.values()}
         self.cn_configs["1"] = CNConfig(
             default_cn,
             CNConfigType.DEFAULT,

@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Iterable
+from typing import Iterable, Any
 
 import pkg_resources
 import re
@@ -221,7 +221,7 @@ class Timing:
         self.start = time.time()
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *_):
         self.end = time.time()
         log.debug("{} took {}", self.name, self.end - self.start)
 
@@ -264,6 +264,9 @@ def colorize(text: str, color: str = "green") -> str:
     Returns:
         str: Colorized string (on xterm-compatible terminals) with a given color.
     """
+
+    import logbook._termcolors
+
     return logbook._termcolors.colorize(color, text)
 
 
@@ -289,4 +292,4 @@ class JsonDict(dict):
         return self.get(key)
 
 
-json = JsonDict()
+json: Any = JsonDict()
