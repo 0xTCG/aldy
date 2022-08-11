@@ -191,11 +191,11 @@ class Gurobi:  # pragma: no cover
         Get the value of the solved variable.
         Automatically adjusts the return type based on the variable type.
         """
-        if hasattr(var, 'vtype') and var.vtype == self.gurobipy.GRB.BINARY:
+        if hasattr(var, "vtype") and var.vtype == self.gurobipy.GRB.BINARY:
             return round(var.x) > 0
-        if hasattr(var, 'vtype') and var.vtype == self.gurobipy.GRB.INTEGER:
+        if hasattr(var, "vtype") and var.vtype == self.gurobipy.GRB.INTEGER:
             return int(round(var.x))
-        elif hasattr(var, 'x'):
+        elif hasattr(var, "x"):
             return var.x
         else:
             return var.getValue()
@@ -380,7 +380,7 @@ class CBC(SCIP):
             kwargs["name"] = escape_name(kwargs["name"], self.names)
         return self.model.Add(*args, **kwargs)
 
-    def addVar(self, *args, **kwargs):
+    def addVar(self, *_, **kwargs):
         name = escape_name(kwargs.get("name", ""), self.names)
         lb = kwargs.get("lb", 0)
         ub = kwargs.get("ub", self.INF)

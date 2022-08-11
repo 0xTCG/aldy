@@ -12,7 +12,7 @@ from .common import AldyException, log
 from .gene import Gene
 
 
-def query(gene: Gene, query: str, full=True):
+def query(gene: Gene, query: str):
     minors = {m: a for a, al in gene.alleles.items() for m in al.minors}
     alts = {
         mal.alt_name: (a, m)
@@ -86,7 +86,7 @@ def query(gene: Gene, query: str, full=True):
         log.info(f"    Minor alleles: {mins if mins else 'none'}")
 
 
-def print_cn(gene: Gene, major: str, full=False):
+def print_cn(gene: Gene, major: str):
     if major not in gene.cn_configs:
         raise AldyException(f"Structural allele {major} not found in {gene.name}")
 
@@ -103,7 +103,7 @@ def print_cn(gene: Gene, major: str, full=False):
         print_majors(gene, major)
 
 
-def print_majors(gene: Gene, major: str, full=False):
+def print_majors(gene: Gene, major: str):
     if major not in gene.alleles:
         raise AldyException(f"Major star-allele {major} not found in {gene.name}")
 

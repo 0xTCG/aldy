@@ -12,8 +12,8 @@ alleles:
     activity: decreased function
     label: HapB3
     mutations:
-    - [346167, C>G, rs75017182]
-    - [352197, G>A, rs56038477]
+    - [346167, C>G, rs75017182, intronic]
+    - [352197, G>A, rs56038477, intronic]
   DPYD*2A:
     pharmvar: https://www.pharmvar.org/haplotype/983
     activity: no function

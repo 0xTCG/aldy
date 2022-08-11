@@ -1,3 +1,5 @@
+options:
+  min_mapq: 0
 CFTR:
   down: [2415408.0]
   e1: [21015.0]

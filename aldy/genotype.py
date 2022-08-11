@@ -39,7 +39,6 @@ def genotype(
     output_file: Optional[Any] = sys.stdout,
     cn_region: Optional[GRange] = None,
     cn_solution: Optional[List[str]] = None,
-    threshold: float = 0.5,
     solver: str = "any",
     reference: Optional[str] = None,
     gap: int = 0,
@@ -49,7 +48,8 @@ def genotype(
     phase: Optional[str] = None,
     report: bool = False,
     genome=None,
-    min_cov: Optional[str] = None,
+    is_simple: bool = False,
+    **params,
 ) -> Dict[str, List[solutions.MinorSolution]]:
     """
     Genotype a sample.
@@ -113,7 +113,6 @@ def genotype(
     # Test the existence of LP solver
     _ = lp_model("init", solver)
 
-    sample_name = os.path.splitext(os.path.basename(sam_path))[0]
     with open(sam_path):  # Check if file exists
         pass
     kind, g = sam.detect_genome(sam_path)
@@ -154,7 +153,6 @@ def genotype(
                     output_file,
                     cn_region,
                     cn_solution,
-                    threshold,
                     solver,
                     reference,
                     gap,
@@ -164,7 +162,8 @@ def genotype(
                     phase,
                     report,
                     genome,
-                    min_cov,
+                    is_simple,
+                    **params,
                 )
             except AldyException as ex:
                 log.error(f"Failed gene {a.upper()}")
@@ -194,8 +193,6 @@ def genotype(
         cn_region = None
         cn_solution = ["1", "1"]
         profile_name = "illumina"
-        if not min_cov:
-            min_cov = "5.0"
     elif profile_name == "wgs":
         profile_name = "illumina"
     elif profile_name == "pgrnseq-v1":
@@ -207,30 +204,30 @@ def genotype(
 
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
-        profile = sam.Profile("user_provided", None, None, 0, ["1", "1"])
+        profile = sam.Profile("user_provided", cn_solution=["1", "1"])
         sample = sam.Sample(gene=gene, profile=profile, vcf_path=sam_path, debug=debug)
     else:
         if cn_solution:
-            profile = sam.Profile("user_provided", None, None, 0, cn_solution)
+            profile = sam.Profile("user_provided", cn_solution=cn_solution)
         else:
-            profile = sam.Sample.load_profile(gene, profile_name, cn_region)
+            profile = sam.Sample.load_profile(gene, profile_name, cn_region, **params)
         sample = sam.Sample(
             gene=gene,
             sam_path=sam_path,
-            threshold=threshold,
             profile=profile,
             reference=reference,
             debug=debug,
-            min_cov=float(min_cov) if min_cov else 2.0,
         )
 
-    json[gene.name].update({"sample": os.path.basename(sam_path).split(".")[0]})
+    json[gene.name].update({"sample": sample.name})
     is_vcf = output_file and output_file.name.endswith(".vcf")
-    is_simple = output_file and output_file.name.endswith(".simple")
+    is_simple = is_simple or (
+        output_file is not None and output_file.name.endswith(".simple")
+    )
     is_aldy = output_file and not (is_vcf or is_simple)
     if is_simple:
         print(
-            sample.coverage.sam.sample_name,
+            sample.name,
             gene.name,
             sep="\t",
             end="\t",
@@ -270,7 +267,7 @@ def genotype(
     # Get major solutions and pick the best one
     if multiple_warn_level >= 3 and len(cn_sols) > 1:
         log.warn("WARNING: multiple gene structures found!")
-    log.info(f"Potential {gene.name} gene structures for {sample_name}:")
+    log.info(f"Potential {gene.name} gene structures for {sample.name}:")
     major_sols: list = []
     cn_sols = sorted(cn_sols, key=lambda m: (int(1000 * m.score), m._solution_nice()))
     if len(cn_sols) == 0:
@@ -316,7 +313,7 @@ def genotype(
 
     if multiple_warn_level >= 2 and len(major_sols) > 1:
         log.warn("WARNING: multiple major solutions found!")
-    log.info(f"Potential major {gene.name} star-alleles for {sample_name}:")
+    log.info(f"Potential major {gene.name} star-alleles for {sample.name}:")
     for i, major_sol in enumerate(major_sols):
         conf = 100 * (min_major_score + SLACK) / (major_sol.score + SLACK)
         log.info(f"  {i + 1:2}: {major_sol._solution_nice()} (confidence: {conf:.0f}%)")
@@ -360,12 +357,12 @@ def genotype(
     if multiple_warn_level >= 1 and len(minor_sols) > 1:
         log.warn("WARNING: multiple optimal solutions found!")
     log.info(
-        f"{{}} {gene.name} star-alleles for {sample_name}:",
+        f"{{}} {gene.name} star-alleles for {sample.name}:",
         "Best" if len(minor_sols) == 1 else "Potential",
     )
     if is_aldy:
         print("#" + "\t".join(OUTPUT_COLS), file=output_file)
-    simple = [sample.coverage.sam.sample_name, gene.name]
+    simple = [sample.name, gene.name]
     for i, minor_sol in enumerate(minor_sols):
         conf = 100 * (min_minor_score + SLACK) / (minor_sol.score + SLACK)
         log.info(
@@ -380,12 +377,12 @@ def genotype(
         if is_aldy:
             print(f"#Solution {i + 1}: {minor_sol._solution_nice()}", file=output_file)
             diplotype.write_decomposition(
-                sample_name, gene, i + 1, minor_sol, output_file
+                sample.name, gene, i + 1, minor_sol, output_file
             )
         elif is_simple:
             print(simple[-2], simple[-1], sep="\t", end="\t", file=output_file)
     if is_vcf:
-        diplotype.write_vcf(sample_name, gene, sample.coverage, minor_sols, output_file)
+        diplotype.write_vcf(sample.name, gene, sample.coverage, minor_sols, output_file)
     elif is_simple:
         print(file=output_file)
     log.debug("[simple]\t{}", "\t".join(simple))

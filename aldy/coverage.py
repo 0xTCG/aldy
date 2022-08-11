@@ -6,13 +6,11 @@
 
 from typing import Dict, Tuple, Callable, List, Any
 
-import collections
-import statistics
+import math
+import copy
 
-from .common import log, AldyException, script_path
+from .common import log, AldyException
 from .gene import Mutation, Gene
-
-MIN_QUAL = 10
 
 
 class Coverage:
@@ -27,8 +25,6 @@ class Coverage:
         sam,
         coverage: Dict[int, Dict[str, List]],
         cnv_coverage: Dict[int, int],
-        threshold: float,
-        min_cov: float = 1.0,
     ) -> None:
         """
         Coverage initialization.
@@ -39,10 +35,6 @@ class Coverage:
             reads supporting that mutation.
             For example, ``coverage[10]['A>G'] = 2`` means that there are 2 reads that
             have G (instead of A) at the genomic locus 10.
-        :param threshold:
-            Threshold `t` used for filtering out low-quality mutations.
-            Any mutation with the coverage less than `t`% is filtered out.
-            Ranges from 0 to 1 (normalized percentage).
         :param cnv_coverage:
             Coverage of the copy-number neutral region of the sample: each genomic locus
             within that region points to the corresponsing read coverage.
@@ -52,12 +44,8 @@ class Coverage:
         self.gene = gene
         self.profile = profile
         self.sam = sam
-
         self._coverage = coverage
         self._cnv_coverage = cnv_coverage
-        self._threshold = threshold
-        self.min_cov = min_cov
-
         self._region_coverage: Dict[Tuple[int, str], float] = {}
 
     def __getitem__(self, mut: Mutation) -> float:
@@ -106,24 +94,28 @@ class Coverage:
             len(self._coverage) + 0.1
         )
 
-    def dump(self, out):
+    def dump(self, out=None):
         for pos, pos_mut in sorted(self._coverage.items()):
-            if not (len(pos_mut) == 1 and "_" in pos_mut):
-                for i, (op, cov) in enumerate(sorted(pos_mut.items(), reverse=True)):
-                    p = self.percentage(Mutation(pos, op))
-                    if pos in self.gene:
-                        x = self.gene.get_functional((pos, op))
-                        if op == "_":
-                            x = ""
-                        if x and (pos, op) not in self.gene.mutations:
-                            x += "**"
-                        t = f"{x if x else ''}\t{self.gene.region_at(pos)[1]}"
-                        t += "\t" + self.gene.get_rsid((pos, op))
-                    else:
-                        t = "\t\t"
-                    # out(
-                    #     f"[dump] {self.sample}\t{gene.name}\t{gene.chr_to_ref.get(pos, '-')+1}\t{op}\t{p:.1f}\t{t}"
-                    # )
+            if len(pos_mut) == 1 and "_" in pos_mut:
+                continue
+            for _, (op, _) in enumerate(sorted(pos_mut.items(), reverse=True)):
+                p = self.percentage(Mutation(pos, op))
+                if pos in self.gene:
+                    x = self.gene.get_functional((pos, op))
+                    if op == "_":
+                        x = ""
+                    if x and (pos, op) not in self.gene.mutations:
+                        x += "**"
+                    r = self.gene.region_at(pos)
+                    t = f"{x if x else ''}\t{r[1] if r else ''}"
+                    t += "\t" + self.gene.get_rsid((pos, op))
+                else:
+                    t = "\t\t"
+                if out:
+                    out(
+                        f"[dump] {self.sam.name}\t{self.gene.name}\t"
+                        f"{self.gene.chr_to_ref.get(pos, -1) + 1}\t{op}\t{p:.1f}\t{t}"
+                    )
 
     def filtered(self, filter_fn: Callable[[Any, Mutation], List]):  # -> Coverage
         """
@@ -140,24 +132,14 @@ class Coverage:
         :return: Filtered coverage.
         """
 
-        cov = {}
+        new_cov = copy.copy(self)
+        new_cov._coverage = {}
         for pos, pos_mut in self._coverage.items():
-            cov[pos] = {}
-            for o, c in pos_mut.items():
+            new_cov._coverage[pos] = {}
+            for o in pos_mut:
                 f = filter_fn(self, Mutation(pos, o))
                 if f:
-                    cov[pos][o] = f
-
-        new_cov = Coverage(
-            self.gene,
-            self.profile,
-            self.sam,
-            cov,
-            self._cnv_coverage,
-            self._threshold,
-            self.min_cov,
-        )
-        new_cov._region_coverage = self._region_coverage
+                    new_cov._coverage[pos][o] = f
         return new_cov
 
     def diploid_avg_coverage(self) -> float:
@@ -175,8 +157,6 @@ class Coverage:
             self._cnv_coverage[i]
             for i in range(self.profile.cn_region.start, self.profile.cn_region.end)
         )
-        # print(self._cnv_coverage, cn_region, sam_ref)
-
         if sam_ref == 0:
             raise AldyException(
                 f"CN-neutral region {self.profile.cn_region} has no reads. "
@@ -200,94 +180,16 @@ class Coverage:
         """
         Basic filtering function.
         """
-        thres = thres if thres else self._threshold
-        if cn:
-            thres /= cn
+        thres = (thres or self.profile.threshold) / (cn or 1)
         quals = self._coverage[mut.pos][mut.op]
-        cond = len(quals) >= max(self.min_cov, self.total(mut.pos) * thres)
-        return quals if cond else []
+        min_cov = max(self.profile.min_coverage, self.total(mut.pos) * thres)
+        return quals if len(quals) >= min_cov else []
 
     def quality_filter(self, mut: Mutation) -> List:
         quals = self._coverage[mut.pos].get(mut.op, [])
-        return [(m, q) for m, q in quals if m >= MIN_QUAL if q if q >= MIN_QUAL]
-
-    # @deprecated
-    def _load_phase(self, gene, ploidy=2):
-        """Loads a HapTree-X/HapCUT2 phase file."""
-
-        if len(self.fragments) == 0:
-            return
-
-        import subprocess, os, tempfile
-
-        phases: List[List[Mutation]] = []
-        with tempfile.TemporaryDirectory() as tmp:
-            snps = {}
-            for read in self.fragments:
-                for pos, op in read:
-                    snps.setdefault(pos, set()).add(op)
-            snps = {pos: ops for pos, ops in snps.items() if len(ops) > 1}
-            frags = {}
-            for read in self.fragments:
-                key = tuple(sorted([(pos, op) for pos, op in read if pos in snps]))
-                if key not in frags:
-                    frags[key] = 0
-                frags[key] += 1
-
-            frag_file = f"{tmp}/fragments.txt"
-            with open(frag_file, "w") as fo:
-                for s, c in frags.items():
-                    if not s:
-                        continue
-                    fo.write(f"{c}")
-                    for p, a in s:
-                        fo.write(f";{p},{a}")
-                    fo.write("\n")
-            phase_file = f"{tmp}/phase.txt"
-
-            htx = script_path("aldy.resources/haptreex")
-            # subprocess.run(f"cp {frag_file} _y", shell=True)
-            cmd = [htx, "--aldy", frag_file, "-o", phase_file, "-p", str(ploidy)]
-            ret = subprocess.run(cmd, env={**os.environ, "OMP_NUM_THREADS": "1"})
-            if ret.returncode != 0:
-                raise AldyException(
-                    "HapTree-X failed"
-                    + (": " + ret.stderr.decode("ascii") if ret.stderr else ""),
-                )
-            log.debug("HapTree-X done")
-
-            haplotypes = [[] for _ in range(ploidy)]
-            _, g_s, g_e = gene.get_wide_region()
-            with open(phase_file) as hap:
-                for li, line in enumerate(hap):
-                    if line[:5] == "BLOCK":
-                        if haplotypes[0]:
-                            phases += list(haplotypes)
-                        haplotypes = [], []
-                    elif line[:5] == "*****":
-                        continue
-                    else:
-                        ls = line.strip().split("\t")
-                        if len(ls) < 7:
-                            raise AldyException(f"Invalid phasing line {li + 1}")
-                        _, gt0_, gt1_, _, pos_, al0, al1, *_ = ls
-                        gt0, gt1, pos = int(gt0_), int(gt1_), int(pos_) - 1
-                        if gt0 + gt1 != 1:
-                            continue
-                        if pos < g_s or pos >= g_e:
-                            continue
-
-                        if (pos, f"{al0}>{al1}") not in gene.mutations:
-                            if (pos, f"{al1}>{al0}") in gene.mutations:
-                                log.warn(f"reorienting {pos} {al0} {al1}")
-                                al1, al0 = al0, al1
-                                gt0, gt1 = gt1, gt0
-                        haplotypes[0].append(
-                            Mutation(pos, f"{al0}>{al1}" if gt0 else "_")
-                        )
-                        haplotypes[1].append(
-                            Mutation(pos, f"{al0}>{al1}" if gt1 else "_")
-                        )
-            if haplotypes[0]:
-                phases += [haplotypes[0], haplotypes[1]]
-        self.phases = phases
+        return [
+            (m, q)
+            for m, q in quals
+            if q >= self.profile.min_quality
+            if m >= self.profile.min_mapq
+        ]
