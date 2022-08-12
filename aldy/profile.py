@@ -46,20 +46,19 @@ class Profile:
         self.cn_fusion_left = float(params.get("cn_fusion_left", 0.5))
         self.cn_fusion_right = float(params.get("cn_fusion_right", 0.25))
 
+        # Penalty for each novel functional mutation (0 for no penalty).
+        # Should be large enough to prevent novel mutations unless really necessary.
         self.major_novel = float(params.get("major_novel", 21.0))  # MAX_CN + 1
-        """Penalty for each novel functional mutation (0 for no penalty).
-            Should be large enough to prevent novel mutations unless really necessary."""
 
+        # Penalty for each missed minor mutation (0 for no penalty).
+        # Ideally larger than `ADD_PENALTY_FACTOR` as additions should be cheaper.
         self.minor_miss = float(params.get("minor_miss", 1.5))
-        """ Penalty for each missed minor mutation (0 for no penalty).
-            Ideally larger than `ADD_PENALTY_FACTOR` as additions should be cheaper.
-        """
+
         self.minor_add = float(params.get("minor_add", 1.0))
-        """ Penalty for each novel minor mutation (0 for no penalty).
-            Zero penalty always prefers mutation additions over coverage errors if the
-            normalized SNP slack coverage is >= 50%.
-            Penalty of 1.0 prefers additions if the SNP slack coverage is >= 75%.
-        """
+        # Penalty for each novel minor mutation (0 for no penalty).
+        # Zero penalty always prefers mutation additions over coverage errors if the
+        # normalized SNP slack coverage is >= 50%.
+        # Penalty of 1.0 prefers additions if the SNP slack coverage is >= 75%.
         self.minor_phase = float(params.get("minor_phase", 0.4))
 
         log.debug(
@@ -122,6 +121,7 @@ class Profile:
     @staticmethod
     def get_sam_profile_data(
         sam_path: str,
+        ref_path: Optional[str] = None,
         regions: Dict[Tuple[str, str, int], GRange] = dict(),
         cn_region: Optional[GRange] = None,
         genome: Optional[str] = "hg19",
@@ -183,8 +183,8 @@ class Profile:
         for c, (s, e) in natsorted(chr_regions.items()):
             if sam_path == "<illumina>":
                 continue
-            with pysam.AlignmentFile(
-                sam_path, reference_filename="../data/ref/hg19.fa"
+            with pysam.AlignmentFile(  # type: ignore
+                sam_path, reference_filename=ref_path
             ) as sam:
                 region = GRange(c, s, e).samtools(
                     pad_left=1000,
@@ -215,7 +215,7 @@ class Profile:
                 except ValueError:
                     log.warn("Cannot fetch {}", region)
 
-        d = {}
+        d: Dict = {}
         for (g, r, ri), (c, s, e) in gene_regions.items():
             if g not in d:
                 d[g] = {}

@@ -5,11 +5,10 @@
 
 
 from typing import List, Dict, Any
-
+from natsort import natsorted
 import collections
 import re
 
-from natsort import natsorted
 from .common import td
 from .gene import Gene, Mutation
 from .coverage import Coverage

@@ -7,11 +7,10 @@
 from typing import Tuple, Dict, List, Optional, Set, NamedTuple
 from dataclasses import dataclass, field
 from enum import Enum
-
+from natsort import natsorted
 import os
 import yaml
 import collections
-from natsort import natsorted
 
 from .common import (
     GRange,
@@ -202,7 +201,7 @@ class Gene:
 
     # Mutations
     mutations: Dict[Tuple[int, str], Tuple[Optional[str], str, int, str]]
-    random_mutations: Set[Tuple[Optional[str], str, int, str]]
+    random_mutations: Set[Mutation]
 
     # Copy number configurations
     do_copy_number: bool

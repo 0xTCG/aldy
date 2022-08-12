@@ -4,22 +4,17 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import collections
 from typing import Tuple, Dict, List, Optional, Any, Set
-
+from dataclasses import dataclass
+from collections import defaultdict, Counter
+from statistics import mean
 import pysam
 import os
 import os.path
-import yaml
 import gzip
 import tarfile
 import pickle
 
-
-from dataclasses import dataclass
-from collections import defaultdict, Counter
-from natsort import natsorted
-from statistics import mean
 from .common import log, GRange, AldyException, script_path, Timing, chr_prefix
 from .gene import Gene, Mutation, CNConfigType
 from .coverage import Coverage
@@ -98,13 +93,14 @@ class Sample:
         self.gene = gene
 
         # Phasing information!
-        self.grid_columns = sorted({pos for pos, _ in gene.mutations})
-        self.grid_columns = {pos: i for i, pos in enumerate(self.grid_columns)}
-        self.phases = {}
-        self.moved = {}
+        self.grid_columns = {
+            pos: i for i, pos in enumerate(sorted({pos for pos, _ in gene.mutations}))
+        }
+        self.phases: Dict[str, Dict[int, str]] = {}
+        self.moved: Dict = {}
 
         self.profile = profile
-        self._fusion_counter = {}
+        self._fusion_counter: Dict = {}
 
         with Timing("[sam] Read SAM"):
             is_sam = False
@@ -175,7 +171,9 @@ class Sample:
         norm: dict = defaultdict(list)
         muts: dict = defaultdict(list)
 
-        with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam:
+        with pysam.AlignmentFile(  # type: ignore
+            sam_path, reference_filename=reference
+        ) as sam:
             # Check do we have proper index to speed up the queries
             try:
                 has_index = sam.check_index()
@@ -240,8 +238,10 @@ class Sample:
             If None, profile loading and coverage rescaling will be skipped
             (and Aldy will require a ``--cn`` parameter to be user-provided).
         """
-        self._dump_cn = collections.defaultdict(int)
-        with pysam.AlignmentFile(path, reference_filename=reference) as sam:
+        self._dump_cn = defaultdict(int)
+        with pysam.AlignmentFile(  # type: ignore
+            path, reference_filename=reference
+        ) as sam:
             # Check do we have proper index to speed up the queries
             try:
                 has_index = sam.check_index()
@@ -305,7 +305,7 @@ class Sample:
                 log.trace(f"[sam] ignoring {pos}: {ref}->{alt}")
                 return pos, None
 
-        with pysam.VariantFile(vcf_path) as vcf:
+        with pysam.VariantFile(vcf_path) as vcf:  # type: ignore
             self._prefix = chr_prefix(gene.chr, list(vcf.header.contigs))
 
             samples = list(vcf.header.samples)
@@ -344,10 +344,11 @@ class Sample:
                     ):
                         for p in range(len(l)):
                             if l[p] != ".":
-                                muts[pos + p, f"{l[p]}>{r[p]}"] -= 10
+                                np = pos + p, f"{l[p]}>{r[p]}"
+                                muts[np] = muts[np][:-10]
                                 if p:
                                     norm[pos + p] += [(40, 40)] * 10
-                        muts[pos, op] += 10
+                        muts[pos, op] += [(40, 40)] * 10
         return norm, muts
 
     def _load_dump(self, dump_path: str, gene: str):
@@ -375,7 +376,9 @@ class Sample:
             phases,
             self._fusion_counter,
             self._insertion_reads,
-        ) = pickle.load(fd)
+        ) = pickle.load(
+            fd  # type: ignore
+        )
         self.phases = {f"r{i}": v for i, v in enumerate(phases)}
         norm = {p: [q for q, n in c.items() for _ in range(n)] for p, c in norm.items()}
         muts = {p: [q for q, n in c.items() for _ in range(n)] for p, c in muts.items()}
@@ -528,9 +531,9 @@ class Sample:
         """
 
         def bin_quality(q):
-            """Inspired by https://www.illumina.com/content/dam/illumina-marketing/documents/products/technotes/technote_understanding_quality_scores.pdf"""
+            """Inspired by https://www.illumina.com/content/dam/illumina-marketing/docum ents/products/technotes/technote_understanding_quality_scores.pdf"""  # noqa
             if q < 2:
-                return q
+                return int(q)
             if 2 <= q < 10:
                 return 6
             if 10 <= q < 20:
@@ -695,14 +698,14 @@ class Sample:
             self._fusion_counter = {}
             for n, cn in gene.cn_configs.items():
                 if cn.kind == CNConfigType.LEFT_FUSION:
-                    sig, pos = 0, next(i for i, j in cn.cn[0].items() if j == 1)
+                    s, pos = 0, next(i for i, j in cn.cn[0].items() if j == 1)
                 elif cn.kind == CNConfigType.RIGHT_FUSION:
-                    sig, pos = 1, next(i for i, j in cn.cn[0].items() if j == 0)
+                    s, pos = 1, next(i for i, j in cn.cn[0].items() if j == 0)
                 else:
                     continue
                 sig = (
-                    (1 - sig, list(cn.cn[0])[list(cn.cn[0]).index(pos) - 1]),
-                    (sig, pos),
+                    (1 - s, list(cn.cn[0])[list(cn.cn[0]).index(pos) - 1]),
+                    (s, pos),
                 )
                 self._fusion_counter[n] = [0, 0]
                 if sig[0][1] in gene.unique_regions or sig[1][1] in gene.unique_regions:
@@ -710,16 +713,19 @@ class Sample:
 
             log.debug("[sam] PacBio remapping enabled")
 
-        with pysam.AlignmentFile(sam_path, reference_filename=reference) as sam, Timing(
-            "[sam] Remap"
-        ):
+        with pysam.AlignmentFile(  # type: ignore
+            sam_path, reference_filename=reference
+        ) as sam, Timing("[sam] Remap"):
             # Assumes SAM index exists
             self._prefix = chr_prefix(gene.chr, [x["SN"] for x in sam.header["SQ"]])
 
-            rng = [*gene.get_wide_region()]
-            if gene.name == "CYP2D6":
-                rng[2] = 42_155_000  # include CYP2D8 [hg38]
-            rng = GRange(*rng)
+            wide = gene.get_wide_region()
+            rng = GRange(
+                wide.chr,
+                wide.start,
+                # include CYP2D8 [hg38]
+                42_155_000 if gene.name == "CYP2D6" else wide.end,
+            )
             counter = 0
             iter = sam.fetch(region=rng.samtools(prefix=self._prefix))
             for read in iter:
@@ -870,7 +876,7 @@ class Sample:
     def _dump_alignments(self, debug: str, norm, muts):
         with open(f"{debug}.genome", "w") as fd:
             print(self.gene.genome, file=fd)
-        with gzip.open(f"{debug}.dump", "wb") as fd:
+        with gzip.open(f"{debug}.dump", "wb") as fd:  # type: ignore
             pickle.dump(
                 (
                     self.name,
@@ -881,14 +887,14 @@ class Sample:
                     self._fusion_counter,
                     self._insertion_reads,
                 ),
-                fd,
+                fd,  # type: ignore
             )
 
 
 def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
     try:
-        pysam.set_verbosity(0)
-        with pysam.AlignmentFile(sam_path) as sam:
+        pysam.set_verbosity(0)  # type: ignore
+        with pysam.AlignmentFile(sam_path) as sam:  # type: ignore
             try:
                 sam.check_index()
             except AttributeError:
@@ -916,12 +922,12 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
                 return "sam", None
     except (ValueError, OSError):
         try:
-            with pysam.VariantFile(sam_path):
+            with pysam.VariantFile(sam_path):  # type: ignore
                 return "vcf", None
         except (ValueError, OSError):
             if sam_path.endswith(".tar.gz"):
                 tar = tarfile.open(sam_path, "r:gz")
-                f = [i for i in tar.getnames() if i.endswith(f".genome")]
+                f = [i for i in tar.getnames() if i.endswith(".genome")]
                 if not f:
                     raise AldyException("Invalid dump file")
                 data = tar.extractfile(f[0])
@@ -931,23 +937,7 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
     return "", None
 
 
-def _chr_prefix(ch: str, chrs: List[str]) -> str:  # assumes ch is not prefixed
-    """
-    Check if `ch` (*without any chr prefix*) should be prefixed with "chr" or not.
-
-    Returns:
-        str: Prefix to be prepended to chromosome (empty if needed).
-
-    Params:
-        ch (str): chromosome name
-        chrs (list[str]): list of chromosome names in the alignment file
-    """
-    if ch not in chrs and "chr" + ch in chrs:
-        return "chr"
-    return ""
-
-
-def _in_region(region: GRange, read: pysam.AlignedSegment, prefix: str) -> bool:
+def _in_region(region: GRange, read, prefix: str) -> bool:
     """
     Returns ``True`` if a read is located within a given gene region.
 

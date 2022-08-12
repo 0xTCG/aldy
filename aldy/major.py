@@ -5,11 +5,9 @@
 
 
 from typing import List, Dict, Tuple, Any, Optional
-
+from natsort import natsorted
 import collections
 import copy
-
-from natsort import natsorted
 
 from . import lpinterface
 from .common import log, json, sorted_tuple
@@ -118,7 +116,7 @@ def solve_major_model(
     a: Any = 0  # HACK: silence type checker
 
     # Create a binary variable for every possible allele copy
-    alleles = {(a, 0): allele_dict[a] for a in allele_dict}
+    alleles = {(a, int(0)): allele_dict[a] for a in allele_dict}
     for (an, _), a in list(alleles.items()):
         max_cn = cn_solution.solution[a.cn_config]
         for i in range(1, max_cn):
@@ -310,8 +308,7 @@ def _print_candidates(
             + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
             + f"region={g[1] if g else '?'}; "
             + f"impact={gene.get_functional(m)}; "
-            # + f"qual=[{q}]"
-            + f")"
+            + ")"
         )
 
     log.debug("[major] candidate mutations=")

@@ -4,6 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
+from collections import Counter
 import pytest  # noqa
 
 from aldy.solutions import SolvedAllele, MinorSolution, MajorSolution, CNSolution
@@ -21,7 +22,9 @@ def assert_diplotype(gene, test, majors):
         else:
             sols.append(SolvedAllele(gene, ma))
     cns = [c for m in cns for c, cc in gene.cn_configs.items() if m in cc.alleles]
-    minor = MinorSolution(0, sols, MajorSolution(0, sols, CNSolution(gene, 0, cns), []))
+    minor = MinorSolution(
+        0, sols, MajorSolution(0, Counter(sols), CNSolution(gene, 0, cns), [])
+    )
     estimate_diplotype(gene, minor)
     assert test == minor.get_major_diplotype(), "Diplotype not equal"
 

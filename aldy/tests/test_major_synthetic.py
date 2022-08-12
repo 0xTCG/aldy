@@ -4,7 +4,8 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # type: ignore
+from typing import Any, List
+import pytest  # noqa
 import collections
 
 
@@ -31,10 +32,10 @@ def assert_major(gene, solver, major):
         for s in sols:
             assert abs(major["score"] - s.score) < SOLUTION_PRECISION, "Score"
 
-    sols_parsed = [
+    sols_parsed: List[Any] = [
         dict(
             collections.Counter(
-                [i.major for i, v in s.solution.items() for j in range(v)]
+                [i.major for i, v in s.solution.items() for _ in range(v)]
             )
         )
         for s in sols

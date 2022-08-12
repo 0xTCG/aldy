@@ -41,7 +41,7 @@ def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
         nonlocal lines
 
         s = str.format(*args)
-        lines += s.split("\n")
+        lines += s.split("\n")  # type: ignore
 
     monkeypatch.setattr(log, "info", log_info)
     if warn:
@@ -279,25 +279,15 @@ def test_NA07000_vcf_in(monkeypatch, solver):
     Potential SLCO1B1 gene structures for NA07000:
     1: 2x*1 (confidence: 100%)
     Potential major SLCO1B1 star-alleles for NA07000:
-    1: 1x*1, 1x*15 & rs4149057, rs2291075 (confidence: 100%)
-    2: 1x*1B, 1x*5 & rs4149057, rs2291075 (confidence: 100%)
-    WARNING: multiple optimal solutions found!
-    Potential SLCO1B1 star-alleles for NA07000:
-    1: *1+rs4149057+rs2291075 / *15 (confidence=100%)
-        Minor alleles: *1.001 +rs4149057 +rs2291075, *15.001
-    2: *1B+rs4149057+rs2291075 / *5 (confidence=100%)
-        Minor alleles: *1.002 +rs4149057 +rs2291075, *5.001
+    1: 1x*1, 1x*15 (confidence: 100%)
+    2: 1x*5, 1x*37 (confidence: 100%)
+    Best SLCO1B1 star-alleles for NA07000:
+    1: *1 / *15 (confidence=100%)
+        Minor alleles: *1.003, *15.001
     SLCO1B1 results:
-    - *1+rs4149057+rs2291075 / *15
-        Minor: [*1.001 +rs4149057 +rs2291075] / [*15.001]
-        Legacy notation: [*1A +rs4149057 +rs2291075] / [*15]
-    - *1B+rs4149057+rs2291075 / *5
-        Minor: [*1.002 +rs4149057 +rs2291075] / [*5.001]
-        Legacy notation: [*1B +rs4149057 +rs2291075] / [*5]
-    WARNING: mutations rs2291075, rs4149057 suggest presence of a novel major star-allele.
-    However, such alleles cannot be determined without phasing data.
-    Please provide --phase parameter for Aldy to accurately call novel major star-alleles.
-    The above-reported assignments of these mutations are random.
+    - *1 / *15
+        Minor: [*1.003] / [*15.001]
+        Legacy notation: [*1.003] / [*15A, SLCO1B1*15B, SLCO1B1*17]
     """
     file = script_path("aldy.tests.resources/NA07000_SLCO1B1.vcf.gz")
     assert_file(
@@ -343,7 +333,7 @@ def test_profile(monkeypatch, capsys):
         nonlocal lines
 
         s = str.format(*args)
-        lines += s.split("\n")
+        lines += s.split("\n")  # type: ignore
 
     monkeypatch.setattr(log, "info", log_info)
 

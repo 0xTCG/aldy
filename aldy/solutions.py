@@ -4,10 +4,11 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import collections
+from typing import List, Dict
 from dataclasses import dataclass, field
 from natsort import natsorted
-from typing import List, Dict, Optional
+from collections import Counter, defaultdict
+
 from .gene import Gene, Mutation
 
 
@@ -41,7 +42,7 @@ class CNSolution:
                     self.region_cn[gi][r] += g[r]
         self.gene = gene
         self.score = score
-        self.solution = collections.Counter(solution)
+        self.solution = Counter(solution)
 
     def __hash__(self):
         return str(self).__hash__()
@@ -89,13 +90,14 @@ class SolvedAllele:
 
     gene: Gene
     major: str
-    minor: Optional[str] = None
+    minor: str = ""
     added: List[Mutation] = field(default_factory=list)
     missing: List[Mutation] = field(default_factory=list)
 
     def mutations(self):
         m = self.gene.alleles[self.major].func_muts
-        m |= self.gene.alleles[self.major].minors[self.minor].neutral_muts
+        if self.minor:
+            m |= self.gene.alleles[self.major].minors[self.minor].neutral_muts
         m |= set(self.added)
         m -= set(self.missing)
         return m
@@ -230,7 +232,7 @@ class MinorSolution:
         m = gene.alleles[self.solution[i].major]
         t = [mi for mi in m.minors if mi == self.solution[i].minor]
         assert len(t) == 1
-        n = [m.minors[t[0]].alt_name if legacy and m.minors[t[0]].alt_name else t[0]]
+        n = [m.minors[t[0]].alt_name or t[0] if legacy else t[0]]
         for m in sorted(self.solution[i].added):
             n.append("+" + gene.get_rsid(m))
         for m in sorted(self.solution[i].missing):
@@ -249,7 +251,7 @@ class MinorSolution:
         )
 
     def get_mutation_coverages(self, coverage):
-        muts = collections.defaultdict(int)
+        muts = defaultdict(int)
         for sa in self.solution:
             for m in (
                 sa.gene.alleles[sa.major].func_muts

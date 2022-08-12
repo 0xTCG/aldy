@@ -5,7 +5,6 @@
 
 
 import pytest
-import ast
 
 from aldy.gene import Gene
 from aldy.common import script_path

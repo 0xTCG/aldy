@@ -5,7 +5,6 @@
 
 
 from typing import List, Optional, Any, Set, Dict
-
 import os
 import sys
 import pkg_resources
@@ -18,7 +17,6 @@ from . import major
 from . import minor
 from . import diplotype
 from . import solutions
-
 from .common import (
     colorize,
     log,
@@ -142,30 +140,33 @@ def genotype(
     else:
         avail_genes = gene_db.lower().split(",")
     if len(avail_genes) != 1:
-        res = {}
+        res: Dict = {}
         for a in avail_genes:
             log.warn("=" * 50)
             log.warn("Gene {}", a.upper())
             try:
-                res[a] = genotype(
-                    a,
-                    sam_path,
-                    profile_name,
-                    output_file,
-                    cn_region,
-                    cn_solution,
-                    solver,
-                    reference,
-                    gap,
-                    max_minor_solutions,
-                    debug,
-                    multiple_warn_level,
-                    phase,
-                    report,
-                    genome,
-                    is_simple,
-                    **params,
-                )
+                res = {
+                    **res,
+                    **genotype(
+                        a,
+                        sam_path,
+                        profile_name,
+                        output_file,
+                        cn_region,
+                        cn_solution,
+                        solver,
+                        reference,
+                        gap,
+                        max_minor_solutions,
+                        debug,
+                        multiple_warn_level,
+                        phase,
+                        report,
+                        genome,
+                        is_simple,
+                        **params,
+                    ),
+                }
             except AldyException as ex:
                 log.error(f"Failed gene {a.upper()}")
                 log.error(f"Message: {str(ex)}")

@@ -5,7 +5,6 @@
 
 
 from typing import Optional, Dict, Tuple, Iterable, Callable
-
 import importlib
 import collections
 
@@ -25,8 +24,7 @@ def escape_name(s: str, d: Optional[dict] = None) -> str:
     if d is not None:
         d[s] += 1
         if d[s] > 1:
-            # return s + "_" + ((d[s] - 1) * "x")
-            return s + f"_{d[s]}"  # + ((d[s] - 1) * "x")
+            return s + f"_{d[s]}"
     return s
 
 

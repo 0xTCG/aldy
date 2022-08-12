@@ -3,11 +3,11 @@
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
+from typing import List, Set, Callable, Optional, Tuple, Dict
+from natsort import natsorted
 import collections
 import os
-from typing import List, Set, Callable, Optional, Tuple, Dict
 
-from natsort import natsorted
 from . import lpinterface
 from .common import log, json, Timing
 from .gene import Mutation, Gene
@@ -43,7 +43,6 @@ def estimate_minor(
         Default is 1.
     :param debug:
         If set, create a "`debug`.minor`identifier`.lp" file for debug purposes.
-        Default is ``None``.
     """
 
     # Get the list of potential alleles and mutations
@@ -106,7 +105,7 @@ def estimate_minor(
         log.debug("*" * 80)
         majors = [m for m in major_sols if m.cn_solution == c]
         _print_candidates(gene, alleles, c, cov, mutations)
-        for i, major_sol in enumerate(natsorted(majors, key=lambda s: str(s.solution))):
+        for major_sol in natsorted(majors, key=lambda s: str(s.solution)):
             minor_sols += solve_minor_model(
                 gene,
                 alleles,
@@ -114,7 +113,6 @@ def estimate_minor(
                 major_sol,
                 mutations,
                 solver,
-                i,
                 max_solutions,
                 debug,
                 major_sol.score - min_score,
@@ -129,7 +127,6 @@ def solve_minor_model(
     major_sol: MajorSolution,
     mutations: Set[Mutation],
     solver: str,
-    identifier: int = 0,
     max_solutions: int = 1,
     debug: Optional[str] = None,
     offset: float = 0,
@@ -148,9 +145,6 @@ def solve_minor_model(
         (all other mutations are ignored).
     :param solver:
         ILP solver to use. Check :obj:`aldy.lpinterface` for available solvers.
-    :param identifier:
-        Unique solution identifier. Used for generating debug information.
-        Default is 0.
     :param max_solutions:
         Maximum number of solutions to report.
         Default is 1.
@@ -176,9 +170,7 @@ def solve_minor_model(
     }
 
     for a, _ in list(alleles):
-        max_cn = major_sol.solution[
-            SolvedAllele(gene, a.major, None, a.added, a.missing)
-        ]
+        max_cn = major_sol.solution[SolvedAllele(gene, a.major, "", a.added, a.missing)]
         for cnt in range(1, max_cn):
             alleles[a, cnt] = alleles[a, 0]
 
@@ -203,7 +195,7 @@ def solve_minor_model(
     # Disable other alleles
     model.addConstr(
         model.quicksum(VA.values()) <= sum(major_sol.solution.values()),
-        name=f"CCNT_OTHER",
+        name="CCNT_OTHER",
     )
 
     # Add a binary variable for each allele/mutation pair, where mutation belongs
@@ -423,7 +415,10 @@ def solve_minor_model(
                 for ai, a in enumerate(alleles):
                     # construct e_ar
                     # e[ai,ri]
-                    #  := ph[ai,ri] * sum(1 - ((mut in a & VK[a,m]) | (mut not in a & VN[a, m])) for mut in read)
+                    #  := ph[ai,ri] * sum(
+                    #     1 - ((mut in a & VK[a,m]) | (mut not in a & VN[a, m]))
+                    #     for mut in read
+                    #  )
                     #  := ph[ai,ri] * len(mut in read) - sum
                     pos, neg, e = [], [], 0
                     for m in mutations:

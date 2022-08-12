@@ -5,15 +5,13 @@
 
 
 from typing import Dict, List, Tuple, Optional
-
-import copy
-import re
 from math import ceil
 from natsort import natsorted
 from functools import partial
+import copy
+import re
 
 from . import lpinterface
-
 from .common import log, json, sorted_tuple, AldyException
 from .gene import CNConfig, CNConfigType, Gene
 from .coverage import Coverage
@@ -69,7 +67,7 @@ def estimate_cn(
         region_cov = {
             r: (
                 coverage.region_coverage(0, r),
-                coverage.region_coverage(1, r) if len(gene.regions) > 1 else 0,
+                coverage.region_coverage(1, r) if len(gene.regions) > 1 else 0.0,
             )
             for r in gene.unique_regions
         }
@@ -259,10 +257,10 @@ def solve_cn_model(
     PARSIMONY_PENALTY *= 0.75
     penalty = {s: PARSIMONY_PENALTY for s, _ in VCN}
     # Also penalize left fusions as they are not likely to occur.
-    for n, s in gene.cn_configs.items():
-        if n in penalty and s.kind == CNConfigType.RIGHT_FUSION:
+    for n, sv in gene.cn_configs.items():
+        if n in penalty and sv.kind == CNConfigType.RIGHT_FUSION:
             penalty[n] += PARSIMONY_PENALTY * profile.cn_fusion_right
-        if n in penalty and s.kind == CNConfigType.LEFT_FUSION:
+        if n in penalty and sv.kind == CNConfigType.LEFT_FUSION:
             penalty[n] += PARSIMONY_PENALTY * profile.cn_fusion_left
     o_pars = profile.cn_parsimony * model.quicksum(
         penalty[s] * v for (s, _), v in VCN.items()

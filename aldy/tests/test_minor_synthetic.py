@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # type: ignore
+import pytest  # noqa
 import collections
 
 from aldy.profile import Profile

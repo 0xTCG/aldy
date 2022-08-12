@@ -6,7 +6,6 @@
 
 
 from typing import Optional, Any
-
 import logbook
 import logbook.more
 import logbook.base
@@ -450,7 +449,9 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             log.error(str(ex))
 
     if args.log:
-        fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="TRACE")  # type: ignore
+        fh = logbook.FileHandler(
+            args.log, mode="w", bubble=True, level="TRACE"  # type: ignore
+        )
         fh.formatter = lambda record, _: record.message  # type: ignore
         fh.push_application()
     if args.debug:

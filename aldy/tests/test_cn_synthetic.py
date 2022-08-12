@@ -11,7 +11,7 @@ from aldy.cn import solve_cn_model
 from aldy.common import SOLUTION_PRECISION
 
 
-def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0):
+def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0.0):
     profile = Profile("test")
     sols = solve_cn_model(
         gene,

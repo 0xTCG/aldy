@@ -5,8 +5,6 @@
 
 
 from typing import Dict, Tuple, Callable, List, Any
-
-import math
 import copy
 
 from .profile import Profile
@@ -145,15 +143,15 @@ class Coverage:
 
     def diploid_avg_coverage(self) -> float:
         """:return: Average coverage of the copy-number neutral region."""
+        assert self.profile.cn_region, "CN region not set"
         return float(sum(self._cnv_coverage.values())) / abs(
             self.profile.cn_region.end - self.profile.cn_region.start
         )
 
     def _normalize_coverage(self) -> None:
-        """
-        Normalize the sample coverage to match the profile coverage.
-        """
+        """Normalize the sample coverage to match the profile coverage."""
 
+        assert self.profile.cn_region and self.profile.data, "CN region not set"
         sam_ref = sum(
             self._cnv_coverage[i]
             for i in range(self.profile.cn_region.start, self.profile.cn_region.end)

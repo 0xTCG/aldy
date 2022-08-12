@@ -19,7 +19,7 @@ def assert_show(monkeypatch, expected, query=None, gene="aldy.tests.resources/to
 
     def log_info(*args):
         s = str.format(*args)
-        lines.append(s)
+        lines.append(s)  # type: ignore
 
     monkeypatch.setattr(log, "info", log_info)
 
