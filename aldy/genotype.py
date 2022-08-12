@@ -27,6 +27,7 @@ from .common import (
     AldyException,
     SOLUTION_PRECISION,
 )
+from .profile import Profile
 from .gene import Gene, GRange
 from .diplotype import OUTPUT_COLS
 from .lpinterface import model as lp_model
@@ -204,20 +205,14 @@ def genotype(
 
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
-        profile = sam.Profile("user_provided", cn_solution=["1", "1"])
-        sample = sam.Sample(gene=gene, profile=profile, vcf_path=sam_path, debug=debug)
+        profile = Profile("user_provided", cn_solution=["1", "1"])
+        sample = sam.Sample(gene, profile, vcf_path=sam_path, debug=debug)
     else:
         if cn_solution:
-            profile = sam.Profile("user_provided", cn_solution=cn_solution)
+            profile = Profile("user_provided", cn_solution=cn_solution)
         else:
-            profile = sam.Sample.load_profile(gene, profile_name, cn_region, **params)
-        sample = sam.Sample(
-            gene=gene,
-            sam_path=sam_path,
-            profile=profile,
-            reference=reference,
-            debug=debug,
-        )
+            profile = Profile.load(gene, profile_name, cn_region, **params)
+        sample = sam.Sample(gene, profile, sam_path, reference, debug)
 
     json[gene.name].update({"sample": sample.name})
     is_vcf = output_file and output_file.name.endswith(".vcf")
@@ -252,6 +247,7 @@ def genotype(
     # Get copy-number solutions
     cn_sols = cn.estimate_cn(
         gene,
+        profile,
         sample.coverage,
         solver=solver,
         gap=gap,

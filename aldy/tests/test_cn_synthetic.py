@@ -6,15 +6,18 @@
 
 import pytest  # noqa
 
+from aldy.profile import Profile
 from aldy.cn import solve_cn_model
 from aldy.common import SOLUTION_PRECISION
 
 
 def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0):
+    profile = Profile("test")
     sols = solve_cn_model(
         gene,
+        profile,
         cn_configs=gene.cn_configs,
-        max_cn=20,
+        max_cn=profile.cn_max,
         region_coverage=cov,
         solver=solver,
         gap=gap,
@@ -52,7 +55,7 @@ def test_basic(toy_gene, solver):
     # Test two copies of *1 with slightly perturbed coverage
     g1 = [1.8, 2.2, 2.1, 1.9, 1.7]
     g2 = [2.05, 1.95, 2, 2, 2.7]
-    d1 = 2 * sum(abs(a - b)/(max(a, b) + 1) for a,b in zip(g1, g2))
+    d1 = 2 * sum(abs(a - b) / (max(a, b) + 1) for a, b in zip(g1, g2))
     d2 = sum(abs(a - 2) for a in g1) / len(toy_gene.unique_regions)
     assert_cn(
         toy_gene,

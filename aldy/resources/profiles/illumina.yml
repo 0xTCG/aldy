@@ -1,3 +1,5 @@
+options:
+  cn_parsimony: 1.0
 CFTR:
   down: [49310]
   e1: [53]

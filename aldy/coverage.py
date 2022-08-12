@@ -9,6 +9,7 @@ from typing import Dict, Tuple, Callable, List, Any
 import math
 import copy
 
+from .profile import Profile
 from .common import log, AldyException
 from .gene import Mutation, Gene
 
@@ -21,7 +22,7 @@ class Coverage:
     def __init__(
         self,
         gene: Gene,
-        profile,
+        profile: Profile,
         sam,
         coverage: Dict[int, Dict[str, List]],
         cnv_coverage: Dict[int, int],
@@ -111,7 +112,7 @@ class Coverage:
                     t += "\t" + self.gene.get_rsid((pos, op))
                 else:
                     t = "\t\t"
-                if out:
+                if out and self.sam:
                     out(
                         f"[dump] {self.sam.name}\t{self.gene.name}\t"
                         f"{self.gene.chr_to_ref.get(pos, -1) + 1}\t{op}\t{p:.1f}\t{t}"

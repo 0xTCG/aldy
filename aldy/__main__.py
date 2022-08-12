@@ -23,7 +23,7 @@ import pytest
 from . import common
 from .common import log, script_path, AldyException, td, parse_cn_region
 from .gene import Gene
-from .sam import load_sam_profile
+from .profile import Profile
 from .genotype import genotype
 from .query import query
 from .version import __version__
@@ -95,7 +95,7 @@ def main(argv):
                 pass
             query(Gene(db_file, genome=args.genome), q)
         elif args.subparser == "profile":
-            p = load_sam_profile(
+            p = Profile.get_sam_profile_data(
                 args.file,
                 cn_region=parse_cn_region(args.cn_neutral_region),
                 genome=args.genome,
@@ -126,19 +126,15 @@ def main(argv):
         log.debug(traceback.format_exc())
         exit(ex.code)
     except Exception as ex:
-        gene = "" if 'gene' not in args else f"gene= {args.gene}, "
-        log.critical(
-            f"ERROR: {gene}file= {args.file if 'file' in args else '-'}"
-        )
+        gene = "" if "gene" not in args else f"gene= {args.gene}, "
+        log.critical(f"ERROR: {gene}file= {args.file if 'file' in args else '-'}")
         log.critical(repr(ex))
         log.warn(traceback.format_exc())
         exit(1)
     except:  # noqa
-        gene = "" if 'gene' not in args else f"gene= {args.gene}, "
+        gene = "" if "gene" not in args else f"gene= {args.gene}, "
         exc = sys.exc_info()[0]
-        log.critical(
-            f"ERROR: {gene}file= {args.file if 'file' in args else '-'}"
-        )
+        log.critical(f"ERROR: {gene}file= {args.file if 'file' in args else '-'}")
         log.critical("Unrecoverable error: {}", repr(exc))
         log.warn(traceback.format_exc())
         exit(1)
@@ -318,6 +314,12 @@ def _get_args(argv):
         default=None,
         type=int,
         help=td("""Minimum quality score. Default is 10."""),
+    )
+    genotype_parser.add_argument(
+        "--cn-fusion-left",
+        default=None,
+        type=float,
+        help=td("""Fusion penalty"""),
     )
     genotype_parser.add_argument(
         "--simple",

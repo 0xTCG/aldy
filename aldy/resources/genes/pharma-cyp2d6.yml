@@ -485,6 +485,11 @@ alleles:
     evidence: M
     mutations:
     - [8246, G>A, rs532668079, R441H]
+  CYP2D6*79.001:
+    activity: no function
+    label: CYP2D6*13B
+    mutations:
+    - [CYP2D7, e2-]
   CYP2D6*81.001:
     pharmvar: https://www.pharmvar.org/haplotype/160
     activity: uncertain function

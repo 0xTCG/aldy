@@ -4,14 +4,19 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # noqa
+import pytest  # type: ignore
 import collections
 
+from aldy.profile import Profile
+from aldy.sam import Sample
 from aldy.solutions import CNSolution, SolvedAllele, MajorSolution
 from aldy.coverage import Coverage
 from aldy.gene import Mutation
-from aldy.minor import estimate_minor, ADD_PENALTY_FACTOR, MISS_PENALTY_FACTOR
+from aldy.minor import estimate_minor
 from aldy.common import SOLUTION_PRECISION, sorted_tuple
+
+
+profile = Profile("test")
 
 
 def assert_minor(gene, solver, data, shallow=False, skip_check=False):
@@ -21,7 +26,14 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
     for (pos, op), c in data["data"].items():
         cov[pos][op] = [(60, 60)] * c
 
-    cov = Coverage(gene, None, None, cov, {}, 0.5)
+    profile = Profile("test")
+    cov = Coverage(gene, profile, None, cov, {})
+    if "phase" in data:
+        cov.sam = Sample.__new__(Sample)
+        cov.sam.phases = {
+            r: {k: v for k, v in ph.items()} for r, ph in data["phase"].items()
+        }
+        cov.sam.moved = {}
 
     if isinstance(data["major"], tuple):
         major = MajorSolution(
@@ -38,13 +50,13 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
             [],
         )
 
-    phase = None
     sols = estimate_minor(gene, cov, [major], solver)
     if skip_check:
         return sols
 
     if "score" in data:
         for s in sols:
+            print(s, data)
             assert abs(data["score"] - s.score) < SOLUTION_PRECISION, "Score"
 
     if not shallow:
@@ -130,7 +142,7 @@ def test_miss(toy_gene, solver):
             },
             "major": {"1": 1, "3": 1},
             "sol": [("1.002", [], []), ("3.001", [(100_000_147, "insA")], [])],
-            "score": MISS_PENALTY_FACTOR,
+            "score": profile.minor_miss,
         },
     )
 
@@ -151,7 +163,7 @@ def test_add(toy_gene, solver):
             },
             "major": {"1": 1, "3": 1},
             "sol": [("1.002", [], []), ("3.001", [], [(100_000_114, "T>A")])],
-            "score": ADD_PENALTY_FACTOR,
+            "score": profile.minor_add,
         },
     )
 
@@ -191,8 +203,12 @@ def test_phase(toy_gene, solver):
             },
             "major": {"1": 1, "3": 1},
             "sol": [("1.001", [], []), ("3.001", [], [(100_000_114, "T>A")])],
-            "score": ADD_PENALTY_FACTOR,
-            "phase": [[(100_000_114, "T>A"), (100_000_150, "C>T")], []],
+            "score": profile.minor_add,
+            "phase": {
+                "r1": {100_000_114: "T>A", 100_000_150: "C>T"},
+                "r2": {100_000_114: "T>A", 100_000_150: "C>T"},
+                "r3": {100_000_114: "T>A", 100_000_150: "C>T"},
+            },
         },
     )
 
@@ -213,7 +229,11 @@ def test_phase(toy_gene, solver):
             "sol": [("1.001", [], []), ("3.001", [], [])],
             "score": 2,
             # ignored because 104T>A is not part of major solution
-            "phase": [[(100_000_104, "T>A"), (100_000_150, "C>T")], []],
+            "phase": {
+                "r1": {100_000_104: "T>A", 100_000_150: "C>T"},
+                "r2": {100_000_104: "T>A", 100_000_150: "C>T"},
+                "r3": {100_000_104: "T>A", 100_000_150: "C>T"},
+            },
         },
     )
 
@@ -232,8 +252,8 @@ def test_phase(toy_gene, solver):
             },
             "major": ({"1": 1, "3": 1}, (100_000_110, "delAC")),
             "sol": [("1.001", [], []), ("3.001", [], [(100_000_110, "delAC")])],
-            "score": ADD_PENALTY_FACTOR * 1.5 + 2,
-            "phase": [[(100_000_110, "delAC"), (100_000_150, "C>T")], []],
+            "score": profile.minor_add * 1.5 + 2,
+            "phase": {"r1": {100_000_110: "delAC", 100_000_150: "C>T"}},
         },
     )
 
@@ -259,6 +279,6 @@ def test_major_novel(toy_gene, solver):
                 ("3.001", [(100_000_147, "insA")], []),
                 ("6.001", [], []),
             ],
-            "score": MISS_PENALTY_FACTOR + (ADD_PENALTY_FACTOR * 1.5),
+            "score": profile.minor_miss + (profile.minor_add * 1.5),
         },
     )

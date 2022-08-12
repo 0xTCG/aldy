@@ -18,23 +18,13 @@ from .common import log, json, sorted_tuple, AldyException
 from .gene import CNConfig, CNConfigType, Gene
 from .coverage import Coverage
 from .solutions import CNSolution
-
-
-MAX_CN = 20.0
-"""Maximum allowed copy number."""
-
-# Model parameters
-
-PCE_PENALTY_COEFF = 2
-"""Error penalty applied to the PCE region (1 for no penalty)."""
-
-MAX_CN_ERROR = MAX_CN
-"""Upper bound for absolute error."""
+from .profile import Profile
 
 
 def estimate_cn(
     gene: Gene,
-    coverage: Coverage,
+    profile: Profile,
+    coverage: Optional[Coverage],
     solver: str,
     gap: float = 0,
     debug: Optional[str] = None,
@@ -62,12 +52,14 @@ def estimate_cn(
 
     log.debug("\n" + "*" * 80)
 
-    if coverage.profile.cn_solution:
-        return [_parse_user_solution(gene, coverage.profile.cn_solution)]
+    if profile.cn_solution:
+        return [_parse_user_solution(gene, profile.cn_solution)]
     elif not gene.do_copy_number:
         basic = list(gene.cn_configs.keys())[0]
         return [_parse_user_solution(gene, [basic, basic])]
     else:
+        assert coverage, "Coverage not provided"
+
         # TODO: filter CN configs with non-present alleles
         max_observed_cn = 1 + max(
             ceil(coverage.region_coverage(gi, r))
@@ -103,6 +95,7 @@ def estimate_cn(
             }
         sol = solve_cn_model(
             gene,
+            profile,
             configs,
             max_observed_cn,
             region_cov,
@@ -110,7 +103,6 @@ def estimate_cn(
             gap,
             debug,
             fusion_support,
-            coverage,
         )
 
         return sol
@@ -118,6 +110,7 @@ def estimate_cn(
 
 def solve_cn_model(
     gene: Gene,
+    profile: Profile,
     cn_configs: Dict[str, CNConfig],
     max_cn: int,
     region_coverage: Dict[str, Tuple[float, float]],
@@ -125,7 +118,6 @@ def solve_cn_model(
     gap: float = 0.1,
     debug: Optional[str] = None,
     fusion_support=None,
-    coverage=None,
 ) -> List[CNSolution]:
     """
     Solve the copy number estimation problem (an instance of closest vector problem).
@@ -235,12 +227,14 @@ def solve_cn_model(
         if r not in gene.unique_regions:
             continue
 
-        VERR_GENE[r] = model.addVar(name=f"EG_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
+        VERR_GENE[r] = model.addVar(
+            name=f"EG_{r}", lb=-profile.cn_max, ub=profile.cn_max
+        )
         model.addConstr(expr_gene + VERR_GENE[r] <= exp_cov0, name=f"CG_COV_{r}")
         model.addConstr(expr_gene + VERR_GENE[r] >= exp_cov0, name=f"CG_COV_{r}")
 
         scale = max(exp_cov0, exp_cov1) + 1
-        VERR[r] = model.addVar(name=f"E_{r}", lb=-MAX_CN_ERROR, ub=MAX_CN_ERROR)
+        VERR[r] = model.addVar(name=f"E_{r}", lb=-profile.cn_max, ub=profile.cn_max)
         model.addConstr(
             expr / scale + VERR[r] <= (exp_cov0 - exp_cov1) / scale, name=f"C_COV_{r}"
         )
@@ -251,29 +245,28 @@ def solve_cn_model(
     # Objective: minimize the sum of absolute errors.
     # PCE_REGION (in CYP2D7) is penalized with an extra score as it is important
     # fusion marker.
-    DIFF_COEFF = 10 / len(gene.unique_regions)
+    DIFF_COEFF = profile.cn_diff / len(gene.unique_regions)
     o_diff = DIFF_COEFF * model.abssum(
-        VERR.values(), coeffs={"E_pce": PCE_PENALTY_COEFF}
+        VERR.values(), coeffs={"E_pce": profile.cn_pce_penalty}
     )
 
     # Also minimize main gene fit
-    FIT_COEFF = 1 / len(gene.unique_regions)
+    FIT_COEFF = profile.cn_fit / len(gene.unique_regions)
     o_fit = FIT_COEFF * model.abssum(VERR_GENE.values())
 
     # Objective: also minimize the total number of present alleles (maximum parsimony)
-    PARSIMONY_PENALTY = 10 / len(gene.unique_regions)
+    PARSIMONY_PENALTY = 10.0 / len(gene.unique_regions)
     PARSIMONY_PENALTY *= 0.75
     penalty = {s: PARSIMONY_PENALTY for s, _ in VCN}
     # Also penalize left fusions as they are not likely to occur.
     for n, s in gene.cn_configs.items():
         if n in penalty and s.kind == CNConfigType.RIGHT_FUSION:
-            penalty[n] += PARSIMONY_PENALTY / 4
+            penalty[n] += PARSIMONY_PENALTY * profile.cn_fusion_right
         if n in penalty and s.kind == CNConfigType.LEFT_FUSION:
-            penalty[n] += PARSIMONY_PENALTY / 2
-    PARS_COEFF = 0.5
-    if coverage and coverage.profile.name in ["10x", "illumina"]:
-        PARS_COEFF = 1
-    o_pars = PARS_COEFF * model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
+            penalty[n] += PARSIMONY_PENALTY * profile.cn_fusion_left
+    o_pars = profile.cn_parsimony * model.quicksum(
+        penalty[s] * v for (s, _), v in VCN.items()
+    )
 
     model.setObjective(o_diff + o_fit + o_pars)
     if debug:
@@ -312,7 +305,10 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
     that are not supported by the remaining mutations.
     """
     cov = coverage.filtered(
-        partial(Coverage.basic_filter, thres=coverage.profile.threshold / MAX_CN)
+        partial(
+            Coverage.basic_filter,
+            thres=coverage.profile.threshold / coverage.profile.cn_max,
+        )
     )
     configs = copy.deepcopy(gene.cn_configs)
     for an in natsorted(gene.cn_configs):

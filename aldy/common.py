@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Iterable, Any
+from typing import Iterable, Any, List
 
 import pkg_resources
 import re
@@ -283,6 +283,22 @@ def parse_cn_region(cn_region):
             ch = ch[3:]
         return GRange(ch, int(r.group(2)), int(r.group(3)))
     return None
+
+
+def chr_prefix(ch: str, chrs: List[str]) -> str:  # assumes ch is not prefixed
+    """
+    Check if `ch` (*without any chr prefix*) should be prefixed with "chr" or not.
+
+    Returns:
+        str: Prefix to be prepended to chromosome (empty if needed).
+
+    Params:
+        ch (str): chromosome name
+        chrs (list[str]): list of chromosome names in the alignment file
+    """
+    if ch not in chrs and "chr" + ch in chrs:
+        return "chr"
+    return ""
 
 
 class JsonDict(dict):

@@ -4,14 +4,18 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # noqa
+import pytest  # type: ignore
 import collections
 
+
+from aldy.profile import Profile
 from aldy.major import estimate_major
 from aldy.solutions import CNSolution
 from aldy.coverage import Coverage
-from aldy.major import NOVEL_MUTATION_PENAL
 from aldy.common import SOLUTION_PRECISION
+
+
+profile = Profile("test")
 
 
 def assert_major(gene, solver, major):
@@ -20,7 +24,7 @@ def assert_major(gene, solver, major):
     cov = collections.defaultdict(dict)
     for (pos, op), c in major["data"].items():
         cov[pos][op] = [(60, 60)] * c
-    cov = Coverage(gene, None, None, cov, {}, 0.5)
+    cov = Coverage(gene, profile, None, cov, {})
     sols = estimate_major(gene, cov, cn_sol, solver)
 
     if "score" in major:
@@ -259,7 +263,7 @@ def test_novel_mutations(toy_gene, solver):
             "cn": {"1": 1, "6": 1},
             "data": {(100_000_110, "_"): 0, (100_000_110, "delAC"): 20},
             "sol": [({"1": 1, "6": 1}, (100_000_110, "delAC"))],
-            "score": NOVEL_MUTATION_PENAL + 0.1 + 1,
+            "score": profile.major_novel + 0.1 + 1,
             # Last 1 is needed as the model right now considers novel mutations
             # as "independent" alleles and still (incorrectly) counts the '_'
             # for both *1 here.
@@ -273,6 +277,6 @@ def test_novel_mutations(toy_gene, solver):
             "cn": {"1": 2},
             "data": {(100_000_110, "_"): 10, (100_000_110, "delAC"): 10},
             "sol": [({"1": 2}, (100_000_110, "delAC"))],
-            "score": NOVEL_MUTATION_PENAL + 0.1 + 1,
+            "score": profile.major_novel + 0.1 + 1,
         },
     )

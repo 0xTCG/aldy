@@ -7,6 +7,7 @@
 import pytest  # noqa
 import collections
 
+from aldy.profile import Profile
 from .test_minor_synthetic import assert_minor
 
 
@@ -76,7 +77,7 @@ def test_normal(real_gene, solver):  # NA07439/v1 : currently test only one solu
                     [(42528027, "T>C")],
                 ),
                 (
-                   "4.004",
+                    "4.004",
                     [(42528223, "G>A")],
                     [(42526048, "G>C"), (42528027, "T>C")],
                 ),
@@ -461,7 +462,9 @@ def test_comparison(real_gene, solver):  # NA10846/v1
         )
         for major in [{"1": 1, "4": 1}, {"10": 1, "4M": 1}, {"39": 1, "4J": 1}]
     ]
-    sols = estimate_minor(real_gene, Coverage(real_gene, None, None, cov, {}, 0.5), majors, solver)
+    sols = estimate_minor(
+        real_gene, Coverage(real_gene, Profile("test"), None, cov, {}), majors, solver
+    )
     assert len(sols) == 3
     sols.sort(key=lambda x: x.score)
 
@@ -596,7 +599,7 @@ def test_major_novel(real_gene, solver):
                         (42526566, "A>G"),
                         (42526560, "T>G"),
                         (42526561, "C>G"),
-                        (42528223, "G>A")
+                        (42528223, "G>A"),
                     ],
                     [],
                 ),
@@ -607,7 +610,7 @@ def test_major_novel(real_gene, solver):
                         (42525810, "T>C"),
                         (42526048, "G>C"),
                         (42528027, "T>C"),
-                        (42525797, "G>C")
+                        (42525797, "G>C"),
                     ],
                 ),
             ],

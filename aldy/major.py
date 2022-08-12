@@ -13,16 +13,9 @@ from natsort import natsorted
 
 from . import lpinterface
 from .common import log, json, sorted_tuple
-from .cn import MAX_CN
 from .gene import MajorAllele, Mutation, Gene
 from .coverage import Coverage
 from .solutions import CNSolution, MajorSolution, SolvedAllele
-
-
-# Model parameters
-NOVEL_MUTATION_PENAL = MAX_CN + 1
-"""Penalty for each novel functional mutation (0 for no penalty).
-   Should be large enough to prevent novel mutations unless really necessary."""
 
 
 def estimate_major(
@@ -217,7 +210,7 @@ def solve_major_model(
     for m in VNEW:
         model.addConstr(z >= VNEW[m], name=f"NOVEL_UB_{VNEW[m]}")
     model.addConstr(z <= model.quicksum(VNEW[m] for m in VNEW), name="NOVEL_LB")
-    objective += NOVEL_MUTATION_PENAL * z
+    objective += coverage.profile.major_novel * z
     objective += 0.1 * model.quicksum(VNEW[m] for m in VNEW)
     model.setObjective(objective)
     if debug:
@@ -271,7 +264,7 @@ def _filter_alleles(
     """
 
     def filter_fns(cov, mut):
-        cond = cov.basic_filter(mut, cn=MAX_CN)
+        cond = cov.basic_filter(mut, cn=coverage.profile.cn_max)
         if mut.op != "_":
             cond = cond and cov.basic_filter(
                 mut, cn=cn_solution.position_cn(mut.pos) + 0.5

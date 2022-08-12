@@ -11,26 +11,9 @@ from natsort import natsorted
 from . import lpinterface
 from .common import log, json, Timing
 from .gene import Mutation, Gene
-from .cn import MAX_CN
 from .coverage import Coverage
 from .solutions import MajorSolution, SolvedAllele, MinorSolution
 from .diplotype import estimate_diplotype
-
-
-# Model parameters
-MISS_PENALTY_FACTOR = 1.5
-"""
-Penalty for each missed minor mutation (0 for no penalty).
-Ideally larger than `ADD_PENALTY_FACTOR` as additions should be cheaper.
-"""
-
-ADD_PENALTY_FACTOR = 1.0
-"""
-Penalty for each novel minor mutation (0 for no penalty).
-Zero penalty always prefers mutation additions over coverage errors if the
-normalized SNP slack coverage is >= 50%.
-Penalty of 1.0 prefers additions if the SNP slack coverage is >= 75%.
-"""
 
 
 def estimate_minor(
@@ -89,7 +72,7 @@ def estimate_minor(
             or (r and r[1] in ["utr3", "utr5", "up"])
         ):
             return False
-        cond = cov.basic_filter(mut, cn=MAX_CN)
+        cond = cov.basic_filter(mut, cn=coverage.profile.cn_max)
         if mut.op != "_":
             cond = cond and cov.basic_filter(
                 mut, cn=major_sol.cn_solution.position_cn(mut.pos) + 0.5
@@ -412,20 +395,17 @@ def solve_minor_model(
     VPHASE = {}
     modes = collections.defaultdict(int)
     if coverage.sam:
-        reads = coverage.sam.grid.keys()
-        read_mode = {}
         mut_pos = {m.pos for m in mutations}
-        for ri, rr in enumerate(reads):
+        for rr, rv in coverage.sam.phases.items():
             c = []
-            for k, v in coverage.sam.grid[rr].items():
+            for k, v in rv.items():
                 if k in mut_pos:
-                    c.append(v)
-                elif v in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
-                    c.append(coverage.sam.moved[v])
+                    c.append((k, v))
+                elif (k, v) in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
+                    c.append(coverage.sam.moved[k, v])
             c = sorted(c)
             if len(c) > 1:
                 modes[tuple(c)] += 1
-            read_mode[rr] = tuple(c)
         log.debug("[minor] number of phases= {}", len(modes))
         log.debug("[minor] number of alleles= {}", len(alleles))
         max_vars = 3_000
@@ -505,8 +485,10 @@ def solve_minor_model(
     o_error = model.abssum((v for v in VERR.values()), coeffs=score)
     objective += o_error
     # ... and penalize the misses ...
-    o_penal = MISS_PENALTY_FACTOR * model.quicksum(len(VKEEP[a]) * VA[a] for a in VKEEP)
-    o_penal -= MISS_PENALTY_FACTOR * model.quicksum(
+    o_penal = coverage.profile.minor_miss * model.quicksum(
+        len(VKEEP[a]) * VA[a] for a in VKEEP
+    )
+    o_penal -= coverage.profile.minor_miss * model.quicksum(
         v[1] for a in VKEEP for _, v in VKEEP[a].items()
     )
     # ... and additions ...
@@ -515,7 +497,7 @@ def solve_minor_model(
         for _, v in VNEW[a].items():
             # HACK:
             # Add cnt/10000 to select the smallest allele if there is a tie
-            o_penal += ADD_PENALTY_FACTOR * (1 + cnt / 1000000) * v[0]
+            o_penal += coverage.profile.minor_add * (1 + cnt / 1000000) * v[0]
             cnt += 1
     # ... and novel functional mutations from the major model!
     for m in {m for a in VNEW for m in VNEW[a]}:
@@ -531,16 +513,13 @@ def solve_minor_model(
             model.addConstr(vo <= model.quicksum(vars), name=f"VNEWOR1_{m.pos}_{m.op}")
             for vi, v in enumerate(vars):
                 model.addConstr(vo >= v, name=f"VNEWOR2_{m.pos}_{m.op}_{vi}")
-            o_penal += ADD_PENALTY_FACTOR / 2 * vo
+            o_penal += coverage.profile.minor_add / 2 * vo
     objective += o_penal
 
-    PHASE_ERROR = 0.4
-    o_phase = PHASE_ERROR * model.quicksum(VPHASEERR)
+    o_phase = coverage.profile.minor_phase * model.quicksum(VPHASEERR)
     objective += o_phase
 
     model.setObjective(objective)
-    if debug:
-        model.dump(f"{debug}.{gene.name}.minor{identifier}.lp")
 
     # Solve the model
     results = {}
