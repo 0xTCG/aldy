@@ -61,6 +61,8 @@ class Profile:
         # Penalty of 1.0 prefers additions if the SNP slack coverage is >= 75%.
         self.minor_phase = float(params.get("minor_phase", 0.4))
 
+        self.male = bool(params.get("male", False))
+
         log.debug(
             f"[params] "
             f"neutral={self.neutral_value}; "

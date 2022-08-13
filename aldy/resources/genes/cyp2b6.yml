@@ -1,6 +1,6 @@
 name: CYP2B6
-version: pharmvar-5.1.15
-generated: '2022-06-20'
+version: pharmvar-5.2.3
+generated: '2022-08-12'
 pharmvar: 30674
 ensembl: ENSG00000197408
 alleles:

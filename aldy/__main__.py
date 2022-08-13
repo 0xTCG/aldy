@@ -321,6 +321,11 @@ def _get_args(argv):
         help=td("""Fusion penalty"""),
     )
     genotype_parser.add_argument(
+        "--male",
+        action="store_true",
+        help=td("""Set if male genome"""),
+    )
+    genotype_parser.add_argument(
         "--simple",
         action="store_true",
         default=False,
