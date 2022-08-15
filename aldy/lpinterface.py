@@ -274,79 +274,7 @@ class Gurobi:  # pragma: no cover
             return
 
 
-class SCIP(Gurobi):
-    """
-    Wrapper around SCIP's Python interface (pyscipopt).
-    """
-
-    def __init__(self, name):
-        self.pyscipopt = importlib.import_module("pyscipopt")
-        self.INF = 1e20
-        self.model = self.pyscipopt.Model(name)
-        self.names = collections.defaultdict(int)
-
-    def update(self):
-        pass
-
-    def addConstr(self, *args, **kwargs):
-        if "name" in kwargs:
-            kwargs["name"] = escape_name(kwargs["name"], self.names)
-        return self.model.addCons(*args, **kwargs)
-
-    def addVar(self, *args, **kwargs):
-        if "name" in kwargs:
-            kwargs["name"] = escape_name(kwargs["name"], self.names)
-        if "update" in kwargs:
-            del kwargs["update"]
-        return self.model.addVar(*args, **kwargs)
-
-    def setObjective(self, objective, method: str = "min"):
-        self.objective = objective
-        self.model.setObjective(
-            self.objective, "minimize" if method == "min" else "maximize"
-        )
-
-    def quicksum(self, expr):
-        return self.pyscipopt.quicksum(expr)
-
-    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
-        # self.model.setRealParam('limits/time', 120)
-        self.model.hideOutput()
-        if init is not None:
-            init(self.model)
-        self.model.optimize()
-
-        status = self.model.getStatus()
-        if status == "infeasible":
-            raise NoSolutionsError(status)
-        return status.lower(), self.model.getObjVal()
-
-    def varName(self, var):
-        return var.name
-
-    def getValue(self, var):
-        x = self.model.getVal(var)
-        if var.vtype() == "BINARY":
-            return round(x) > 0
-        if var.vtype() == "INTEGER":
-            return int(round(x))
-        else:
-            return x
-
-    def dump(self, file):
-        self.model.writeProblem(file)
-
-    def variables(self):
-        return self.model.getVars()
-
-    def is_binary(self, v):
-        return v.vtype() == "BINARY"
-
-    def change_model(self):
-        self.model.freeTransform()
-
-
-class CBC(SCIP):
+class CBC(Gurobi):
     """
     Wrapper around CBC's Python interface (Google's ortools).
     """
@@ -447,7 +375,7 @@ def model(name: str, solver: str):
     """
     Create an ILP solver instance for a model named ``name``.
     If ``solver`` is ``'any'``, this function will try to use
-    Gurobi, and will fall back on SCIP (and then CBC) if Gurobi or SCIP is missing.
+    Gurobi, and will fall back on CBC if Gurobi is missing.
 
     Raises:
       :obj:`Exception` if no solver is found.
@@ -460,17 +388,6 @@ def model(name: str, solver: str):
         try:
             model = Gurobi(name)
             log.trace("[lp] solver= gurobi")
-        except ImportError:
-            model = None
-        return model
-
-    def test_scip(name):
-        """
-        Test if SCIP is present. Requires `PySCIPopt`.
-        """
-        try:
-            model = SCIP(name)
-            log.trace("[lp] solver= scip")
         except ImportError:
             model = None
         return model
@@ -491,11 +408,9 @@ def model(name: str, solver: str):
         if model is None:
             model = test_gurobi(name)
         if model is None:
-            model = test_scip(name)
-        if model is None:
             raise Exception(
                 "No ILP solver found. Aldy cannot operate without an ILP solver. "
-                + "Please install Gurobi, SCIP, or Google OR Tools."
+                + "Please install Gurobi or Google OR Tools."
             )
         return model
     else:

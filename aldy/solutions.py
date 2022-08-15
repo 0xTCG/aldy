@@ -241,13 +241,16 @@ class MinorSolution:
 
     def get_major_diplotype(self):
         return " / ".join(
-            " + ".join(f"*{self.get_major_name(i)}" for i in d) for d in self.diplotype
+            " + ".join(f"*{self.get_major_name(i)}" for i in d)
+            for d in self.diplotype
+            if d
         )
 
     def get_minor_diplotype(self, legacy=False):
         return " / ".join(
             " + ".join(f"[*{self.get_minor_name(i, legacy)}]" for i in d)
             for d in self.diplotype
+            if d
         )
 
     def get_mutation_coverages(self, coverage):

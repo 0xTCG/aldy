@@ -239,9 +239,8 @@ def _get_args(argv):
         help=td(
             """ILP solver:
                - gurobi (Gurobi)
-               - scip (SCIP)
                - cbc (Google OR-Tools/CBC)
-               - any (attempts to use Gurobi, then SCIP, then CBC).
+               - any (attempts to use Gurobi and then CBC).
                Default is "any"."""
         ),
     )

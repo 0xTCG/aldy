@@ -27,12 +27,6 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest pytest-cov codecov black mypy types-pkg_resources types-pyyaml
         python -m pip install setuptools wheel twine
-        # SCIP
-        export VERSION=8.0.1
-        export DEBFILE=SCIPOptSuite-${VERSION}-Linux.deb
-        wget http://scip.zib.de/download/release/$DEBFILE
-        sudo apt-get install ./$DEBFILE
-        python -m pip install pyscipopt
         python -m pip install .
     - name: Format with black
       run: black aldy
@@ -48,7 +42,7 @@ jobs:
         cd ..
     - name: Run code coverage tests
       run: |
-        pytest --cov=./ -v aldy --solvers=scip,any
+        pytest --cov=./ -v aldy
     - name: Upload code coverage data
       uses: codecov/codecov-action@v1
     - name: Build package

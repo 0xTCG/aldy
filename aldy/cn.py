@@ -55,7 +55,7 @@ def estimate_cn(
     elif not gene.do_copy_number:
         basic = list(gene.cn_configs.keys())[0]
         cn = 2
-        if gene.chr == "Y" or (profile.male and gene.chr == "X"):
+        if profile.male and gene.chr in ["X", "Y"]:
             cn = 1
         return [_parse_user_solution(gene, [basic] * cn)]
     else:

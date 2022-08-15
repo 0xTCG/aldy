@@ -192,7 +192,7 @@ def genotype(
         profile_name = "pgx3"
 
     if profile_name in ["exome", "wxs", "wes"]:
-        cn_solution = ["1", "1"]
+        gene.do_copy_number = False
         profile_name = "illumina"
     elif profile_name == "wgs":
         profile_name = "illumina"

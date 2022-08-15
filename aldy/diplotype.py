@@ -275,13 +275,12 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
 
     # Each diplotype should have at least one item
     # e.g. 1, 1 -> becomes 1+1/_ due to duplicate heuristic -> fixed to 1/1
+    print(diplotype)
     if len(diplotype[1]) == 0:
         if len(diplotype[0]) > 1:
             diplotype = diplotype[0][:-1], [diplotype[0][-1]]
         elif len(diplotype[0]) == 1 and isinstance(diplotype[0][0], tuple):
             diplotype = diplotype[0][0]
-        else:
-            assert False, diplotype
 
     def key(x):
         if isinstance(x, tuple):
