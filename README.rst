@@ -60,27 +60,27 @@ Gene Support
    * - *CYP1A1*
      - PharmGKB (Dec 2014)
      - ✅
-     - -
+     - 
    * - *CYP1A2*
      - PharmGKB (Mar 2014)
      - ✅
-     - -
+     - 
    * - *CYP2A13*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP2C19*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP2C8*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP2C9*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP2E1*
      - PharmGKB (Nov 2013)
      - ⚠️
@@ -88,11 +88,11 @@ Gene Support
    * - *CYP2F1*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP2J2*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP2R1*
      - PharmVar 5.2.3
      - ⚠️
@@ -100,7 +100,7 @@ Gene Support
    * - *CYP2S1*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP2W1*
      - PharmVar 5.2.3
      - ⚠️
@@ -108,35 +108,35 @@ Gene Support
    * - *CYP3A43*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP3A4*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP3A5*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP3A7*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CYP4F2*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *CFTR*
      - PharmGKB (Jun 2020)
      - ✅
-     - -
+     - 
    * - *COMT*
      - Pharmacoscan
      - ✅
-     - -
+     - 
    * - *DPYD*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *G6PD*
      - PharmGKB (Sep 2018)
      - ⚠️
@@ -144,23 +144,23 @@ Gene Support
    * - *GSTM1*
      - Pharmacoscan
      - ✅
-     - -
+     - 
    * - *GSTP1*
      - Pharmacoscan
      - ✅
-     - -
+     - 
    * - *IFNL3*
      - PharmGKB
      - ✅
-     - -
+     - 
    * - *NAT1*
      - PharmGKB (Mar 2014)
      - ✅
-     - -
+     - 
    * - *NAT2*
      - PharmGKB (Mar 2014)
      - ✅
-     - -
+     - 
    * - *NUDT15*
      - PharmVar 5.2.3
      - ✅
@@ -168,11 +168,11 @@ Gene Support
    * - *SLCO1B1*
      - PharmVar 5.2.3
      - ✅
-     - -
+     - 
    * - *TPMT*
      - PharmGKB (Jun 2020)
      - ✅
-     - -
+     - 
    * - *UGT1A1*
      - PharmGKB (Feb 2020)
      - ⚠️
