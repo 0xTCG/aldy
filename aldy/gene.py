@@ -30,11 +30,9 @@ class Mutation(NamedTuple):
 
     :param pos: Reference genome position (0-based).
     :param op: Variant operation in HGVS-like format:
-    - ``X>Y``:  a SNP from X to Y
-    - ``insX``:  an insertion of X
-    - ``delX``:  a deletion of X (X, Y are both of format ``[ACGT]+``).
-
-    .. note:: Has custom printer (``__str__``).
+    - `X>Y`:  a SNP from X to Y
+    - `insX`:  an insertion of X
+    - `delX`:  a deletion of X (X, Y are both of format `[ACGT]+`).
     """
 
     pos: int
@@ -55,8 +53,6 @@ class MinorAllele:
     :param activity: Activity indicator (see PharmVar for details).
     :param evidence: Evidence indicator (see PharmVar for details).
     :param pharmvar: PharmVar ID.
-
-    .. note:: Has custom printer (``__str__``).
     """
 
     name: str
@@ -111,13 +107,11 @@ class CNConfig:
 
     :param cn:
         Value of the expected region copy number in each gene.
-        For example, ``cn[0]["e1"] == 1`` means that the exon 1 of the main gene (ID 0)
+        For example, `cn[0]["e1"] == 1` means that the exon 1 of the main gene (ID 0)
         has one copy (and thus should be present) in the configuration `cn`.
     :param kind: Type of the copy-number configuration.
     :param alleles: Allele IDs that have this CN configuration.
     :param description: Human-readable description (e.g. "deletion").
-
-    .. note:: Has custom printer (``__str__``)
     """
 
     cn: List[Dict[str, int]]
@@ -133,86 +127,74 @@ class CNConfig:
 
 @dataclass
 class Gene:
-    r"""
-    Gene (and associated pseudogenes) description relative to a reference genome.
-
-    :param name: Gene name (e.g. _CYP2D6_).
-    :param version: Database version.
-    :param ensembl: ENSEMBL gene ID.
-    :param pharmvar: PharmVar ID.
-    :param refseq: RefSeq sequence ID.
-    :param seq: RefSeq sequence (typically \*1 allele).
-    :param genome: Reference genome version (e.g. hg19).
-    :param chr: Reference genome chromosome.
-    :param strand: Reference genome strand of RefSeq sequence.
-    :param chr_to_ref: Location mapping from the reference to the RefSeq sequence.
-    :param ref_to_chr: Location mapping from the RefSeq sequence to the reference.
-    :param pseudogenes: Pseudogene names. A pseudogene has ID greater than zero.
-    :param regions:
-        Collection of regions (names and ranges) for each gene in the database.
-        Maps a gene ID to a dictionary that maps a gene region name
-        (e.g. "e9" for exon 9) to its region in the reference genome.
-        Gene 0 is the main gene.
-    :param exons: List of RefSeq exon coordinates.
-    :param aminoacid: Aminoacid sequence of the main gene.
-
-    :param mutations:
-        Maps ``(position, mutation_type)`` to a corresponding :obj:`Mutation`.
-    :param random_mutations:
-        Set of (silent) mutations that can occur in any allele.
-    :param mutation_info:
-        Attributes of each mutation.
-        These attributes currently consist:
-        - function (None if the mutation is not functional),
-        - rsID,
-        - RefSeq position, and
-        - RefSeq opcode.
-    :param do_copy_number: Indicates if the gene is subject to structural variations.
-    :param cn_configs:
-        Copy-number configurations associated with the gene.
-        `1` (akin to \*1) is the default CN config (no structural variations present).
-    :param unique_regions: List of genic regions used for copy-number calling.
-    :param alleles: Major star-alleles in the gene.
-    :param common_tandems:
-        List of common allele tandems. Used in diplotype assignment heuristics.
-        For example, the fact that \*13 is always followed by \*1
-        (encoded as ``('13', '1')``) will be used to group \*13 and \*1 together
-        within the same haplotype (e.g. \*13+\*1).
-    """
+    """Gene (and associated pseudogenes) description relative to a reference genome."""
 
     # Basic information
     name: str
+    """Gene name (e.g. _CYP2D6_)."""
     version: str
+    """Database version."""
     pharmvar: Optional[str]
+    """PharmVar ID."""
     ensembl: Optional[str]
+    """ENSEMBL gene ID."""
 
     # Structure
     refseq: str
+    """RefSeq sequence ID."""
     seq: str
+    """RefSeq sequence (typically `*1` allele)."""
     genome: str
+    """Reference genome version (e.g., hg19)."""
     chr: str
+    """Reference genome chromosome."""
     strand: int
+    """RefSeq sequence strand within the reference genome."""
     chr_to_ref: Dict[int, int]
+    """Position mapping from the reference to the RefSeq sequence."""
     ref_to_chr: Dict[int, int]
+    """Position mapping from the RefSeq sequence to the reference."""
     pseudogenes: List[str]
+    """Pseudogene names. A pseudogene has ID greater than zero."""
     regions: List[Dict[str, GRange]]
+    """
+    Collection of regions (names and ranges) for each gene in the database.
+    Maps a gene ID to a dictionary that maps a gene region name
+    (e.g. `"e9"` for exon 9) to its region in the reference genome.
+    Gene 0 is the main gene.
+    """
     exons: List[Tuple[int, int]]
+    """List of RefSeq exon coordinates."""
     aminoacid: str
+    """Aminoacid sequence of the main gene."""
 
     # Mutations
     mutations: Dict[Tuple[int, str], Tuple[Optional[str], str, int, str]]
+    """Maps `(position, mutation)` to the corresponding :py:class:`Mutation`."""
     random_mutations: Set[Mutation]
+    """Set of mutations that can occur in any allele."""
 
-    # Copy number configurations
     do_copy_number: bool
+    """Set if the gene is subject to structural variations."""
     cn_configs: Dict[str, CNConfig]
+    """
+    Copy-number configurations associated with the gene.
+    `1` (akin to `*1`) is the default CN configuration (no structural variations
+    present).
+    """
     unique_regions: List[str]
+    """List of genic regions used for copy-number calling."""
 
     # Alleles
     alleles: Dict[str, MajorAllele]
+    """Major star-alleles in the gene."""
     common_tandems: List[Tuple]
-
-    # _lookup_range / _lookup_seq / _region_at
+    """
+    List of common allele tandems. Used in diplotype assignment heuristics.
+    For example, the fact that `*13` is always followed by `*1`
+    (encoded as `('13', '1')`) will be used to group `*13` and `*1` together
+    within the same haplotype (e.g. `*13+*1`).
+    """
 
     def __init__(
         self,
@@ -222,14 +204,13 @@ class Gene:
         genome: Optional[str] = None,
     ) -> None:
         """
-        Initialize the Gene class with the database description
-        specified in YML file ``path``.
+        Initialize the object with the database description specified in a YAML file.
 
-        :param path: Location of YML file
-        :param name: Gene name
-        :param yml: YML file contents (used if ``path`` is ``None``).
-        :param genome: Reference genome version
-        :raise :obj:`aldy.common.AldyException`:: if a path is not set.
+        :param path: Location of the YAML file.
+        :param name: Gene name.
+        :param yml: YML file contents (used if `path` is `None`).
+        :param genome: Reference genome version.
+        :raises: :py:class:`aldy.common.AldyException`: if the path is not set.
         """
 
         if path and os.path.exists(path):
@@ -252,16 +233,13 @@ class Gene:
         self._init_partials()
 
     def region_at(self, pos: int) -> Optional[Tuple[int, str]]:
-        """
-        :param pos: Position in the reference genome.
-        :return: Gene ID and a region that covers the position.
-        """
+        """:returns: Gene ID and a region that covers the position."""
         return self._region_at.get(pos, None)
 
     def get_functional(self, mut, infer=True) -> Optional[str]:
         """
-        :return: String describing the mutation effect if a mutation is functional;
-                 otherwise None.
+        :returns: String describing the mutation effect if a mutation is functional;
+            otherwise `None`.
         """
         pos, op = mut
         if (pos, op) in self.mutations:
@@ -299,17 +277,11 @@ class Gene:
         return None
 
     def is_functional(self, mut, infer=True) -> bool:
-        """
-        :return: ``True`` if a mutation is functional.
-        """
+        """:returns: `True` if a mutation is functional."""
         return self.get_functional(mut, infer) is not None
 
     def get_rsid(self, *args, default=True) -> str:
-        """
-        :return: rsID if a mutation has it; otherwise "-".
-            bool: ``True`` if a mutation is functional
-            (i.e. does it affect the underlying aminoacid or not).
-        """
+        """:returns: rsID if a mutation has it; otherwise `"-"`."""
         assert 1 <= len(args) <= 2
         if len(args) == 2:
             pos, op = args
@@ -321,11 +293,7 @@ class Gene:
         return res if res != "-" or not default else f"{pos + 1}.{op}"
 
     def get_refseq(self, *args, from_atg=False) -> str:
-        """
-        Returns:
-            bool: ``True`` if a mutation is functional
-            (i.e. does it affect the underlying aminoacid or not).
-        """
+        """:returns: `True` if a mutation is functional."""
         assert 1 <= len(args) <= 2
         atg_start = self.exons[0][0]
         if len(args) == 2:
@@ -344,10 +312,9 @@ class Gene:
 
     def deletion_allele(self) -> Optional[str]:
         """
-        Returns:
-            str, optional: The deletion allele ID. Can be ``None``
-            if gene has no deletion allele.
+        :returns: The ID of the deletion allele (or `None` if gene has no such allele).
         """
+
         try:
             return next(
                 a
@@ -358,15 +325,14 @@ class Gene:
             return None
 
     def has_coverage(self, a: str, pos: int):
-        """
-        :return: ``True`` if a major allele `a` covers the mutation `m`.
-        """
+        """:returns: `True` if a major allele contains the given mutation."""
         m = self.region_at(pos)
         if m:
             return self.cn_configs[self.alleles[a].cn_config].cn[m[0]][m[1]] > 0
         return False
 
     def get_wide_region(self):
+        """:returns: The genomic region that covers all specified gene regions."""
         mi = min(r.start for g in self.regions for r in g.values())
         ma = max(r.end for g in self.regions for r in g.values())
         return GRange(self.chr, mi, ma)
@@ -401,7 +367,7 @@ class Gene:
 
     def _init_basic(self, yml) -> None:
         """
-        Read basic gene properties (``name``, ``seq`` and ``region``).
+        Read basic gene properties (`name`, `seq` and `region`).
 
         All database YAML coordinates are indexed starting from 1.
         Aldy internally uses 0-based indexing.
@@ -457,9 +423,8 @@ class Gene:
 
     def _init_regions(self, yml) -> None:
         """
-        Calculate the genic regions and pseudogenes
-        (``regions``, ``unique_regions`` and ``pseudogenes``).
-        Prepare ``region_at()`` call.
+        Calculate the genic regions and pseudogenes (`regions`, `unique_regions`
+        and `pseudogenes`). Prepare :py:method:`aldy.gene.Gene.region_at` call.
         """
 
         self.regions = []
@@ -511,12 +476,10 @@ class Gene:
 
     def _init_alleles(self, yml) -> None:
         """
-        Initialize allele (``alleles``, ``common_tandems``)
-        and copy number configurations (``cn_configs``).
-        Initialize old notation lookup table (``old_notation``).
+        Initialize allele (`alleles`, `common_tandems`) and copy number configurations
+        (`cn_configs`). Initialize old notation lookup table (`old_notation`).
 
-        Raises:
-            :obj:`aldy.common.AldyException` if allele name cannot be found.
+        :raise: :py:class:`aldy.common.AldyException` if allele name cannot be found.
         """
 
         alleles = {}
@@ -595,7 +558,6 @@ class Gene:
                 allele.get("pharmvar", None),
             )
 
-        # TODO:
         self.common_tandems: List[tuple] = []
         if "tandems" in yml["structure"]:
             self.common_tandems = [tuple(y) for y in yml["structure"]["tandems"]]
@@ -734,12 +696,12 @@ class Gene:
 
     def _init_partials(self) -> None:
         """
-        Construct "partial" major alleles.
-        If a major allele is cut in half by a fusion, we will create a "new" major
-        allele that contains the functional mutations that have survived
-        the fusion event.
+        Construct partial major alleles.
+        If a major allele is cut in half by a fusion, we will create a new major
+        allele that contains the functional mutations that have survived the fusion
+        event.
 
-        Note:
+        .. note::
             This is currently supported only for left fusions.
         """
 
@@ -803,7 +765,7 @@ class Gene:
 
         for an, a in self.alleles.items():
             # Clean up minor alleles (as many might be identical after a fusion).
-            # Put a reference to the cleaned-up alleles in ``alt_name`` field.
+            # Put a reference to the cleaned-up alleles in `alt_name` field.
             minors: Dict[tuple, List[str]] = collections.defaultdict(list)
             for s in a.minors:
                 key = sorted_tuple(a.minors[s].neutral_muts)

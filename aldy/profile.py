@@ -5,12 +5,10 @@
 
 
 from typing import Dict, List, Tuple, Optional
-
 import pysam
 import os
 import os.path
 import yaml
-
 
 from collections import defaultdict
 from natsort import natsorted
@@ -19,62 +17,188 @@ from .gene import Gene
 
 
 class Profile:
-    def __init__(self, name, cn_region=None, data=None, **params):
-        self.name = name
-        self.cn_region = cn_region
-        self.data = data
+    """Profile and model parameter information."""
 
-        params = {k: v for k, v in params.items() if v is not None}
+    def __init__(self, name, cn_region=None, data=None, **kwargs):
+        self.name = name
+        """Name of the profile."""
+
+        self.cn_region = cn_region
+        """Location of the copy-number neutral region."""
+
+        self.data = data
+        """Profile coverage data."""
+
+        params = {k: v for k, v in kwargs.items() if v is not None}
+
+        self.gap = float(params.get("gap", 0.0))
+        """
+        Optimality gap. Non-zero values enable non-optimal solutions.
+        Default: 0 (only optimal solutions)
+        """
+
         self.cn_solution = params.get("cn_solution")
+        """
+        User-specified copy-number configuration.
+        Default: `None` (uses CN solver in :py:mod:`aldy.cn` for detection)
+        """
+
         self.neutral_value = float(params.get("neutral_value", 0))
+        """
+        Joint coverage of the copy-number neutral region.
+        Default: 0 (typically specified in the profile's YAML file)
+        """
+
         self.threshold = float(params.get("threshold", 0.5))
+        """
+        Single-copy variant threshold.
+        Its value indicate the fraction of total reads that contain the given variant
+        in a single gene copy. For example, if two copies are given (maternal and
+        paternal), and if the single copy coverage is 10, threshold of 0.5 will ensure
+        that all variants with coverage less than 5 (i.e., 0.5 * 10) are filtered out.
+        Default: 0.5
+        """
+
         self.min_coverage = float(
             params.get("min_coverage", 5.0 if name == "illumina" else 2.0)
         )
-        self.min_quality = float(params.get("min_quality", 10.0))
-        self.min_mapq = float(params.get("min_mapq", 10.0))
-        self.phase = bool(params.get("phase", True))
+        """
+        Minimum coverage needed to call a variant.
+        Default: 2 (5 for illumina/wgs)
+        """
 
-        # Copy-number parameters
+        self.min_quality = float(params.get("min_quality", 10.0))
+        """
+        Minimum base quality for a read base to be considered.
+        Default: 10
+        """
+
+        self.min_mapq = float(params.get("min_mapq", 10.0))
+        """
+        Minimum mapping quality for a read to be considered.
+        Default: 10
+        """
+
+        self.phase = bool(params.get("phase", True))
+        """
+        Set if the phasing model in :py:mod:`aldy.minor` is to be used.
+        Default: `True`
+        """
+
+        self.sam_long_reads = bool(params.get("sam_long_reads", False))
+        """
+        Set if long reads should be split-mapped. Should be used when dealing
+        with long PacBio or Nanopore reads
+        Default: `False` (typically specified in the profile's YAML file)
+        """
+
+        self.sam_mappy_preset = str(params.get("sam_mappy_preset", "map-hifi"))
+        """
+        Mappy preset to use for split-mapping.
+        Default: map-hifi
+        """
+
         self.cn_max = int(params.get("cn_max", 20))
+        """
+        Maximum possible copy number of a gene.
+        Default: 20
+        """
+
         self.cn_pce_penalty = float(params.get("cn_pce_penalty", 2.0))
-        """Error penalty applied to the PCE region (1 for no penalty)."""
+        """
+        Error penalty applied to the PCE region during CN calling (1 for no penalty).
+        Default: 2.0
+        """
 
         self.cn_diff = float(params.get("cn_diff", 10.0))
+        """
+        The first CN objective term (coverage fit) coefficient.
+        Default: 10.0
+        """
+
         self.cn_fit = float(params.get("cn_fit", 1.0))
+        """
+        The second CN objective term (gene fit) coefficient.
+        Default: 1.0
+        """
+
         self.cn_parsimony = float(params.get("cn_parsimony", 0.5))
+        """
+        The third CN objective term (max. parsimony) coefficient.
+        Default: 0.5
+        """
+
         self.cn_fusion_left = float(params.get("cn_fusion_left", 0.5))
+        """
+        Extra penalty for the left fusions.
+        Default: 0.5.
+        """
+
         self.cn_fusion_right = float(params.get("cn_fusion_right", 0.25))
+        """
+        Extra penalty for the right fusions.
+        Default: 0.25.
+        """
 
-        # Penalty for each novel functional mutation (0 for no penalty).
-        # Should be large enough to prevent novel mutations unless really necessary.
-        self.major_novel = float(params.get("major_novel", 21.0))  # MAX_CN + 1
+        self.major_novel = float(params.get("major_novel", 21.0))
+        """
+        Penalty for novel functional mutation (0 for no penalty).
+        Should be large enough to avoid calling novel mutations unless really necessary.
+        Default: 21.0 (i.e., `max_cn + 1`)
+        """
 
-        # Penalty for each missed minor mutation (0 for no penalty).
-        # Ideally larger than `ADD_PENALTY_FACTOR` as additions should be cheaper.
         self.minor_miss = float(params.get("minor_miss", 1.5))
+        """
+        Penalty for missed minor mutations (0 for no penalty).
+        Ideally larger than `minor_add` as additions should be cheaper.
+        Default: 1.5
+        """
 
         self.minor_add = float(params.get("minor_add", 1.0))
-        # Penalty for each novel minor mutation (0 for no penalty).
-        # Zero penalty always prefers mutation additions over coverage errors if the
-        # normalized SNP slack coverage is >= 50%.
-        # Penalty of 1.0 prefers additions if the SNP slack coverage is >= 75%.
+        """
+        Penalty for novel minor mutations (0 for no penalty).
+        Zero penalty ensures that extra mutations are preferred over the coverage errors
+        if the normalized variant slack coverage is >= 50%. Penalty of 1.0 prefers
+        additions only if the variant slack coverage is >= 75%.
+        Default: 1.0
+        """
+
         self.minor_phase = float(params.get("minor_phase", 0.4))
+        """
+        The minor star-allele calling model's phasing term coefficient.
+        Default: 0.4
+        """
+
+        self.minor_phase_vars = int(params.get("minor_phase_vars", 3_000))
+        """
+        Number of variables to use during the phasing. Use lower number if the model
+        takes too long to complete.
+        Default: 3,000
+        """
 
         self.male = bool(params.get("male", False))
+        """
+        Set if the sample is male (i.e., has two X chromosomes). Used for calling
+        sex chromosome genes (e.g., G6PD) when the CN calling is disabled.
+        Default: False
+        """
 
-        log.debug(
-            f"[params] "
-            f"neutral={self.neutral_value}; "
-            f"threshold={self.threshold}; "
-            f"min_coverage={self.min_coverage}; "
-            f"min_quality={self.min_quality}; "
-            f"min_mapq={self.min_mapq}; "
-            f"phase={self.phase}"
-        )
+        pams = []
+        for n, v in kwargs.items():
+            if v is not None:
+                pams.append(f"{n}={v}")
+        log.debug(f"[params] {'; '.join(pams)}")
 
     @staticmethod
     def load(gene, profile, cn_region=None, **params):
+        """
+        Load the copy number profile and parameters from a profile file.
+
+        :param gene: Gene instance.
+        :param profile: A profile YAML or a SAM/BAM/CRAM file that contains profile
+            data.
+        :param cn_region: Copy-number neutral region.
+        """
         prof = None
         is_yml = True
         if os.path.exists(profile) and os.path.isfile(profile):
@@ -129,25 +253,20 @@ class Profile:
         genome: Optional[str] = "hg19",
     ) -> Dict[str, Dict[str, List[float]]]:
         """
-        Load the profile information from a SAM/BAM file.
+        Load the profile information from a SAM/BAM/CRAM file.
 
-        Returns:
-            list[str, str, int, float]: list of tuples
-            ``(gene_name, chromosome, loci, coverage)``.
+        :param regions: List of regions to be extracted.
+        :param cn_region: Copy-number neutral region.
 
-        Params:
-            factor (float):
-                Scaling factor. Default is 2.0 (for two copies).
-            regions (list[:obj:`GRange`], optional):
-                List of regions to be extracted.
+        :return: list of tuples `(gene_name, chromosome, loci, coverage)`.
 
-        Notes:
-            Profiles that were used in Aldy paper:
 
-                1. PGRNseq-v1/v3: NA17642 was used for all genes
-                    (n.b. PGXT147 with rescale 2.52444127771 was used for CYP2B6 beta).
-                2. PGRNseq-v2: NA19789.bam was used for all genes.
-                3. Illumina: by definition contains all ones (uniform coverage profile).
+        .. note::
+            Profile samples used in the original Aldy paper:
+
+                1. PGRNseq-v1/v3: NA17642
+                2. PGRNseq-v2: NA19789
+                3. Illumina: by definition contains all ones (uniform coverage).
         """
 
         if not genome:

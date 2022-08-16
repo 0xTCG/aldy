@@ -17,7 +17,7 @@ You can get the genotypes of a SAM/BAM with a single call::
   result = aldy.genotype.genotype('cyp2d6', '/path/to/sample.bam', profile='pgrnseq-v1')
   print(result)
 
-Please check :obj:`aldy.major.SolvedAllele` and :obj:`aldy.genotype` for more details.
+Please check :py:class:`aldy.major.SolvedAllele` and :py:class:`aldy.genotype` for more details.
 
 
 Loading a gene
@@ -44,9 +44,9 @@ Loading a SAM/BAM file
 A SAM/BAM/CRAM file can be loaded as follows::
 
   import aldy.sam
-  sample = aldy.sam.Sample(sam_path='my/sample.bam', 
-                           gene=gene, 
-                           threshold=0.5, 
+  sample = aldy.sam.Sample(sam_path='my/sample.bam',
+                           gene=gene,
+                           threshold=0.5,
                            profile='illumina',
                            reference=None,
                            cn_region=aldy.sam.DEFAULT_CN_NEUTRAL_REGION)
@@ -64,10 +64,10 @@ To detect copy number configurations, run::
   import aldy.cn
   cn_sols = aldy.cn.estimate_cn(gene, sample.coverage, solver='gurobi')
 
-You can also use ``solver='cbc'``, or alternatively ``solver='scip'`` if you have 
+You can also use ``solver='cbc'``, or alternatively ``solver='scip'`` if you have
 `PySCIPOpt <https://github.com/SCIP-Interfaces/PySCIPOpt>`_ installed.
 
-Result is a list of :obj:`aldy.solutions.CNSolution` objects described in API.
+Result is a list of :py:class:`aldy.solutions.CNSolution` objects described in API.
 
 
 Calling major and minor star-alleles
@@ -77,16 +77,16 @@ Once you get copy number solutions, you can call valid major star-alleles for ea
 
   import aldy.major
 
-  major_sols = [sol 
+  major_sols = [sol
                 for cn_sol in cn_sols
                 for sol in aldy.major.estimate_major(gene, sample.coverage, cn_sol, 'gurobi')]
   # Get the best major star-allele score
   min_score = min(major_sols, key=lambda m: m.score).score
   # Take the best major star-allele calls
-  major_sols = sorted([m for m in major_sols if abs(m.score - min_score) < 1e-3], 
+  major_sols = sorted([m for m in major_sols if abs(m.score - min_score) < 1e-3],
                      key=lambda m: m.score)
 
-You are pretty much set if you need only major star-alleles. 
+You are pretty much set if you need only major star-alleles.
 However, if you have multiple equally likely major star-allele calls, or if you need
 to get the whole decomposition, then do the following::
 
@@ -95,11 +95,11 @@ to get the whole decomposition, then do the following::
   minor_sols = aldy.minor.estimate_minor(gene, sample.coverage, major_sols, 'gurobi')
   # Get the best minor star-allele score
   min_score = min(minor_sols, key=lambda m: m.score).score
-  # Get the best minor (and major) star-allele 
+  # Get the best minor (and major) star-allele
   minor_sols = [m for m in minor_sols if abs(m.score - min_score) < 1e-3]
 
 
-``minor_sols`` will contain a list of :obj:`aldy.solutions.MinorSolution` objects that point to the optimal major star-alleles and copy numbers.
+``minor_sols`` will contain a list of :py:class:`aldy.solutions.MinorSolution` objects that point to the optimal major star-alleles and copy numbers.
 
 Finally, if you want to get a nice diplotype (e.g. \*1/\*2+\*3), just type::
 

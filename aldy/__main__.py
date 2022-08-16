@@ -396,13 +396,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
     """
     Genotype a file.
 
-    Args:
-        gene (str)
-        output (str, optional)
-        args: remaining command-line arguments
-
-    Raises:
-        :obj:`aldy.common.AldyException` if ``cn_region`` is invalid.
+    :raise: :py:class:`aldy.common.AldyException` if `cn_region` is invalid.
     """
 
     cn_region = parse_cn_region(args.cn_neutral_region)

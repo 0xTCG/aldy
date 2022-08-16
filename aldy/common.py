@@ -80,11 +80,11 @@ PROTEINS = {
     "AGG": "R",
     "GGG": "G",
 }
-"""dict[str, str]: Codon table (stop codon is X)."""
+"""Codon table (stop codon is X)."""
 
 
 REV_COMPLEMENT = {"A": "T", "T": "A", "C": "G", "G": "C"}
-"""dict[str, str]: Reverse-complement DNA table."""
+"""Reverse-complement DNA table."""
 
 
 log = logbook.Logger("Aldy")
@@ -92,39 +92,28 @@ log = logbook.Logger("Aldy")
 
 
 SOLUTION_PRECISION = 1e-2
-"""float: Solution precision (all values whose difference is less than
-   SOLUTION_PRECISION are considered equal)"""
+"""
+Solution precision (all values whose absolute difference falls below the specified
+precision are considered equal).
+"""
 
 
 class AldyException(Exception):
-    """
-    Aldy exception class.
-    """
+    """Aldy exception class."""
 
     pass
 
 
 class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
-    """
-    A range within the reference genome (e.g. chr22:10-20).
-    Immutable.
-
-    Attributes:
-        chr (str): Chromosome identifier.
-        start (int): Start position of the interval.
-        end (int): End position of the interval.
-
-    Notes:
-        Has custom printer (``__str__``).
-    """
+    """Reference genome range (e.g. `chr22:10-20`). Immutable."""
 
     def samtools(self, pad_left=500, pad_right=1, prefix="") -> str:
-        """
-        Samtools-compatible region representation (e.g. chr1:10-20).
+        """Samtools-compatible region representation (e.g. chr1:10-20).
 
-        Returns:
-            str
-        """
+        :param pad_left: Left padding.
+        :param pad_right: Right padding.
+        :param prefix: Chromosome prefix."""
+
         return "{}:{}-{}".format(
             prefix + self.chr, self.start - pad_left, self.end + pad_right
         )
@@ -133,86 +122,53 @@ class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
         return self.samtools(0, 0, "")
 
 
-# Aldy auxiliaries
-
-
 def allele_name(x: str) -> str:
-    """
-    Returns:
-        str: Major allele number of the star-allele name (e.g. ``'12A'`` -> ``12``).
-    """
+    """:returns: Major allele number of the star-allele name (e.g. `'12A'` -> `12`)."""
     if "*" in x:
         x = x.split("*", maxsplit=1)[1]
     return x.replace("/", "_")
 
 
-def freezekey(x):  # hashing for dictionaries
-    return tuple(i[1] for i in sorted(x[0].items())) + tuple(
-        i[1] for i in sorted(x[1].items())
-    )
-
-
 def rev_comp(seq: str) -> str:
-    """
-    Returns:
-        str: Reverse-complemented DNA sequence.
-    """
+    """:returns: Reverse-complemented DNA sequence."""
 
     return "".join([REV_COMPLEMENT.get(x, x) for x in seq[::-1]])
 
 
 def seq_to_amino(seq: str) -> str:
-    """
-    Returns:
-        str: Protein sequence formed from the provided DNA sequence.
-    """
+    """:returns: Protein sequence formed from the provided DNA sequence."""
 
     return "".join(
         PROTEINS[seq[i : i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3)
     )
 
 
-# Language auxiliaries
+def freezekey(x):
+    """Hashing support for dictionaries."""
+    return tuple(i[1] for i in sorted(x[0].items())) + tuple(
+        i[1] for i in sorted(x[1].items())
+    )
 
 
 def sorted_tuple(x: Iterable) -> tuple:
-    """
-    Sort a tuple.
-    """
+    """:returns: Sorted tuple."""
     return tuple(sorted(x))
 
 
 def td(s: str) -> str:
     """
-    Abbreviation for textwrap.dedent. Useful for stripping indentation
-    in multi-line docstrings.
+    Abbreviation for textwrap.dedent. Used for stripping indentation in multi-line
+    docstrings.
     """
     return textwrap.dedent(s)
 
 
-def timing(f):  # pragma: no cover
-    """
-    Decorator for timing a function.
-    Prints the time spent in the function after once it is completed.
-
-    Usage::
-
-        @timing
-
-    (without any parameters).
-    """
-
-    def wrap(*args, **kwargs):
-        time1 = time.time()
-        ret = f(*args, **kwargs)
-        time2 = time.time()
-        log.warn("Time needed: ({:.1f})", time2 - time1)
-        return ret
-
-    return wrap
-
-
 class Timing:
+    """
+    Context manager for timing code blocks. Prints the time spent in the function after
+    it is completed.
+    """
+
     def __init__(self, name="Block"):
         self.name = name
 
@@ -226,31 +182,20 @@ class Timing:
 
 
 def pp(x) -> str:
-    """
-    Returns:
-        str: Pretty-printed variable string.
-    """
+    """:returns: Pretty-printed variable string."""
+
     return pprint.pformat(x)
-
-
-def pr(x):
-    """
-    Pretty-print a variable to stdout.
-    """
-    pprint.pprint(x)
 
 
 def script_path(key: str) -> str:
     """
-    Args:
-        key (str): resource to be extracted.
-        Specify as ``path/file`` (e.g. ``aldy.resources/test.txt``).
+    Obtain the full path of a resource.
 
-    Returns:
-        str: Full path of the resource.
-
-    Raises:
-        :obj:`aldy.common.AldyException`.
+    :param key: resource to be extracted.
+    :param key: resource to be extracted in `path/file` format
+        (e.g., `aldy.resources/test.txt`).
+    :returns: Full path of the resource.
+    :raises: :py:class:`aldy.common.AldyException` if the resource does not exist.
     """
     components = key.split("/")
     if len(components) < 2:
@@ -259,10 +204,7 @@ def script_path(key: str) -> str:
 
 
 def colorize(text: str, color: str = "green") -> str:
-    """
-    Returns:
-        str: Colorized string (on xterm-compatible terminals) with a given color.
-    """
+    """:returns: xterm-compatible colorized string with a given color."""
 
     import logbook._termcolors
 
@@ -270,6 +212,11 @@ def colorize(text: str, color: str = "green") -> str:
 
 
 def parse_cn_region(cn_region):
+    """
+    :returns: :py:class:`GRange` object that represents the user-provided CN region in
+        Samtools format (i.e., `chr1:100-200`).
+    :raises: :py:class:`aldy.common.AldyException` if the region is invalid.
+    """
     if cn_region is not None:
         r = re.match(r"^(.+?):(\d+)-(\d+)$", cn_region)
         if not r:
@@ -284,16 +231,10 @@ def parse_cn_region(cn_region):
     return None
 
 
-def chr_prefix(ch: str, chrs: List[str]) -> str:  # assumes ch is not prefixed
+def chr_prefix(ch: str, chrs: List[str]) -> str:
     """
-    Check if `ch` (*without any chr prefix*) should be prefixed with "chr" or not.
-
-    Returns:
-        str: Prefix to be prepended to chromosome (empty if needed).
-
-    Params:
-        ch (str): chromosome name
-        chrs (list[str]): list of chromosome names in the alignment file
+    Check if a chromosome needs "chr" prefix given the available chromosomes.
+    :returns: Chromosome prefix if the chromosome does not have it.
     """
     if ch not in chrs and "chr" + ch in chrs:
         return "chr"
@@ -301,6 +242,11 @@ def chr_prefix(ch: str, chrs: List[str]) -> str:  # assumes ch is not prefixed
 
 
 class JsonDict(dict):
+    """
+    Dictionary that adds a dictionary for each missing key. Used to ease handling and
+    populating JSON objects.
+    """
+
     def __getitem__(self, key):
         if key not in self:
             self[key] = JsonDict()

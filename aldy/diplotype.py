@@ -32,22 +32,19 @@ OUTPUT_COLS = [
     "Code",
     "Status",
 ]
-"""list[str]: Output column descriptions"""
+"""Output column descriptions"""
 
 
 def write_decomposition(
-    sample: str, gene: Gene, sol_id: int, minor: MinorSolution, f
-) -> None:
-    """
-    Write an allelic decomposition to the file `f`.
+    sample: str, gene: Gene, coverage: Coverage, sol_id: int, minor: MinorSolution, f
+):
+    """Write an allelic decomposition to the given file.
 
-    Args:
-        sample (str): Sample name.
-        gene (:obj:`aldy.gene.Gene`): Gene instance.
-        sol_id (int): Solution ID (each solution must have a different ID).
-        minor (:obj:`aldy.solutions.MinorSolution`):
-            Minor star-allele solution to be written.
-        f (file): Output file.
+    :param sample: Sample name.
+    :param gene: Gene instance.
+    :param sol_id: Solution ID (each solution must have a different ID).
+    :param minor: Minor star-allele solution to be written.
+    :param f: Output file.
     """
 
     for copy, a in enumerate(minor.solution):
@@ -72,7 +69,7 @@ def write_decomposition(
                         a.minor,
                         m.pos,
                         m.op,
-                        -1,
+                        coverage[m],
                         fn if fn else "none",
                         gene.get_rsid(m, default=False),
                         "",
@@ -104,6 +101,16 @@ def write_decomposition(
 def write_vcf(
     sample: str, gene: Gene, coverage: Coverage, minors: List[MinorSolution], f
 ):
+    """
+    Write an allelic decomposition in the VCF format to the given file.
+
+    :param sample: Sample name.
+    :param gene: Gene instance.
+    :param sol_id: Solution ID (each solution must have a different ID).
+    :param minor: Minor star-allele solution to be written.
+    :param f: Output file.
+    """
+
     header = f"""
     ##fileformat=VCFv4.2
     ##source=aldy-v{version}
@@ -115,6 +122,7 @@ def write_vcf(
     ##FORMAT=<ID=MA,Number=1,Type=String,Description="Major genotype star-allele calls">
     ##FORMAT=<ID=MI,Number=1,Type=String,Description="Minor genotype star-allele calls">
     """
+
     all_mutations: Dict[Mutation, List[dict]] = {
         m: [collections.defaultdict(int)] * len(minors)
         for minor in minors
@@ -146,13 +154,13 @@ def write_vcf(
         file=f,
     )
     for m in sorted(all_mutations):
-        ref = m.op[0]  # TODO: should be genome nucleotide, not the RefSeq nucleotide...
+        ref = m.op[0]  # TODO: should be genome nucleotide, not the RefSeq nucleotide?!
         if m.op[1] == ">":
             alt = m.op[2]
         elif m.op[:3] == "ins":
             alt = ref + m.op[3:]
         else:
-            ref, alt = ".", f"{m.op[3:]}, ."  # TODO: this is wrong...
+            ref, alt = ".", f"{m.op[3:]}, ."  # TODO: this is wrong?!
 
         fm = gene.get_functional(m)
         fm = fm.replace(" ", "_").replace("\t", "_").replace(";", "_") if fm else "none"
@@ -203,15 +211,14 @@ def write_vcf(
 
 
 def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
-    """
-    Calculate the diplotype assignment for a minor solution.
-    Assigns a ``diplotype`` attribute of the :obj:`aldy.solutions.MinorSolution`.
-    Relies on the diplotype assignment heuristics to assign correct diplotypes.
-    This heuristics has no biological validity whatsoever--- it is purely used
-    to pretty-print the final solutions.
+    """Calculate the diplotype assignment for a minor solution.
+    Set the `diplotype` attribute of the :py:class:`aldy.solutions.MinorSolution`.
 
-    Returns:
-        str: Diplotype assignment.
+    Uses the diplotype assignment heuristics to assign correct diplotypes.
+    This heuristics has no biological validity whatsoever---it is purely used
+    for pretty-printing the final solutions.
+
+    :returns: Diplotype assignment.
     """
 
     del_allele = gene.deletion_allele()
@@ -245,8 +252,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     # Handle duplicates (heuristics that groups duplicate alleles together,
     #                    e.g. 1, 1, 2 -> 1+1/2)
     # First check should we split them (e.g. 1, 1, 1, 1 -> 1+1/1+1)?
-    def xlen(d):
-        return sum(2 if isinstance(n, tuple) else 1 for n in d)
+    xlen = lambda d: sum(2 if isinstance(n, tuple) else 1 for n in d)  # noqa
 
     if len(major_dict) == 1:
         items = next(iter(major_dict.values()))
@@ -281,12 +287,12 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
         elif len(diplotype[0]) == 1 and isinstance(diplotype[0][0], tuple):
             diplotype = diplotype[0][0]
 
-    def key(x):
-        if isinstance(x, tuple):
-            return solution.get_major_name(x[0])
-        return solution.get_major_name(x)
-
     def flatten(d):
+        def key(x):
+            if isinstance(x, tuple):
+                return solution.get_major_name(x[0])
+            return solution.get_major_name(x)
+
         for i in natsorted(d, key=key):
             if isinstance(i, tuple):
                 yield from i

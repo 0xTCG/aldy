@@ -1,3 +1,5 @@
+options:
+  sam_long_reads: true
 CFTR:
   down: [0]
   e1: [0]

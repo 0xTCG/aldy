@@ -34,76 +34,52 @@ from .lpinterface import model as lp_model
 def genotype(
     gene_db: str,
     sam_path: str,
-    profile_name: str,
+    profile_name: Optional[str],
     output_file: Optional[Any] = sys.stdout,
     cn_region: Optional[GRange] = None,
     cn_solution: Optional[List[str]] = None,
     solver: str = "any",
     reference: Optional[str] = None,
-    gap: int = 0,
     max_minor_solutions: int = 1,
     debug: Optional[str] = None,
     multiple_warn_level: int = 1,
-    phase: Optional[str] = None,
     report: bool = False,
     genome=None,
     is_simple: bool = False,
     **params,
 ) -> Dict[str, List[solutions.MinorSolution]]:
-    """
-    Genotype a sample.
+    """Genotype a sample.
 
-    Returns:
-        dict[str, list[:obj:`aldy.solutions.MinorSolution`]]: List of genotype
-        solutions for each gene.
-
-    Args:
-        gene_db (str):
-            Gene name (if it is located in the Aldy's gene database)
-            or the location of a gene database in YML format.
-        sam_path (str):
-            Location of SAM/BAM/CRAM file that is to be analyzed.
-        profile_name (str):
-            Coverage profile (e.g. 'illumina').
-            Can be ``None`` if ``cn_solution`` is provided.
-        cn_region (:obj:`aldy.common.GRange`, optional):
-            Copy-number neutral region.
-            Can be ``None`` (will use the default CYP2D8 region or ``None``
-            if ``cn_solution`` is provided).
-        output_file (file, optional):
-            Location of an output decomposition file.
-            Provide ``None`` for no output.
-            Default is ``sys.stdout``.
-        cn_solution (list[str], optional):
-            User-specified list of the copy number configurations.
-            Copy-number detection solver will not run is this parameter is set.
-            Default is ``None``.
-        threshold (float):
-            Mutation filtering threshold.
-            Default is 0.5 (for 50%).
-        solver (str):
-            ILP solver. Check :obj:`aldy.lpinterface` for the list of available solvers.
-            Default is ``'any'``.
-        phase (str, optional):
-            Location of HapCUT or HapTree-compatible phased blocks.
-        reference (str, optional):
-            A reference genome for reading CRAM files.
-            Default is ``None``.
-        gap (float):
-            Relative optimality gap. Use non-zero values to allow non-optimal solutions.
-            Default is 0 (reports only optimal solutions).
-        max_minor_solutions (int):
-            Maximum number of minor solutions to report for each major solution.
-            Default is 1.
-        debug (str, optional):
-            Prefix for debug information and core dump files.
-            ``None`` for no debug information.
-            Default is ``None``.
-        min_cov (float):
-            Minimum mutation read coverage.
-            Default is 1.
-    Raises:
-        :obj:`aldy.common.AldyException` if the average coverage is too low (below 2).
+    :param gene_db: Gene name (if it is shipped with Aldy)
+        or the location of the gene database in YAML format.
+    :param sam_path: Location of SAM/BAM/CRAM file that is to be analyzed.
+    :param profile_name: Coverage profile (e.g. WGS).
+        `None` if `cn_solution` is provided.
+    :param output_file: Location of the output file. Use `None` for no output.
+        Default: `sys.stdout`.
+    :param cn_region: Copy-number neutral region.
+        Default: None (uses the provided CYP2D8 region).
+    :param cn_solution: List of the copy number configurations.
+        Copy-number detection will not run if this parameter is set.
+        Default: `None`.
+    :param solver: ILP solver (see :py:mod:`aldy.lpinterface` for supported solvers).
+    :param reference: Reference genome (for reading CRAM files).
+        Default: `None`.
+    :param max_minor_solutions: Maximum number of minor solutions to report for each
+        major solution.
+        Default: 1.
+    :param debug: Prefix for debug and core dump files.
+        Default: `None` (no debug information).
+    :param multiple_warn_level: Warning level (1 for optimal solutions, 2 for major
+        solutions and 3 for CN solutions).
+        Default: 1 (warn only on multiple optimal solutions).
+    :param report: If set, write the solution summary to the stderr.
+        Default: `False`.
+    :param genome: Reference genome (e.g., hg19 or hg38).
+        Default: `None` (auto-detect).
+    :param is_simple: Use simple output format.
+        Default: `False`.
+    :param params: Model parameters. See :py:mod:`aldy.profile` for details.
     """
 
     t1 = time.time()
@@ -156,11 +132,9 @@ def genotype(
                         cn_solution,
                         solver,
                         reference,
-                        gap,
                         max_minor_solutions,
                         debug,
                         multiple_warn_level,
-                        phase,
                         report,
                         genome,
                         is_simple,
@@ -206,7 +180,7 @@ def genotype(
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
         profile = Profile("user_provided", cn_solution=["1", "1"])
-        sample = sam.Sample(gene, profile, vcf_path=sam_path, debug=debug)
+        sample = sam.Sample(gene, profile, sam_path, debug=debug)
     else:
         if cn_solution:
             profile = Profile("user_provided", cn_solution=cn_solution)
@@ -250,7 +224,6 @@ def genotype(
         profile,
         sample.coverage,
         solver=solver,
-        gap=gap,
         debug=debug,
     )
 
@@ -277,16 +250,17 @@ def genotype(
     log.debug("*" * 80)
 
     for i, cn_sol in enumerate(cn_sols):
-        major_sols += major.estimate_major(
+        sols = major.estimate_major(
             gene,
             sample.coverage,
             cn_sol,
             solver=solver,
-            gap=gap,
             identifier=i,
             debug=debug,
-            offset=cn_sol.score - min_cn_score,
         )
+        for s in sols:
+            s.score += cn_sol.score - min_cn_score
+        major_sols += sols
     if len(major_sols) == 0:
         if is_simple:
             print(file=output_file)
@@ -303,7 +277,11 @@ def genotype(
     ]
     min_major_score = min(major_sols, key=lambda m: m.score).score
     major_sols = sorted(
-        [m for m in major_sols if m.score - min_major_score - gap < SOLUTION_PRECISION],
+        [
+            m
+            for m in major_sols
+            if m.score - min_major_score - profile.gap < SOLUTION_PRECISION
+        ],
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )
 
@@ -322,7 +300,6 @@ def genotype(
         major_sols,
         solver,
         max_solutions=max_minor_solutions,
-        debug=debug,
     ):
         n = solutions.MinorSolution(
             m.score
@@ -345,7 +322,11 @@ def genotype(
         )
     min_minor_score = min(minor_sols, key=lambda m: m.score).score
     minor_sols = sorted(
-        [m for m in minor_sols if m.score - min_minor_score - gap < SOLUTION_PRECISION],
+        [
+            m
+            for m in minor_sols
+            if m.score - min_minor_score - profile.gap < SOLUTION_PRECISION
+        ],
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )
     log.debug("*" * 80)
@@ -373,7 +354,7 @@ def genotype(
         if is_aldy:
             print(f"#Solution {i + 1}: {minor_sol._solution_nice()}", file=output_file)
             diplotype.write_decomposition(
-                sample.name, gene, i + 1, minor_sol, output_file
+                sample.name, gene, sample.coverage, i + 1, minor_sol, output_file
             )
         elif is_simple:
             print(simple[-2], simple[-1], sep="\t", end="\t", file=output_file)
@@ -382,37 +363,39 @@ def genotype(
     elif is_simple:
         print(file=output_file)
     log.debug("[simple]\t{}", "\t".join(simple))
+
     if report:
         log.info(colorize(f"{gene.name} results:"))
         reported: Set[str] = set()
         for r in minor_sols:
-            s = f"  - {r.get_major_diplotype()}"
-            if s not in reported:
-                log.info(colorize(s))
+            st = f"  - {r.get_major_diplotype()}"
+            if st not in reported:
+                log.info(colorize(st))
                 log.info(f"    Minor: {r.get_minor_diplotype()}")
                 log.info(f"    Legacy notation: {r.get_minor_diplotype(legacy=True)}")
-                reported.add(s)
+                reported.add(st)
                 # Calculate coverage of each mutation in a solution
                 for m, mc, sc in r.get_mutation_coverages(sample.coverage):
                     if abs(mc - sc) > 0.5:
                         log.warn(
                             "    Warning: Coverage of {} is not in line with "
-                            "the prediction\n"
-                            "             (predicted: {:.1f}, observed: {:.1f})",
+                            "the prediction (predicted: {:.1f}, observed: {:.1f})",
                             gene.get_rsid(m),
                             mc,
                             sc,
                         )
-    if any(len(m.major_solution.added) > 0 for m in minor_sols) and not phase:
+    if (
+        any(len(m.major_solution.added) > 0 for m in minor_sols)
+        and not sample.is_long_read
+    ):
         novels = {
             gene.get_rsid(mm) for m in minor_sols for mm in m.major_solution.added
         }
         log.warn(
-            "WARNING: mutations {} suggest presence of a novel major star-allele."
-            + "\nHowever, such alleles cannot be determined without phasing data."
-            + "\nPlease provide --phase parameter for Aldy to accurately call novel "
-            + "major star-alleles.\nThe above-reported assignments of these mutations "
-            + "are random.",
+            "WARNING: mutations {} suggest presence of a novel major star-allele.\n"
+            "However, exact allele contents cannot be determined without the "
+            "long-read phasing data. The reported assignments of novel mutations "
+            "are for that reason currently randomly assigned.",
             ", ".join(sorted(novels)),
         )
 

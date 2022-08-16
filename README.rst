@@ -39,99 +39,99 @@ Gene Support
    * - Gene
      - Version
      - Status
-     - Copy number & Fusion
+     - Has copy number & structural variation?
    * - *CYP2D6*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ✅
+     - Yes
    * - *CYP2A6*
      - cypalleles.ki.se (Jan 2012)
      - ✅
      - ✅
    * - *CYP2B6*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ⚠️ (possible mapping conflicts with *CYP2B7*; needs more validation)
-     - 🚫
+     - Yes
    * - *CYP1A1*
      - PharmGKB (Dec 2014)
      - ✅
-     - ❓ (no reported CN/fusion events in the database)
+     - No
    * - *CYP1A2*
      - PharmGKB (Mar 2014)
      - ✅
-     - ❓
+     - No
    * - *CYP2A13*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP2C19*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - 🚫
+     - No
    * - *CYP2C8*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP2C9*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP2E1*
      - PharmGKB (Nov 2013)
      - ⚠️ (not tested on real data yet)
-     - ❓
+     - No
    * - *CYP2F1*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ⚠️ (not tested on real data yet)
-     - ❓
+     - No
    * - *CYP2J2*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP2R1*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ⚠️ (not tested on real data yet)
-     - ❓
+     - No
    * - *CYP2S1*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP2W1*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ⚠️ (not tested on real data yet)
-     - ❓
+     - No
    * - *CYP3A43*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP3A4*
-     - cypalleles.ki.se (2020)
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP3A5*
-     - PharmVar 4.2.4
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP3A7*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CYP4F2*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *CFTR*
      - PharmGKB (Jun 2020)
      - ✅
-     - ❓
+     - No
    * - *COMT*
      - Pharmacoscan
      - ✅
-     - ❓
+     - No
    * - *DPYD*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *G6PD*
      - PharmGKB (Sep 2018)
      - ✅
@@ -139,39 +139,39 @@ Gene Support
    * - *GSTM1*
      - Pharmacoscan
      - ✅
-     - ❓
+     - No
    * - *GSTP1*
      - Pharmacoscan
      - ✅
-     - ❓
+     - No
    * - *IFNL3*
      - PharmGKB
      - ✅
-     - ❓
+     - No
    * - *NAT1*
      - PharmGKB (Mar 2014)
      - ✅
-     - ❓
+     - No
    * - *NAT2*
      - PharmGKB (Mar 2014)
      - ✅
-     - ❓
+     - No
    * - *NUDT15*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *SLCO1B1*
-     - PharmGKB (Oct 2019)
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     - No
    * - *TPMT*
      - PharmGKB (Jun 2020)
      - ✅
-     - ❓
+     - No
    * - *UGT1A1*
      - PharmGKB (Feb 2020)
      - ✅
-     - ❓
+     - No
    * - *UGT2B7*
      - pharmacogenomics.pha.ulaval.ca (Apr 2015) / Pharmacoscan
      - ✅
@@ -189,7 +189,7 @@ If you are using Aldy in a clinical or commercial environment, **please read thi
 Aldy is a computational tool whose purpose is to *aid the genotype detection process*. It can be of tremendous help in that process, however it is not perfect, and it can easily make a wrong call if the data is noisy, ambigious or if the target sample contains a previously unknown allele.
 
 ☣️🚨 **Do not use the raw output of Aldy (or any other computational tool for that matter) to diagnose a disease or prescribe a drug!**
-**It is your responsibility to validate every result manually or (ideally) in a wetlab before doing something that can have major consequences.** 🚨☣️
+**It is your responsibility to inspect and validate the results (ideally) in a wetlab before doing something that can have major consequences.** 🚨☣️
 
 We really mean it.
 
@@ -234,15 +234,6 @@ The following solvers are currently supported:
   and typing::
 
       python3 setup.py install
-
-* `SCIP <http://scip.zib.de>`_: another solver which is also free for academic purposes.
-  SCIP is easier to install than Gurobi (no registration or activation required).
-  However, it might be slower than Gurobi.
-  Once you you install SCIP, please install
-  `PySCIPPpt <https://github.com/SCIP-Interfaces/PySCIPOpt>`_ module for the Python
-  SCIP bindings via `pip`: ``pip install pyscipopt``. If it fails, make sure to set
-  `SCIPOPTDIR` environmental variable to point to SCIP's install directory.
-
 
 
 Sanity check
@@ -302,17 +293,24 @@ Sequencing profile selection
 The ``[profile]`` argument refers to the sequencing profile.
 The following profiles are available:
 
-- ``illumina`` for Illumina WGS or exome (WXS) data (or any uniform-coverage technology).
+- ``illumina`` or ``wgs`` for Illumina WGS or exome (WXS) data (or any uniform-coverage technology).
 
 .. attention::
   It is highly recommended to use samples with at least 40x coverage.
-  Anything lower than 20x will result in tears and agony.
+  Anything below 20x .
 
 - ``pgx1`` for PGRNseq v.1 capture protocol data
 - ``pgx2`` for PGRNseq v.2 capture protocol data
 - ``pgx3`` for PGRNseq v.3 capture protocol data
 
-- ``wxs`` for whole-exome sequencing data
+- ``10x`` for 10X Genomics data
+
+.. attention::
+  For the best results on 10X Genomics datasets, use EMA aligner, especially
+  if doing *CYP2D6* analysis. Aldy will also use EMA read cloud information for
+  improved variant phasing.
+
+- ``exome``, ``wxs``, ``wes`` for whole-exome sequencing data
 
    .. attention::
    ⚠️ **Be warned!:** whole-exome data is incomplete *by definition*, and Aldy will not be able to call majoe star-alleles that are

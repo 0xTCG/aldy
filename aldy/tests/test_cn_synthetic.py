@@ -13,6 +13,7 @@ from aldy.common import SOLUTION_PRECISION
 
 def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0.0):
     profile = Profile("test")
+    profile.gap = gap
     sols = solve_cn_model(
         gene,
         profile,
@@ -20,7 +21,6 @@ def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0.0):
         max_cn=profile.cn_max,
         region_coverage=cov,
         solver=solver,
-        gap=gap,
     )
     if expected_obj:
         for s in sols:

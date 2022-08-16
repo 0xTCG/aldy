@@ -10,12 +10,11 @@ import copy
 from .profile import Profile
 from .common import log, AldyException
 from .gene import Mutation, Gene
+from .solutions import CNSolution
 
 
 class Coverage:
-    """
-    Data structure that maintains the coverage information for a given sample.
-    """
+    """Data structure that maintains the coverage information for a given sample."""
 
     def __init__(
         self,
@@ -26,19 +25,17 @@ class Coverage:
         cnv_coverage: Dict[int, int],
     ) -> None:
         """
-        Coverage initialization.
-
-        :param coverage:
-            Coverage for each locus within a sample represented as a dictionary that
-            maps mutation (or a reference position indicated by `_`) to the number of
-            reads supporting that mutation.
-            For example, ``coverage[10]['A>G'] = 2`` means that there are 2 reads that
-            have G (instead of A) at the genomic locus 10.
-        :param cnv_coverage:
-            Coverage of the copy-number neutral region of the sample: each genomic locus
-            within that region points to the corresponsing read coverage.
-            Used for coverage rescaling.
-        :param sample: Sample name. Default: 'sample'.
+        :param gene: Gene instance.
+        :param profile: Profile instance.
+        :param sam: Sample instance.
+        :param coverage: Coverage for each sample location. Each location is represented
+            as a dictionary that maps a mutation (or a reference position indicated by
+            `_`) to the list of read quality scores that cover it. For example,
+            `coverage[10]['A>G'] = [(10, 20), (10, 10)]` indicates that 2 reads have G
+            (instead of A) at the location 10.
+        :param cnv_coverage: Coverage of the copy-number neutral region within the
+            sample. Each location is represented by the total corresponsing read
+            coverage. Used for coverage rescaling.
         """
         self.gene = gene
         self.profile = profile
@@ -48,18 +45,18 @@ class Coverage:
         self._region_coverage: Dict[Tuple[int, str], float] = {}
 
     def __getitem__(self, mut: Mutation) -> float:
-        """:return: Coverage of the mutation ``mut``."""
+        """:returns: Mutation coverage."""
         return self.coverage(mut)
 
     def coverage(self, mut: Mutation) -> float:
-        """:return: Coverage of the mutation ``mut``."""
+        """:returns: Mutation coverage."""
         if mut.pos in self._coverage and mut.op in self._coverage[mut.pos]:
             return len(self._coverage[mut.pos][mut.op])
         else:
             return 0
 
     def total(self, pos: int) -> float:
-        """:return: Total coverage at the locus ``pos``."""
+        """:returns: Location coverage."""
         if pos not in self._coverage:
             return 0
         return float(
@@ -67,33 +64,34 @@ class Coverage:
         )
 
     def percentage(self, m: Mutation) -> float:
-        """:return: Coverage of the mutation ``mut`` as a percentage (0-100%)."""
+        """:returns: Mutation coverage expressed as percentage (0-100%)."""
         total = self.total(m.pos)
         if total == 0:
             return 0
         return 100.0 * self.coverage(m) / total
 
-    def single_copy(self, pos: int, cn_solution) -> float:
+    def single_copy(self, pos: int, cn_solution: CNSolution) -> float:
         """
-        :param pos: Genomic locus,
+        :param pos: Genomic locus.
         :param cn_solution: Copy-number solution.
-        :return: Coverage of a single gene copy at the locus ``pos``.
+        :returns: Coverage of a *single* gene copy at the given location.
         """
         if cn_solution.position_cn(pos) == 0:
             return 0
         return max(1, self.total(pos)) / cn_solution.position_cn(pos)
 
     def region_coverage(self, gene: int, region: str) -> float:
-        """:return: Average coverage of the region ``region`` in ``gene``."""
+        """:returns: Average coverage of a gene region."""
         return self._region_coverage[gene, region]
 
     def average_coverage(self) -> float:
-        """:return: Average coverage of the sample."""
+        """:returns: Average coverage of the gene."""
         return sum(self.total(pos) for pos in self._coverage) / float(
             len(self._coverage) + 0.1
         )
 
     def dump(self, out=None):
+        """Pretty-print the coverage data."""
         for pos, pos_mut in sorted(self._coverage.items()):
             if len(pos_mut) == 1 and "_" in pos_mut:
                 continue
@@ -116,19 +114,19 @@ class Coverage:
                         f"{self.gene.chr_to_ref.get(pos, -1) + 1}\t{op}\t{p:.1f}\t{t}"
                     )
 
-    def filtered(self, filter_fn: Callable[[Any, Mutation], List]):  # -> Coverage
+    def filtered(self, filter_fn: Callable[[Any, Mutation], List]):
         """
-        :param filter_fn:
-            Function that performs mutation filtering with the following arguments:
+        :param filter_fn: Function that performs mutation filtering with the following
+            arguments:
 
-                1. mut (:obj:`aldy.gene.Mutation`): mutation to be filtered
+                1. mut (:py:class:`aldy.gene.Mutation`): mutation to be filtered
                 2. cov (float): coverage of the mutation
                 3. total (float): total coverage of the mutation locus
                 4. thres (float): filtering threshold
 
-            ``filter_fn`` returns ``False`` if a mutation is filtered out.
+            `filter_fn` returns `False` if a mutation should be filtered out.
 
-        :return: Filtered coverage.
+        :returns: Filtered coverage.
         """
 
         new_cov = copy.copy(self)
@@ -142,14 +140,14 @@ class Coverage:
         return new_cov
 
     def diploid_avg_coverage(self) -> float:
-        """:return: Average coverage of the copy-number neutral region."""
+        """:returns: Average coverage of the copy-number neutral region."""
         assert self.profile.cn_region, "CN region not set"
         return float(sum(self._cnv_coverage.values())) / abs(
             self.profile.cn_region.end - self.profile.cn_region.start
         )
 
     def _normalize_coverage(self) -> None:
-        """Normalize the sample coverage to match the profile coverage."""
+        """Normalize the sample coverage with the profile coverage."""
 
         assert self.profile.cn_region and self.profile.data, "CN region not set"
         sam_ref = sum(
@@ -176,15 +174,14 @@ class Coverage:
                 self._region_coverage[gene, region] = (ratio * s / p) if p != 0 else 0.0
 
     def basic_filter(self, mut: Mutation, cn=None, thres=None) -> List:
-        """
-        Basic filtering function.
-        """
+        """Basic threshold-based filter."""
         thres = (thres or self.profile.threshold) / (cn or 1)
         quals = self._coverage[mut.pos][mut.op]
         min_cov = max(self.profile.min_coverage, self.total(mut.pos) * thres)
         return quals if len(quals) >= min_cov else []
 
     def quality_filter(self, mut: Mutation) -> List:
+        """Basic quality filter."""
         quals = self._coverage[mut.pos].get(mut.op, [])
         return [
             (m, q)

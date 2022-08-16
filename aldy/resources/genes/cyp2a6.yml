@@ -1,180 +1,62 @@
 name: CYP2A6
-version: aldy-karolinska-1.0
-generated: '2020-07-11'
+version: pharmvar-5.2.3
+generated: '2022-08-12'
+pharmvar: 30670
 ensembl: ENSG00000255974
 alleles:
   CYP2A6*1.001:
-    label: CYP2A6*1
-    activity: Normal (in vivo); Normal (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1903
+    activity: function not assigned
+    evidence: D
     mutations: []
   CYP2A6*1.002:
-    label: CYP2A6*1B2
+    pharmvar: https://www.pharmvar.org/haplotype/1907
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
   CYP2A6*1.003:
-    label: CYP2A6*1B3
+    pharmvar: https://www.pharmvar.org/haplotype/1879
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [4627, G>A, rs67568271]
-  CYP2A6*1.005:
-    label: CYP2A6*1B5
-    mutations:
-    - [3443, T>C, rs57837628]
     - [4009, A>G, rs4803381]
-    - [3342, A>G, rs2644914]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [6641, T>C, rs8192725]
-  CYP2A6*1.006:
-    label: CYP2A6*1B6
-    mutations:
-    - [3342, A>G, rs2644914]
-    - [3443, T>C, rs57837628]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [4009, A>G, rs4803381]
-    - [6641, T>C, rs8192725]
-    - [11306, A>G, '-']
-    - [11314, T>C, rs2431414]
-  CYP2A6*1.007:
-    label: CYP2A6*1B7
-    mutations:
-    - [3443, T>C, rs57837628]
-    - [3558, A>T, rs111822043]
-    - [3342, A>G, rs2644914]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [6641, T>C, rs8192725]
-  CYP2A6*1.008:
-    label: CYP2A6*1B8
-    mutations:
-    - [3443, T>C, rs57837628]
-    - [3558, A>T, rs111822043]
-    - [4009, A>G, rs4803381]
-    - [3342, A>G, rs2644914]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [6641, T>C, rs8192725]
-  CYP2A6*1.009:
-    label: CYP2A6*1B9
-    mutations:
-    - [3443, T>C, rs57837628]
-    - [3558, A>T, rs111822043]
-    - [4009, A>G, rs4803381]
-    - [3342, A>G, rs2644914]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [6641, T>C, rs8192725]
-    - [11411, T>G, rs370819234]  # Manually corrected
-  CYP2A6*1.010:
-    label: CYP2A6*1B10
-    mutations:
-    - [3443, T>C, rs57837628]
-    - [3558, A>T, rs111822043]
-    - [4009, A>G, rs4803381]
-    - [3342, A>G, rs2644914]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [6641, T>C, rs8192725]
-    - [11410, C>G, rs373949046]
-  CYP2A6*1.011:
-    label: CYP2A6*1B11
-    mutations:
-    - [3443, T>C, rs57837628]
-    - [3558, A>T, rs111822043]
-    - [4009, A>G, rs4803381]
-    - [10649, C>T, rs553913513]
-    - [3342, A>G, rs2644914]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [6641, T>C, rs8192725]
-  CYP2A6*1.013:
-    label: CYP2A6*1B13
-    mutations:
-    - [4277, A>G, rs61663607]
-    - [5043, C>T, rs8192720]
-    - [11712, C>G, '-']
-  CYP2A6*1.014:
-    label: CYP2A6*1B14
-    mutations:
-    - [11803, C>G, rs8192733]
-    - [5359, T>C, '-']
-    - [12181, A>G, rs28742185]
-    - [11956, insCACTT, rs72549451]
-  CYP2A6*1.015:
-    label: CYP2A6*1B15
-    mutations:
-    - [6402, C>T, rs866618989]
-    - [8246, A>G, rs56113850]
-    - [11803, C>G, rs8192733]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [6641, T>C, rs8192725]
-    - [12181, A>G, rs28742185]
-    - [11981, insGAAAAG, rs72549452]
-    - [11956, insCACTT, rs72549451]
-    - [6496, delCTCTCT, rs1379602712]
-    - [4039, A>C, '-']
-  CYP2A6*1.016:
-    label: CYP2A6*1B16
-    mutations:
-    - [6651, T>C, rs200390640]
-    - [10705, T>C, rs28399461]
-    - [11803, C>G, rs8192733]
-    - [12010, A>G, rs72549453]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [4277, A>G, rs61663607]
-    - [5043, C>T, rs8192720]
-    - [12181, A>G, rs28742185]
-    - [11981, insGAAAAG, rs72549452]
-    - [11956, insCACTT, rs72549451]
-  CYP2A6*1.017:
-    label: CYP2A6*1B17
-    mutations:
-    - [6667, C>T, rs781549568]
-    - [7317, C>T, rs72549439]
-    - [8015, T>C, rs56267346]
-    - [8809, C>T, rs535108140]
-    - [9657, A>C, rs72549445]
-    - [11164, C>A, rs531467589]
-    - [11803, C>G, rs8192733]
-    - [11853, A>G, rs8192734]
-    - [11856, C>A, rs28399483]
-    - [12010, A>G, rs72549453]
-    - [6641, T>C, rs8192725]
-    - [7504, G>A, rs2388868]
-    - [9871, C>T, rs2302989]
-    - [9998, C>T, rs138932530]
-    - [12181, A>G, rs28742185]
-    - [11981, insGAAAAG, rs72549452]
-    - [11956, insCACTT, rs72549451]
-    - [9092, delA, '-']
-  CYP2A6*1.018:
-    label: CYP2A6*1F
+    - [5072, A>G, rs1137115]
+  CYP2A6*1.004:
+    pharmvar: https://www.pharmvar.org/haplotype/1919
+    activity: function not assigned
+    evidence: L
     mutations:
     - [10738, C>T, rs28399462]
-  CYP2A6*1.019:
-    label: CYP2A6*1G
+  CYP2A6*1.005:
+    pharmvar: https://www.pharmvar.org/haplotype/1893
+    activity: function not assigned
+    evidence: L
     mutations:
     - [10738, C>T, rs28399462]
     - [10846, A>G, rs56164728]
-  CYP2A6*1.020:
-    label: CYP2A6*1H
-    activity: Decr.? (in vitro)
+  CYP2A6*1.006:
+    pharmvar: https://www.pharmvar.org/haplotype/1910
+    activity: function not assigned
+    evidence: L
     mutations:
     - [4277, A>G, rs61663607]
-  CYP2A6*1.021:
-    label: CYP2A6*1J
+    - [5072, A>G, rs1137115]
+  CYP2A6*1.007:
+    pharmvar: https://www.pharmvar.org/haplotype/1876
+    activity: function not assigned
+    evidence: L
     mutations:
     - [4009, A>G, rs4803381]
     - [4277, A>G, rs61663607]
-  CYP2A6*1.022:
-    label: CYP2A6*1K
+    - [5072, A>G, rs1137115]
+  CYP2A6*1.008:
+    pharmvar: https://www.pharmvar.org/haplotype/1859
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [3823, insTGCTGGGATTACAGGCGTGAGCCACCGCGCCCGGC, rs1263850274]
     - [4336, A>G, rs3822484]
+    - [5072, A>G, rs1137115]
     - [5452, C>T, rs368758891]
     - [6641, T>C, rs8192725]
     - [6800, G>A, rs28399441]
@@ -183,79 +65,156 @@ alleles:
     - [8399, C>T, rs1284294132]
     - [8925, G>A, rs796429900]
     - [9095, delA, rs72549443]
+    - [9105, delA, '-']
     - [11375, T>C, rs2431413]
-    - [12181, A>G, rs28742185]
   CYP2A6*2.001:
-    label: CYP2A6*2
-    activity: None (in vivo); None (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1922
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [6820, T>A, rs1801272, F]
-  CYP2A6*3.001:
-    label: CYP2A6*3
-    mutations:
-    - [5037, A>C, rs72549432, F]
-    - [5059, T>C, rs373993802, F]
-    - [5090, T>C, rs139764932]
-    - [5110, A>G, rs767380497, F]
-    - [5139, T>C, rs762573512]
-    - [5162, G>C, rs1199940391]
+    - [6820, T>A, rs1801272, L160H]
   CYP2A6*4.001:
     label: CYP2A6*4
-    activity: None (in vivo)
-    mutations: 
+    activity: none (in vivo)
+    mutations:
     - [CYP2A6, deletion]
   CYP2A6*5.001:
-    label: CYP2A6*5
-    activity: None (in vivo); None (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1896
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [11603, G>T, rs5031017, F]
+    - [5072, A>G, rs1137115]
+    - [11603, G>T, rs5031017, G479V]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
   CYP2A6*6.001:
-    label: CYP2A6*6
-    activity: Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1905
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [6724, G>A, rs4986891, F]
+    - [6724, G>A, rs4986891, R128Q]
   CYP2A6*7.001:
-    label: CYP2A6*7
-    activity: (Decr.) (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1862
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [11579, T>C, rs5031016, F]
+    - [11579, T>C, rs5031016, I471T]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
   CYP2A6*8.001:
-    label: CYP2A6*8
-    activity: Normal (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1889
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [11621, G>T, rs28399468, F]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
   CYP2A6*9.001:
-    label: CYP2A6*9A
-    activity: Decr. (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1908
+    activity: function not assigned
+    evidence: L
     mutations:
     - [4009, A>G, rs4803381]
-    - [4974, T>G, rs28399433, F]
+    - [4974, T>G, rs28399433, expression]
+    - [5072, A>G, rs1137115]
   CYP2A6*9.002:
-    label: CYP2A6*9B
+    pharmvar: https://www.pharmvar.org/haplotype/1873
+    activity: function not assigned
+    evidence: L
     mutations:
     - [4009, A>G, rs4803381]
+    - [4974, T>G, rs28399433, expression]
+    - [5072, A>G, rs1137115]
+    - [6641, T>C, rs8192725]
     - [6857, G>T, rs8192726]
     - [11375, T>C, rs2431413]
-    - [3342, A>G, rs2644914]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [4974, T>G, rs28399433, F]
-    - [6641, T>C, rs8192725]
     - [11713, C>G, rs7248240]
   CYP2A6*10.001:
-    label: CYP2A6*10
-    activity: Decr. (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1860
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [11579, T>C, rs5031016, F]
-    - [11621, G>T, rs28399468, F]
+    - [11579, T>C, rs5031016, I471T]
+    - [11621, G>T, rs28399468, R485L]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
   CYP2A6*11.001:
-    label: CYP2A6*11
-    activity: Decr. (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1904
+    activity: function not assigned
+    evidence: L
     mutations:
+    - [5072, A>G, rs1137115]
     - [8412, T>C, rs28399447, S224P]
   CYP2A6*12.001:
     label: CYP2A6*12A
-    activity: Decr. (in vivo); Decr. (in vitro)
+    activity: decreased
     mutations:
     - [CYP2A7, e2-]
   CYP2A6*12.002:
@@ -282,252 +241,373 @@ alleles:
     - [10738, C>T, rs28399462]
     - [CYP2A7, e2-]
   CYP2A6*13.001:
-    label: CYP2A6*13
+    pharmvar: https://www.pharmvar.org/haplotype/1882
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [5034, G>A, rs28399434, F]
-    - [4974, T>G, rs28399433, F]
+    - [4974, T>G, rs28399433, expression]
+    - [5034, G>A, rs28399434, G5R]
+    - [5072, A>G, rs1137115]
   CYP2A6*14.001:
-    label: CYP2A6*14
+    pharmvar: https://www.pharmvar.org/haplotype/1923
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [5107, G>A, rs28399435, F]
+    - [5107, G>A, rs28399435, S29N]
   CYP2A6*15.001:
-    label: CYP2A6*15
+    pharmvar: https://www.pharmvar.org/haplotype/1912
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [7155, A>G, rs199916117, F]
-    - [4974, T>G, rs28399433, F]
+    - [4974, T>G, rs28399433, expression]
+    - [5043, C>T, rs8192720]
+    - [5072, A>G, rs1137115]
+    - [7155, A>G, rs199916117, K194E]
   CYP2A6*16.001:
-    label: CYP2A6*16
+    pharmvar: https://www.pharmvar.org/haplotype/1895
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [7182, C>A, rs56256500, F]
+    - [5072, A>G, rs1137115]
+    - [7182, C>A, rs56256500, R203S]
   CYP2A6*17.001:
-    label: CYP2A6*17
-    activity: Decr. (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1909
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [10086, G>A, rs28399454, F]
-    - [10738, C>T, rs28399462]
-    - [10846, A>G, rs56164728]
+    - [5072, A>G, rs1137115]
     - [5230, C>T, rs8192722]
     - [6800, G>A, rs28399441]
-    - [10184, G>A, rs4803380]
     - [9510, C>T, rs28399451]
+    - [10086, G>A, rs28399454, V365M]
+    - [10184, G>A, rs4803380]
+    - [10738, C>T, rs28399462]
+    - [10846, A>G, rs56164728]
   CYP2A6*18.001:
-    label: CYP2A6*18A
-    activity: Decr (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1877
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [10689, A>T, rs1809810, F]
+    - [5072, A>G, rs1137115]
+    - [10689, A>T, rs1809810, Y392F]
   CYP2A6*18.002:
-    label: CYP2A6*18B
-    activity: Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1869
+    activity: function not assigned
+    evidence: L
     mutations:
+    - [10689, A>T, rs1809810, Y392F]
     - [10705, T>C, rs28399461]
-    - [10689, A>T, rs1809810, F]
     - [10723, T>C, rs56314118]
   CYP2A6*18.003:
-    label: CYP2A6*18C
+    pharmvar: https://www.pharmvar.org/haplotype/1866
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [3443, T>C, rs57837628]
-    - [3558, A>T, rs111822043]
     - [4009, A>G, rs4803381]
-    - [3342, A>G, rs2644914]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
+    - [5072, A>G, rs1137115]
     - [6641, T>C, rs8192725]
-    - [10689, A>T, rs1809810, F]
+    - [10689, A>T, rs1809810, Y392F]
     - [11713, C>G, rs7248240]
   CYP2A6*19.001:
-    label: CYP2A6*19
-    activity: Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1886
+    activity: function not assigned
+    evidence: L
     mutations:
+    - [5072, A>G, rs1137115]
+    - [10689, A>T, rs1809810, Y392F]
     - [11375, T>C, rs2431413]
-    - [11579, T>C, rs5031016, F]
-    - [10689, A>T, rs1809810, F]
+    - [11579, T>C, rs5031016, I471T]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
   CYP2A6*20.001:
-    label: CYP2A6*20
-    activity: Decr. (in vivo); None (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1894
+    activity: function not assigned
+    evidence: L
     mutations:
+    - [7162, delAA, rs568811809, frameshift]
     - [7317, C>T, rs72549439]
     - [10705, T>C, rs28399461]
     - [11713, C>G, rs7248240]
-    - [7162, delAA, rs568811809, Frameshift]
   CYP2A6*21.001:
-    label: CYP2A6*21
-    activity: Decr. (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1916
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [11594, A>G, rs6413474, F]
+    - [11594, A>G, rs6413474, K476R]
   CYP2A6*22.001:
-    label: CYP2A6*22
+    pharmvar: https://www.pharmvar.org/haplotype/1888
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [6819, C>A, rs60563539, F]
-    - [6815, C>G, rs60605885, F]
+    - [6815, C>G, rs60605885, D158E]
+    - [6819, C>A, rs60563539, L160I]
   CYP2A6*23.001:
-    label: CYP2A6*23
-    activity: Decr. (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1915
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [7182, C>T, rs56256500, F]
+    - [5072, A>G, rs1137115]
+    - [7182, C>T, rs56256500, R203C]
   CYP2A6*24.001:
-    label: CYP2A6*24A
-    activity: Decr. (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1884
+    activity: function not assigned
+    evidence: D
     mutations:
     - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
     - [5599, A>G, rs72549434]
+    - [5615, G>C, rs72549435, V110L]
     - [5741, G>A, rs56145769]
     - [6158, C>G, rs7250713]
+    - [6641, T>C, rs8192725]
+    - [7504, G>A, rs2388868]
     - [8246, A>G, rs56113850]
     - [11239, A>G, rs570351602]
     - [11303, A>G, rs72547581]
     - [11314, T>C, rs2431414]
     - [11375, T>C, rs2431413]
-    - [11479, A>T, rs143731390, F]
+    - [11479, A>T, rs143731390, N438Y]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
     - [11803, C>G, rs8192733]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [5615, G>C, rs72549435, F]
-    - [6641, T>C, rs8192725]
-    - [7504, G>A, rs2388868]
-    - [12181, A>G, rs28742185]
   CYP2A6*24.002:
-    label: CYP2A6*24B
+    pharmvar: https://www.pharmvar.org/haplotype/1865
+    activity: function not assigned
+    evidence: D
     mutations:
     - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
     - [5599, A>G, rs72549434]
+    - [5615, G>C, rs72549435, V110L]
     - [5741, G>A, rs56145769]
     - [6158, C>G, rs7250713]
-    - [6402, C>T, rs866618989]
+    - [6403, C>T, rs896441635]
+    - [6404, T>C, rs1036227507]
+    - [6502, delCTCTCT, rs67032351]
+    - [6641, T>C, rs8192725]
+    - [7504, G>A, rs2388868]
     - [8246, A>G, rs56113850]
     - [11239, A>G, rs570351602]
     - [11303, A>G, rs72547581]
     - [11314, T>C, rs2431414]
     - [11375, T>C, rs2431413]
-    - [11479, A>T, rs143731390, F]
+    - [11479, A>T, rs143731390, N438Y]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
     - [11803, C>G, rs8192733]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [5615, G>C, rs72549435, F]
-    - [6472, delCTCTCT, rs67032351]
-    - [6641, T>C, rs8192725]
-    - [7504, G>A, rs2388868]
-    - [12181, A>G, rs28742185]
   CYP2A6*25.001:
-    label: CYP2A6*25
+    pharmvar: https://www.pharmvar.org/haplotype/1864
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [6693, T>C, rs28399440, F]
+    - [4277, A>G, rs61663607]
+    - [5043, C>T, rs8192720]
+    - [5072, A>G, rs1137115]
+    - [5789, A>T, rs138920918]
+    - [6186, G>A, rs1226465361]
+    - [6641, T>C, rs8192725]
+    - [6693, T>C, rs28399440, F118L]
     - [7317, C>T, rs72549439]
+    - [7504, G>A, rs2388868]
     - [7626, G>A, rs554129636]
     - [7942, G>A, rs56100930]
     - [8015, T>C, rs56267346]
     - [9657, A>C, rs72549445]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [4277, A>G, rs61663607]
-    - [5043, C>T, rs8192720]
-    - [5789, A>T, rs138920918]
-    - [6641, T>C, rs8192725]
-    - [7504, G>A, rs2388868]
     - [11607, T>C, rs58537201]
     - [11713, C>G, rs7248240]
-    - [12181, A>G, rs28742185]
   CYP2A6*26.001:
-    label: CYP2A6*26
-    activity: Decr. (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1861
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [6693, T>C, rs28399440, F]
-    - [6731, C>T, rs535832503]
-    - [6732, T>G, rs59552350, F]
-    - [7317, C>T, rs72549439]
-    - [8015, T>C, rs56267346]
-    - [9657, A>C, rs72549445]
-    - [11136, C>T, rs145026630]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
     - [4277, A>G, rs61663607]
     - [5043, C>T, rs8192720]
+    - [5072, A>G, rs1137115]
     - [6186, G>A, rs1226465361]
     - [6641, T>C, rs8192725]
-    - [6724, G>T, rs4986891, F]
+    - [6693, T>C, rs28399440, F118L]
+    - [6724, G>T, rs4986891, R128L]
+    - [6731, C>T, rs535832503]
+    - [6732, T>G, rs59552350, S131A]
+    - [7317, C>T, rs72549439]
     - [7504, G>A, rs2388868]
+    - [8015, T>C, rs56267346]
+    - [9095, delA, rs72549443]
+    - [9657, A>C, rs72549445]
+    - [11136, C>T, rs145026630]
     - [11607, T>C, rs58537201]
     - [11713, C>G, rs7248240]
-    - [12181, A>G, rs28742185]
-    - [9092, delA, '-']
   CYP2A6*27.001:
-    label: CYP2A6*27
-    activity: Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1867
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [6693, T>C, rs28399440, F]
-    - [7317, C>T, rs72549439]
-    - [8015, T>C, rs56267346]
-    - [8893, G>A, rs72549442]
-    - [9657, A>C, rs72549445]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
     - [4277, A>G, rs61663607]
     - [5043, C>T, rs8192720]
+    - [5072, A>G, rs1137115]
     - [6641, T>C, rs8192725]
-    - [7183, G>A, rs28399445, Frameshift]
-    - [7184, delC, rs28399445, Frameshift]
+    - [6693, T>C, rs28399440, F118L]
+    - [7183, delGC, rs1555782914]
+    - [7183, insA, '-']
+    - [7317, C>T, rs72549439]
     - [7504, G>A, rs2388868]
+    - [8015, T>C, rs56267346]
+    - [8893, G>A, rs72549442]
+    - [9095, delA, rs72549443]
+    - [9657, A>C, rs72549445]
     - [10878, T>A, rs72549446]
     - [11607, T>C, rs58537201]
     - [11713, C>G, rs7248240]
-    - [12181, A>G, rs28742185]
-    - [9092, delA, '-']
   CYP2A6*28.001:
-    label: CYP2A6*28A
+    pharmvar: https://www.pharmvar.org/haplotype/1897
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [3753, T>C, rs72549429]
+    - [5677, G>T, rs72549436]
+    - [6641, T>C, rs8192725]
+    - [9702, T>G, rs56048590]
     - [10759, C>T, rs2002977]
-    - [10766, A>G, rs28399463, F]
-    - [10771, G>C, rs8192730, F]
+    - [10766, A>G, rs28399463, N418D]
+    - [10771, G>C, rs8192730, E419D]
     - [11375, T>C, rs2431413]
     - [11382, C>A, rs866437607]
+    - [11406, G>T, rs555584221]
     - [11410, C>G, rs373949046]
     - [11411, T>C, rs370819234]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
     - [11803, C>G, rs8192733]
-    - [5677, G>T, rs72549436]
-    - [6641, T>C, rs8192725]
-    - [9702, T>G, rs56048590]
-    - [11406, G>T, rs555584221]
-    - [12181, A>G, rs28742185]
   CYP2A6*28.002:
-    label: CYP2A6*28B
+    pharmvar: https://www.pharmvar.org/haplotype/1892
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [3753, T>C, rs72549429]
     - [5677, G>T, rs72549436]
-    - [6402, C>T, rs866618989]
-    - [6472, delCTCTCT, rs67032351]
+    - [6403, C>T, rs896441635]
+    - [6404, T>C, rs1036227507]
+    - [6502, delCTCTCT, rs67032351]
     - [6641, T>C, rs8192725]
     - [9702, T>G, rs56048590]
     - [10759, C>T, rs2002977]
-    - [10766, A>G, rs28399463, F]
-    - [10771, G>C, rs8192730, F]
+    - [10766, A>G, rs28399463, N418D]
+    - [10771, G>C, rs8192730, E419D]
     - [11375, T>C, rs2431413]
     - [11382, C>A, rs866437607]
-    - [11981, insGAAAAG, rs72549452]
-    - [12181, A>G, rs28742185]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
   CYP2A6*31.001:
-    label: CYP2A6*31A
+    pharmvar: https://www.pharmvar.org/haplotype/1890
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [3733, G>A, rs7259706]
     - [4009, A>G, rs4803381]
     - [4530, delCCCCTTCCTGAGACCCTTAACCC, rs1555783362]
-    - [5037, A>C, rs72549432, F]
+    - [4530, insAATCCATATGTGGAATCTG, '-']
+    - [5037, A>C, rs72549432, M6L]
+    - [5072, A>G, rs1137115]
     - [6360, C>G, rs72549437]
     - [6641, T>C, rs8192725]
     - [7742, G>A, rs72549440]
     - [8015, T>C, rs56267346]
-    - [8276, A>G, rs1423689213]
+    - [8246, A>G, rs56113850]
     - [8336, C>T, rs72549441]
     - [11713, C>G, rs7248240]
-    - [12181, A>G, rs28742185]
-    - [12589, C>T, rs1466649602]
   CYP2A6*31.002:
-    label: CYP2A6*31B
+    pharmvar: https://www.pharmvar.org/haplotype/1872
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [3733, G>A, rs7259706]
     - [4009, A>G, rs4803381]
     - [4047, T>C, rs540814634]
     - [4530, delCCCCTTCCTGAGACCCTTAACCC, rs1555783362]
-    - [5037, A>C, rs72549432, F]
+    - [4530, insAATCCATATGTGGAATCTG, '-']
+    - [5037, A>C, rs72549432, M6L]
+    - [5072, A>G, rs1137115]
     - [5488, C>T, rs72549433]
     - [6360, C>G, rs72549437]
     - [6641, T>C, rs8192725]
@@ -536,132 +616,670 @@ alleles:
     - [8246, A>G, rs56113850]
     - [8336, C>T, rs72549441]
     - [9095, delA, rs72549443]
+
     - [11713, C>G, rs7248240]
-    - [12181, A>G, rs28742185]
   CYP2A6*34.001:
     label: CYP2A6*34
+    activity: uncertain
     mutations:
     - [CYP2A7, i4-]
   CYP2A6*35.001:
-    label: CYP2A6*35A
-    activity: Decr. (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1885
+    activity: function not assigned
+    evidence: D
     mutations:
     - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
     - [5741, G>A, rs56145769]
     - [6158, C>G, rs7250713]
+    - [6641, T>C, rs8192725]
+    - [7504, G>A, rs2388868]
     - [8246, A>G, rs56113850]
     - [11239, A>G, rs570351602]
     - [11303, A>G, rs72547581]
     - [11314, T>C, rs2431414]
     - [11375, T>C, rs2431413]
-    - [11479, A>T, rs143731390, F]
+    - [11479, A>T, rs143731390, N438Y]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
     - [11803, C>G, rs8192733]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
-    - [6641, T>C, rs8192725]
-    - [7504, G>A, rs2388868]
-    - [12181, A>G, rs28742185]
   CYP2A6*35.002:
-    label: CYP2A6*35B
-    activity: Decr. (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1913
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [11479, A>T, rs143731390, F]
-    - [11803, C>G, rs8192733]
-    - [11856, C>A, rs28399483]
-    - [12020, T>C, '-']
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
     - [4277, A>G, rs61663607]
     - [5043, C>T, rs8192720]
     - [6641, T>C, rs8192725]
-    - [9105, delA, rs1206000955]
-    - [12181, A>G, rs28742185]
+    - [9105, delA, '-']
+    - [11479, A>T, rs143731390, N438Y]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+    - [11803, C>G, rs8192733]
+    - [11856, C>A, rs28399483]
   CYP2A6*36.001:
-    label: CYP2A6*36
+    pharmvar: https://www.pharmvar.org/haplotype/1883
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [11479, A>T, rs143731390, F]
-    - [11579, T>C, rs5031016, F]
-    - [11803, C>G, rs8192733]
-    - [11856, C>A, rs28399483]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
     - [4277, A>G, rs61663607]
     - [5043, C>T, rs8192720]
     - [6641, T>C, rs8192725]
-    - [12181, A>G, rs28742185]
-    - [12020, T>C, '-']
-    - [9105, delA, rs1206000955]
+    - [9105, delA, '-']
+    - [11479, A>T, rs143731390, N438Y]
+    - [11579, T>C, rs5031016, I471T]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+    - [11803, C>G, rs8192733]
+    - [11856, C>A, rs28399483]
   CYP2A6*37.001:
-    label: CYP2A6*37
+    pharmvar: https://www.pharmvar.org/haplotype/1878
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [11375, T>C, rs2431413]
-    - [11479, A>T, rs143731390, F]
-    - [11579, T>C, rs5031016, F]
-    - [11803, C>G, rs8192733]
-    - [11856, C>A, rs28399483]
-    - [12010, A>G, rs72549453]
-    - [3721, A>C, rs7260629]
-    - [3733, G>A, rs7259706]
     - [4277, A>G, rs61663607]
     - [5043, C>T, rs8192720]
     - [6641, T>C, rs8192725]
-    - [9105, delA, rs1206000955]
-    - [11621, G>T, rs28399468, F]
-    - [11956, insCACTT, rs72549451]
-    - [11981, insGAAAAG, rs72549452]
-    - [12181, A>G, rs28742185]
-    - [12020, T>C, '-']
+    - [9105, delA, '-']
+    - [11375, T>C, rs2431413]
+    - [11479, A>T, rs143731390, N438Y]
+    - [11579, T>C, rs5031016, I471T]
+    - [11621, G>T, rs28399468, R485L]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+    - [11803, C>G, rs8192733]
+    - [11856, C>A, rs28399483]
   CYP2A6*38.001:
-    label: CYP2A6*38
+    pharmvar: https://www.pharmvar.org/haplotype/1918
+    activity: function not assigned
+    evidence: L
     mutations:
-    - [10044, T>C, rs148166815, F]
+    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
+    - [10044, T>C, rs148166815, Y351H]
   CYP2A6*39.001:
-    label: CYP2A6*39
-    activity: Decr. expr./Decr. activity per pmol (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1887
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [5192, C>A, rs756293343]
-    - [5489, G>A, rs143690364, F]
+    - [5072, A>G, rs1137115]
+    - [5192, C>A, '-']
+    - [5230, C>T, rs8192722]
+    - [5281, G>C, rs1780633376]
+    - [5489, G>A, rs143690364, V68M]
     - [6800, G>A, rs28399441]
+    - [7504, G>A, rs2388868]
+    - [8015, T>C, rs56267346]
+    - [9510, C>T, rs28399451]
+    - [10184, G>A, rs4803380]
     - [10738, C>T, rs28399462]
   CYP2A6*40.001:
-    label: CYP2A6*40
-    activity: Decr. expr./Decr. activity per pmol (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1900
+    activity: function not assigned
+    evidence: D
     mutations:
+    - [5072, A>G, rs1137115]
     - [5165, G>A, rs8192721]
-    - [6788, C>G, '-', F]
+    - [6788, C>G, rs1967144166, I149M]
+    - [6839, G>A, rs369373560]
+    - [6911, G>C, rs57607700]
+    - [7504, G>A, rs2388868]
+    - [7942, G>A, rs56100930]
+    - [8015, T>C, rs56267346]
     - [8513, C>T, rs1809811]
+    - [8591, C>G, rs4079369]
     - [10759, C>T, rs2002977]
+    - [10864, G>C, rs2002975]
+    - [11713, C>G, rs7248240]
   CYP2A6*41.001:
-    label: CYP2A6*41
-    activity: None (in vivo); Decr. (in vitro)
+    pharmvar: https://www.pharmvar.org/haplotype/1868
+    activity: function not assigned
+    evidence: D
     mutations:
     - [5528, C>T, rs142692109]
-    - [8536, G>A, rs140471703, F]
+    - [8536, G>A, rs140471703, R265Q]
   CYP2A6*42.001:
-    label: CYP2A6*42
-    activity: Decr. expr./Incr. activity per pmol (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1871
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [8545, T>C, rs763469584, F]
+    - [8545, T>C, rs763469584, I268T]
     - [10705, T>C, rs28399461]
   CYP2A6*43.001:
-    label: CYP2A6*43
-    activity: Decr. expr./Unchanged activity per pmol (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1874
+    activity: function not assigned
+    evidence: D
     mutations:
-    - [9427, C>T, '-', F]
+    - [5072, A>G, rs1137115]
+    - [5230, C>T, rs8192722]
+    - [9427, C>T, '-', T303I]
   CYP2A6*44.001:
-    label: CYP2A6*44
-    activity: Decr. expr./Incr. activity per pmol (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1901
+    activity: function not assigned
+    evidence: D
     mutations:
+    - [5816, T>G, rs1455495935]
+    - [6164, C>G, '-']
+    - [7504, G>A, rs2388868]
+    - [7942, G>A, rs56100930]
+    - [8015, T>C, rs56267346]
+    - [10682, G>A, rs376817657, E390K]
     - [10759, C>T, rs2002977]
-    - [10766, A>G, rs28399463, F]
-    - [10771, G>C, rs8192730, F]
-    - [10682, G>A, rs376817657, F]
+    - [10766, A>G, rs28399463, N418D]
+    - [10771, G>C, rs8192730, E419D]
+    - [11375, T>C, rs2431413]
+    - [11382, C>A, rs866437607]
+    - [11406, G>T, rs555584221]
+    - [11410, C>G, rs373949046]
+    - [11411, T>C, rs370819234]
+    - [11803, C>G, rs8192733]
   CYP2A6*45.001:
-    label: CYP2A6*45
-    activity: Decr. expr./Decr. activity per pmol (in vivo)
+    pharmvar: https://www.pharmvar.org/haplotype/1863
+    activity: function not assigned
+    evidence: D
     mutations:
+    - [6911, G>C, rs57607700]
     - [9485, G>A, '-']
-    - [11552, T>C, '-', F]
+    - [10857, C>T, '-']
+    - [11552, T>C, '-', L462P]
+    - [11713, C>G, rs7248240]
+  CYP2A6*46.001:
+    pharmvar: https://www.pharmvar.org/haplotype/1881
+    activity: function not assigned
+    evidence: M
+    mutations:
+    - [5072, A>G, rs1137115]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.002:
+    pharmvar: https://www.pharmvar.org/haplotype/1914
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.003:
+    pharmvar: https://www.pharmvar.org/haplotype/1891
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4627, G>A, rs67568271]
+    - [5072, A>G, rs1137115]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.004:
+    pharmvar: https://www.pharmvar.org/haplotype/1870
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
+    - [6641, T>C, rs8192725]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.005:
+    pharmvar: https://www.pharmvar.org/haplotype/1906
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
+    - [6641, T>C, rs8192725]
+    - [11314, T>C, rs2431414]
+    - [11406, G>T, rs555584221]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.006:
+    pharmvar: https://www.pharmvar.org/haplotype/1875
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [5072, A>G, rs1137115]
+    - [6641, T>C, rs8192725]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.007:
+    pharmvar: https://www.pharmvar.org/haplotype/1898
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
+    - [6641, T>C, rs8192725]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.008:
+    pharmvar: https://www.pharmvar.org/haplotype/1902
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
+    - [6641, T>C, rs8192725]
+    - [11411, T>C, rs370819234]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.009:
+    pharmvar: https://www.pharmvar.org/haplotype/1920
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
+    - [6641, T>C, rs8192725]
+    - [11410, C>G, rs373949046]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.010:
+    pharmvar: https://www.pharmvar.org/haplotype/1880
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4009, A>G, rs4803381]
+    - [5072, A>G, rs1137115]
+    - [6641, T>C, rs8192725]
+    - [10649, C>T, rs553913513]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+  CYP2A6*46.011:
+    pharmvar: https://www.pharmvar.org/haplotype/1917
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [5359, T>C, '-']
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+    - [11803, C>G, rs8192733]
+  CYP2A6*46.012:
+    pharmvar: https://www.pharmvar.org/haplotype/1911
+    activity: function not assigned
+    evidence: L
+    mutations:
+    - [4277, A>G, rs61663607]
+    - [5043, C>T, rs8192720]
+    - [5072, A>G, rs1137115]
+    - [11700, delG, rs59322119]
+    - [11702, A>G, rs28399469]
+    - [11706, C>T, rs28399470]
+    - [11709, A>G, rs28399471]
+    - [11712, C>G, '-']
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-']
+    - [11719, insC, '-']
+    - [11720, insC, rs1568513216]
+    - [11723, insA, '-']
+    - [11727, insC, '-']
+    - [11730, delC, '-']
+    - [11732, C>T, rs28399474]
+    - [11734, delGC, rs1568513196]
+    - [11741, C>A, rs28399478]
+    - [11748, C>G, rs28399479]
+    - [11750, G>A, rs28399480]
+    - [11755, delG, '-']
+    - [11758, insG, '-']
+  CYP2A6*46.013:
+    pharmvar: https://www.pharmvar.org/haplotype/1899
+    activity: function not assigned
+    evidence: D
+    mutations:
+    - [4055, A>C, '-']
+    - [5072, A>G, rs1137115]
+    - [6403, C>T, rs896441635]
+    - [6404, T>C, rs1036227507]
+    - [6502, delCTCTCT, rs67032351]
+    - [6641, T>C, rs8192725]
+    - [8246, A>G, rs56113850]
+    - [8276, A>G, rs1423689213]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+    - [11803, C>G, rs8192733]
+  CYP2A6*46.014:
+    pharmvar: https://www.pharmvar.org/haplotype/1924
+    activity: function not assigned
+    evidence: D
+    mutations:
+    - [4277, A>G, rs61663607]
+    - [5043, C>T, rs8192720]
+    - [5072, A>G, rs1137115]
+    - [6651, T>C, rs200390640]
+    - [10705, T>C, rs28399461]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+    - [11803, C>G, rs8192733]
+  CYP2A6*46.015:
+    pharmvar: https://www.pharmvar.org/haplotype/1921
+    activity: function not assigned
+    evidence: D
+    mutations:
+    - [6641, T>C, rs8192725]
+    - [6667, C>T, rs781549568]
+    - [7317, C>T, rs72549439]
+    - [7504, G>A, rs2388868]
+    - [8015, T>C, rs56267346]
+    - [8809, C>T, rs535108140]
+    - [9095, delA, rs72549443]
+    - [9657, A>C, rs72549445]
+    - [9871, C>T, rs2302989]
+    - [9998, C>T, rs138932530]
+    - [11164, C>A, rs531467589]
+    - [11621, G>T, rs28399468, R485L]
+    - [11700, delG, rs59322119, 3'UTR]
+    - [11702, A>G, rs28399469, 3'UTR]
+    - [11706, C>T, rs28399470, 3'UTR]
+    - [11709, A>G, rs28399471, 3'UTR]
+    - [11713, C>G, rs7248240]
+    - [11717, delC, '-', 3'UTR]
+    - [11719, insC, '-', 3'UTR]
+    - [11720, insC, rs1568513216, 3'UTR]
+    - [11723, insA, '-', 3'UTR]
+    - [11727, insC, '-', 3'UTR]
+    - [11730, delC, '-', 3'UTR]
+    - [11732, C>T, rs28399474, 3'UTR]
+    - [11734, delGC, rs1568513196, 3'UTR]
+    - [11741, C>A, rs28399478, 3'UTR]
+    - [11748, C>G, rs28399479, 3'UTR]
+    - [11750, G>A, rs28399480, 3'UTR]
+    - [11755, delG, '-', 3'UTR]
+    - [11758, insG, '-', 3'UTR]
+    - [11803, C>G, rs8192733]
+    - [11853, A>G, rs8192734]
+    - [11856, C>A, rs28399483]
+  CYP2A6*47.001:
+    label: CYP2A6*47
+    activity: none
+    mutations:
+    - [CYP2A7, i8-]
 structure:
   genes: [CYP2A6, CYP2A7]
   regions:

@@ -21,29 +21,22 @@ def estimate_major(
     coverage: Coverage,
     cn_solution: CNSolution,
     solver: str,
-    gap: float = 0,
     identifier: int = 0,
     debug: Optional[str] = None,
-    offset: float = 0,
 ) -> List[MajorSolution]:
     """
     Estimate optimal major star-alleles.
 
     :param gene: Gene instance.
-    :param coverage: Read coverage data.
-    :param cn_solution:
-        Copy-number solution that will be used for major star-allele calling.
-    :param solver:
-        ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
-    :param gap:
-        Relative optimality gap. Use non-zero values to allow non-optimal solutions.
-        Default is 0 (reports only optimal solutions).
-    :param identifier:
-        Unique solution identifier. Used for generating debug information.
-        Default is 0.
-    :param debug:
-        If set, create a "`debug`.major`identifier`.lp" file for debug purposes.
-        Default is ``None``.
+    :param profile: Profile instance.
+    :param coverage: Read coverage instance.
+    :param cn_solution: Copy-number solution for major star-allele calling.
+    :param solver: ILP solver (see :py:mod:`aldy.lpinterface` for supported solvers).
+    :param identifier: Unique solution identifier. Used for debug purposes.
+        Default: 0.
+    :param debug: When set, create a `{debug}.major{identifier}.lp` model description
+        file for debug purposes.
+        Default: `None` (no debug dumps).
     """
 
     log.debug("*" * 80)
@@ -57,7 +50,7 @@ def estimate_major(
         results: List[MajorSolution] = []
     else:
         results = solve_major_model(
-            gene, alleles, coverage, cn_solution, solver, gap, identifier, debug, offset
+            gene, coverage, cn_solution, alleles, solver, identifier, debug
         )
     # TODO: Check for novel functional mutations and do something with them
 
@@ -66,35 +59,26 @@ def estimate_major(
 
 def solve_major_model(
     gene: Gene,
-    allele_dict: Dict[str, MajorAllele],
     coverage: Coverage,
     cn_solution: CNSolution,
+    allele_dict: Dict[str, MajorAllele],
     solver: str,
-    gap: float = 0,
     identifier: int = 0,
     debug: Optional[str] = None,
-    offset: float = 0,
 ) -> List[MajorSolution]:
     """
     Solves the major star-allele detection problem via integer linear programming.
 
     :param gene: Gene instance.
-    :param allele_dict: Dictionary of the candidate major star-alleles.
-    :param coverage: Mutation coverage data.
-    :param cn_solution:
-        Copy-number solution that will be used for calling major star-alleles
-        (:obj:`aldy.solutions.CNSolution`).
-    :param solver:
-        ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
-    :param gap:
-        Relative optimality gap. Use non-zero values to allow non-optimal solutions.
-        Default is 0 (reports only optimal solutions).
-    :param identifier:
-        Unique solution identifier. Used for generating debug information.
-        Default is 0.
-    :param debug:
-        If set, create a "`debug`.major`identifier`.lp" file for debug purposes.
-        Default is ``None``.
+    :param coverage: Read coverage instance.
+    :param cn_solution: Copy-number solution for major star-allele calling.
+    :param allele_dict: Candidate major star-alleles.
+    :param solver: ILP solver (see :py:mod:`aldy.lpinterface` for supported solvers).
+    :param identifier: Unique solution identifier. Used for debug purposes.
+        Default: 0.
+    :param debug: When set, create a `{debug}.major{identifier}.lp` model description
+        file for debug purposes.
+        Default: `None` (no debug dumps).
 
     .. note::
         Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_
@@ -113,7 +97,7 @@ def solve_major_model(
     }
     _print_candidates(gene, allele_dict, coverage, cn_solution, func_muts)
 
-    a: Any = 0  # HACK: silence type checker
+    a: Any = 0
 
     # Create a binary variable for every possible allele copy
     alleles = {(a, int(0)): allele_dict[a] for a in allele_dict}
@@ -201,7 +185,7 @@ def solve_major_model(
         model.addConstr(VXOR >= 1, name="CXOR")
 
     # Objective: minimize the absolute sum of errors and the number of novel mutations
-    objective = offset
+    objective = 0
     objective += model.abssum(e for e in VERR.values())
 
     z = model.addVar(vtype="B", name="NOVEL")
@@ -221,7 +205,7 @@ def solve_major_model(
     }
     result: Dict[Any, MajorSolution] = {}
     debug_info["sol"] = []
-    for status, opt, sol in model.solutions(gap):
+    for status, opt, sol in model.solutions(coverage.profile.gap):
         solved_alleles = sorted_tuple(
             [lookup[s][0] for s in sol if s in lookup and s.startswith("A_")]
         )
@@ -257,8 +241,7 @@ def _filter_alleles(
     """
     Filter out low-quality mutations and alleles that are not expressed.
 
-    :return: Tuple of allele dictionary describing the feasible alleles,
-             and the coverage description of high-confidence variants.
+    :returns: Expressed alleles and the coverage of high-quality variants.
     """
 
     def filter_fns(cov, mut):
@@ -290,10 +273,8 @@ def _print_candidates(
     coverage: Coverage,
     cn_solution: CNSolution,
     muts: set,
-) -> None:
-    """
-    Pretty-prints the list of allele candidates and their functional mutations.
-    """
+):
+    """Pretty-prints the list of allele candidates and their functional mutations."""
 
     def print_mut(m):
         copies = (
