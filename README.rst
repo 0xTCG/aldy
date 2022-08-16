@@ -31,8 +31,8 @@ More details, together with the API documentation, are available
 Experimental data is available `here <paper>`_.
 
 If you are using Aldy, please cite our papers in
-`Nature Communictions <https://www.nature.com/articles/s41467-018-03273-1>_`
-and `bioRxiv <https://www.biorxiv.org/content/10.1101/2022.08.11.503701v1>_`.
+`Nature Communictions <https://www.nature.com/articles/s41467-018-03273-1>`_
+and `bioRxiv <https://www.biorxiv.org/content/10.1101/2022.08.11.503701v1>`_.
 
 
 Gene Support
@@ -297,9 +297,10 @@ The following profiles are available:
 
 - ``illumina`` or ``wgs`` for Illumina WGS or exome (WXS) data (or any uniform-coverage technology).
 
-.. attention::
-  It is highly recommended to use samples with at least 40x coverage.
-  Anything below 20x might result in noisy copy number calls and missed variants.
+   .. attention::
+   
+   It is highly recommended to use samples with at least 40x coverage.
+   Anything below 20x might result in noisy copy number calls and missed variants.
 
 - ``pgx1`` for PGRNseq v.1 capture protocol data
 - ``pgx2`` for PGRNseq v.2 capture protocol data
@@ -307,10 +308,11 @@ The following profiles are available:
 
 - ``10x`` for 10X Genomics data
 
-.. attention::
-  For the best results on 10X Genomics datasets, use `EMA aligner <https://github.com/arshajii/ema/>`_,
-  especially if doing *CYP2D6* analysis. Aldy will also use EMA read cloud information for
-  improved variant phasing.
+   .. attention::
+   
+   For the best results on 10X Genomics datasets, use `EMA aligner <https://github.com/arshajii/ema/>`_,
+   especially if doing *CYP2D6* analysis. Aldy will also use EMA read cloud information for
+   improved variant phasing.
 
 - ``exome``, ``wxs``, ``wes`` for whole-exome sequencing data
 
