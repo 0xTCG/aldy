@@ -51,10 +51,10 @@ def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
         **{
             "--gene": "pharma-cyp2d6",
             "--profile": "illumina",
-            "--threshold": "50",
-            "--gap": "0",
+            "--param": "threshold=0.5",
+            "--param": "gap=0",
+            "--param": "max-minor-solutions=3",
             "--solver": solver,
-            "--max-minor-solutions": "3",
         },
         **(params or {}),
     }
@@ -164,7 +164,7 @@ def test_NA10860_gap(monkeypatch, solver):
         Legacy notation: [*4] + [*4] / [*139]
     """
     file = script_path("aldy.tests.resources/NA10860.bam")
-    assert_file(monkeypatch, file, solver, expected, {"--gap": "0.3"})
+    assert_file(monkeypatch, file, solver, expected, {"--param": "gap=0.3"})
 
 
 def test_NA10860_cn(monkeypatch, solver):
@@ -265,7 +265,7 @@ def test_fusion_off(monkeypatch, solver):
         file,
         solver,
         expected,
-        {"--profile": "pgrnseq-v1", "--cn-fusion-left": "10"},
+        {"--profile": "pgrnseq-v1", "--param": "cn-fusion-left=10"},
     )
 
 
@@ -295,7 +295,7 @@ def test_NA07000_vcf_in(monkeypatch, solver):
         file,
         solver,
         expected,
-        {"--max-minor-solutions": "1", "--gene": "SLCO1B1"},
+        {"--param": "max-minor-solutions=1", "--gene": "SLCO1B1"},
         warn=True,
     )
 
@@ -322,7 +322,7 @@ def test_fix_insertions(monkeypatch, solver):
         file,
         solver,
         expected,
-        {"--profile": "pgrnseq-v3", "--max-minor-solutions": "1"},
+        {"--profile": "pgrnseq-v3", "--param": "max-minor-solutions=1"},
     )
 
 

@@ -17,7 +17,7 @@ You can get the genotypes of a SAM/BAM with a single call::
   result = aldy.genotype.genotype('cyp2d6', '/path/to/sample.bam', profile='pgrnseq-v1')
   print(result)
 
-Please check :py:class:`aldy.major.SolvedAllele` and :py:class:`aldy.genotype` for more details.
+Please check :py:class:`aldy.major.SolvedAllele` and :py:mod:`aldy.genotype` for more details.
 
 
 Loading a gene

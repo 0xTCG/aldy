@@ -16,18 +16,23 @@
   </p>
 
 
-Aldy calls genotypes of many highly polymorphic pharmacogenes and reports them in a phased star-allele nomenclature.
+Aldy 4 calls genotypes of many highly polymorphic pharmacogenes and reports them in a phased star-allele nomenclature.
 It can also call copy number of a given pharmacogene, and genotype each copy present in the sample—something that standard genotype callers like GATK cannot do.
 
 Algorithm details
 =================
 
-TL;DR: Aldy uses star-allele databases to guide the process of detecting the most likely genotype.
+TL;DR: Aldy 4 uses star-allele databases to guide the process of detecting the most likely genotype.
 The optimization is done in three stages via integer linear programming.
 
-Documentation is available `at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
+More details, together with the API documentation, are available
+`at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
 
 Experimental data is available `here <paper>`_.
+
+If you are using Aldy, please cite our papers in
+`Nature Communictions <https://www.nature.com/articles/s41467-018-03273-1>_`
+and `bioRxiv <https://www.biorxiv.org/content/10.1101/2022.08.11.503701v1>_`.
 
 
 Gene Support
@@ -39,147 +44,147 @@ Gene Support
    * - Gene
      - Version
      - Status
-     - Has copy number & structural variation?
+     - Details
    * - *CYP2D6*
      - PharmVar 5.2.3
      - ✅
-     - Yes
+     - Copy number and structural variation support
    * - *CYP2A6*
-     - cypalleles.ki.se (Jan 2012)
+     - PharmVar 5.2.3
      - ✅
-     - ✅
+     - Copy number and structural variation support
    * - *CYP2B6*
      - PharmVar 5.2.3
-     - ⚠️ (possible mapping conflicts with *CYP2B7*; needs more validation)
-     - Yes
+     - ✅
+     - Some allele calls should be validated (e.g., \*6/\*9)
    * - *CYP1A1*
      - PharmGKB (Dec 2014)
      - ✅
-     - No
+     - -
    * - *CYP1A2*
      - PharmGKB (Mar 2014)
      - ✅
-     - No
+     - -
    * - *CYP2A13*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP2C19*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP2C8*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP2C9*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP2E1*
      - PharmGKB (Nov 2013)
-     - ⚠️ (not tested on real data yet)
-     - No
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *CYP2F1*
      - PharmVar 5.2.3
-     - ⚠️ (not tested on real data yet)
-     - No
+     - ✅
+     - -
    * - *CYP2J2*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP2R1*
      - PharmVar 5.2.3
-     - ⚠️ (not tested on real data yet)
-     - No
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *CYP2S1*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP2W1*
      - PharmVar 5.2.3
-     - ⚠️ (not tested on real data yet)
-     - No
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *CYP3A43*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP3A4*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP3A5*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP3A7*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CYP4F2*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *CFTR*
      - PharmGKB (Jun 2020)
      - ✅
-     - No
+     - -
    * - *COMT*
      - Pharmacoscan
      - ✅
-     - No
+     - -
    * - *DPYD*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *G6PD*
      - PharmGKB (Sep 2018)
-     - ✅
-     - ❓
+     - ⚠️
+     - Thorough testing on real data sets pending; Null allele calling is unstable
    * - *GSTM1*
      - Pharmacoscan
      - ✅
-     - No
+     - -
    * - *GSTP1*
      - Pharmacoscan
      - ✅
-     - No
+     - -
    * - *IFNL3*
      - PharmGKB
      - ✅
-     - No
+     - -
    * - *NAT1*
      - PharmGKB (Mar 2014)
      - ✅
-     - No
+     - -
    * - *NAT2*
      - PharmGKB (Mar 2014)
      - ✅
-     - No
+     - -
    * - *NUDT15*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *SLCO1B1*
      - PharmVar 5.2.3
      - ✅
-     - No
+     - -
    * - *TPMT*
      - PharmGKB (Jun 2020)
      - ✅
-     - No
+     - -
    * - *UGT1A1*
      - PharmGKB (Feb 2020)
-     - ✅
-     - No
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *UGT2B7*
      - pharmacogenomics.pha.ulaval.ca (Apr 2015) / Pharmacoscan
-     - ✅
-     - ❓
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *VKORC1*
      - PharmGKB (Jan 2021)
-     - ✅
-     - ❓
+     - ⚠️
+     - Thorough testing on real data sets pending
 
 ⚠️ Warning
 ==========
@@ -246,29 +251,26 @@ the installation by issuing the following command (this should take a few minute
 
 In case everything is set up properly, you should see something like this::
 
-    🐿  Aldy v3.0 (Python 3.7.5 on macOS 10.16)
-      (c) 2016-2020 Aldy Authors. All rights reserved.
-       Free for non-commercial/academic use only.
-    =============================================== test session starts ================================================
+    🐿  Aldy v4.0 (Python 3.7.5 on macOS 12.4)
+        (c) 2016-2022 Aldy Authors. All rights reserved.
+        Free for non-commercial/academic use only.
+    ================================ test session starts ================================
     platform darwin -- Python 3.7.5, pytest-5.3.1, py-1.8.0, pluggy-0.13.1
-    rootdir: /Users/inumanag/Projekti/aldy/devel, inifile: setup.cfg
-    plugins: xdist-1.31.0, forked-1.1.3
-    collected 73 items
-
-    tests/test_cn_real.py ........                                                                    [ 12%]
-    tests/test_cn_synthetic.py .....                                                                  [ 20%]
-    tests/test_diplotype_real.py ....                                                                 [ 27%]
-    tests/test_diplotype_synthetic.py ......                                                          [ 37%]
-    tests/test_full.py .....                                                                          [ 45%]
-    tests/test_gene.py ....                                                                           [ 51%]
-    tests/test_major_real.py ...........                                                              [ 69%]
-    tests/test_major_synthetic.py .......                                                             [ 80%]
-    tests/test_minor_real.py ......                                                                   [ 90%]
-    tests/test_minor_synthetic.py .....                                                               [ 98%]
-    tests/test_paper.py s                                                                             [100%]
-
-    =============================== 73 passed, 1 skipped in 106.83s (0:01:46) ===============================
-
+    rootdir: aldy, inifile: setup.cfg
+    plugins: anyio-3.6.1, xdist-1.31.0, cov-2.10.1, forked-1.1.3
+    collected 76 items
+    aldy/tests/test_cn_real.py ........                                            [ 10%]
+    aldy/tests/test_cn_synthetic.py .....                                          [ 17%]
+    aldy/tests/test_diplotype_real.py ....                                         [ 22%]
+    aldy/tests/test_diplotype_synthetic.py ......                                  [ 30%]
+    aldy/tests/test_full.py ...........                                            [ 44%]
+    aldy/tests/test_gene.py .......                                                [ 53%]
+    aldy/tests/test_major_real.py ...........                                      [ 68%]
+    aldy/tests/test_major_synthetic.py .......                                     [ 77%]
+    aldy/tests/test_minor_real.py .......                                          [ 86%]
+    aldy/tests/test_minor_synthetic.py ......                                      [ 94%]
+    aldy/tests/test_query.py ....                                                  [100%]
+    =========================== 76 passed in 131.10s (0:02:11) ==========================
 
 Running
 =======
@@ -297,7 +299,7 @@ The following profiles are available:
 
 .. attention::
   It is highly recommended to use samples with at least 40x coverage.
-  Anything below 20x .
+  Anything below 20x might result in noisy copy number calls and missed variants.
 
 - ``pgx1`` for PGRNseq v.1 capture protocol data
 - ``pgx2`` for PGRNseq v.2 capture protocol data
@@ -306,8 +308,8 @@ The following profiles are available:
 - ``10x`` for 10X Genomics data
 
 .. attention::
-  For the best results on 10X Genomics datasets, use EMA aligner, especially
-  if doing *CYP2D6* analysis. Aldy will also use EMA read cloud information for
+  For the best results on 10X Genomics datasets, use `EMA aligner <https://github.com/arshajii/ema/>`_,
+  especially if doing *CYP2D6* analysis. Aldy will also use EMA read cloud information for
   improved variant phasing.
 
 - ``exome``, ``wxs``, ``wes`` for whole-exome sequencing data
@@ -316,6 +318,14 @@ The following profiles are available:
    ⚠️ **Be warned!:** whole-exome data is incomplete *by definition*, and Aldy will not be able to call majoe star-alleles that are
    defined by their intronic or upstream variants.
    Aldy also assumes that there are only two (2) gene copies if `wxs` profile is used, as it cannot call copy number changes nor fusions from exome data.
+
+- ``pacbio-hifi-targeted``, ``pacbio-hifi-targeted-twist`` for PacBio HiFi target capture data
+
+   .. attention::
+
+    ⚠️ **Be warned!:** The provided PacBio capture profiles are custom and are not standard.
+    Please ensure to generate a custom profile if using different PacBio HiFi capture protocols.
+
 
 If you are using different technology (e.g. some home-brewed capture kit),
 you can proceed provided that the following requirements are met:
@@ -331,7 +341,7 @@ Having said that, you can use a sample BAM that is known to have two copies
 of the genes you wish to genotype (without any fusions or copy number alterations)
 as a profile as follows::
 
-    aldy genotype -p profile-sample.bam -g [gene] file.bam
+    aldy genotype -p profile-sample.bam -g [gene] file.bam -n [cn-neutral-region]
 
 Alternatively, you can generate a profile for your panel/technology by running::
 
@@ -366,10 +376,9 @@ The summary of results are shown at the end of the output::
 
     Best CYP2D6 star-alleles for NA07048:
       1: *1-like/*4
-          Minor: *1 +42525810:SNP.TC*, *4EW
-          Confidence: 1.00 (score = 25.73)
+          Minor alleles: *1 +42525810:SNP.TC*, *4EW
       2: *1/*4-like
-          Minor: *1, *4EW +42525810:SNP.TC*
+          Minor alleles: *1, *4EW +42525810:SNP.TC*
           Confidence: 1.00 (score = 25.73)
     CYP2D6 results:
       *1-like/*4                     (*1 +42525810:SNP.TC*, *4.b)
@@ -450,8 +459,8 @@ If you encounter any issues with Aldy, please run Aldy with debug parameter:
 This will produce `debuginfo.tar.gz` file that contains sample and LP model dumps.
 Please send us this file and we will try to resolve the issue.
 
-This file contains no private information of any kind except for the mutation counts
-at the target gene locus and the file name.
+This file contains no private information of any kind except for the phasing information
+and mutation counts at the target gene locus, as well as the file name.
 
 
 Sample datasets
@@ -486,7 +495,7 @@ Gene (`-g`)   HG00463               NA19790          NA24027           NA10856  
 License
 =======
 
-© 2016-2019 Aldy Authors, Indiana University Bloomington. All rights reserved.
+© 2016-2022 Aldy Authors, Indiana University Bloomington. All rights reserved.
 
 **Aldy is NOT free software.**
 Complete legal license is available in :ref:`aldy_license`.
@@ -709,6 +718,17 @@ Commands:
 Change log
 ==========
 
+- Aldy v4.0 (Aug 17th, 2022)
+   - Major model changes
+   - Phasing support
+   - Long-read sequencing support (PacBio HiFi, 10X Genomics)
+   - Support for new pharmacogenes
+   - New allele databases
+   - New profile format (**⚠️ WARNING:** Please make sure to re-generate custom profiles if using older Aldy profiles.)
+   - Major API changes
+   - New debug format
+   - Various small fixes
+
 - Aldy v3.0 (Nov 30th, 2020)
    - Support for hg38
    - Support for 15+ new pharmacogenes
@@ -721,11 +741,14 @@ Acknowledgements
 
 The following people made Aldy much better software:
 
+- Ananth Hari
+- Qinghui Zhou
 - Michael Ford `@michael-ford <https://github.com/michael-ford>`_
 - Farid Rashidi `@faridrashidi <https://github.com/faridrashidi>`_
 - David Twesigomwe `@twesigomwedavid <https://github.com/twesigomwedavid>`_
 - Tyler Shrug `@tshugg <https://github.com/tshugg>`_
 - Reynold C. Ly
+- Pieter W. Smit
 - Lawrence Hon `@lhon <https://github.com/lhon>`_
 - Zach Langley `@zlangley <https://github.com/zlangley>`_
 

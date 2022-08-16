@@ -40,7 +40,6 @@ def genotype(
     cn_solution: Optional[List[str]] = None,
     solver: str = "any",
     reference: Optional[str] = None,
-    max_minor_solutions: int = 1,
     debug: Optional[str] = None,
     multiple_warn_level: int = 1,
     report: bool = False,
@@ -65,9 +64,6 @@ def genotype(
     :param solver: ILP solver (see :py:mod:`aldy.lpinterface` for supported solvers).
     :param reference: Reference genome (for reading CRAM files).
         Default: `None`.
-    :param max_minor_solutions: Maximum number of minor solutions to report for each
-        major solution.
-        Default: 1.
     :param debug: Prefix for debug and core dump files.
         Default: `None` (no debug information).
     :param multiple_warn_level: Warning level (1 for optimal solutions, 2 for major
@@ -132,7 +128,6 @@ def genotype(
                         cn_solution,
                         solver,
                         reference,
-                        max_minor_solutions,
                         debug,
                         multiple_warn_level,
                         report,
@@ -299,7 +294,7 @@ def genotype(
         sample.coverage,
         major_sols,
         solver,
-        max_solutions=max_minor_solutions,
+        max_solutions=profile.max_minor_solutions,
     ):
         n = solutions.MinorSolution(
             m.score

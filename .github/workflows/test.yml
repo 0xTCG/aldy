@@ -25,15 +25,13 @@ jobs:
       run: |
         sudo apt-get install libgfortran4
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest pytest-cov codecov black mypy types-pkg_resources types-pyyaml
+        python -m pip install flake8 pytest pytest-cov codecov black
         python -m pip install setuptools wheel twine
         python -m pip install .
     - name: Format with black
       run: black aldy
     - name: Lint with flake8
       run: flake8 aldy
-    - name: Typecheck with mypy
-      run: mypy aldy
     - name: Run Aldy tests
       run: |
         mkdir -p tmp

@@ -543,11 +543,12 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
     def print_mut(m):
         copies = coverage.single_copy(m.pos, cn_sol)
         copies = coverage[m] / copies if copies > 0 else 0
+        impact = gene.get_functional(m)
         return (
             f"  {gene.get_rsid(m):12} {str(m):15} "
             + f"{gene.get_refseq(m, from_atg=True):10} "
             + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
-            + f"impact={gene.get_functional(m)})"
+            + (f"impact={impact})" if impact else "")
         )
 
     log.debug("[minor] candidate mutations=")

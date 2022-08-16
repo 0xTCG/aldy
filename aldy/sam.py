@@ -784,7 +784,7 @@ class Sample:
                             pcs, ed = self._split_read(s, q, h)
                             pieces += pcs
                             s_start += ed
-                    for (ref_start, seq, qual, cigar) in pieces:
+                    for ref_start, seq, qual, cigar in pieces:
                         r = self._parse_read(
                             counter,
                             ref_start,

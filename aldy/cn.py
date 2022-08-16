@@ -346,12 +346,13 @@ def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
     :raise: :py:class:`aldy.common.AldyException` if a user-provided solution does
         not match the gene database.
     """
+
     for sol in sols:
         if sol not in gene.cn_configs:
             raise AldyException(
-                "Given copy number solution contains unknown copy number configuration"
-                + f"{sol}. Please run 'aldy show --gene {gene.name}' for the list the"
-                + "valid configurations"
+                "The copy number solution contains unknown copy number configuration "
+                f"{sol}. Please run 'aldy query {gene.name}' for the list of "
+                "the valid configurations"
             )
     s = CNSolution(gene, 0, sols)  # type: ignore
     log.debug("[cn] result= {} (provided)", s)

@@ -94,12 +94,24 @@ def main(argv):
                 pass
             query(Gene(db_file, genome=args.genome), q)
         elif args.subparser == "profile":
-            p = Profile.get_sam_profile_data(
-                args.file,
-                cn_region=parse_cn_region(args.cn_neutral_region),
-                genome=args.genome,
-            )
-            print(yaml.dump(p, default_flow_style=None))
+            params = {}
+            if args.param:
+                for pl in args.param:
+                    for p in pl:
+                        if "=" not in p:
+                            raise AldyException(f"Invalid parameter {p}")
+                        k, v = p.split("=", 1)
+                        params[k.replace("-", "_")] = v
+            try:
+                p = Profile.get_sam_profile_data(
+                    args.file,
+                    cn_region=parse_cn_region(args.cn_neutral_region),
+                    genome=args.genome,
+                    params=params,
+                )
+                print(yaml.dump(p, default_flow_style=None))
+            except AldyException as ex:
+                log.error("ERROR: {}", str(ex))
         elif args.subparser in ["genotype", "g"]:
             # Prepare the output file
             output = args.output
@@ -188,9 +200,9 @@ def _get_args(argv):
         help=td(
             """Sequencing profile. The following profiles are supported:
                - illumina (also: wgs),
-               - pgrnseq-v1,
-               - pgrnseq-v2,
-               - pgrnseq-v3,
+               - pgrnseq-v1 (also: pgx1),
+               - pgrnseq-v2 (also: pgx2),
+               - pgrnseq-v3 (also: pgx3),
                - 10x,
                - pacbio-hifi-targeted,
                - pacbio-hifi-targeted-twist,
@@ -198,13 +210,6 @@ def _get_args(argv):
                You can also provide a custom SAM/BAM file as a profile.
                Please check documentation for more details."""
         ),
-    )
-    genotype_parser.add_argument(
-        "--threshold",
-        "-T",
-        default=50,
-        type=float,
-        help="Cut-off rate for variations (percent per copy). Default is 50.",
     )
     genotype_parser.add_argument(
         "--reference",
@@ -245,33 +250,10 @@ def _get_args(argv):
         ),
     )
     genotype_parser.add_argument(
-        "--gap",
-        "-G",
-        default=0,
-        type=float,
-        help=td(
-            """Solver optimality gap.
-               Any solution whose score is less than (1+gap) times the optimal solution
-               score will be reported.
-               Default is 0 (report only optimal solutions)."""
-        ),
-    )
-    # genotype_parser.add_argument('--remap', default=0,
-    #   help='Realign reads for better mutation calling.
-    # Requires samtools and bowtie2 in $PATH.')
-    genotype_parser.add_argument(
         "--debug",
         default=None,
         help="Create a directory that will contain the debug information "
         + "and core dumps.",
-    )
-    genotype_parser.add_argument("--log", "-l", default=None, help="Log file location")
-    genotype_parser.add_argument(
-        "--max-minor-solutions",
-        default=1,
-        type=int,
-        help="Maximum number of minor solutions to report for each major solution. "
-        + "Default is 1.",
     )
     genotype_parser.add_argument(
         "--cn",
@@ -285,6 +267,7 @@ def _get_args(argv):
                (e.g. two copies of the main gene), use 1,1."""
         ),
     )
+    genotype_parser.add_argument("--log", "-l", default=None, help="Log file location")
     genotype_parser.add_argument(
         "--multiple-warn-level",
         "-W",
@@ -296,42 +279,12 @@ def _get_args(argv):
         + "Default is 1 (warn after the genotyping).",
     )
     genotype_parser.add_argument(
-        "--min-coverage",
-        default=None,
-        type=int,
-        help=td("""Minimum mutation read coverage. Default is 1."""),
-    )
-    genotype_parser.add_argument(
-        "--min-mapq",
-        default=None,
-        type=int,
-        help=td("""Minimum read mapping quality. Default is 10."""),
-    )
-    genotype_parser.add_argument(
-        "--min-quality",
-        default=None,
-        type=int,
-        help=td("""Minimum quality score. Default is 10."""),
-    )
-    genotype_parser.add_argument(
-        "--cn-fusion-left",
-        default=None,
-        type=float,
-        help=td("""Fusion penalty"""),
-    )
-    genotype_parser.add_argument(
-        "--male",
-        action="store_true",
-        help=td("""Set if male genome"""),
-    )
-    genotype_parser.add_argument(
         "--simple",
         action="store_true",
         default=False,
         help=td("""Print one-line result per gene (debug). Default is off."""),
     )
-
-    genotype_parser.add_argument("--phase", action="store_true", help="Use phase file.")
+    genotype_parser.add_argument("--param", action="append", nargs="+")
 
     _ = subparsers.add_parser(
         "test",
@@ -375,6 +328,7 @@ def _get_args(argv):
         default=None,
         help="SAM/BAM reference genome (hg19 or hg38; hg19 by default)",
     )
+    profile_parser.add_argument("--param", action="append", nargs="+")
 
     _ = subparsers.add_parser(
         "help", parents=[base], help="Show program usage and exit."
@@ -404,8 +358,6 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
     if cn_solution:
         cn_solution = cn_solution.split(",")
 
-    args.threshold = float(args.threshold) / 100
-
     def run(debug):
         log.trace(
             "\n[main] arguments= {}",
@@ -426,8 +378,18 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             log.warn("         Results might not be biologically relevant!")
 
         try:
-            params = vars(args).copy()
-            del params["gene"], params["file"], params["profile"], params["debug"]
+            params = {
+                k: v
+                for k, v in vars(args).items()
+                if k in ["solver", "reference", "multiple_warn_level", "genome"]
+            }
+            if args.param:
+                for pl in args.param:
+                    for p in pl:
+                        if "=" not in p:
+                            raise AldyException(f"Invalid parameter {p}")
+                        k, v = p.split("=", 1)
+                        params[k.replace("-", "_")] = v
             _ = genotype(
                 gene_db=gene,
                 sam_path=args.file,
