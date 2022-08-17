@@ -4,32 +4,29 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import collections
+from typing import List, Dict
 from dataclasses import dataclass, field
 from natsort import natsorted
-from typing import List, Dict, Optional
+from collections import Counter, defaultdict
+
 from .gene import Gene, Mutation
 
 
 @dataclass
 class CNSolution:
-    r"""
-    Valid copy-number configuration assignment.
-
-    :param gene: Gene instance.
-    :param score: ILP model objective score (0 for user-provided solutions).
-    :param solution:
-        Copy-number configurations mapped to the corresponding copy number
-        (e.g. ``{1: 2}`` means that there are two copies of \*1 configuration).
-    :param region_cn: Gene region copy numbers inferred by this solution.
-
-    .. note:: Has custom printer (``__str__``).
-    """
+    """Valid copy-number configuration assignment."""
 
     gene: Gene
+    """Gene instance."""
     score: float
+    """ILP model objective score (0 for user-provided solutions)."""
     solution: Dict[str, int]
+    """
+    Copy-number configurations mapped to the corresponding copy number
+    (e.g. `{1: 2}` means that there are two copies of `*1` configuration).
+    """
     region_cn: List[Dict[str, int]]
+    """Gene region copy numbers inferred by this solution."""
 
     def __init__(self, gene: Gene, score: float, solution: List[str]):
         self.region_cn = [
@@ -41,13 +38,13 @@ class CNSolution:
                     self.region_cn[gi][r] += g[r]
         self.gene = gene
         self.score = score
-        self.solution = collections.Counter(solution)
+        self.solution = Counter(solution)
 
     def __hash__(self):
         return str(self).__hash__()
 
     def position_cn(self, pos: int) -> float:
-        """:return: Copy number at the locus ``pos``."""
+        """:returns: Copy number at the given location."""
         r = self.gene.region_at(pos)
         return self.region_cn[r[0]][r[1]] if r else 0
 
@@ -65,64 +62,52 @@ class CNSolution:
         )
 
     def max_cn(self):
-        """Maximum copy-number in this solution"""
+        """Maximum copy-number in the solution."""
         return sum(self.solution.values())
 
 
 @dataclass
 class SolvedAllele:
-    """
-    Solved star-allele assignment.
-
-    :param gene: Gene instance.
-    :param major: Major star-allele identifier.
-    :param minor: Minor star-allele identifier. Can be None.
-    :param added:
-        Mutations that are added to the star-allele
-        (present in the allele database definition).
-    :param missing:
-        Mutations that are omitted from the star-allele
-        (present in the allele database definition but not here).
-
-    .. note:: Has custom printer (``__str__``).
-    """
+    """Valid star-allele assignment."""
 
     gene: Gene
+    """Gene instance."""
     major: str
-    minor: Optional[str] = None
+    """Major star-allele identifier."""
+    minor: str = ""
+    """Minor star-allele identifier. Empty string when not assigned."""
     added: List[Mutation] = field(default_factory=list)
+    """Mutations that are added to the star-allele (from the allele database)."""
     missing: List[Mutation] = field(default_factory=list)
+    """
+    Mutations that are omitted from the star-allele (but present in the star-allele
+    definition).
+    """
 
     def mutations(self):
+        """Set of allele mutations."""
         m = self.gene.alleles[self.major].func_muts
-        m |= self.gene.alleles[self.major].minors[self.minor].neutral_muts
+        if self.minor:
+            m |= self.gene.alleles[self.major].minors[self.minor].neutral_muts
         m |= set(self.added)
         m -= set(self.missing)
         return m
 
     def major_repr(self):
-        """
-        Pretty-formats major star-allele name.
-        """
-        return "*{}{}".format(
-            self.major,
-            "".join(
-                " +" + self.gene.get_rsid(m)
-                for m in sorted(
-                    m for m in self.added if self.gene.is_functional(m, False)
-                )
-            ),
+        """Pretty-formats major star-allele name."""
+        extra = "".join(
+            " +" + self.gene.get_rsid(m)
+            for m in sorted(m for m in self.added if self.gene.is_functional(m, False))
         )
+        s = f"{self.major}{extra}"
+        return f"*({s})" if extra else f"*{s}"
 
     def __str__(self):
-        """
-        Pretty-formats minor star-allele name.
-        """
-        return "*{}{}{}".format(
-            self.minor if self.minor else self.major,
-            "".join(" +" + self.gene.get_rsid(m) for m in sorted(self.added)),
-            "".join(" -" + self.gene.get_rsid(m) for m in sorted(self.missing)),
-        )
+        """Pretty-formats minor star-allele name."""
+        extra = "".join(" +" + self.gene.get_rsid(m) for m in sorted(self.added))
+        miss = "".join(" -" + self.gene.get_rsid(m) for m in sorted(self.missing))
+        s = f"{self.minor if self.minor else self.major}{extra}{miss}"
+        return f"*({s})" if extra or miss else f"*{s}"
 
     def __hash__(self):
         return hash(
@@ -132,25 +117,22 @@ class SolvedAllele:
 
 @dataclass
 class MajorSolution:
-    r"""
-    Valid major star-allele assignment.
-
-    :param score: ILP model objective score.
-    :param solution:
-        Major star-alleles and the corresponding copy numbers
-        (e.g. ``{1: 2}`` means that we have two copies of \*1).
-    :param cn_solution: Copy-number solution that was used to assign major star-alleles.
-    :param added:
-        List of added mutations. Will be assigned to :obj:`SolvedAllele` in the
-        minor star-allele calling step if phasing is enabled.
-
-    .. note:: Has custom printer (``__str__``).
-    """
+    """Valid major star-allele assignment."""
 
     score: float
+    """ILP model objective score."""
     solution: Dict[SolvedAllele, int]
+    """
+    Major star-alleles and the corresponding copy numbers
+    (e.g. `{1: 2}` means that we have two copies of `*1`).
+    """
     cn_solution: CNSolution
+    """Copy-number solution that was used to assign major star-alleles."""
     added: List[Mutation]
+    """
+    List of added mutations. Will be assigned to :py:class:`SolvedAllele` in the
+    minor star-allele calling step if phasing is enabled.
+    """
 
     def _solution_nice(self):
         x = ", ".join(
@@ -173,22 +155,17 @@ class MajorSolution:
 
 @dataclass
 class MinorSolution:
-    """
-    Valid minor star-allele assignment.
-
-    :param score: ILP model objective score.
-    :param solution:
-        List of solved minor star-alleles.
-        Modifications to minor alleles are represented in :obj:`SolvedAllele` format.
-    :param major_solution:
-        Major star-allele solution used for calculating minor star-allele assignments.
-
-    .. note:: Has custom printer (``__str__``).
-    """
+    """Valid minor star-allele assignment."""
 
     score: float
+    """ILP model objective score."""
     solution: List[SolvedAllele]
+    """
+    List of solved minor star-alleles.
+    Modifications to minor alleles are represented in :py:class:`SolvedAllele`.
+    """
     major_solution: MajorSolution
+    """Major star-allele solution used for calculating minor star-allele assignments."""
 
     def _solution_nice(self):
         return ", ".join(
@@ -230,7 +207,7 @@ class MinorSolution:
         m = gene.alleles[self.solution[i].major]
         t = [mi for mi in m.minors if mi == self.solution[i].minor]
         assert len(t) == 1
-        n = [m.minors[t[0]].alt_name if legacy and m.minors[t[0]].alt_name else t[0]]
+        n = [m.minors[t[0]].alt_name or t[0] if legacy else t[0]]
         for m in sorted(self.solution[i].added):
             n.append("+" + gene.get_rsid(m))
         for m in sorted(self.solution[i].missing):
@@ -239,17 +216,20 @@ class MinorSolution:
 
     def get_major_diplotype(self):
         return " / ".join(
-            " + ".join(f"*{self.get_major_name(i)}" for i in d) for d in self.diplotype
+            " + ".join(f"*{self.get_major_name(i)}" for i in d)
+            for d in self.diplotype
+            if d
         )
 
     def get_minor_diplotype(self, legacy=False):
         return " / ".join(
             " + ".join(f"[*{self.get_minor_name(i, legacy)}]" for i in d)
             for d in self.diplotype
+            if d
         )
 
     def get_mutation_coverages(self, coverage):
-        muts = collections.defaultdict(int)
+        muts = defaultdict(int)
         for sa in self.solution:
             for m in (
                 sa.gene.alleles[sa.major].func_muts

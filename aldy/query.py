@@ -12,7 +12,9 @@ from .common import AldyException, log
 from .gene import Gene
 
 
-def query(gene: Gene, query: str, full=True):
+def query(gene: Gene, query: str):
+    """Query a gene instance."""
+
     minors = {m: a for a, al in gene.alleles.items() for m in al.minors}
     alts = {
         mal.alt_name: (a, m)
@@ -86,7 +88,8 @@ def query(gene: Gene, query: str, full=True):
         log.info(f"    Minor alleles: {mins if mins else 'none'}")
 
 
-def print_cn(gene: Gene, major: str, full=False):
+def print_cn(gene: Gene, major: str):
+    """Pretty-print a copy number configuration."""
     if major not in gene.cn_configs:
         raise AldyException(f"Structural allele {major} not found in {gene.name}")
 
@@ -103,7 +106,9 @@ def print_cn(gene: Gene, major: str, full=False):
         print_majors(gene, major)
 
 
-def print_majors(gene: Gene, major: str, full=False):
+def print_majors(gene: Gene, major: str):
+    """Pretty-print a major star-allele."""
+
     if major not in gene.alleles:
         raise AldyException(f"Major star-allele {major} not found in {gene.name}")
 
@@ -134,6 +139,8 @@ def print_majors(gene: Gene, major: str, full=False):
 
 
 def print_minors(gene: Gene, major: str, minor: str):
+    """Pretty-print a minor star-allele."""
+
     allele = gene.alleles[major]
     if minor not in allele.minors:
         raise AldyException(f"Minor star-allele {minor} not found in {gene.name}")
@@ -162,6 +169,8 @@ def print_minors(gene: Gene, major: str, minor: str):
 
 
 def _print_mutation(gene: Gene, m):
+    """Pretty-print a mutation."""
+
     fields = [
         gene.get_rsid(m, default=False),
         gene.get_refseq(m, from_atg=True),

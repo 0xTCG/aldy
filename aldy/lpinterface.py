@@ -5,7 +5,6 @@
 
 
 from typing import Optional, Dict, Tuple, Iterable, Callable
-
 import importlib
 import collections
 
@@ -13,39 +12,38 @@ from .common import log, sorted_tuple, SOLUTION_PRECISION
 
 
 SOLVER_PRECISON = 1e-5
-"""float: Default solver precision"""
+"""Default solver precision"""
 
 
-def escape_name(s: str, d: collections.defaultdict = None) -> str:
+def escape_name(s: str, d: Optional[dict] = None) -> str:
     """
-    Escape variable names to conform given names with the various solver requirements.
+    Escape variable names to conform with the various solver requirements.
     """
     s = s.replace(".", "").replace("-", "m").replace("#", "__").replace(">", "")[:200]
     # Ensure that all names are unique
     if d is not None:
         d[s] += 1
         if d[s] > 1:
-            return s + "_" + ((d[s] - 1) * "x")
+            return s + f"_{d[s]}"
     return s
 
 
 class NoSolutionsError(Exception):
-    """
-    Raised if a model is infeasible.
-    """
+    """Raised if a model is infeasible."""
 
     pass
 
 
 class Gurobi:  # pragma: no cover
-    """
-    Wrapper around Gurobi's Python interface (gurobipy).
-    """
+    """Wrapper around Gurobi's Python interface (:py:mod:`gurobipy`)."""
 
     def __init__(self, name, prev_model=None):
         self.gurobipy = importlib.import_module("gurobipy")
         self.names = collections.defaultdict(int)
 
+        self.env = self.gurobipy.Env(empty=True)
+        self.env.setParam("OutputFlag", 0)
+        self.env.start()
         self.INF = self.gurobipy.GRB.INFINITY
         self.GUROBI_STATUS = {
             getattr(self.gurobipy.GRB.status, v): v
@@ -55,13 +53,11 @@ class Gurobi:  # pragma: no cover
         if prev_model:
             self.model = prev_model
         else:
-            self.model = self.gurobipy.Model(name)
+            self.model = self.gurobipy.Model(name, env=self.env)
             self.model.reset()
 
     def addConstr(self, *args, **kwargs):
-        """
-        Add a constraint to the model.
-        """
+        """Add a constraint to the model."""
         if "name" in kwargs:
             kwargs["name"] = escape_name(kwargs["name"], self.names)
         c = self.model.addConstr(*args, **kwargs)
@@ -71,11 +67,11 @@ class Gurobi:  # pragma: no cover
         """
         Add a variable to the model.
 
-        ``vtype`` is the variable type:
+        `vtype` is the variable type:
 
-        - ``B`` for binary variable
-        - ``I`` for integer variable
-        - ``C`` or nothing for continuous variable.
+            - `B` for binary variable
+            - `I` for integer variable
+            - `C` or nothing for continuous variable.
         """
         if "vtype" in kwargs and kwargs["vtype"] == "B":
             kwargs["vtype"] = self.gurobipy.GRB.BINARY
@@ -93,9 +89,7 @@ class Gurobi:  # pragma: no cover
         return v
 
     def setObjective(self, objective, method: str = "min"):
-        """
-        Set the model objective.
-        """
+        """Set the model objective."""
         self.objective = objective
         self.model.setObjective(
             self.objective,
@@ -107,8 +101,8 @@ class Gurobi:  # pragma: no cover
 
     def quicksum(self, expr: Iterable):
         """
-        Perform a quick summation of the iterable ``expr``.
-        Much faster than Python's ``sum`` on large iterables.
+        Perform a quick summation of the iterable `expr`.
+        Much faster than Python's `sum` on large iterables.
         """
         return self.gurobipy.quicksum(expr)
 
@@ -120,19 +114,17 @@ class Gurobi:  # pragma: no cover
         self.model.update()
 
     def varName(self, var):
-        """
-        Return a variable name.
-        """
+        """Return a variable name."""
         return var.varName
 
     def abssum(self, vars: Iterable, coeffs: Optional[Dict[str, float]] = None):
         r"""
-        Return the absolute sum of ``vars``: e.g.
+        Return the absolute sum of `vars`: e.g.
            :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
-        where :math:`c_i` is defined in the ``coeffs`` dictionary.
+        where :math:`c_i` is defined in the `coeffs` dictionary.
 
-        Key of the ``coeffs`` dictionary stands for the name of the variable
-        (should be accessible via ``varName`` call; 1 if not defined).
+        Key of the `coeffs` dictionary stands for the name of the variable
+        (should be accessible via `varName` call; 1 if not defined).
         """
         vv = []
         for i, v in enumerate(vars):
@@ -148,9 +140,9 @@ class Gurobi:  # pragma: no cover
     def prod(self, res, terms):
         r"""
         Ensure that :math:`res = \prod terms`
-        (where ``terms`` is a sequence of binary variables)
+        (where `terms` is a sequence of binary variables)
         by adding the appropriate linear constraints.
-        Returns ``res``.
+        Returns `res`.
         """
         for v in terms:
             self.addConstr(res <= v, name="PROD")
@@ -161,14 +153,11 @@ class Gurobi:  # pragma: no cover
         """
         Solve the model. Assumes that the objective is set.
 
-        Additional parameters of the solver can be set via ``init`` function that takes
+        Additional parameters of the solver can be set via `init` function that takes
         the model instance as the sole argument.
 
-        Returns:
-           tuple[str, float]: Status of the solution and the objective value.
-
-        Raises:
-           :obj:`NoSolutionsError` if the model is infeasible.
+        :returns: Status of the solution and the objective value.
+        :raise: :py:class:`NoSolutionsError` if the model is infeasible.
         """
 
         self.model.params.outputFlag = 0
@@ -187,36 +176,26 @@ class Gurobi:  # pragma: no cover
         Get the value of the solved variable.
         Automatically adjusts the return type based on the variable type.
         """
-        if var.vtype == self.gurobipy.GRB.BINARY:
+        if hasattr(var, "vtype") and var.vtype == self.gurobipy.GRB.BINARY:
             return round(var.x) > 0
-        if var.vtype == self.gurobipy.GRB.INTEGER:
+        if hasattr(var, "vtype") and var.vtype == self.gurobipy.GRB.INTEGER:
             return int(round(var.x))
-        else:
+        elif hasattr(var, "x"):
             return var.x
+        else:
+            return var.getValue()
 
     def dump(self, file):
-        """
-        Dump the model description (in LP format) to a file.
-        """
+        """Dump the model description (in LP format) to a file."""
         self.model.write(file)
 
     def variables(self):
-        """
-        Return the list of model variables.
-        """
+        """Return the list of model variables."""
         return self.model.getVars()
 
     def is_binary(self, v):
-        """
-        ``True`` if the variable is binary.
-        """
+        """Check if the variable is binary."""
         return v.vtype == self.gurobipy.GRB.BINARY
-
-    def change_model(self):
-        """
-        Callback that should be called prior to changing an already solved model.
-        """
-        pass
 
     def solutions(
         self,
@@ -236,14 +215,12 @@ class Gurobi:  # pragma: no cover
         the solution that are accessed
         by their name.
 
-        Additional parameters of the solver can be set via ``init`` function that takes
+        Additional parameters of the solver can be set via `init` function that takes
         the model instance as the sole argument.
 
         This is a generic version that supports any solver.
 
-        Returns:
-           generator[tuple[str, float, any]]: Status of the solution,
-           the objective value and the solution itself.
+        :yields: Status of the solution, the objective value and the solution itself.
         """
 
         try:
@@ -263,86 +240,13 @@ class Gurobi:  # pragma: no cover
             yield status, obj, sorted_tuple(set(vv.keys()))
 
             if not limit or iteration + 1 < limit:
-                self.change_model()
                 self.addConstr(self.quicksum(vv.values()) <= len(vv) - 1)
                 yield from self.solutions(gap, best_obj, limit, iteration + 1, init)
         except NoSolutionsError:
             return
 
 
-class SCIP(Gurobi):
-    """
-    Wrapper around SCIP's Python interface (pyscipopt).
-    """
-
-    def __init__(self, name):
-        self.pyscipopt = importlib.import_module("pyscipopt")
-        self.INF = 1e20
-        self.model = self.pyscipopt.Model(name)
-        self.names = collections.defaultdict(int)
-
-    def update(self):
-        pass
-
-    def addConstr(self, *args, **kwargs):
-        if "name" in kwargs:
-            kwargs["name"] = escape_name(kwargs["name"], self.names)
-        return self.model.addCons(*args, **kwargs)
-
-    def addVar(self, *args, **kwargs):
-        if "name" in kwargs:
-            kwargs["name"] = escape_name(kwargs["name"], self.names)
-        if "update" in kwargs:
-            del kwargs["update"]
-        return self.model.addVar(*args, **kwargs)
-
-    def setObjective(self, objective, method: str = "min"):
-        self.objective = objective
-        self.model.setObjective(
-            self.objective, "minimize" if method == "min" else "maximize"
-        )
-
-    def quicksum(self, expr):
-        return self.pyscipopt.quicksum(expr)
-
-    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
-        # self.model.setRealParam('limits/time', 120)
-        self.model.hideOutput()
-        if init is not None:
-            init(self.model)
-        self.model.optimize()
-
-        status = self.model.getStatus()
-        if status == "infeasible":
-            raise NoSolutionsError(status)
-        return status.lower(), self.model.getObjVal()
-
-    def varName(self, var):
-        return var.name
-
-    def getValue(self, var):
-        x = self.model.getVal(var)
-        if var.vtype() == "BINARY":
-            return round(x) > 0
-        if var.vtype() == "INTEGER":
-            return int(round(x))
-        else:
-            return x
-
-    def dump(self, file):
-        self.model.writeProblem(file)
-
-    def variables(self):
-        return self.model.getVars()
-
-    def is_binary(self, v):
-        return v.vtype() == "BINARY"
-
-    def change_model(self):
-        self.model.freeTransform()
-
-
-class CBC(SCIP):
+class CBC(Gurobi):
     """
     Wrapper around CBC's Python interface (Google's ortools).
     """
@@ -374,7 +278,7 @@ class CBC(SCIP):
             kwargs["name"] = escape_name(kwargs["name"], self.names)
         return self.model.Add(*args, **kwargs)
 
-    def addVar(self, *args, **kwargs):
+    def addVar(self, *_, **kwargs):
         name = escape_name(kwargs.get("name", ""), self.names)
         lb = kwargs.get("lb", 0)
         ub = kwargs.get("ub", self.INF)
@@ -412,7 +316,7 @@ class CBC(SCIP):
 
     def getValue(self, var):
         x = var.solution_value()
-        if var.integer():
+        if hasattr(var, "integer") and var.integer():
             x = int(round(x))
             if (
                 abs(var.lb()) < SOLUTION_PRECISION
@@ -435,24 +339,18 @@ class CBC(SCIP):
     def is_binary(self, v):
         return isinstance(self.getValue(v), bool)
 
-    def change_model(self):
-        pass
-
 
 def model(name: str, solver: str):
     """
-    Create an ILP solver instance for a model named ``name``.
-    If ``solver`` is ``'any'``, this function will try to use
-    Gurobi, and will fall back on SCIP (and then CBC) if Gurobi or SCIP is missing.
+    Create an ILP solver instance for a model named `name`.
+    If `solver` is `'any'`, this function will try to use
+    Gurobi, and will fall back on CBC if Gurobi is missing.
 
-    Raises:
-      :obj:`Exception` if no solver is found.
+    :raise: :py:class:`Exception` if no solver is found.
     """
 
     def test_gurobi(name):  # pragma: no cover
-        """
-        Test if Gurobi is present. Requires Gurobi 7+.
-        """
+        """Test if Gurobi is present. Requires Gurobi 7+."""
         try:
             model = Gurobi(name)
             log.trace("[lp] solver= gurobi")
@@ -460,21 +358,8 @@ def model(name: str, solver: str):
             model = None
         return model
 
-    def test_scip(name):
-        """
-        Test if SCIP is present. Requires `PySCIPopt`.
-        """
-        try:
-            model = SCIP(name)
-            log.trace("[lp] solver= scip")
-        except ImportError:
-            model = None
-        return model
-
     def test_cbc(name):
-        """
-        Test if OR-Tools are present. Requires Google's `ortools`.
-        """
+        """Test if OR-Tools are present. Requires Google's `ortools`."""
         try:
             model = CBC(name)
             log.trace("[lp] solver= cbc")
@@ -487,11 +372,9 @@ def model(name: str, solver: str):
         if model is None:
             model = test_gurobi(name)
         if model is None:
-            model = test_scip(name)
-        if model is None:
             raise Exception(
                 "No ILP solver found. Aldy cannot operate without an ILP solver. "
-                + "Please install Gurobi, SCIP, or Google OR Tools."
+                + "Please install Gurobi or Google OR Tools."
             )
         return model
     else:

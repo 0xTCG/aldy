@@ -1,44 +1,50 @@
 name: CYP2W1
-version: pharmvar-4.1.7
-generated: '2020-07-11'
+version: pharmvar-5.2.3
+generated: '2022-08-12'
 pharmvar: 12714
 ensembl: ENSG00000073067
 alleles:
   CYP2W1*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/329
-    activity: normal function
+    activity: function not assigned
     label: CYP2W1*1A
     mutations: []
   CYP2W1*1.002:
     pharmvar: https://www.pharmvar.org/haplotype/327
+    activity: function not assigned
     label: CYP2W1*1B
     mutations:
     - [5179, C>T, rs2272375]
   CYP2W1*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/330
+    activity: function not assigned
     label: CYP2W1*2
     mutations:
     - [5179, C>T, rs2272375]
     - [7021, G>A, rs3735684, A181T]
   CYP2W1*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/328
+    activity: function not assigned
     label: CYP2W1*3
     mutations:
     - [5179, C>T, rs2272375]
     - [5186, A>C, rs1316523256, E58A]
   CYP2W1*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/325
+    activity: function not assigned
     label: CYP2W1*4
     mutations:
     - [10445, G>A, rs78873069, V432I]
   CYP2W1*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/324
+    activity: function not assigned
     label: CYP2W1*5
     mutations:
     - [10445, G>A, rs78873069, V432I]
     - [10597, G>C, rs773499447, Q482H]
   CYP2W1*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/326
+    activity: function not assigned
     label: CYP2W1*6
     mutations:
     - [10614, C>T, rs3808348, P488L]
@@ -46,7 +52,7 @@ structure:
   genes: [CYP2W1]
   regions:
     hg19:
-      up: [1017835, 1022848]
+      up: [1017835, 1022835]
       utr5: [1022835, 1022848]
       e1: [1022848, 1023022]
       e2: [1024048, 1024211]
@@ -60,7 +66,7 @@ structure:
       utr3: [1028459, 1029277]
       down: [1029277, 1031277]
     hg38:
-      up: [978199, 983212]
+      up: [978199, 983181]
       utr5: [983181, 983212]
       e1: [983212, 983386]
       e2: [984412, 984575]

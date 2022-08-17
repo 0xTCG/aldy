@@ -87,7 +87,7 @@ def test_deletion(real_gene, solver):
     assert_cn(
         real_gene,
         solver,
-        [{"1": 1, "5": 1}],
+        [{"1": 1}],
         {
             "e1": (1.0, 1.9),
             "i1": (1.3, 1.6),
@@ -185,12 +185,12 @@ def test_gap(real_gene, solver):
         "pce": (0, 1.9),
     }
 
-    assert_cn(real_gene, solver, [{"1": 1, "5": 1}], data, gap=0.0)
+    assert_cn(real_gene, solver, [{"1": 1}], data, gap=0.0)
     assert_cn(
         real_gene,
         solver,
         [
-            {"1": 1, "5": 1},
+            {"1": 1},
             {"13": 1, "68": 1},
             {"16": 1, "36.ALDY": 1},
             {"16": 1, "61": 1},
@@ -203,13 +203,13 @@ def test_gap(real_gene, solver):
             {"63": 1, "77": 1},
         ],
         data,
-        gap=0.1,
+        gap=0.2,
     )
     assert_cn(
         real_gene,
         solver,
         [
-            {"1": 1, "5": 1},
+            {"1": 1},
             {"13": 1, "68": 1},
             {"16": 1, "36.ALDY": 1},
             {"16": 1, "61": 1},
@@ -220,7 +220,6 @@ def test_gap(real_gene, solver):
             {"61": 1, "77": 1},
             {"63": 1, "76": 1},
             {"63": 1, "77": 1},
-            {"68": 1, "79": 1},
         ],
         data,
         gap=0.65,

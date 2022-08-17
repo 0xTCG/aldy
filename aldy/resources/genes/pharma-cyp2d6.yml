@@ -1,0 +1,804 @@
+name: CYP2D6
+version: pharmvar-4.1.7
+generated: '2020-07-11'
+pharmvar: 33529
+ensembl: ENSG00000100197
+alleles:
+  CYP2D6*1.001:
+    pharmvar: https://www.pharmvar.org/haplotype/126
+    activity: normal function
+    label: CYP2D6*1
+    evidence: D
+    mutations: []
+  CYP2D6*2.001:
+    pharmvar: https://www.pharmvar.org/haplotype/129
+    activity: normal function
+    label: CYP2D6*2
+    evidence: D
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*3.001:
+    pharmvar: https://www.pharmvar.org/haplotype/221
+    activity: no function
+    label: CYP2D6*3.001
+    evidence: D
+    mutations:
+    - [6750, delA, rs35742686, 259frameshift]
+  CYP2D6*3.002:
+    pharmvar: https://www.pharmvar.org/haplotype/220
+    activity: no function
+    label: CYP2D6*3.002
+    evidence: L
+    mutations:
+    - [5950, A>G, rs1135824, N166D]
+    - [6750, delA, rs35742686, 259frameshift]
+  CYP2D6*4:
+    pharmvar: https://www.pharmvar.org/haplotype/235
+    activity: no function
+    label: CYP2D6*4
+    evidence: D
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [6047, G>A, rs3892097, splicing defect/169frameshift]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*4.009:
+    pharmvar: https://www.pharmvar.org/haplotype/253
+    activity: no function
+    label: CYP2D6*4.009
+    evidence: L
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [6047, G>A, rs3892097, splicing defect/169frameshift]
+  CYP2D6*4.010:
+    pharmvar: https://www.pharmvar.org/haplotype/252
+    activity: no function
+    label: CYP2D6*4.010
+    evidence: L
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [6047, G>A, rs3892097, splicing defect/169frameshift]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*4.021:
+    pharmvar: https://www.pharmvar.org/haplotype/652
+    activity: no function
+    evidence: D
+    label: CYP2D6*4.021
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [6047, G>A, rs3892097, splicing defect/169frameshift]
+    - [7466, G>A, rs1058172, R365H]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*4.025:
+    pharmvar: https://www.pharmvar.org/haplotype/652
+    activity: no function
+    evidence: D
+    label: CYP2D6*4.025
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+    - [6047, G>A, rs3892097, splicing defect/169frameshift]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*5.001:
+    activity: no function
+    mutations:
+    - [CYP2D6, deletion]
+  CYP2D6*6.001:
+    pharmvar: https://www.pharmvar.org/haplotype/714
+    activity: no function
+    label: CYP2D6*6
+    evidence: L
+    mutations:
+    - [5908, delT, rs5030655, 152frameshift]
+  CYP2D6*7.001:
+    pharmvar: https://www.pharmvar.org/haplotype/155
+    activity: no function
+    label: CYP2D6*7
+    evidence: D
+    mutations:
+    - [7136, A>C, rs5030867, H324P]
+  CYP2D6*8.001:
+    pharmvar: https://www.pharmvar.org/haplotype/154
+    activity: no function
+    label: CYP2D6*8
+    evidence: L
+    mutations:
+    - [5959, G>T, rs5030865, G169X]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*9.001:
+    pharmvar: https://www.pharmvar.org/haplotype/153
+    activity: decreased function
+    label: CYP2D6*9
+    evidence: D
+    mutations:
+    - [6816, delAAG, rs5030656, K281del]
+  CYP2D6*10.001:
+    pharmvar: https://www.pharmvar.org/haplotype/179
+    activity: decreased function
+    label: CYP2D6*10
+    evidence: L
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*10^R26H:
+    label: CYP2D6*10^R26H
+    mutations:
+    - [4277, G>A, rs28371696, R26H]
+    - [4300, C>T, rs1065852, P34S]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*11.001:
+    pharmvar: https://www.pharmvar.org/haplotype/166
+    activity: no function
+    label: CYP2D6*11
+    evidence: D
+    mutations:
+    - [5082, G>C, rs201377835, splicing defect]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*12.001:
+    pharmvar: https://www.pharmvar.org/haplotype/121
+    activity: no function
+    label: CYP2D6*12
+    evidence: L
+    mutations:
+    - [4324, G>A, rs5030862, G42R]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*14.001:
+    pharmvar: https://www.pharmvar.org/haplotype/138
+    activity: decreased function
+    label: CYP2D6*14
+    evidence: D
+    mutations:
+    - [5959, G>A, rs5030865, G169R]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*15.001:
+    pharmvar: https://www.pharmvar.org/haplotype/117
+    activity: no function
+    label: CYP2D6*15
+    evidence: D
+    mutations:
+    - [4337, insT, rs774671100, 47frameshift]
+  CYP2D6*17.001:
+    pharmvar: https://www.pharmvar.org/haplotype/120
+    activity: decreased function
+    label: CYP2D6*17
+    evidence: D
+    mutations:
+    - [5222, C>T, rs28371706, T107I]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*18.001:
+    pharmvar: https://www.pharmvar.org/haplotype/119
+    activity: no function
+    label: CYP2D6*18
+    evidence: L
+    mutations:
+    - [8334, insGTGCCCACT, '-', insertion]  # Manual patch
+  CYP2D6*19.001:
+    pharmvar: https://www.pharmvar.org/haplotype/115
+    activity: no function
+    label: CYP2D6*19
+    evidence: L
+    mutations:
+    - [6740, delAACT, rs72549353, 255frameshift]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*20.001:
+    pharmvar: https://www.pharmvar.org/haplotype/123
+    activity: no function
+    label: CYP2D6*20
+    evidence: L
+    mutations:
+    - [6177, insG, rs72549354, 213frameshift]
+    - [6180, T>C, rs199535154, L213P]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*22.001:
+    pharmvar: https://www.pharmvar.org/haplotype/135
+    activity: uncertain function
+    label: CYP2D6*22
+    evidence: D
+    mutations:
+    - [4282, C>T, rs138100349, R28C]
+  CYP2D6*23.001:
+    pharmvar: https://www.pharmvar.org/haplotype/134
+    activity: uncertain function
+    label: CYP2D6*23
+    evidence: L
+    mutations:
+    - [5156, C>T, rs267608310, A85V]
+  CYP2D6*25.001:
+    pharmvar: https://www.pharmvar.org/haplotype/136
+    activity: uncertain function
+    label: CYP2D6*25
+    evidence: L
+    mutations:
+    - [7399, C>G, rs267608295, R343G]
+  CYP2D6*28.001:
+    pharmvar: https://www.pharmvar.org/haplotype/133
+    activity: uncertain function
+    label: CYP2D6*28
+    evidence: D
+    mutations:
+    - [4219, G>A, rs72549358, V7M]
+    - [5905, C>G, rs78482768, Q151E]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*29.001:
+    pharmvar: https://www.pharmvar.org/haplotype/132
+    activity: decreased function
+    label: CYP2D6*29
+    evidence: D
+    mutations:
+    - [5860, G.G>A.C, rs61736512, V136M]
+    - [7051, C>T, rs16947, R296C]
+    - [7384, G>A, rs59421388, V338M]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*31.001:
+    pharmvar: https://www.pharmvar.org/haplotype/142
+    activity: no function
+    label: CYP2D6*31
+    evidence: D
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+    - [8243, G>A, rs267608319, R440H]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*33.001:
+    pharmvar: https://www.pharmvar.org/haplotype/227
+    activity: normal function
+    label: CYP2D6*33
+    evidence: D
+    mutations:
+    - [6684, G>T, rs28371717, A237S]
+  CYP2D6*34.001:
+    pharmvar: https://www.pharmvar.org/haplotype/226
+    activity: normal function
+    label: CYP2D6*34
+    evidence: L
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+  CYP2D6*35.001:
+    pharmvar: https://www.pharmvar.org/haplotype/184
+    activity: normal function
+    label: CYP2D6*35
+    evidence: D
+    mutations:
+    - [4231, G>A, rs769258, V11M]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*35^R365H:
+    pharmvar: https://www.pharmvar.org/haplotype/167
+    activity: normal function
+    label: CYP2D6*35^R365H
+    evidence: D
+    mutations:
+    - [4231, G>A, rs769258, V11M]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+    - [7466, G>A, rs1058172, R365H]
+  CYP2D6*37.001:
+    pharmvar: https://www.pharmvar.org/haplotype/224
+    activity: uncertain function
+    label: CYP2D6*37
+    evidence: L
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [6144, G>A, rs745365204, R201H]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*38.001:
+    pharmvar: https://www.pharmvar.org/haplotype/223
+    activity: no function
+    label: CYP2D6*38
+    evidence: L
+    mutations:
+    - [6788, delGACT, rs72549351, 272frameshift]
+  CYP2D6*40.001:
+    pharmvar: https://www.pharmvar.org/haplotype/231
+    activity: no function
+    label: CYP2D6*40
+    evidence: D
+    mutations:
+    - [5222, C>T, rs28371706, T107I]
+    - [6063, insTTTCGCCCCTTTCGCCCC, rs72549356, 174_175insFRPx2]  # Manual patch
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*41.001:
+    pharmvar: https://www.pharmvar.org/haplotype/230
+    activity: decreased function
+    label: CYP2D6*41
+    evidence: D
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+    - [7189, G>A, rs28371725, splicing defect]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*42.001:
+    pharmvar: https://www.pharmvar.org/haplotype/233
+    activity: no function
+    label: CYP2D6*42
+    evidence: D
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+    - [7460, insGT, rs72549346, 364frameshift]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*43.001:
+    pharmvar: https://www.pharmvar.org/haplotype/232
+    activity: uncertain function
+    label: CYP2D6*43
+    evidence: D
+    mutations:
+    - [4277, G>A, rs28371696, R26H]
+  CYP2D6*44.001:
+    pharmvar: https://www.pharmvar.org/haplotype/240
+    activity: no function
+    label: CYP2D6*44
+    evidence: L
+    mutations:
+    - [4282, C>T, rs138100349, R28C]
+    - [7151, G>C, rs72549349, splicing defect]
+  CYP2D6*45.001:
+    pharmvar: https://www.pharmvar.org/haplotype/203
+    activity: normal function
+    label: CYP2D6*45
+    evidence: D
+    mutations:
+    - [5917, G>A, rs28371710, E155K]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*46.001:
+    pharmvar: https://www.pharmvar.org/haplotype/204
+    activity: normal function
+    label: CYP2D6*46A
+    evidence: D
+    mutations:
+    - [4277, G>A, rs28371696, R26H]
+    - [5917, G>A, rs28371710, E155K]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*47.001:
+    pharmvar: https://www.pharmvar.org/haplotype/241
+    activity: no function
+    label: CYP2D6*47
+    evidence: D
+    mutations:
+    - [4273, C>T, rs267608313, R25W]
+    - [4300, C>T, rs1065852, P34S]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*48.001:
+    pharmvar: https://www.pharmvar.org/haplotype/239
+    activity: normal function
+    label: CYP2D6*48
+    evidence: D
+    mutations:
+    - [5171, C>T, rs267608309, A90V]
+  CYP2D6*49.001:
+    pharmvar: https://www.pharmvar.org/haplotype/238
+    activity: decreased function
+    label: CYP2D6*49
+    evidence: D
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [5812, T>A, rs1135822, F120I]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*51.001:
+    pharmvar: https://www.pharmvar.org/haplotype/244
+    activity: no function
+    label: CYP2D6*51
+    evidence: D
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+    - [7373, A>C, rs72549348, E334A]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*53.001:
+    pharmvar: https://www.pharmvar.org/haplotype/246
+    activity: normal function
+    label: CYP2D6*53
+    evidence: L
+    mutations:
+    - [5812, T>A, rs1135822, F120I]
+    - [5818, G>T, rs1135823, A122S]
+  CYP2D6*54.001:
+    pharmvar: https://www.pharmvar.org/haplotype/245
+    activity: decreased function
+    label: CYP2D6*54
+    evidence: L
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [6757, C>T, rs267608297, T261I]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*55.001:
+    pharmvar: https://www.pharmvar.org/haplotype/180
+    activity: decreased function
+    label: CYP2D6*55
+    evidence: L
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+    - [8036, A>C, '-', K404Q]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*56.001:
+    pharmvar: https://www.pharmvar.org/haplotype/229
+    activity: no function
+    label: CYP2D6*56.001
+    evidence: D
+    mutations:
+    - [7051, C>T, rs16947, R296C]
+    - [7402, C>T, rs72549347, R344X]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*56.002:
+    pharmvar: https://www.pharmvar.org/haplotype/228
+    activity: no function
+    label: CYP2D6*56.002
+    evidence: D
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [7402, C>T, rs72549347, R344X]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*62.001:
+    pharmvar: https://www.pharmvar.org/haplotype/186
+    activity: no function
+    label: CYP2D6*62
+    evidence: D
+    mutations:
+    - [8245, C>T, rs730882251, R441C]
+  CYP2D6*69.001:
+    pharmvar: https://www.pharmvar.org/haplotype/202
+    activity: no function
+    label: CYP2D6*69
+    evidence: D
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [7051, C>T, rs16947, R296C]
+    - [7189, G>A, rs28371725, splicing defect]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*70.001:
+    pharmvar: https://www.pharmvar.org/haplotype/208
+    activity: uncertain function
+    label: CYP2D6*70
+    evidence: M
+    mutations:
+    - [5809, G>A, rs374616348, V119M]
+    - [5860, G.G>A.C, rs61736512, V136M]
+    - [7384, G>A, rs59421388, V338M]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*71.001:
+    pharmvar: https://www.pharmvar.org/haplotype/212
+    activity: uncertain function
+    label: CYP2D6*71
+    evidence: M
+    mutations:
+    - [4325, G>A, rs118203758, G42E]
+  CYP2D6*73.001:
+    pharmvar: https://www.pharmvar.org/haplotype/206
+    activity: unknown function
+    label: CYP2D6*73
+    evidence: D
+    mutations:
+    - [5212, G>A, rs267608308, V104M]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*75.001:
+    pharmvar: https://www.pharmvar.org/haplotype/207
+    activity: uncertain function
+    label: CYP2D6*75
+    evidence: M
+    mutations:
+    - [8246, G>A, rs532668079, R441H]
+  CYP2D6*79.001:
+    activity: no function
+    label: CYP2D6*13B
+    mutations:
+    - [CYP2D7, e2-]
+  CYP2D6*81.001:
+    pharmvar: https://www.pharmvar.org/haplotype/160
+    activity: uncertain function
+    label: CYP2D6*81
+    evidence: M
+    mutations:
+    - [6780, C>T, rs367543000, R269X]
+    - [6807, G>A, rs77913725, E278K]
+    - [6811, T>A, rs1135828, M279K]
+  CYP2D6*82.001:
+    pharmvar: https://www.pharmvar.org/haplotype/162
+    activity: unknown function
+    label: CYP2D6*82
+    evidence: M
+    mutations:
+    - [5213, T>C, rs76187628, V104A]
+    - [5221, A>T, rs74802369, T107Y]
+    - [5222, C>A, rs28371706, T107Y]
+    - [5227, A>G, rs78459009, I109V]
+  CYP2D6*84.001:
+    pharmvar: https://www.pharmvar.org/haplotype/157
+    activity: decreased function
+    label: CYP2D6*84
+    evidence: D
+    mutations:
+    - [6775, C>A, rs148769737, P267H]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*86.001:
+    pharmvar: https://www.pharmvar.org/haplotype/159
+    activity: unknown function
+    label: CYP2D6*86
+    evidence: D
+    mutations:
+    - [6807, G>A, rs77913725, E278K]
+    - [6811, T>A, rs1135828, M279K]
+  CYP2D6*88.001:
+    pharmvar: https://www.pharmvar.org/haplotype/165
+    activity: uncertain function
+    label: CYP2D6*88
+    evidence: L
+    mutations:
+    - [5213, T>C, rs76187628, V104A]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*89.001:
+    pharmvar: https://www.pharmvar.org/haplotype/163
+    activity: uncertain function
+    label: CYP2D6*89
+    evidence: L
+    mutations:
+    - [5879, T>C, rs375135093, L142S]
+  CYP2D6*95.001:
+    pharmvar: https://www.pharmvar.org/haplotype/169
+    activity: uncertain function
+    label: CYP2D6*95
+    evidence: L
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [7535, G>A, rs77312092, R388H]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*100.001:
+    pharmvar: https://www.pharmvar.org/haplotype/219
+    activity: no function
+    label: CYP2D6*100
+    evidence: D
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [7029, delC, rs267608279, 288frameshift]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*102.001:
+    pharmvar: https://www.pharmvar.org/haplotype/217
+    activity: unknown function
+    label: CYP2D6*102
+    evidence: L
+    mutations:
+    - [5171, C>T, rs267608309, A90V]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*103.001:
+    pharmvar: https://www.pharmvar.org/haplotype/216
+    activity: unknown function
+    label: CYP2D6*103
+    evidence: L
+    mutations:
+    - [5171, C>T, rs267608309, A90V]
+    - [5950, A>G, rs1135824, N166D]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*107.001:
+    pharmvar: https://www.pharmvar.org/haplotype/213
+    activity: unknown function
+    label: CYP2D6*107
+    evidence: L
+    mutations:
+    - [5860, G>A, rs61736512, V136M]
+  CYP2D6*109.001:
+    pharmvar: https://www.pharmvar.org/haplotype/209
+    activity: uncertain function
+    label: CYP2D6*109
+    evidence: D
+    mutations:
+    - [6816, delAAG, rs5030656, K281del]
+    - [7384, G>A, rs59421388, V338M]
+  CYP2D6*114.001:
+    pharmvar: https://www.pharmvar.org/haplotype/140
+    activity: no function
+    label: CYP2D6*114
+    evidence: L
+    mutations:
+    - [4300, C>T, rs1065852, P34S]
+    - [5959, G>A, rs5030865, G169R]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*121.001:
+    pharmvar: https://www.pharmvar.org/haplotype/637
+    evidence: D
+    label: CYP2D6*121
+    mutations:
+    - [5950, A>G, rs1135824, N166D]
+    - [5955, C>A, rs1135825, H167Q]
+    - [5956, T>G, rs1135826, S168A]
+    - [7051, C>T, rs16947, R296C]
+    - [8381, G>C, rs1135840, S486T]
+  CYP2D6*139.001:
+    pharmvar: https://www.pharmvar.org/haplotype/734
+    evidence: D
+    label: CYP2D6*139
+    mutations:
+    - [7466, G>A, rs1058172, R365H]
+  CYP2D6*T470A:
+    label: CYP2D6*T470A
+    mutations:
+    - [8332, A>G, rs1135835, T470A]
+structure:
+  genes: [CYP2D6, CYP2D7]
+  regions:
+    hg19:
+      up: [42526909, 42530998, 42540551, 42544640]
+      utr5: [42526794, 42526909, 42540466, 42540551]
+      e1: [42526614, 42526794, 42540285, 42540466]
+      e2: [42525740, 42525912, 42539411, 42539583]
+      e3: [42525035, 42525188, 42538729, 42538882]
+      e4: [42524786, 42524947, 42538480, 42538641]
+      e5: [42524176, 42524353, 42537878, 42538055]
+      e6: [42523844, 42523986, 42537544, 42537686]
+      e7: [42523449, 42523637, 42537162, 42537350]
+      e8: [42522853, 42522995, 42536566, 42536708]
+      e9: [42522576, 42522755, 42536289, 42536468]
+      utr3: [42522501, 42522576, 42536214, 42536289]
+      ins: [42521976, 42522501, 42535689, 42536214]
+      pce: [42521976, 42521976, 42534089, 42535689]
+      rep: [42519176, 42521976, 42531289, 42534089]
+    hg38:
+      up: [42130811, 42134992, 42144550, 42148731]
+      utr5: [42130792, 42130811, 42144465, 42144550]
+      e1: [42130612, 42130792, 42144284, 42144465]
+      e2: [42129738, 42129910, 42143410, 42143582]
+      e3: [42129033, 42129186, 42142728, 42142881]
+      e4: [42128784, 42128945, 42142479, 42142640]
+      e5: [42128174, 42128351, 42141868, 42142045]
+      e6: [42127842, 42127984, 42141534, 42141676]
+      e7: [42127447, 42127635, 42141152, 42141340]
+      e8: [42126851, 42126993, 42140555, 42140697]
+      e9: [42126574, 42126753, 42140280, 42140457]
+      utr3: [42126499, 42126574, 42140203, 42140280]
+      ins: [42125974, 42126499, 42139680, 42140203]
+      pce: [42125974, 42125974, 42138080, 42139680]
+      rep: [42123774, 42125974, 42135280, 42138080]
+  cn_regions: [e1, i1, e2, i2, e3, e5, i5, e6, i6, e9, pce]
+  tandems:
+  - ['13', '1']
+  - ['77', '2']
+  - ['79', '2']
+  - ['78', '2']
+  - ['76', '1']
+  - ['36', '10']
+  - ['57', '10']
+  - ['68', '4']
+reference:
+  name: NG_008376.3
+  mappings:
+    hg19: ['22', 42522044, 42530998, '-', M94 I3 M5892 D5 M2062 I1 M901]
+    hg38: ['22', 42126039, 42134992, '-', M8953]
+  exons:
+  - [4200, 4380]
+  - [5082, 5254]
+  - [5806, 5959]
+  - [6047, 6208]
+  - [6641, 6818]
+  - [7008, 7150]
+  - [7357, 7545]
+  - [7999, 8141]
+  - [8239, 8418]
+  seq: |-
+    ATTACAGCCTTCTGAGTCACTGACACTACAGGTGTGAGCCACCATGTCCAGCTTGTAGTGGTTTTGAACAGCTCTT
+    GCCCCTTCTTGGGAATCTAGGTGCCCTGCACGTGGGTAAGGCTGTCTGCAGCTGTGCCCATATTCAGGAAGGCCGG
+    CAAGGCCCTGAGCCCTCACACGTGACTGACCTGAGGTGCTGTGCAGACAGCAGGTGACGGCTAAGGGAAAGTTGAG
+    CACTGCCTAGCCGAGCACTGAAGCCACGCCCGGCACACAGAGAGAGACCCACTCGGCAAAGACTTCGCTTCCAGGC
+    ACCTAAGGAACTCTCTGACCAGTCATTAGCTGACCACTGCCGTAACTGAAGAGCGGCTTCAGTGGCCACAGCTCGC
+    AGGGAATGGAGACATTAATGCTTAGTCAGAATTAGTTCAGAAAAGTCACCCAGCAAAGAAACAGCTCCAACAGGCA
+    ACAACAACAACACATCCTTGGCAGGGAAGAGAATCTGACTTCCGGAGTTGCCACATTATCGCCCGTGAAATGTCCA
+    GGTTTTAACAAATTATGAGACATGGAAAGGAAACCGAAAGGACGACCCAGACACGGGAAAAGTCACCAATGGGACC
+    AGCCCGATGCTGCAATTGCTAGACAAAGACGTTCAGTCAGCTCATTTAAATATGTTCAAAGACCTAAAACATGCTG
+    CATCTGAGGCTGCACCGGCTGGAACCTGCTGATCTCGGAAGCTAAGCATGGTCAGGCCTGGCTAGTACTTCAAAGG
+    GAGAAACCACGTGTAGGCCTGGTGCAGTGGCTCACACCTATAATCCTAGCACTCTGGGAAGCTGAGGCCCGTGGAT
+    TGCTTGAGCCCAGGAGTTTGAGAGCAGCTTGGGAAATGTGGTGAGACCCCCATCTCTACAAAAAAATTTAAAAAAT
+    TAGCTGGCTGCCTATGGTCCCAGCCTCTCAGGATGCTGAGGTAGGAGGATCACTTCAGCCCAGGAAGTTGAGGCTG
+    CAGTGAGCCATGACTGCATCACTGCACTCCAGCTTGGGCGACAGAGAGACCCTCTCCCAAGAAAAAGAAAAGAACC
+    ATGTCAAAAGAACTAACGAAAGTGTGGGAACAATGTCTCACCAATTAGAGAATATCAATAATGGGATGAACCTTAT
+    AAAAAGGGGCTGGGCATGGTGGCTCATGCCTATAATCCCAGCACTTTGGGAGGCTGAGGCGGGCATATCATGAGGT
+    CAAGAGATTGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTTAAAATACAAAAATTAGCCGGGCGTGG
+    TGGCACGTGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGAGAGGCAGAGATTGC
+    AGTGAGCCGAGATTGCACCACTGCACTACAGCCTGGGTGACAGAGCGATACTCCAAAAAACAAAACAAAACAAAAA
+    ACAAAAAAAAAGTTTAAAAAGGAACCAAATAAAAATTCTGGAGTTGTAGGGTAAAATAAATGAAAATTCATCCCAG
+    GGGCCCAAGAGCAGATTGGAACAATTGGAAGAAAGAGCCTGTGACTATGGAGAGAGGCCACCTGAGGTAGTACCCT
+    CTGAGGAACAGGAACAAGCATGAAGAGCAATGCACAGAGATCCAGAGACCTGGAGACGCCGTCAAGCTTTCCGACA
+    TACACGCAATGGGAGTCCCAGGAAAGAAGACAGGGAGAAAGGAGTAAAGGAATAGTTGAAGAATTAATGGCTGAAA
+    AACCTCCCAAATCTGATGAAAAATATTAATCTGTACATCCAAAAAGCTCATCAAACTCCAAGTAGGGTAAACTCAA
+    AGAGATCTTCAGCCATACGCATCATCATAATCACTGTCAAAAGACAGATTTTTCTTTTTTTAGAATTTTAAATGTA
+    CCTTTTAATTTGCTCCTGGGGCAAAGAGCCAGGACTGGTACTAGAGCAGTGTCTGGGATGAGAAGAATTTAATAAA
+    ATGGGATTAGGTCCAATGGTTGGGTTAGGGGAGGCAACCTGCTCGGGAGGATCAGCCTCAACCTATCCATGCAGCA
+    GGGCCTCCACCTGTCCCTCTCCGTAGTCCCACACCTGGAACCCAGAGCCATCTGCCTCTTCCCAGATCATGGCCGA
+    CAGCACTCCACCAGACTGCGGCTGGAGCAGGCACAGGATTCACTTATTGAGGGCTGTGGCCTGGCACAGATCATAG
+    CCTATACCCAGGGACAGTTGTGTCACTTCTGCCACCACCACATCCGCCTTCTGCAGCCACATCAAGTACCACTCAT
+    GGATGAGCCCGTCACCCCCAGCGGACTTATCAACCCCGCGTCCAGCTCCACAGCCGCCACGTGCTCGGTGAGCACT
+    GGCTCCAAGCATGGCAGCTGCCATACAATCCACCTGTAGAGGGCCCGGTCCTCCTGTCCTCAGTGGATGATCCCGT
+    AGAAGTCCAGAGCTCGGCAGCTGCCCTCCCACAAAAGACAGGATTTTGAAAGCAGCAAGAGAGAAGAGACGTATCA
+    GGTAGTCACAGTGGCTCAGGCCTGTAATCCCAGCACTTTGGGAGGCCCAGGTGGGAGGATCGCTTCACCCCAGGAA
+    TTCAAGACCAGCCTGGACAACTTGGAAGAACCCGGTCTCTACAAAAAATACAAAATTAGCTGGGATTGGGTGCGGT
+    GGCTCATGCCTATAATCCCAGCACTTTGGGAGCCTGAGGTGGGTGGATCACCTGAAGTCAGGAGTTCAAGACTAGC
+    CTGGCCAACATGGTGAAACCCTATCTCTACTGAAAATACAAAAAGCTAGACGTGGTGGCACACACCTGTAATCCCA
+    GCTACTTAGGAGGCTGAGGCAGGAGAATTGCTTGAAGCCTAGAGGTGAAGGTTGTAGTGAGCCGAGATTGCATCAT
+    TGCACAATGGAGGGGAGCCACCAGCCTGGGCAACAAGAGGAAATCTCCGTCTCCAAAAAAAAAAAAAAAAAAAAAA
+    GAATTAGGCTGGGTGGTGCCTGTAGTCCCAGCTACTTGGGAGGCAGGGGGTCCACTTGATGTCGAGACTGCAGTGA
+    GCCATGATCCTGCCACTGCACTCCGGCCTGGGCAACAGAGTGAGACCCTGTCTAAAGAAAAAAAAAATAAAGCAAC
+    ATATCCTGAACAAAGGATCCTCCATAACGTTCCCACCAGATTTCTAATCAGAAACATGGAGGCCAGAAAGCAGTGG
+    AGGAGGACGACCCTCAGGCAGCCCGGGAGGATGTTGTCACAGGCTGGGGCAAGGGCCTTCCGGCTACCAACTGGGA
+    GCTCTGGGAACAGCCCTGTTGCAAACAAGAAGCCATAGCCCGGCCAGAGCCCAGGAATGTGGGCTGGGCTGGGAGC
+    AGCCTCTGGACAGGAGTGGTCCCATCCAGGAAACCTCCGGCATGGCTGGGAAGTGGGGTACTTGGTGCCGGGTCTG
+    TATGTGTGTGTGACTGGTGTGTGTGAGAGAGAATGTGTGCCCTAAGTGTCAGTGTGAGTCTGTGTATGTGTGAATA
+    TTGTCTTTGTGTGGGTGATTTTCTGCGTGTGTAATCGTGTCCCTGCAAGTGTGAACAAGTGGACAAGTGTCTGGGA
+    GTGGACAAGAGATCTGTGCACCATCAGGTGTGTGCATAGCGTCTGTGCATGTCAAGAGTGCAAGGTGAAGTGAAGG
+    GACCAGGCCCATGATGCCACTCATCATCAGGAGCTCTAAGGCCCCAGGTAAGTGCCAGTGACAGATAAGGGTGCTG
+    AAGGTCACTCTGGAGTGGGCAGGTGGGGGTAGGGAAAGGGCAAGGCCATGTTCTGGAGGAGGGGTTGTGACTACAT
+    TAGGGTGTATGAGCCTAGCTGGGAGGTGGATGGCCGGGTCCACTGAAACCCTGGTTATCCCAGAAGGCTTTGCAGG
+    CTTCAGGAGCTTGGAGTGGGGAGAGGGGGTGACTTCTCCGACCAGGCCCCTCCACCGGCCTACCCTGGGTAAGGGC
+    CTGGAGCAGGAAGCAGGGGCAAGAACCTCTGGAGCAGCCCATACCCGCCCTGGCCTGACTCTGCCACTGGCAGCAC
+    AGTCAACACAGCAGGTTCACTCACAGCAGAGGGCAAAGGCCATCATCAGCTCCCTTTATAAGGGAAGGGTCACGCG
+    CTCGGTGTGCTGAGAGTGTCCTGCCTGGTCCTCTGTGCCTGGTGGGGTGGGGGTGCCAGGTGTGTCCAGAGGAGCC
+    CATTTGGTAGTGAGGCAGGTATGGGGCTAGAAGCACTGGTGCCCCTGGCCGTGATAGTGGCCATCTTCCTGCTCCT
+    GGTGGACCTGATGCACCGGCGCCAACGCTGGGCTGCACGCTACCCACCAGGCCCCCTGCCACTGCCCGGGCTGGGC
+    AACCTGCTGCATGTGGACTTCCAGAACACACCATACTGCTTCGACCAGGTGAGGGAGGAGGTCCTGGAGGGCGGCA
+    GAGGTGCTGAGGCTCCCCTACCAGAAGCAAACATGGATGGTGGGTGAAACCACAGGCTGGACCAGAAGCCAGGCTG
+    AGAAGGGGAAGCAGGTTTGGGGGACGTCCTGGAGAAGGGCATTTATACATGGCATGAAGGACTGGATTTTCCAAAG
+    GCCAAGGAAGAGTAGGGCAAGGGCCTGGAGGTGGAGCTGGACTTGGCAGTGGGCATGCAAGCCCATTGGGCAACAT
+    ATGTTATGGAGTACAAAGTCCCTTCTGCTGACACCAGAAGGAAAGGCCTTGGGAATGGAAGATGAGTTAGTCCTGA
+    GTGCCGTTTAAATCACGAAATCGAGGATGAAGGGGGTGCAGTGACCCGGTTCAAACCTTTTGCACTGTGGGTCCTC
+    GGGCCTCACTGCTCACCGGCATGGACCATCATCTGGGAATGGGATGCTAACTGGGGCCTCTCGGCAATTTTGGTGA
+    CTCTTGCAAGGTCATACCTGGGTGACGCATCCAAACTGAGTTCCTCCATCACAGAAGGTGTGACCCCCACCCCCGC
+    CCCACGATCAGGAGGCTGGGTCTCCTCCTTCCACCTGCTCACTCCTGGTAGCCCCGGGGGTCGTCCAAGGTTCAAA
+    TAGGACTAGGACCTGTAGTCTGGGGTGATCCTGGCTTGACAAGAGGCCCTGACCCTCCCTCTGCAGTTGCGGCGCC
+    GCTTCGGGGACGTGTTCAGCCTGCAGCTGGCCTGGACGCCGGTGGTCGTGCTCAATGGGCTGGCGGCCGTGCGCGA
+    GGCGCTGGTGACCCACGGCGAGGACACCGCCGACCGCCCGCCTGTGCCCATCACCCAGATCCTGGGTTTCGGGCCG
+    CGTTCCCAAGGCAAGCAGCGGTGGGGACAGAGACAGATTTCCGTGGGACCCGGGTGGGTGATGACCGTAGTCCGAG
+    CTGGGCAGAGAGGGCGCGGGGTCGTGGACATGAAACAGGCCAGCGAGTGGGGACAGCGGGCCAAGAAACCACCTGC
+    ACTAGGGAGGTGTGAGCATGGGGACGAGGGCGGGGCTTGTGACGAGTGGGCGGGGCCACTGCCGAGACCTGGCAGG
+    AGCCCAATGGGTGAGGCTGGCGCATTTCCCAGCTGGAATCCGGTGTCGAAGTGGGGGGCGGGGACCGCACCTGTGC
+    TGTAAGCTCAGTGTGGGTGGCGCGGGGCCCGCGGGGTCTTCCCTGAGTGCAAAGGCGGTCAGGGTGGGCAGAGACG
+    AGGTGGGGCAAAGCCCTGCCCCAGCCAAGGGAGCAAGGTGGATGCACAAAGAGTGGGCCCTGTGACCAGCTGGACA
+    GAGCCAGGGACTGCGGGAGACCAGGGGGAGCATAGGGTTGGAGTGGGTGGTGGATGGTGGGGCTAATGCCTTCATG
+    GCCACGCGCACGTGCCCGTCCCACCCCCAGGGGTGTTCCTGGCGCGCTATGGGCCCGCGTGGCGCGAGCAGAGGCG
+    CTTCTCCGTGTCCACCTTGCGCAACTTGGGCCTGGGCAAGAAGTCGCTGGAGCAGTGGGTGACCGAGGAGGCCGCC
+    TGCCTTTGTGCCGCCTTCGCCAACCACTCCGGTGGGTGATGGGCAGAAGGGCACAAAGCGGGAACTGGGAAGGCGG
+    GGGACGGGGAAGGCGACCCCTTACCCGCATCTCCCACCCCCAGGACGCCCCTTTCGCCCCAACGGTCTCTTGGACA
+    AAGCCGTGAGCAACGTGATCGCCTCCCTCACCTGCGGGCGCCGCTTCGAGTACGACGACCCTCGCTTCCTCAGGCT
+    GCTGGACCTAGCTCAGGAGGGACTGAAGGAGGAGTCGGGCTTTCTGCGCGAGGTGCGGAGCGAGAGACCGAGGAGT
+    CTCTGCAGGGCGAGCTCCCGAGAGGTGCCGGGGCTGGACTGGGGCCTCGGAAGAGCAGGATTTGCATAGATGGGTT
+    TGGGAAAGGACATTCCAGGAGACCCCACTGTAAGAAGGGCCTGGAGGAGGAGGGGACATCTCAGACATGGTCGTGG
+    GAGAGGTGTGCCCGGGTCAGGGGGCACCAGGAGAGGCCAAGGACTCTGTACCTCCTATCCACGTCAGAGATTTCGA
+    TTTTAGGTTTCTCCTCTGGGCAAGGAGAGAGGGTGGAGGCTGGCACTTGGGGAGGGACTTGGTGAGGTCAGTGGTA
+    AGGACAGGCAGGCCCTGGGTCTACCTGGAGATGGCTGGGGCCTGAGACTTGTCCAGGTGAACGCAGAGCACAGGAG
+    GGATTGAGACCCCGTTCTGTCTGGTGTAGGTGCTGAATGCTGTCCCCGTCCTCCTGCATATCCCAGCGCTGGCTGG
+    CAAGGTCCTACGCTTCCAAAAGGCTTTCCTGACCCAGCTGGATGAGCTGCTAACTGAGCACAGGATGACCTGGGAC
+    CCAGCCCAGCCCCCCCGAGACCTGACTGAGGCCTTCCTGGCAGAGATGGAGAAGGTGAGAGTGGCTGCCACGGTGG
+    GGGGCAAGGGTGGTGGGTTGAGCGTCCCAGGAGGAATGAGGGGAGGCTGGGCAAAAGGTTGGACCAGTGCATCACC
+    CGGCGAGCCGCATCTGGGCTGACAGGTGCAGAATTGGAGGTCATTTGGGGGCTACCCCGTTCTGTCCCGAGTATGC
+    TCTCGGCCCTGCTCAGGCCAAGGGGAACCCTGAGAGCAGCTTCAATGATGAGAACCTGCGCATAGTGGTGGCTGAC
+    CTGTTCTCTGCCGGGATGGTGACCACCTCGACCACGCTGGCCTGGGGCCTCCTGCTCATGATCCTACATCCGGATG
+    TGCAGCGTGAGCCCATCTGGGAAACAGTGCAGGGGCCGAGGGAGGAAGGGTACAGGCGGGGGCCCATGAACTTTGC
+    TGGGACACCCGGGGCTCCAAGCACAGGCTTGACCAGGATCCTGTAAGCCTGACCTCCTCCAACATAGGAGGCAAGA
+    AGGAGTGTCAGGGCCGGACCCCCTGGGTGCTGACCCATTGTGGGGACGCATGTCTGTCCAGGCCGTGTCCAACAGG
+    AGATCGACGACGTGATAGGGCAGGTGCGGCGACCAGAGATGGGTGACCAGGCTCACATGCCCTACACCACTGCCGT
+    GATTCATGAGGTGCAGCGCTTTGGGGACATCGTCCCCCTGGGTGTGACCCATATGACATCCCGTGACATCGAAGTA
+    CAGGGCTTCCGCATCCCTAAGGTAGGCCTGGCGCCCTCCTCACCCCAGCTCAGCACCAGCACCTGGTGATAGCCCC
+    AGCATGGCTACTGCCAGGTGGGCCCACTCTAGGAACCCTGGCCACCTAGTCCTCAATGCCACCACACTGACTGTCC
+    CCACTTGGGTGGGGGGTCCAGAGTATAGGCAGGGCTGGCCTGTCCATCCAGAGCCCCCGTCTAGTGGGGAGACAAA
+    CCAGGACCTGCCAGAATGTTGGAGGACCCAACGCCTGCAGGGAGAGGGGGCAGTGTGGGTGCCTCTGAGAGGTGTG
+    ACTGCGCCCTGCTGTGGGGTCGGAGAGGGTACTGTGGAGCTTCTCGGGCGCAGGACTAGTTGACAGAGTCCAGCTG
+    TGTGCCAGGCAGTGTGTGTCCCCCGTGTGTTTGGTGGCAGGGGTCCCAGCATCCTAGAGTCCAGTCCCCACTCTCA
+    CCCTGCATCTCCTGCCCAGGGAACGACACTCATCACCAACCTGTCATCGGTGCTGAAGGATGAGGCCGTCTGGGAG
+    AAGCCCTTCCGCTTCCACCCCGAACACTTCCTGGATGCCCAGGGCCACTTTGTGAAGCCGGAGGCCTTCCTGCCTT
+    TCTCAGCAGGTGCCTGTGGGGAGCCCGGCTCCCTGTCCCCTTCCGTGGAGTCTTGCAGGGGTATCACCCAGGAGCC
+    AGGCTCACTGACGCCCCTCCCCTCCCCACAGGCCGCCGTGCATGCCTCGGGGAGCCCCTGGCCCGCATGGAGCTCT
+    TCCTCTTCTTCACCTCCCTGCTGCAGCACTTCAGCTTCTCGGTGCCCACTGGACAGCCCCGGCCCAGCCACCATGG
+    TGTCTTTGCTTTCCTGGTGAGCCCATCCCCCTATGAGCTTTGTGCTGTGCCCCGCTAGAATGGGGTACCTAGTCCC
+    CAGCCTGCTCCCTAGCCAGAGGCTCTAATGTACAATAAAGCAATGTGGTAGTTCCAACTCGGGTCCCCTGCTCACG
+    CCCTCGTTGGGATCATCCTCCTCAGGGCAACCCCACCCCTGCCTCATTCCTGCTTACCCCACCGCCTGGCCGCATT
+    TGAGACAGGGGTACGTTGAGGCTGAGCAGATGTCAGTTACCCTTGCCCATAATCCCATGTCCCCCACTGACCCAAC
+    TCTGACTGCCCAGATTGGTGACAAGGACTACATTGTCCTGGCATGTGGGGAAGGGGCCAGAATGGGCTGACTAGAG
+    GTGTCAGTCAGCCCTGGATGTGGTGGAGAGGGCAGGACTCAGCCTGGAGGCCCATATTTCAGGCCTAACTCAGCCC
+    ACCCCACATCAGGGACAGCAGTCCTGCCAGCACCATCACAACAGTCACCTCCCTTCATATATGACACCCCAAAACG
+    GAAGACAAATCATGGCGTCAGGGAGCTATATGCCAGGGCTACCTACCTCCCAGGGCTCAGT

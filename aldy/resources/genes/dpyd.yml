@@ -1,18 +1,25 @@
 name: DPYD
-version: pharmvar-4.1.7
-generated: '2020-07-20'
+version: pharmvar-5.2.3
+generated: '2022-08-12'
 pharmvar: 1409
 ensembl: ENSG00000188641
 alleles:
   DPYD*1:
     label: DPYD*1
     mutations: []
-  DPYD*2:
+  DPYD*HapB3:
+    pharmvar: https://www.pharmvar.org/haplotype/1077
+    activity: decreased function
+    label: HapB3
+    mutations:
+    - [346167, C>G, rs75017182, intronic]
+    - [352197, G>A, rs56038477, intronic]
+  DPYD*2A:
     pharmvar: https://www.pharmvar.org/haplotype/983
     activity: no function
     label: DPYD*2A
     mutations:
-    - [476002, G>A, rs3918290, splicing]
+    - [476002, G>A, rs3918290, splice defect]
   DPYD*3:
     pharmvar: https://www.pharmvar.org/haplotype/1034
     activity: no function
@@ -38,11 +45,11 @@ alleles:
     mutations:
     - [620696, G>A, rs1801160, V732I]
   DPYD*7:
-    pharmvar: https://www.pharmvar.org/haplotype/1041
+    pharmvar: https://www.pharmvar.org/haplotype/1589
     activity: no function
     label: DPYD*7
     mutations:
-    - [185642, delTCAT, rs72549309, F100Sfs]
+    - [185646, delTCAT, rs72549309, F100Sfs]
   DPYD*8:
     pharmvar: https://www.pharmvar.org/haplotype/911
     activity: no function
@@ -85,13 +92,6 @@ alleles:
     label: DPYD*13
     mutations:
     - [410273, T>G, rs55886062, I560S]
-  DPYD*HapB3:
-    pharmvar: https://www.pharmvar.org/haplotype/1077
-    activity: decreased function
-    label: HapB3
-    mutations:
-    - [346167, C>G, rs75017182, intronic]
-    - [352197, G>A, rs56038477, intronic]
   DPYD*rs2297595:
     pharmvar: https://www.pharmvar.org/haplotype/943
     activity: normal function
@@ -99,10 +99,12 @@ alleles:
     - [226525, A>G, rs2297595, M166V]
   DPYD*rs3918289:
     pharmvar: https://www.pharmvar.org/haplotype/982
+    activity: function not assigned
     mutations:
     - [476001, C>G, rs3918289, N635K]
   DPYD*rs6670886:
     pharmvar: https://www.pharmvar.org/haplotype/1020
+    activity: function not assigned
     mutations:
     - [226554, G>A, rs6670886, S175S]
   DPYD*rs17376848:
@@ -112,38 +114,47 @@ alleles:
     - [475992, T>C, rs17376848, F632F]
   DPYD*rs45589337:
     pharmvar: https://www.pharmvar.org/haplotype/984
+    activity: function not assigned
     mutations:
     - [246890, A>G, rs45589337, K259E]
   DPYD*rs55674432:
     pharmvar: https://www.pharmvar.org/haplotype/996
+    activity: function not assigned
     mutations:
     - [827444, G>T, rs55674432, G880V]
   DPYD*rs55886062.2:
     pharmvar: https://www.pharmvar.org/haplotype/1001
+    activity: function not assigned
     mutations:
     - [410273, T>A, rs55886062, I560N]
   DPYD*rs55971861:
     pharmvar: https://www.pharmvar.org/haplotype/1003
+    activity: function not assigned
     mutations:
     - [543599, A>C, rs55971861, I636L]
   DPYD*rs56005131:
     pharmvar: https://www.pharmvar.org/haplotype/1004
+    activity: function not assigned
     mutations:
     - [691069, C>A, rs56005131, T768K]
   DPYD*rs57918000:
     pharmvar: https://www.pharmvar.org/haplotype/1014
+    activity: function not assigned
     mutations:
     - [376347, C>T, rs57918000, N457N]
   DPYD*rs59086055:
     pharmvar: https://www.pharmvar.org/haplotype/1015
+    activity: function not assigned
     mutations:
     - [475870, C>T, rs59086055, R592W]
   DPYD*rs60139309:
     pharmvar: https://www.pharmvar.org/haplotype/1016
+    activity: function not assigned
     mutations:
     - [732951, A>G, rs60139309, K861R]
   DPYD*rs60511679:
     pharmvar: https://www.pharmvar.org/haplotype/1017
+    activity: function not assigned
     mutations:
     - [620697, T>G, rs60511679, V732G]
   DPYD*rs61622928:
@@ -163,30 +174,37 @@ alleles:
     - [843669, A>T, rs67376798, D949V]
   DPYD*rs72547601:
     pharmvar: https://www.pharmvar.org/haplotype/1032
+    activity: function not assigned
     mutations:
     - [846939, A>G, rs72547601, H978R]
   DPYD*rs72547602:
     pharmvar: https://www.pharmvar.org/haplotype/1033
+    activity: function not assigned
     mutations:
     - [846927, A>T, rs72547602, D974V]
   DPYD*rs72549304:
     pharmvar: https://www.pharmvar.org/haplotype/1035
+    activity: function not assigned
     mutations:
     - [376451, C>T, rs72549304, S492L]
   DPYD*rs72549305:
     pharmvar: https://www.pharmvar.org/haplotype/1036
+    activity: function not assigned
     mutations:
     - [332822, A>G, rs72549305, I370V]
   DPYD*rs72549306.2:
     pharmvar: https://www.pharmvar.org/haplotype/1038
+    activity: function not assigned
     mutations:
     - [332717, G>A, rs72549306, V335M]
   DPYD*rs72549307:
     pharmvar: https://www.pharmvar.org/haplotype/1039
+    activity: function not assigned
     mutations:
     - [226661, A>G, rs72549307, Y211C]
   DPYD*rs72549308:
     pharmvar: https://www.pharmvar.org/haplotype/1040
+    activity: function not assigned
     mutations:
     - [226630, A>C, rs72549308, S201R]
   DPYD*rs72549310:
@@ -196,10 +214,12 @@ alleles:
     - [42707, C>T, rs72549310, R21X]
   DPYD*rs72975710.1:
     pharmvar: https://www.pharmvar.org/haplotype/1043
+    activity: function not assigned
     mutations:
     - [376325, C>T, rs72975710, A450V]
   DPYD*rs72975710.2:
     pharmvar: https://www.pharmvar.org/haplotype/1044
+    activity: function not assigned
     mutations:
     - [376325, C>G, rs72975710, A450G]
   DPYD*rs80081766:
@@ -209,22 +229,27 @@ alleles:
     - [42708, G>A, rs80081766, R21Q]
   DPYD*rs111858276:
     pharmvar: https://www.pharmvar.org/haplotype/857
+    activity: function not assigned
     mutations:
     - [376460, A>G, rs111858276, D495G]
   DPYD*rs112766203.1:
     pharmvar: https://www.pharmvar.org/haplotype/858
+    activity: function not assigned
     mutations:
     - [620781, C>T, rs112766203, T760I]
   DPYD*rs112766203.2:
     pharmvar: https://www.pharmvar.org/haplotype/859
+    activity: function not assigned
     mutations:
     - [620781, C>G, rs112766203, T760S]
   DPYD*rs114096998.1:
     pharmvar: https://www.pharmvar.org/haplotype/860
+    activity: function not assigned
     mutations:
     - [847073, C>A, rs114096998, P1023T]
   DPYD*rs114096998.2:
     pharmvar: https://www.pharmvar.org/haplotype/861
+    activity: function not assigned
     mutations:
     - [847073, C>T, rs114096998, P1023S]
   DPYD*rs115232898:
@@ -234,94 +259,117 @@ alleles:
     - [226586, A>G, rs115232898, Y186C]
   DPYD*rs116364703:
     pharmvar: https://www.pharmvar.org/haplotype/863
+    activity: function not assigned
     mutations:
     - [376470, A>T, rs116364703, Q498H]
   DPYD*rs137878450:
     pharmvar: https://www.pharmvar.org/haplotype/865
+    activity: function not assigned
     mutations:
     - [843629, G>T, rs137878450, G936C]
   DPYD*rs137999090:
     pharmvar: https://www.pharmvar.org/haplotype/866
+    activity: function not assigned
     mutations:
     - [552462, G>A, rs137999090, G674D]
   DPYD*rs138391898:
     pharmvar: https://www.pharmvar.org/haplotype/867
+    activity: function not assigned
     mutations:
     - [376495, G>A, rs138391898, V507I]
   DPYD*rs138545885:
     pharmvar: https://www.pharmvar.org/haplotype/868
+    activity: function not assigned
     mutations:
     - [552431, G>T, rs138545885, A664S]
   DPYD*rs138616379:
     pharmvar: https://www.pharmvar.org/haplotype/869
+    activity: function not assigned
     mutations:
     - [475871, G>A, rs138616379, R592Q]
   DPYD*rs139459586:
     pharmvar: https://www.pharmvar.org/haplotype/870
+    activity: function not assigned
     mutations:
     - [846984, T>G, rs139459586, L993R]
   DPYD*rs139834141:
     pharmvar: https://www.pharmvar.org/haplotype/871
+    activity: function not assigned
     mutations:
     - [226527, G>A, rs139834141, M166I]
   DPYD*rs140039091:
     pharmvar: https://www.pharmvar.org/haplotype/872
+    activity: function not assigned
     mutations:
     - [410239, G>C, rs140039091, A549P]
   DPYD*rs140114515:
     pharmvar: https://www.pharmvar.org/haplotype/873
+    activity: function not assigned
     mutations:
     - [847055, G>A, rs140114515, V1017I]
   DPYD*rs140602333:
     pharmvar: https://www.pharmvar.org/haplotype/874
+    activity: function not assigned
     mutations:
     - [352141, C>T, rs140602333, R394W]
   DPYD*rs140989814:
     pharmvar: https://www.pharmvar.org/haplotype/875
+    activity: function not assigned
     mutations:
     - [846987, G>C, rs140989814, S994T]
   DPYD*rs141044036:
     pharmvar: https://www.pharmvar.org/haplotype/876
+    activity: function not assigned
     mutations:
     - [843695, A>G, rs141044036, K958E]
   DPYD*rs141439344:
     pharmvar: https://www.pharmvar.org/haplotype/877
+    activity: function not assigned
     mutations:
     - [376423, G>A, rs141439344, V483I]
   DPYD*rs141462178:
     pharmvar: https://www.pharmvar.org/haplotype/878
+    activity: function not assigned
     mutations:
     - [204410, A>G, rs141462178, M115V]
   DPYD*rs141726921:
     pharmvar: https://www.pharmvar.org/haplotype/879
+    activity: function not assigned
     mutations:
     - [246887, G>A, rs141726921, G258S]
   DPYD*rs142512579:
     pharmvar: https://www.pharmvar.org/haplotype/880
+    activity: function not assigned
     mutations:
     - [352255, G>A, rs142512579, D432N]
   DPYD*rs142619737:
     pharmvar: https://www.pharmvar.org/haplotype/881
+    activity: function not assigned
     mutations:
     - [410209, G>A, rs142619737, G539R]
   DPYD*rs143154602:
     pharmvar: https://www.pharmvar.org/haplotype/882
+    activity: function not assigned
     mutations:
     - [332771, C>T, rs143154602, R353C]
   DPYD*rs143815742.1:
     pharmvar: https://www.pharmvar.org/haplotype/883
+    activity: function not assigned
     mutations:
     - [352142, G>T, rs143815742, R394L]
   DPYD*rs143815742.2:
     pharmvar: https://www.pharmvar.org/haplotype/884
+    activity: function not assigned
     mutations:
     - [352142, G>A, rs143815742, R394Q]
   DPYD*rs143879757.1:
     pharmvar: https://www.pharmvar.org/haplotype/885
+    activity: function not assigned
     mutations:
     - [330936, C>A, rs143879757, T298K]
   DPYD*rs143879757.2:
     pharmvar: https://www.pharmvar.org/haplotype/886
+    activity: function not assigned
     mutations:
     - [330936, C>T, rs143879757, T298M]
   DPYD*rs143986398:
@@ -331,74 +379,92 @@ alleles:
     - [185621, C>G, rs143986398, P92A]
   DPYD*rs144395748.1:
     pharmvar: https://www.pharmvar.org/haplotype/888
+    activity: function not assigned
     mutations:
     - [376334, C>G, rs144395748, P453R]
   DPYD*rs144395748.2:
     pharmvar: https://www.pharmvar.org/haplotype/889
+    activity: function not assigned
     mutations:
     - [376334, C>A, rs144395748, P453H]
   DPYD*rs144935781:
     pharmvar: https://www.pharmvar.org/haplotype/890
+    activity: function not assigned
     mutations:
     - [352090, A>G, rs144935781, M377V]
   DPYD*rs145112791:
     pharmvar: https://www.pharmvar.org/haplotype/891
+    activity: function not assigned
     mutations:
     - [330977, C>T, rs145112791, L312F]
   DPYD*rs145529148:
     pharmvar: https://www.pharmvar.org/haplotype/892
+    activity: function not assigned
     mutations:
     - [846921, A>G, rs145529148, Q972R]
   DPYD*rs145548112:
     pharmvar: https://www.pharmvar.org/haplotype/893
+    activity: function not assigned
     mutations:
     - [619865, G>A, rs145548112, A721T]
   DPYD*rs145773863:
     pharmvar: https://www.pharmvar.org/haplotype/894
+    activity: function not assigned
     mutations:
     - [475873, G>A, rs145773863, G593R]
   DPYD*rs146356975:
     pharmvar: https://www.pharmvar.org/haplotype/895
+    activity: function not assigned
     mutations:
     - [330911, A>G, rs146356975, K290E]
   DPYD*rs146529561:
     pharmvar: https://www.pharmvar.org/haplotype/896
+    activity: function not assigned
     mutations:
     - [620688, C>T, rs146529561, A729V]
   DPYD*rs147545709:
     pharmvar: https://www.pharmvar.org/haplotype/897
+    activity: function not assigned
     mutations:
     - [827461, C>T, rs147545709, R886C]
   DPYD*rs147601618:
     pharmvar: https://www.pharmvar.org/haplotype/898
+    activity: function not assigned
     mutations:
     - [475892, T>C, rs147601618, M599T]
   DPYD*rs148799944:
     pharmvar: https://www.pharmvar.org/haplotype/899
+    activity: function not assigned
     mutations:
     - [847067, G>C, rs148799944, V1021L]
   DPYD*rs148994843:
     pharmvar: https://www.pharmvar.org/haplotype/900
+    activity: function not assigned
     mutations:
     - [410137, G>A, rs148994843, V515I]
   DPYD*rs150036960:
     pharmvar: https://www.pharmvar.org/haplotype/901
+    activity: function not assigned
     mutations:
     - [42692, C>G, rs150036960, L16V]
   DPYD*rs150385342.1:
     pharmvar: https://www.pharmvar.org/haplotype/902
+    activity: function not assigned
     mutations:
     - [185660, G>A, rs150385342, A105T]
   DPYD*rs150385342.2:
     pharmvar: https://www.pharmvar.org/haplotype/903
+    activity: function not assigned
     mutations:
     - [185660, G>T, rs150385342, A105S]
   DPYD*rs150437414:
     pharmvar: https://www.pharmvar.org/haplotype/904
+    activity: function not assigned
     mutations:
     - [330972, T>C, rs150437414, L310S]
   DPYD*rs151074666:
     pharmvar: https://www.pharmvar.org/haplotype/905
+    activity: function not assigned
     mutations:
     - [847004, G>A, rs151074666, D1000N]
   DPYD*rs183105782:
@@ -408,14 +474,17 @@ alleles:
     - [330953, T>C, rs183105782, Y304H]
   DPYD*rs183385770:
     pharmvar: https://www.pharmvar.org/haplotype/915
+    activity: function not assigned
     mutations:
     - [332738, G>A, rs183385770, D342N]
   DPYD*rs186169810:
     pharmvar: https://www.pharmvar.org/haplotype/916
+    activity: function not assigned
     mutations:
     - [352275, T>G, rs186169810, F438L]
   DPYD*rs187713395:
     pharmvar: https://www.pharmvar.org/haplotype/917
+    activity: function not assigned
     mutations:
     - [552480, T>C, rs187713395, M680T]
   DPYD*rs188052243:
@@ -430,658 +499,822 @@ alleles:
     - [332768, C>G, rs190577302, L352V]
   DPYD*rs190951787:
     pharmvar: https://www.pharmvar.org/haplotype/920
+    activity: function not assigned
     mutations:
     - [410171, C>G, rs190951787, T526S]
   DPYD*rs199549923:
     pharmvar: https://www.pharmvar.org/haplotype/921
+    activity: function not assigned
     mutations:
     - [376379, C>A, rs199549923, T468N]
   DPYD*rs199634007:
     pharmvar: https://www.pharmvar.org/haplotype/922
+    activity: function not assigned
     mutations:
     - [691102, C>A, rs199634007, T779N]
   DPYD*rs199646142:
     pharmvar: https://www.pharmvar.org/haplotype/923
+    activity: function not assigned
     mutations:
     - [352190, G>A, rs199646142, R410Q]
   DPYD*rs199777072:
     pharmvar: https://www.pharmvar.org/haplotype/924
+    activity: function not assigned
     mutations:
     - [732854, G>A, rs199777072, D829N]
   DPYD*rs200064537:
     pharmvar: https://www.pharmvar.org/haplotype/925
+    activity: function not assigned
     mutations:
     - [352221, T>A, rs200064537, N420K]
   DPYD*rs200296941:
     pharmvar: https://www.pharmvar.org/haplotype/926
+    activity: function not assigned
     mutations:
     - [475997, A>G, rs200296941, D634G]
   DPYD*rs200562975:
     pharmvar: https://www.pharmvar.org/haplotype/927
+    activity: function not assigned
     mutations:
     - [204518, A>G, rs200562975, N151D]
   DPYD*rs200643089:
     pharmvar: https://www.pharmvar.org/haplotype/928
+    activity: function not assigned
     mutations:
     - [691090, T>G, rs200643089, L775W]
   DPYD*rs200687447.1:
     pharmvar: https://www.pharmvar.org/haplotype/929
+    activity: function not assigned
     mutations:
     - [732851, G>A, rs200687447, E828K]
   DPYD*rs200687447.2:
     pharmvar: https://www.pharmvar.org/haplotype/930
+    activity: function not assigned
     mutations:
     - [732851, G>C, rs200687447, E828Q]
   DPYD*rs200693895:
     pharmvar: https://www.pharmvar.org/haplotype/931
+    activity: function not assigned
     mutations:
     - [352241, T>C, rs200693895, V427A]
   DPYD*rs200709381:
     pharmvar: https://www.pharmvar.org/haplotype/932
+    activity: function not assigned
     mutations:
     - [352298, A>C, rs200709381, K446T]
   DPYD*rs201018345:
     pharmvar: https://www.pharmvar.org/haplotype/933
+    activity: function not assigned
     mutations:
     - [332681, G>A, rs201018345, A323T]
   DPYD*rs201035051:
     pharmvar: https://www.pharmvar.org/haplotype/934
+    activity: function not assigned
     mutations:
     - [827428, A>C, rs201035051, K875Q]
   DPYD*rs201268750:
     pharmvar: https://www.pharmvar.org/haplotype/935
+    activity: function not assigned
     mutations:
     - [846940, C>A, rs201268750, H978Q]
   DPYD*rs201433243:
     pharmvar: https://www.pharmvar.org/haplotype/936
+    activity: function not assigned
     mutations:
     - [475961, G>A, rs201433243, C622Y]
   DPYD*rs201615754.1:
     pharmvar: https://www.pharmvar.org/haplotype/937
+    activity: function not assigned
     mutations:
     - [410276, G>T, rs201615754, R561L]
   DPYD*rs201615754.2:
     pharmvar: https://www.pharmvar.org/haplotype/938
+    activity: function not assigned
     mutations:
     - [410276, G>A, rs201615754, R561Q]
   DPYD*rs201648613:
     pharmvar: https://www.pharmvar.org/haplotype/939
+    activity: function not assigned
     mutations:
     - [352093, G>C, rs201648613, E378Q]
   DPYD*rs201785202:
     pharmvar: https://www.pharmvar.org/haplotype/940
+    activity: function not assigned
     mutations:
     - [332834, C>T, rs201785202, P374S]
   DPYD*rs202144771:
     pharmvar: https://www.pharmvar.org/haplotype/941
+    activity: function not assigned
     mutations:
     - [846983, C>T, rs202144771, L993F]
   DPYD*rs202212118:
     pharmvar: https://www.pharmvar.org/haplotype/942
+    activity: function not assigned
     mutations:
     - [619775, G>T, rs202212118, V691L]
   DPYD*rs267598785:
     pharmvar: https://www.pharmvar.org/haplotype/944
+    activity: function not assigned
     mutations:
     - [691131, C>T, rs267598785, P789S]
   DPYD*rs267598786:
     pharmvar: https://www.pharmvar.org/haplotype/945
+    activity: function not assigned
     mutations:
     - [620778, G>A, rs267598786, R759Q]
   DPYD*rs267598789:
     pharmvar: https://www.pharmvar.org/haplotype/946
+    activity: function not assigned
     mutations:
     - [234290, C>T, rs267598789, P237S]
   DPYD*rs367619008:
     pharmvar: https://www.pharmvar.org/haplotype/947
+    activity: function not assigned
     mutations:
     - [97900, A>G, rs367619008, K63E]
   DPYD*rs368146607:
     pharmvar: https://www.pharmvar.org/haplotype/948
+    activity: function not assigned
     mutations:
     - [475942, A>C, rs368146607, K616Q]
   DPYD*rs368152149:
     pharmvar: https://www.pharmvar.org/haplotype/949
+    activity: function not assigned
     mutations:
     - [226597, A>G, rs368152149, I190V]
   DPYD*rs368327291:
     pharmvar: https://www.pharmvar.org/haplotype/950
+    activity: function not assigned
     mutations:
     - [620714, G>C, rs368327291, V738L]
   DPYD*rs368519011:
     pharmvar: https://www.pharmvar.org/haplotype/951
+    activity: function not assigned
     mutations:
     - [732989, A>G, rs368519011, K874E]
   DPYD*rs368970772:
     pharmvar: https://www.pharmvar.org/haplotype/953
+    activity: function not assigned
     mutations:
     - [226518, C>A, rs368970772, F163L]
   DPYD*rs369103276:
     pharmvar: https://www.pharmvar.org/haplotype/954
+    activity: function not assigned
     mutations:
     - [246957, T>C, rs369103276, I281T]
   DPYD*rs369575517:
     pharmvar: https://www.pharmvar.org/haplotype/955
+    activity: function not assigned
     mutations:
     - [332693, C>T, rs369575517, P327S]
   DPYD*rs370569731.1:
     pharmvar: https://www.pharmvar.org/haplotype/956
+    activity: function not assigned
     mutations:
     - [352268, G>C, rs370569731, S436T]
   DPYD*rs370569731.2:
     pharmvar: https://www.pharmvar.org/haplotype/957
+    activity: function not assigned
     mutations:
     - [352268, G>A, rs370569731, S436N]
   DPYD*rs370615432:
     pharmvar: https://www.pharmvar.org/haplotype/958
+    activity: function not assigned
     mutations:
     - [204409, G>T, rs370615432, K114N]
   DPYD*rs370707404:
     pharmvar: https://www.pharmvar.org/haplotype/959
+    activity: function not assigned
     mutations:
     - [376367, T>C, rs370707404, V464A]
   DPYD*rs371258350:
     pharmvar: https://www.pharmvar.org/haplotype/960
+    activity: function not assigned
     mutations:
     - [475904, G>A, rs371258350, G603E]
   DPYD*rs371313778:
     pharmvar: https://www.pharmvar.org/haplotype/961
+    activity: function not assigned
     mutations:
     - [691200, G>A, rs371313778, V812I]
   DPYD*rs371587702.1:
     pharmvar: https://www.pharmvar.org/haplotype/962
+    activity: function not assigned
     mutations:
     - [97907, C>T, rs371587702, T65M]
   DPYD*rs371587702.2:
     pharmvar: https://www.pharmvar.org/haplotype/963
+    activity: function not assigned
     mutations:
     - [97907, C>G, rs371587702, T65R]
   DPYD*rs371792178.1:
     pharmvar: https://www.pharmvar.org/haplotype/964
+    activity: function not assigned
     mutations:
     - [226553, C>T, rs371792178, S175L]
   DPYD*rs371792178.2:
     pharmvar: https://www.pharmvar.org/haplotype/965
+    activity: function not assigned
     mutations:
     - [226553, C>G, rs371792178, S175W]
   DPYD*rs372058915:
     pharmvar: https://www.pharmvar.org/haplotype/966
+    activity: function not assigned
     mutations:
     - [732896, A>G, rs372058915, I843V]
   DPYD*rs372307932:
     pharmvar: https://www.pharmvar.org/haplotype/967
+    activity: function not assigned
     mutations:
     - [843666, T>A, rs372307932, I948N]
   DPYD*rs372909322:
     pharmvar: https://www.pharmvar.org/haplotype/968
+    activity: function not assigned
     mutations:
     - [732973, A>G, rs372909322, I868M]
   DPYD*rs374527058:
     pharmvar: https://www.pharmvar.org/haplotype/969
+    activity: function not assigned
     mutations:
     - [475853, T>C, rs374527058, V586A]
   DPYD*rs374531732:
     pharmvar: https://www.pharmvar.org/haplotype/970
+    activity: function not assigned
     mutations:
     - [226582, G>A, rs374531732, A185T]
   DPYD*rs374825099.1:
     pharmvar: https://www.pharmvar.org/haplotype/971
+    activity: function not assigned
     mutations:
     - [691096, C>A, rs374825099, A777D]
   DPYD*rs374825099.2:
     pharmvar: https://www.pharmvar.org/haplotype/972
+    activity: function not assigned
     mutations:
     - [691096, C>G, rs374825099, A777G]
   DPYD*rs374827081:
     pharmvar: https://www.pharmvar.org/haplotype/973
+    activity: function not assigned
     mutations:
     - [226550, C>G, rs374827081, P174R]
   DPYD*rs375436137:
     pharmvar: https://www.pharmvar.org/haplotype/974
+    activity: function not assigned
     mutations:
     - [619779, G>A, rs375436137, R692Q]
   DPYD*rs375990187:
     pharmvar: https://www.pharmvar.org/haplotype/975
+    activity: function not assigned
     mutations:
     - [185637, T>C, rs375990187, I97T]
   DPYD*rs376073289.1:
     pharmvar: https://www.pharmvar.org/haplotype/976
+    activity: function not assigned
     mutations:
     - [226652, G>A, rs376073289, R208Q]
   DPYD*rs376073289.2:
     pharmvar: https://www.pharmvar.org/haplotype/977
+    activity: function not assigned
     mutations:
     - [226652, G>T, rs376073289, R208L]
   DPYD*rs376128878:
     pharmvar: https://www.pharmvar.org/haplotype/978
+    activity: function not assigned
     mutations:
     - [234320, C>A, rs376128878, L247I]
   DPYD*rs376273539:
     pharmvar: https://www.pharmvar.org/haplotype/979
+    activity: function not assigned
     mutations:
     - [5173, C>G, rs376273539, I12M]
   DPYD*rs377143350:
     pharmvar: https://www.pharmvar.org/haplotype/980
+    activity: function not assigned
     mutations:
     - [332784, G>A, rs377143350, R357H]
   DPYD*rs377169736:
     pharmvar: https://www.pharmvar.org/haplotype/981
+    activity: function not assigned
     mutations:
     - [204412, G>C, rs377169736, M115I]
   DPYD*rs527580106:
     pharmvar: https://www.pharmvar.org/haplotype/985
+    activity: function not assigned
     mutations:
     - [97942, A>G, rs527580106, M77V]
   DPYD*rs528152707:
     pharmvar: https://www.pharmvar.org/haplotype/986
+    activity: function not assigned
     mutations:
     - [185607, G>T, rs528152707, C87F]
   DPYD*rs528430685:
     pharmvar: https://www.pharmvar.org/haplotype/987
+    activity: function not assigned
     mutations:
     - [352189, C>T, rs528430685, R410W]
   DPYD*rs528768620:
     pharmvar: https://www.pharmvar.org/haplotype/988
+    activity: function not assigned
     mutations:
     - [42732, G>A, rs528768620, C29Y]
   DPYD*rs529019871:
     pharmvar: https://www.pharmvar.org/haplotype/989
+    activity: function not assigned
     mutations:
     - [543656, A>G, rs529019871, K655E]
   DPYD*rs532341730:
     pharmvar: https://www.pharmvar.org/haplotype/990
+    activity: function not assigned
     mutations:
     - [352233, T>A, rs532341730, D424E]
   DPYD*rs536577604:
     pharmvar: https://www.pharmvar.org/haplotype/991
+    activity: function not assigned
     mutations:
     - [204534, A>G, rs536577604, Q156R]
   DPYD*rs538336580:
     pharmvar: https://www.pharmvar.org/haplotype/992
+    activity: function not assigned
     mutations:
     - [204461, A>T, rs538336580, T132S]
   DPYD*rs538703919:
     pharmvar: https://www.pharmvar.org/haplotype/993
+    activity: function not assigned
     mutations:
     - [619778, C>T, rs538703919, R692W]
   DPYD*rs547099198:
     pharmvar: https://www.pharmvar.org/haplotype/994
+    activity: function not assigned
     mutations:
     - [691144, C>T, rs547099198, T793I]
   DPYD*rs548783838:
     pharmvar: https://www.pharmvar.org/haplotype/995
+    activity: function not assigned
     mutations:
     - [543624, G>A, rs548783838, S644N]
   DPYD*rs556933127:
     pharmvar: https://www.pharmvar.org/haplotype/997
+    activity: function not assigned
     mutations:
     - [246883, T>G, rs556933127, I256M]
   DPYD*rs557220418:
     pharmvar: https://www.pharmvar.org/haplotype/998
+    activity: function not assigned
     mutations:
     - [732968, C>T, rs557220418, R867C]
   DPYD*rs558354142:
     pharmvar: https://www.pharmvar.org/haplotype/999
+    activity: function not assigned
     mutations:
     - [410312, C>T, rs558354142, T573I]
   DPYD*rs559427764:
     pharmvar: https://www.pharmvar.org/haplotype/1002
+    activity: function not assigned
     mutations:
     - [827466, G>T, rs559427764, K887N]
   DPYD*rs568169006:
     pharmvar: https://www.pharmvar.org/haplotype/1005
+    activity: function not assigned
     mutations:
     - [843612, A>G, rs568169006, Q930R]
   DPYD*rs568367673:
     pharmvar: https://www.pharmvar.org/haplotype/1006
+    activity: function not assigned
     mutations:
     - [691066, G>T, rs568367673, G767V]
   DPYD*rs569661196:
     pharmvar: https://www.pharmvar.org/haplotype/1007
+    activity: function not assigned
     mutations:
     - [619845, T>C, rs569661196, V714A]
   DPYD*rs570122671:
     pharmvar: https://www.pharmvar.org/haplotype/1008
+    activity: function not assigned
     mutations:
     - [620712, C>T, rs570122671, T737I]
   DPYD*rs571114616:
     pharmvar: https://www.pharmvar.org/haplotype/1009
+    activity: function not assigned
     mutations:
     - [732897, T>C, rs571114616, I843T]
   DPYD*rs573299212:
     pharmvar: https://www.pharmvar.org/haplotype/1010
+    activity: function not assigned
     mutations:
     - [332787, G>A, rs573299212, R358H]
   DPYD*rs575763449:
     pharmvar: https://www.pharmvar.org/haplotype/1011
+    activity: function not assigned
     mutations:
     - [332691, C>T, rs575763449, S326F]
   DPYD*rs575853463:
     pharmvar: https://www.pharmvar.org/haplotype/1012
+    activity: function not assigned
     mutations:
     - [552468, G>A, rs575853463, G676E]
   DPYD*rs576409484:
     pharmvar: https://www.pharmvar.org/haplotype/1013
+    activity: function not assigned
     mutations:
     - [352118, A>T, rs576409484, E386V]
   DPYD*rs672601273:
     pharmvar: https://www.pharmvar.org/haplotype/1021
+    activity: function not assigned
     mutations:
     - [846993, G>T, rs672601273, C996F]
   DPYD*rs672601273.1:
     pharmvar: https://www.pharmvar.org/haplotype/1022
+    activity: function not assigned
     mutations:
     - [846993, G>T, rs672601273, C996F]
   DPYD*rs672601273.2:
     pharmvar: https://www.pharmvar.org/haplotype/1023
+    activity: function not assigned
     mutations:
     - [846993, G>A, rs672601273, C996Y]
   DPYD*rs672601275:
     pharmvar: https://www.pharmvar.org/haplotype/1024
+    activity: function not assigned
     mutations:
     - [732901, A>C, rs672601275, E844D]
   DPYD*rs672601276:
     pharmvar: https://www.pharmvar.org/haplotype/1025
+    activity: function not assigned
     mutations:
     - [691095, G>T, rs672601276, A777S]
   DPYD*rs672601282:
     pharmvar: https://www.pharmvar.org/haplotype/1026
+    activity: function not assigned
     mutations:
     - [410149, C>T, rs672601282, P519S]
   DPYD*rs672601284:
     pharmvar: https://www.pharmvar.org/haplotype/1027
+    activity: function not assigned
     mutations:
     - [330930, G>A, rs672601284, G296D]
   DPYD*rs672601285:
     pharmvar: https://www.pharmvar.org/haplotype/1028
+    activity: function not assigned
     mutations:
     - [330912, A>G, rs672601285, K290R]
   DPYD*rs672601287:
     pharmvar: https://www.pharmvar.org/haplotype/1029
+    activity: function not assigned
     mutations:
     - [226571, A>C, rs672601287, K181T]
   DPYD*rs672601288:
     pharmvar: https://www.pharmvar.org/haplotype/1030
+    activity: function not assigned
     mutations:
     - [185616, G>T, rs672601288, S90I]
   DPYD*rs745512069:
     pharmvar: https://www.pharmvar.org/haplotype/1045
+    activity: function not assigned
     mutations:
     - [352175, C>T, rs745512069, A405V]
   DPYD*rs745704371:
     pharmvar: https://www.pharmvar.org/haplotype/1046
+    activity: function not assigned
     mutations:
     - [332794, C>G, rs745704371, F360L]
   DPYD*rs745833535:
     pharmvar: https://www.pharmvar.org/haplotype/1047
+    activity: function not assigned
     mutations:
     - [410146, A>G, rs745833535, K518E]
   DPYD*rs745911874:
     pharmvar: https://www.pharmvar.org/haplotype/1048
+    activity: function not assigned
     mutations:
     - [376414, G>A, rs745911874, G480S]
   DPYD*rs745982505.1:
     pharmvar: https://www.pharmvar.org/haplotype/1049
+    activity: function not assigned
     mutations:
     - [846998, A>G, rs745982505, I998V]
   DPYD*rs745982505.2:
     pharmvar: https://www.pharmvar.org/haplotype/1050
+    activity: function not assigned
     mutations:
     - [846998, A>T, rs745982505, I998F]
   DPYD*rs746115989:
     pharmvar: https://www.pharmvar.org/haplotype/1051
+    activity: function not assigned
     mutations:
     - [552477, G>A, rs746115989, G679E]
   DPYD*rs746329786:
     pharmvar: https://www.pharmvar.org/haplotype/1052
+    activity: function not assigned
     mutations:
     - [246956, A>T, rs746329786, I281F]
   DPYD*rs746777181:
     pharmvar: https://www.pharmvar.org/haplotype/1053
+    activity: function not assigned
     mutations:
     - [332754, G>A, rs746777181, C347Y]
   DPYD*rs747132274:
     pharmvar: https://www.pharmvar.org/haplotype/1054
+    activity: function not assigned
     mutations:
     - [691114, G>C, rs747132274, R783P]
   DPYD*rs747161261:
     pharmvar: https://www.pharmvar.org/haplotype/1055
+    activity: function not assigned
     mutations:
     - [376432, G>A, rs747161261, A486T]
   DPYD*rs747627716:
     pharmvar: https://www.pharmvar.org/haplotype/1056
+    activity: function not assigned
     mutations:
     - [410320, T>G, rs747627716, F576V]
   DPYD*rs747633945:
     pharmvar: https://www.pharmvar.org/haplotype/1057
+    activity: function not assigned
     mutations:
     - [332709, G>A, rs747633945, R332Q]
   DPYD*rs747858350:
     pharmvar: https://www.pharmvar.org/haplotype/1058
+    activity: function not assigned
     mutations:
     - [410252, C>T, rs747858350, P553L]
   DPYD*rs747872037:
     pharmvar: https://www.pharmvar.org/haplotype/1059
+    activity: function not assigned
     mutations:
     - [552492, G>T, rs747872037, C684F]
   DPYD*rs748214188:
     pharmvar: https://www.pharmvar.org/haplotype/1060
+    activity: function not assigned
     mutations:
     - [732879, T>A, rs748214188, L837Q]
   DPYD*rs748235192.1:
     pharmvar: https://www.pharmvar.org/haplotype/1061
+    activity: function not assigned
     mutations:
     - [475955, A>T, rs748235192, Y620F]
   DPYD*rs748235192.2:
     pharmvar: https://www.pharmvar.org/haplotype/1062
+    activity: function not assigned
     mutations:
     - [475955, A>G, rs748235192, Y620C]
   DPYD*rs748266854:
     pharmvar: https://www.pharmvar.org/haplotype/1063
+    activity: function not assigned
     mutations:
     - [330918, C>T, rs748266854, A292V]
   DPYD*rs748320430:
     pharmvar: https://www.pharmvar.org/haplotype/1064
+    activity: function not assigned
     mutations:
     - [204453, T>G, rs748320430, V129G]
   DPYD*rs748620513:
     pharmvar: https://www.pharmvar.org/haplotype/1065
+    activity: function not assigned
     mutations:
     - [352261, G>C, rs748620513, V434L]
   DPYD*rs748639205:
     pharmvar: https://www.pharmvar.org/haplotype/1066
+    activity: function not assigned
     mutations:
     - [843645, T>G, rs748639205, V941G]
   DPYD*rs748853941:
     pharmvar: https://www.pharmvar.org/haplotype/1067
+    activity: function not assigned
     mutations:
     - [226573, A>G, rs748853941, M182V]
   DPYD*rs748958293:
     pharmvar: https://www.pharmvar.org/haplotype/1068
+    activity: function not assigned
     mutations:
     - [332783, C>T, rs748958293, R357C]
   DPYD*rs748974194:
     pharmvar: https://www.pharmvar.org/haplotype/1069
+    activity: function not assigned
     mutations:
     - [42741, C>T, rs748974194, S32L]
   DPYD*rs749157068:
     pharmvar: https://www.pharmvar.org/haplotype/1070
+    activity: function not assigned
     mutations:
     - [330990, G>T, rs749157068, G316V]
   DPYD*rs749269410:
     pharmvar: https://www.pharmvar.org/haplotype/1071
+    activity: function not assigned
     mutations:
     - [226648, G>A, rs749269410, A207T]
   DPYD*rs749354734:
     pharmvar: https://www.pharmvar.org/haplotype/1072
+    activity: function not assigned
     mutations:
     - [352269, T>A, rs749354734, S436R]
   DPYD*rs749586100:
     pharmvar: https://www.pharmvar.org/haplotype/1073
+    activity: function not assigned
     mutations:
     - [732979, A>T, rs749586100, E870D]
   DPYD*rs749699298:
     pharmvar: https://www.pharmvar.org/haplotype/1074
+    activity: function not assigned
     mutations:
     - [185659, T>G, rs749699298, I104M]
   DPYD*rs749982106:
     pharmvar: https://www.pharmvar.org/haplotype/1075
+    activity: function not assigned
     mutations:
     - [552432, C>T, rs749982106, A664V]
   DPYD*rs750147471:
     pharmvar: https://www.pharmvar.org/haplotype/1076
+    activity: function not assigned
     mutations:
     - [376345, A>G, rs750147471, N457D]
   DPYD*rs750224169:
     pharmvar: https://www.pharmvar.org/haplotype/1078
+    activity: function not assigned
     mutations:
     - [204462, C>T, rs750224169, T132I]
   DPYD*rs750423752:
     pharmvar: https://www.pharmvar.org/haplotype/1079
+    activity: function not assigned
     mutations:
     - [691158, T>G, rs750423752, S798A]
   DPYD*rs750687600:
     pharmvar: https://www.pharmvar.org/haplotype/1080
+    activity: function not assigned
     mutations:
     - [234296, G>A, rs750687600, D239N]
   DPYD*rs750721736:
     pharmvar: https://www.pharmvar.org/haplotype/1081
+    activity: function not assigned
     mutations:
     - [332790, T>A, rs750721736, V359E]
   DPYD*rs751049055:
     pharmvar: https://www.pharmvar.org/haplotype/1082
+    activity: function not assigned
     mutations:
     - [330946, G>T, rs751049055, Q301H]
   DPYD*rs751104498:
     pharmvar: https://www.pharmvar.org/haplotype/1083
+    activity: function not assigned
     mutations:
     - [376483, A>G, rs751104498, I503V]
   DPYD*rs751113340:
     pharmvar: https://www.pharmvar.org/haplotype/1084
+    activity: function not assigned
     mutations:
     - [330899, C>T, rs751113340, P286S]
   DPYD*rs751190912:
     pharmvar: https://www.pharmvar.org/haplotype/1085
+    activity: function not assigned
     mutations:
     - [619790, C>T, rs751190912, R696C]
   DPYD*rs751340819:
     pharmvar: https://www.pharmvar.org/haplotype/1086
+    activity: function not assigned
     mutations:
     - [352238, T>C, rs751340819, M426T]
   DPYD*rs751374989:
     pharmvar: https://www.pharmvar.org/haplotype/1087
+    activity: function not assigned
     mutations:
     - [352232, A>T, rs751374989, D424V]
   DPYD*rs751399062:
     pharmvar: https://www.pharmvar.org/haplotype/1088
+    activity: function not assigned
     mutations:
     - [732822, C>A, rs751399062, A818D]
   DPYD*rs751841116.1:
     pharmvar: https://www.pharmvar.org/haplotype/1089
+    activity: function not assigned
     mutations:
     - [226610, G>T, rs751841116, G194V]
   DPYD*rs751841116.2:
     pharmvar: https://www.pharmvar.org/haplotype/1090
+    activity: function not assigned
     mutations:
     - [226610, G>A, rs751841116, G194D]
   DPYD*rs751848058:
     pharmvar: https://www.pharmvar.org/haplotype/1091
+    activity: function not assigned
     mutations:
     - [410280, A>T, rs751848058, R562S]
   DPYD*rs752020412:
     pharmvar: https://www.pharmvar.org/haplotype/1092
+    activity: function not assigned
     mutations:
     - [332798, G>A, rs752020412, V362I]
   DPYD*rs752228747:
     pharmvar: https://www.pharmvar.org/haplotype/1093
+    activity: function not assigned
     mutations:
     - [732936, C>T, rs752228747, T856I]
   DPYD*rs752388408:
     pharmvar: https://www.pharmvar.org/haplotype/1094
+    activity: function not assigned
     mutations:
     - [732836, G>A, rs752388408, D823N]
   DPYD*rs752518145:
     pharmvar: https://www.pharmvar.org/haplotype/1095
+    activity: function not assigned
     mutations:
     - [543621, G>T, rs752518145, C643F]
   DPYD*rs752985272:
     pharmvar: https://www.pharmvar.org/haplotype/1096
+    activity: function not assigned
     mutations:
     - [332811, G>T, rs752985272, G366V]
   DPYD*rs753166888:
     pharmvar: https://www.pharmvar.org/haplotype/1097
+    activity: function not assigned
     mutations:
     - [226621, G>C, rs753166888, A198P]
   DPYD*rs753217888:
     pharmvar: https://www.pharmvar.org/haplotype/1098
+    activity: function not assigned
     mutations:
     - [42705, C>G, rs753217888, P20R]
   DPYD*rs753296078:
     pharmvar: https://www.pharmvar.org/haplotype/1099
+    activity: function not assigned
     mutations:
     - [619795, G>C, rs753296078, W697C]
   DPYD*rs753419296:
     pharmvar: https://www.pharmvar.org/haplotype/1100
+    activity: function not assigned
     mutations:
     - [732953, G>C, rs753419296, G862R]
   DPYD*rs753527420:
     pharmvar: https://www.pharmvar.org/haplotype/1101
+    activity: function not assigned
     mutations:
     - [543643, G>C, rs753527420, W650C]
   DPYD*rs753707032:
     pharmvar: https://www.pharmvar.org/haplotype/1102
+    activity: function not assigned
     mutations:
     - [475946, C>T, rs753707032, T617M]
   DPYD*rs753710779:
     pharmvar: https://www.pharmvar.org/haplotype/1103
+    activity: function not assigned
     mutations:
     - [376333, C>T, rs753710779, P453S]
   DPYD*rs753820482:
     pharmvar: https://www.pharmvar.org/haplotype/1104
+    activity: function not assigned
     mutations:
     - [846950, A>G, rs753820482, I982V]
   DPYD*rs753950237:
     pharmvar: https://www.pharmvar.org/haplotype/1105
+    activity: function not assigned
     mutations:
     - [843660, C>T, rs753950237, A946V]
   DPYD*rs754028972:
     pharmvar: https://www.pharmvar.org/haplotype/1106
+    activity: function not assigned
     mutations:
     - [352130, T>C, rs754028972, F390S]
   DPYD*rs754125729.1:
     pharmvar: https://www.pharmvar.org/haplotype/1107
+    activity: function not assigned
     mutations:
     - [410264, C>T, rs754125729, T557I]
   DPYD*rs754125729.2:
     pharmvar: https://www.pharmvar.org/haplotype/1108
+    activity: function not assigned
     mutations:
     - [410264, C>A, rs754125729, T557K]
   DPYD*rs754467630:
     pharmvar: https://www.pharmvar.org/haplotype/1109
+    activity: function not assigned
     mutations:
     - [332781, C>T, rs754467630, A356V]
   DPYD*rs754786483:
     pharmvar: https://www.pharmvar.org/haplotype/1110
+    activity: function not assigned
     mutations:
     - [847016, A>G, rs754786483, M1004V]
   DPYD*rs755155824:
     pharmvar: https://www.pharmvar.org/haplotype/1111
+    activity: function not assigned
     mutations:
     - [226699, G>T, rs755155824, G224C]
   DPYD*rs755407188:
     pharmvar: https://www.pharmvar.org/haplotype/1112
+    activity: function not assigned
     mutations:
     - [410260, A>C, rs755407188, S556R]
   DPYD*rs755416212:
     pharmvar: https://www.pharmvar.org/haplotype/1113
+    activity: function not assigned
     mutations:
     - [234285, G>A, rs755416212, R235Q]
   DPYD*rs755428442:
     pharmvar: https://www.pharmvar.org/haplotype/1114
+    activity: function not assigned
     mutations:
     - [843653, G>C, rs755428442, V944L]
   DPYD*rs755645831:
     pharmvar: https://www.pharmvar.org/haplotype/1115
+    activity: function not assigned
     mutations:
     - [226585, T>G, rs755645831, Y186D]
   DPYD*rs755692084:
@@ -1091,794 +1324,992 @@ alleles:
     - [619764, A>C, rs755692084, D687A]
   DPYD*rs755729055:
     pharmvar: https://www.pharmvar.org/haplotype/1117
+    activity: function not assigned
     mutations:
     - [827473, A>G, rs755729055, I890V]
   DPYD*rs756020314:
     pharmvar: https://www.pharmvar.org/haplotype/1118
+    activity: function not assigned
     mutations:
     - [475883, C>G, rs756020314, S596C]
   DPYD*rs756372042:
     pharmvar: https://www.pharmvar.org/haplotype/1119
+    activity: function not assigned
     mutations:
     - [332721, T>C, rs756372042, I336T]
   DPYD*rs756613407:
     pharmvar: https://www.pharmvar.org/haplotype/1120
+    activity: function not assigned
     mutations:
     - [410269, A>G, rs756613407, M559V]
   DPYD*rs756684474:
     pharmvar: https://www.pharmvar.org/haplotype/1121
+    activity: function not assigned
     mutations:
     - [42783, A>G, rs756684474, D46G]
   DPYD*rs756890859:
     pharmvar: https://www.pharmvar.org/haplotype/1122
+    activity: function not assigned
     mutations:
     - [619784, A>G, rs756890859, I694V]
   DPYD*rs756992995:
     pharmvar: https://www.pharmvar.org/haplotype/1123
+    activity: function not assigned
     mutations:
     - [732917, G>A, rs756992995, D850N]
   DPYD*rs757155354:
     pharmvar: https://www.pharmvar.org/haplotype/1124
+    activity: function not assigned
     mutations:
     - [352226, A>G, rs757155354, D422G]
   DPYD*rs757227327:
     pharmvar: https://www.pharmvar.org/haplotype/1125
+    activity: function not assigned
     mutations:
     - [732819, G>A, rs757227327, S817N]
   DPYD*rs757342874:
     pharmvar: https://www.pharmvar.org/haplotype/1126
+    activity: function not assigned
     mutations:
     - [185600, G>A, rs757342874, A85T]
   DPYD*rs757376267:
     pharmvar: https://www.pharmvar.org/haplotype/1127
+    activity: function not assigned
     mutations:
     - [846926, G>T, rs757376267, D974Y]
   DPYD*rs757695236:
     pharmvar: https://www.pharmvar.org/haplotype/1128
+    activity: function not assigned
     mutations:
     - [827512, G>A, rs757695236, A903T]
   DPYD*rs757954074:
     pharmvar: https://www.pharmvar.org/haplotype/1129
+    activity: function not assigned
     mutations:
     - [732932, G>A, rs757954074, A855T]
   DPYD*rs757958938:
     pharmvar: https://www.pharmvar.org/haplotype/1130
+    activity: function not assigned
     mutations:
     - [97871, A>G, rs757958938, E53G]
   DPYD*rs757994597:
     pharmvar: https://www.pharmvar.org/haplotype/1131
+    activity: function not assigned
     mutations:
     - [332708, C>T, rs757994597, R332W]
   DPYD*rs758154803:
     pharmvar: https://www.pharmvar.org/haplotype/1132
+    activity: function not assigned
     mutations:
     - [410167, T>C, rs758154803, Y525H]
   DPYD*rs758489611:
     pharmvar: https://www.pharmvar.org/haplotype/1133
+    activity: function not assigned
     mutations:
     - [475874, G>A, rs758489611, G593E]
   DPYD*rs758514990:
     pharmvar: https://www.pharmvar.org/haplotype/1134
+    activity: function not assigned
     mutations:
     - [204446, G>A, rs758514990, G127R]
   DPYD*rs758649719:
     pharmvar: https://www.pharmvar.org/haplotype/1135
+    activity: function not assigned
     mutations:
     - [691125, G>A, rs758649719, G795R]
   DPYD*rs758699471:
     pharmvar: https://www.pharmvar.org/haplotype/1136
+    activity: function not assigned
     mutations:
     - [226682, A>G, rs758699471, E218G]
   DPYD*rs759082282:
     pharmvar: https://www.pharmvar.org/haplotype/1137
+    activity: function not assigned
     mutations:
     - [352240, G>T, rs759082282, V427F]
   DPYD*rs759249769:
     pharmvar: https://www.pharmvar.org/haplotype/1138
+    activity: function not assigned
     mutations:
     - [475877, C>A, rs759249769, T594N]
   DPYD*rs759424419:
     pharmvar: https://www.pharmvar.org/haplotype/1139
+    activity: function not assigned
     mutations:
     - [410286, T>A, rs759424419, F564L]
   DPYD*rs759479759:
     pharmvar: https://www.pharmvar.org/haplotype/1140
+    activity: function not assigned
     mutations:
     - [226624, A>G, rs759479759, S199G]
   DPYD*rs759562628:
     pharmvar: https://www.pharmvar.org/haplotype/1141
+    activity: function not assigned
     mutations:
     - [846947, A>C, rs759562628, T981P]
   DPYD*rs759766897:
     pharmvar: https://www.pharmvar.org/haplotype/1142
+    activity: function not assigned
     mutations:
     - [827450, A>G, rs759766897, Y882C]
   DPYD*rs759967863:
     pharmvar: https://www.pharmvar.org/haplotype/1143
+    activity: function not assigned
     mutations:
     - [330981, T>C, rs759967863, V313A]
   DPYD*rs760038956:
     pharmvar: https://www.pharmvar.org/haplotype/1144
+    activity: function not assigned
     mutations:
     - [619805, G>A, rs760038956, A701T]
   DPYD*rs760222167:
     pharmvar: https://www.pharmvar.org/haplotype/1145
+    activity: function not assigned
     mutations:
     - [246893, A>G, rs760222167, S260G]
   DPYD*rs760235888:
     pharmvar: https://www.pharmvar.org/haplotype/1146
+    activity: function not assigned
     mutations:
     - [846956, G>A, rs760235888, D984N]
   DPYD*rs760485592:
     pharmvar: https://www.pharmvar.org/haplotype/1147
+    activity: function not assigned
     mutations:
     - [847034, C>T, rs760485592, P1010S]
   DPYD*rs760553268:
     pharmvar: https://www.pharmvar.org/haplotype/1148
+    activity: function not assigned
     mutations:
     - [185625, C>G, rs760553268, T93S]
   DPYD*rs760570391:
     pharmvar: https://www.pharmvar.org/haplotype/1149
+    activity: function not assigned
     mutations:
     - [332823, T>C, rs760570391, I370T]
   DPYD*rs760663364:
     pharmvar: https://www.pharmvar.org/haplotype/1150
+    activity: function not assigned
     mutations:
     - [410132, C>T, rs760663364, A513V]
   DPYD*rs761302217:
     pharmvar: https://www.pharmvar.org/haplotype/1151
+    activity: function not assigned
     mutations:
     - [732858, A>G, rs761302217, Y830C]
   DPYD*rs761351410:
     pharmvar: https://www.pharmvar.org/haplotype/1152
+    activity: function not assigned
     mutations:
     - [691081, C>T, rs761351410, P772L]
   DPYD*rs761479700:
     pharmvar: https://www.pharmvar.org/haplotype/1153
+    activity: function not assigned
     mutations:
     - [246917, C>G, rs761479700, L268V]
   DPYD*rs761555670:
     pharmvar: https://www.pharmvar.org/haplotype/1154
+    activity: function not assigned
     mutations:
     - [376481, A>G, rs761555670, Y502C]
   DPYD*rs761609256:
     pharmvar: https://www.pharmvar.org/haplotype/1155
+    activity: function not assigned
     mutations:
     - [691177, A>C, rs761609256, Q804P]
   DPYD*rs762083671:
     pharmvar: https://www.pharmvar.org/haplotype/1156
+    activity: function not assigned
     mutations:
     - [552448, A>T, rs762083671, L669F]
   DPYD*rs762102298:
     pharmvar: https://www.pharmvar.org/haplotype/1157
+    activity: function not assigned
     mutations:
     - [97931, T>G, rs762102298, L73R]
   DPYD*rs762198241:
     pharmvar: https://www.pharmvar.org/haplotype/1158
+    activity: function not assigned
     mutations:
     - [5144, C>T, rs762198241, P3S]
   DPYD*rs762430779:
     pharmvar: https://www.pharmvar.org/haplotype/1159
+    activity: function not assigned
     mutations:
     - [204391, C>A, rs762430779, N108K]
   DPYD*rs762446803:
     pharmvar: https://www.pharmvar.org/haplotype/1160
+    activity: function not assigned
     mutations:
     - [732825, T>G, rs762446803, I819S]
   DPYD*rs762468894:
     pharmvar: https://www.pharmvar.org/haplotype/1161
+    activity: function not assigned
     mutations:
     - [204498, C>G, rs762468894, A144G]
   DPYD*rs762523739:
     pharmvar: https://www.pharmvar.org/haplotype/1162
+    activity: function not assigned
     mutations:
     - [475928, A>T, rs762523739, E611V]
   DPYD*rs762533012:
     pharmvar: https://www.pharmvar.org/haplotype/1163
+    activity: function not assigned
     mutations:
     - [204399, G>A, rs762533012, G111E]
   DPYD*rs762598766:
     pharmvar: https://www.pharmvar.org/haplotype/1164
+    activity: function not assigned
     mutations:
     - [352150, A>G, rs762598766, I397V]
   DPYD*rs762779297:
     pharmvar: https://www.pharmvar.org/haplotype/1165
+    activity: function not assigned
     mutations:
     - [843687, A>G, rs762779297, N955S]
   DPYD*rs762858106:
     pharmvar: https://www.pharmvar.org/haplotype/1166
+    activity: function not assigned
     mutations:
     - [843605, G>A, rs762858106, A928T]
   DPYD*rs762911226:
     pharmvar: https://www.pharmvar.org/haplotype/1167
+    activity: function not assigned
     mutations:
     - [827437, A>T, rs762911226, S878C]
   DPYD*rs763008163:
     pharmvar: https://www.pharmvar.org/haplotype/1168
+    activity: function not assigned
     mutations:
     - [332806, A>C, rs763008163, R364S]
   DPYD*rs763061658:
     pharmvar: https://www.pharmvar.org/haplotype/1169
+    activity: function not assigned
     mutations:
     - [226526, T>C, rs763061658, M166T]
   DPYD*rs763449831:
     pharmvar: https://www.pharmvar.org/haplotype/1170
+    activity: function not assigned
     mutations:
     - [691189, G>A, rs763449831, S808N]
   DPYD*rs763506271:
     pharmvar: https://www.pharmvar.org/haplotype/1171
+    activity: function not assigned
     mutations:
     - [552464, A>G, rs763506271, M675V]
   DPYD*rs763557204:
     pharmvar: https://www.pharmvar.org/haplotype/1172
+    activity: function not assigned
     mutations:
     - [376382, T>C, rs763557204, M469T]
   DPYD*rs763572567:
     pharmvar: https://www.pharmvar.org/haplotype/1173
+    activity: function not assigned
     mutations:
     - [475922, A>C, rs763572567, N609T]
   DPYD*rs763623595:
     pharmvar: https://www.pharmvar.org/haplotype/1174
+    activity: function not assigned
     mutations:
     - [204491, T>G, rs763623595, L142V]
   DPYD*rs763784786:
     pharmvar: https://www.pharmvar.org/haplotype/1175
+    activity: function not assigned
     mutations:
     - [552456, C>G, rs763784786, P672R]
   DPYD*rs763862486:
     pharmvar: https://www.pharmvar.org/haplotype/1176
+    activity: function not assigned
     mutations:
     - [843671, G>A, rs763862486, E950K]
   DPYD*rs763893877:
     pharmvar: https://www.pharmvar.org/haplotype/1177
+    activity: function not assigned
     mutations:
     - [843598, A>G, rs763893877, I925M]
   DPYD*rs763984510:
     pharmvar: https://www.pharmvar.org/haplotype/1178
+    activity: function not assigned
     mutations:
     - [352295, C>G, rs763984510, P445R]
   DPYD*rs764111543:
     pharmvar: https://www.pharmvar.org/haplotype/1179
+    activity: function not assigned
     mutations:
     - [332735, G>A, rs764111543, G341R]
   DPYD*rs764270260:
     pharmvar: https://www.pharmvar.org/haplotype/1180
+    activity: function not assigned
     mutations:
     - [410282, C>T, rs764270260, A563V]
   DPYD*rs764555085:
     pharmvar: https://www.pharmvar.org/haplotype/1181
+    activity: function not assigned
     mutations:
     - [42693, T>C, rs764555085, L16P]
   DPYD*rs764635955:
     pharmvar: https://www.pharmvar.org/haplotype/1182
+    activity: function not assigned
     mutations:
     - [226618, C>A, rs764635955, P197T]
   DPYD*rs764666241:
     pharmvar: https://www.pharmvar.org/haplotype/1183
+    activity: function not assigned
     mutations:
     - [352239, G>T, rs764666241, M426I]
   DPYD*rs764679468:
     pharmvar: https://www.pharmvar.org/haplotype/1184
+    activity: function not assigned
     mutations:
     - [827536, T>G, rs764679468, C911G]
   DPYD*rs764945792:
     pharmvar: https://www.pharmvar.org/haplotype/1185
+    activity: function not assigned
     mutations:
     - [246885, G>A, rs764945792, C257Y]
   DPYD*rs765001324:
     pharmvar: https://www.pharmvar.org/haplotype/1186
+    activity: function not assigned
     mutations:
     - [620766, G>A, rs765001324, G755E]
   DPYD*rs765034707:
     pharmvar: https://www.pharmvar.org/haplotype/1187
+    activity: function not assigned
     mutations:
     - [234335, G>T, rs765034707, G252C]
   DPYD*rs765075551:
     pharmvar: https://www.pharmvar.org/haplotype/1188
+    activity: function not assigned
     mutations:
     - [732918, A>G, rs765075551, D850G]
   DPYD*rs765131182:
     pharmvar: https://www.pharmvar.org/haplotype/1189
+    activity: function not assigned
     mutations:
     - [97940, C>T, rs765131182, A76V]
   DPYD*rs765247038:
     pharmvar: https://www.pharmvar.org/haplotype/1190
+    activity: function not assigned
     mutations:
     - [843708, C>T, rs765247038, T962I]
   DPYD*rs765309287:
     pharmvar: https://www.pharmvar.org/haplotype/1191
+    activity: function not assigned
     mutations:
     - [226622, C>A, rs765309287, A198E]
   DPYD*rs765465250:
     pharmvar: https://www.pharmvar.org/haplotype/1192
+    activity: function not assigned
     mutations:
     - [475879, A>G, rs765465250, T595A]
   DPYD*rs765640386:
     pharmvar: https://www.pharmvar.org/haplotype/1193
+    activity: function not assigned
     mutations:
     - [619801, G>T, rs765640386, R699S]
   DPYD*rs765990958:
     pharmvar: https://www.pharmvar.org/haplotype/1194
+    activity: function not assigned
     mutations:
     - [543645, C>T, rs765990958, T651M]
   DPYD*rs766411970:
     pharmvar: https://www.pharmvar.org/haplotype/1195
+    activity: function not assigned
     mutations:
     - [619821, T>G, rs766411970, F706C]
   DPYD*rs766438205:
     pharmvar: https://www.pharmvar.org/haplotype/1196
+    activity: function not assigned
     mutations:
     - [847031, A>G, rs766438205, T1009A]
   DPYD*rs766635900:
     pharmvar: https://www.pharmvar.org/haplotype/1197
+    activity: function not assigned
     mutations:
     - [42722, G>A, rs766635900, A26T]
   DPYD*rs766700777:
     pharmvar: https://www.pharmvar.org/haplotype/1198
+    activity: function not assigned
     mutations:
     - [352225, G>C, rs766700777, D422H]
   DPYD*rs766761199:
     pharmvar: https://www.pharmvar.org/haplotype/1199
+    activity: function not assigned
     mutations:
     - [410202, A>C, rs766761199, E536D]
   DPYD*rs766833304:
     pharmvar: https://www.pharmvar.org/haplotype/1200
+    activity: function not assigned
     mutations:
     - [732959, C>G, rs766833304, P864A]
   DPYD*rs766885021:
     pharmvar: https://www.pharmvar.org/haplotype/1201
+    activity: function not assigned
     mutations:
     - [376474, T>G, rs766885021, S500A]
   DPYD*rs767200577:
     pharmvar: https://www.pharmvar.org/haplotype/1202
+    activity: function not assigned
     mutations:
     - [691074, A>G, rs767200577, I770V]
   DPYD*rs767376585:
     pharmvar: https://www.pharmvar.org/haplotype/1203
+    activity: function not assigned
     mutations:
     - [475893, G>C, rs767376585, M599I]
   DPYD*rs767437717:
     pharmvar: https://www.pharmvar.org/haplotype/1204
+    activity: function not assigned
     mutations:
     - [352131, C>A, rs767437717, F390L]
   DPYD*rs767464878:
     pharmvar: https://www.pharmvar.org/haplotype/1205
+    activity: function not assigned
     mutations:
     - [691171, G>T, rs767464878, G802V]
   DPYD*rs767468952:
     pharmvar: https://www.pharmvar.org/haplotype/1206
+    activity: function not assigned
     mutations:
     - [691071, G>A, rs767468952, A769T]
   DPYD*rs767482279:
     pharmvar: https://www.pharmvar.org/haplotype/1207
+    activity: function not assigned
     mutations:
     - [204477, T>C, rs767482279, V137A]
   DPYD*rs767547827:
     pharmvar: https://www.pharmvar.org/haplotype/1208
+    activity: function not assigned
     mutations:
     - [620723, C>G, rs767547827, L741V]
   DPYD*rs767818267:
     pharmvar: https://www.pharmvar.org/haplotype/1209
+    activity: function not assigned
     mutations:
     - [97922, G>A, rs767818267, R70Q]
   DPYD*rs767836989:
     pharmvar: https://www.pharmvar.org/haplotype/1210
+    activity: function not assigned
     mutations:
     - [234314, A>G, rs767836989, I245V]
   DPYD*rs767986711:
     pharmvar: https://www.pharmvar.org/haplotype/1211
+    activity: function not assigned
     mutations:
     - [552443, A>C, rs767986711, N668H]
   DPYD*rs768117152:
     pharmvar: https://www.pharmvar.org/haplotype/1212
+    activity: function not assigned
     mutations:
     - [332795, A>G, rs768117152, I361V]
   DPYD*rs768157853:
     pharmvar: https://www.pharmvar.org/haplotype/1213
+    activity: function not assigned
     mutations:
     - [732965, C>G, rs768157853, P866A]
   DPYD*rs768200107:
     pharmvar: https://www.pharmvar.org/haplotype/1214
+    activity: function not assigned
     mutations:
     - [827464, A>C, rs768200107, K887Q]
   DPYD*rs768288280:
     pharmvar: https://www.pharmvar.org/haplotype/1215
+    activity: function not assigned
     mutations:
     - [185657, A>G, rs768288280, I104V]
   DPYD*rs768501828:
     pharmvar: https://www.pharmvar.org/haplotype/1216
+    activity: function not assigned
     mutations:
     - [42737, A>G, rs768501828, T31A]
   DPYD*rs768507975:
     pharmvar: https://www.pharmvar.org/haplotype/1217
+    activity: function not assigned
     mutations:
     - [619843, T>A, rs768507975, N713K]
   DPYD*rs768680499:
     pharmvar: https://www.pharmvar.org/haplotype/1218
+    activity: function not assigned
     mutations:
     - [226562, C>A, rs768680499, P178H]
   DPYD*rs768915005:
     pharmvar: https://www.pharmvar.org/haplotype/1219
+    activity: function not assigned
     mutations:
     - [246921, G>A, rs768915005, S269N]
   DPYD*rs769190350:
     pharmvar: https://www.pharmvar.org/haplotype/1220
+    activity: function not assigned
     mutations:
     - [5160, A>T, rs769190350, D8V]
   DPYD*rs769306962:
     pharmvar: https://www.pharmvar.org/haplotype/1221
+    activity: function not assigned
     mutations:
     - [352174, G>A, rs769306962, A405T]
   DPYD*rs769466648.1:
     pharmvar: https://www.pharmvar.org/haplotype/1222
+    activity: function not assigned
     mutations:
     - [475933, A>C, rs769466648, I613L]
   DPYD*rs769466648.2:
     pharmvar: https://www.pharmvar.org/haplotype/1223
+    activity: function not assigned
     mutations:
     - [475933, A>G, rs769466648, I613V]
   DPYD*rs769514867:
     pharmvar: https://www.pharmvar.org/haplotype/1224
+    activity: function not assigned
     mutations:
     - [410141, C>A, rs769514867, S516Y]
   DPYD*rs769696395:
     pharmvar: https://www.pharmvar.org/haplotype/1225
+    activity: function not assigned
     mutations:
     - [552473, A>G, rs769696395, R678G]
   DPYD*rs769709846:
     pharmvar: https://www.pharmvar.org/haplotype/1226
+    activity: function not assigned
     mutations:
     - [332739, A>G, rs769709846, D342G]
   DPYD*rs769820114:
     pharmvar: https://www.pharmvar.org/haplotype/1227
+    activity: function not assigned
     mutations:
     - [5174, G>A, rs769820114, E13K]
   DPYD*rs769847078:
     pharmvar: https://www.pharmvar.org/haplotype/1228
+    activity: function not assigned
     mutations:
     - [42746, A>G, rs769847078, K34E]
   DPYD*rs769932607:
     pharmvar: https://www.pharmvar.org/haplotype/1229
+    activity: function not assigned
     mutations:
     - [827447, C>T, rs769932607, P881L]
   DPYD*rs770229152:
     pharmvar: https://www.pharmvar.org/haplotype/1230
+    activity: function not assigned
     mutations:
     - [42725, A>T, rs770229152, T27S]
   DPYD*rs770566506:
     pharmvar: https://www.pharmvar.org/haplotype/1231
+    activity: function not assigned
     mutations:
     - [332690, T>C, rs770566506, S326P]
   DPYD*rs770958862:
     pharmvar: https://www.pharmvar.org/haplotype/1232
+    activity: function not assigned
     mutations:
     - [691113, C>T, rs770958862, R783C]
   DPYD*rs771194906:
     pharmvar: https://www.pharmvar.org/haplotype/1233
+    activity: function not assigned
     mutations:
     - [330897, T>C, rs771194906, L285S]
   DPYD*rs771534236:
     pharmvar: https://www.pharmvar.org/haplotype/1234
+    activity: function not assigned
     mutations:
     - [204426, A>G, rs771534236, N120S]
   DPYD*rs771536388:
     pharmvar: https://www.pharmvar.org/haplotype/1235
+    activity: function not assigned
     mutations:
     - [330998, G>A, rs771536388, A319T]
   DPYD*rs771573678:
     pharmvar: https://www.pharmvar.org/haplotype/1236
+    activity: function not assigned
     mutations:
     - [185634, A>T, rs771573678, D96V]
   DPYD*rs771646887:
     pharmvar: https://www.pharmvar.org/haplotype/1237
+    activity: function not assigned
     mutations:
     - [620790, G>A, rs771646887, G763E]
   DPYD*rs771648776:
     pharmvar: https://www.pharmvar.org/haplotype/1238
+    activity: function not assigned
     mutations:
     - [410248, A>G, rs771648776, T552A]
   DPYD*rs771885007:
     pharmvar: https://www.pharmvar.org/haplotype/1239
+    activity: function not assigned
     mutations:
     - [332762, T>C, rs771885007, S350P]
   DPYD*rs771930534.1:
     pharmvar: https://www.pharmvar.org/haplotype/1240
+    activity: function not assigned
     mutations:
     - [827567, T>A, rs771930534, I921N]
   DPYD*rs771930534.2:
     pharmvar: https://www.pharmvar.org/haplotype/1241
+    activity: function not assigned
     mutations:
     - [827567, T>C, rs771930534, I921T]
   DPYD*rs772097379:
     pharmvar: https://www.pharmvar.org/haplotype/1242
+    activity: function not assigned
     mutations:
     - [5150, C>T, rs772097379, L5F]
   DPYD*rs772264512:
     pharmvar: https://www.pharmvar.org/haplotype/1243
+    activity: function not assigned
     mutations:
     - [410135, C>T, rs772264512, S514F]
   DPYD*rs772320654:
     pharmvar: https://www.pharmvar.org/haplotype/1244
+    activity: function not assigned
     mutations:
     - [330915, A>G, rs772320654, D291G]
   DPYD*rs772358811:
     pharmvar: https://www.pharmvar.org/haplotype/1245
+    activity: function not assigned
     mutations:
     - [352258, G>C, rs772358811, V433L]
   DPYD*rs772544099:
     pharmvar: https://www.pharmvar.org/haplotype/1246
+    activity: function not assigned
     mutations:
     - [846960, C>A, rs772544099, T985N]
   DPYD*rs772826416:
     pharmvar: https://www.pharmvar.org/haplotype/1247
+    activity: function not assigned
     mutations:
     - [827558, T>C, rs772826416, I918T]
   DPYD*rs772906420:
     pharmvar: https://www.pharmvar.org/haplotype/1248
+    activity: function not assigned
     mutations:
     - [332831, G>A, rs772906420, V373I]
   DPYD*rs773159364:
     pharmvar: https://www.pharmvar.org/haplotype/1249
+    activity: function not assigned
     mutations:
     - [185633, G>C, rs773159364, D96H]
   DPYD*rs773407491:
     pharmvar: https://www.pharmvar.org/haplotype/1250
+    activity: function not assigned
     mutations:
     - [619841, A>G, rs773407491, N713D]
   DPYD*rs773584401:
     pharmvar: https://www.pharmvar.org/haplotype/1251
+    activity: function not assigned
     mutations:
     - [732861, G>T, rs773584401, C831F]
   DPYD*rs773652644:
     pharmvar: https://www.pharmvar.org/haplotype/1252
+    activity: function not assigned
     mutations:
     - [543657, A>G, rs773652644, K655R]
   DPYD*rs773815814.1:
     pharmvar: https://www.pharmvar.org/haplotype/1253
+    activity: function not assigned
     mutations:
     - [732962, G>T, rs773815814, V865F]
   DPYD*rs773815814.2:
     pharmvar: https://www.pharmvar.org/haplotype/1254
+    activity: function not assigned
     mutations:
     - [732962, G>A, rs773815814, V865I]
   DPYD*rs773868825:
     pharmvar: https://www.pharmvar.org/haplotype/1255
+    activity: function not assigned
     mutations:
     - [847053, G>A, rs773868825, G1016D]
   DPYD*rs773983635:
     pharmvar: https://www.pharmvar.org/haplotype/1256
+    activity: function not assigned
     mutations:
     - [246918, T>A, rs773983635, L268H]
   DPYD*rs774134971:
     pharmvar: https://www.pharmvar.org/haplotype/1257
+    activity: function not assigned
     mutations:
     - [843596, A>G, rs774134971, I925V]
   DPYD*rs774500505:
     pharmvar: https://www.pharmvar.org/haplotype/1258
+    activity: function not assigned
     mutations:
     - [410212, T>A, rs774500505, L540M]
   DPYD*rs774579695.1:
     pharmvar: https://www.pharmvar.org/haplotype/1259
+    activity: function not assigned
     mutations:
     - [732969, G>A, rs774579695, R867H]
   DPYD*rs774799003:
     pharmvar: https://www.pharmvar.org/haplotype/1260
+    activity: function not assigned
     mutations:
     - [376372, C>T, rs774799003, P466S]
   DPYD*rs774883578:
     pharmvar: https://www.pharmvar.org/haplotype/1261
+    activity: function not assigned
     mutations:
     - [352172, T>G, rs774883578, V404G]
   DPYD*rs775494607:
     pharmvar: https://www.pharmvar.org/haplotype/1262
+    activity: function not assigned
     mutations:
     - [843606, C>T, rs775494607, A928V]
   DPYD*rs775526810:
     pharmvar: https://www.pharmvar.org/haplotype/1263
+    activity: function not assigned
     mutations:
     - [226529, G>T, rs775526810, S167I]
   DPYD*rs775570841:
     pharmvar: https://www.pharmvar.org/haplotype/1264
+    activity: function not assigned
     mutations:
     - [732988, C>G, rs775570841, D873E]
   DPYD*rs775601164:
     pharmvar: https://www.pharmvar.org/haplotype/1265
+    activity: function not assigned
     mutations:
     - [42719, C>T, rs775601164, H25Y]
   DPYD*rs775926386:
     pharmvar: https://www.pharmvar.org/haplotype/1266
+    activity: function not assigned
     mutations:
     - [246924, C>G, rs775926386, T270S]
   DPYD*rs776082092:
     pharmvar: https://www.pharmvar.org/haplotype/1267
+    activity: function not assigned
     mutations:
     - [376391, G>A, rs776082092, S472N]
   DPYD*rs776236081:
     pharmvar: https://www.pharmvar.org/haplotype/1268
+    activity: function not assigned
     mutations:
     - [843632, G>A, rs776236081, E937K]
   DPYD*rs776289153:
     pharmvar: https://www.pharmvar.org/haplotype/1269
+    activity: function not assigned
     mutations:
     - [843711, G>A, rs776289153, C963Y]
   DPYD*rs776321529:
     pharmvar: https://www.pharmvar.org/haplotype/1270
+    activity: function not assigned
     mutations:
     - [410291, C>G, rs776321529, A566G]
   DPYD*rs776662759:
     pharmvar: https://www.pharmvar.org/haplotype/1271
+    activity: function not assigned
     mutations:
     - [42720, A>C, rs776662759, H25P]
   DPYD*rs776973423:
     pharmvar: https://www.pharmvar.org/haplotype/1272
+    activity: function not assigned
     mutations:
     - [226625, G>A, rs776973423, S199N]
   DPYD*rs776984091:
     pharmvar: https://www.pharmvar.org/haplotype/1273
+    activity: function not assigned
     mutations:
     - [475945, A>G, rs776984091, T617A]
   DPYD*rs777220476.1:
     pharmvar: https://www.pharmvar.org/haplotype/1274
+    activity: function not assigned
     mutations:
     - [330894, G>A, rs777220476, G284D]
   DPYD*rs777220476.2:
     pharmvar: https://www.pharmvar.org/haplotype/1275
+    activity: function not assigned
     mutations:
     - [330894, G>T, rs777220476, G284V]
   DPYD*rs777238016:
     pharmvar: https://www.pharmvar.org/haplotype/1276
+    activity: function not assigned
     mutations:
     - [42788, A>G, rs777238016, N48D]
   DPYD*rs777347164:
     pharmvar: https://www.pharmvar.org/haplotype/1277
+    activity: function not assigned
     mutations:
     - [330993, G>A, rs777347164, S317N]
   DPYD*rs777368221:
     pharmvar: https://www.pharmvar.org/haplotype/1278
+    activity: function not assigned
     mutations:
     - [410166, T>G, rs777368221, F524L]
   DPYD*rs777425216:
     pharmvar: https://www.pharmvar.org/haplotype/1279
+    activity: function not assigned
     mutations:
     - [410245, G>A, rs777425216, A551T]
   DPYD*rs777560627:
     pharmvar: https://www.pharmvar.org/haplotype/1280
+    activity: function not assigned
     mutations:
     - [332703, C>T, rs777560627, S330L]
   DPYD*rs777673186:
     pharmvar: https://www.pharmvar.org/haplotype/1281
+    activity: function not assigned
     mutations:
     - [691123, C>G, rs777673186, P786R]
   DPYD*rs777902288:
     pharmvar: https://www.pharmvar.org/haplotype/1282
+    activity: function not assigned
     mutations:
     - [330913, A>T, rs777902288, K290N]
   DPYD*rs778022685:
     pharmvar: https://www.pharmvar.org/haplotype/1283
+    activity: function not assigned
     mutations:
     - [204434, G>A, rs778022685, G123S]
   DPYD*rs778054451:
     pharmvar: https://www.pharmvar.org/haplotype/1284
+    activity: function not assigned
     mutations:
     - [843644, G>A, rs778054451, V941I]
   DPYD*rs778141885:
     pharmvar: https://www.pharmvar.org/haplotype/1285
+    activity: function not assigned
     mutations:
     - [226675, A>G, rs778141885, I216V]
   DPYD*rs778298325:
     pharmvar: https://www.pharmvar.org/haplotype/1286
+    activity: function not assigned
     mutations:
     - [619791, G>A, rs778298325, R696H]
   DPYD*rs778601245:
     pharmvar: https://www.pharmvar.org/haplotype/1287
+    activity: function not assigned
     mutations:
     - [332772, G>A, rs778601245, R353H]
   DPYD*rs778754188:
     pharmvar: https://www.pharmvar.org/haplotype/1288
+    activity: function not assigned
     mutations:
     - [410327, T>C, rs778754188, L578P]
   DPYD*rs778760295:
     pharmvar: https://www.pharmvar.org/haplotype/1289
+    activity: function not assigned
     mutations:
     - [332712, G>C, rs778760295, G333A]
   DPYD*rs778776264:
     pharmvar: https://www.pharmvar.org/haplotype/1290
+    activity: function not assigned
     mutations:
     - [376441, A>G, rs778776264, T489A]
   DPYD*rs778867644:
     pharmvar: https://www.pharmvar.org/haplotype/1291
+    activity: function not assigned
     mutations:
     - [352202, A>G, rs778867644, D414G]
   DPYD*rs778911905:
     pharmvar: https://www.pharmvar.org/haplotype/1292
+    activity: function not assigned
     mutations:
     - [847007, T>G, rs778911905, C1001G]
   DPYD*rs779465366:
     pharmvar: https://www.pharmvar.org/haplotype/1293
+    activity: function not assigned
     mutations:
     - [352262, T>C, rs779465366, V434A]
   DPYD*rs779557503:
     pharmvar: https://www.pharmvar.org/haplotype/1294
+    activity: function not assigned
     mutations:
     - [332786, C>T, rs779557503, R358C]
   DPYD*rs779573574:
     pharmvar: https://www.pharmvar.org/haplotype/1295
+    activity: function not assigned
     mutations:
     - [827469, A>T, rs779573574, K888N]
   DPYD*rs779728902:
     pharmvar: https://www.pharmvar.org/haplotype/1296
+    activity: function not assigned
     mutations:
     - [226574, T>A, rs779728902, M182K]
   DPYD*rs779925747:
     pharmvar: https://www.pharmvar.org/haplotype/1297
+    activity: function not assigned
     mutations:
     - [330920, A>C, rs779925747, I293L]
   DPYD*rs779967271:
     pharmvar: https://www.pharmvar.org/haplotype/1298
+    activity: function not assigned
     mutations:
     - [376457, A>G, rs779967271, N494S]
   DPYD*rs780025995:
     pharmvar: https://www.pharmvar.org/haplotype/1299
+    activity: function not assigned
     mutations:
     - [234291, C>T, rs780025995, P237L]
   DPYD*rs780047918:
     pharmvar: https://www.pharmvar.org/haplotype/1300
+    activity: function not assigned
     mutations:
     - [691143, A>G, rs780047918, T793A]
   DPYD*rs780120302:
     pharmvar: https://www.pharmvar.org/haplotype/1301
+    activity: function not assigned
     mutations:
     - [543630, A>G, rs780120302, N646S]
   DPYD*rs780813130:
     pharmvar: https://www.pharmvar.org/haplotype/1303
+    activity: function not assigned
     mutations:
     - [732812, G>A, rs780813130, V815I]
   DPYD*rs780873985:
     pharmvar: https://www.pharmvar.org/haplotype/1304
+    activity: function not assigned
     mutations:
     - [42773, A>G, rs780873985, R43G]
   DPYD*rs780885126:
     pharmvar: https://www.pharmvar.org/haplotype/1305
+    activity: function not assigned
     mutations:
     - [352177, A>G, rs780885126, M406V]
   DPYD*rs781184141:
     pharmvar: https://www.pharmvar.org/haplotype/1306
+    activity: function not assigned
     mutations:
     - [226685, A>G, rs781184141, K219R]
   DPYD*rs866110709:
     pharmvar: https://www.pharmvar.org/haplotype/1308
+    activity: function not assigned
     mutations:
     - [410299, G>A, rs866110709, G569S]
   DPYD*rs866869468:
     pharmvar: https://www.pharmvar.org/haplotype/1309
+    activity: function not assigned
     mutations:
     - [552416, G>T, rs866869468, D659Y]
   DPYD*rs867143119:
     pharmvar: https://www.pharmvar.org/haplotype/1310
+    activity: function not assigned
     mutations:
     - [847018, G>T, rs867143119, M1004I]
   DPYD*rs867226255:
     pharmvar: https://www.pharmvar.org/haplotype/1311
+    activity: function not assigned
     mutations:
     - [226567, G>A, rs867226255, E180K]
   DPYD*rs867232786:
     pharmvar: https://www.pharmvar.org/haplotype/1312
+    activity: function not assigned
     mutations:
     - [843668, G>A, rs867232786, D949N]
   DPYD*rs867600987:
     pharmvar: https://www.pharmvar.org/haplotype/1313
+    activity: function not assigned
     mutations:
     - [843590, G>A, rs867600987, D923N]
   DPYD*rs868047175:
     pharmvar: https://www.pharmvar.org/haplotype/1314
+    activity: function not assigned
     mutations:
     - [352166, G>A, rs868047175, R402K]
   DPYD*rs868235016:
     pharmvar: https://www.pharmvar.org/haplotype/1315
+    activity: function not assigned
     mutations:
     - [843706, G>A, rs868235016, M961I]
   DPYD*rs1180771326:
     pharmvar: https://www.pharmvar.org/haplotype/864
+    activity: function not assigned
     mutations:
     - [410176, A>G, rs1180771326, I528V]
 structure:

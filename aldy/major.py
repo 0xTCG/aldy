@@ -5,24 +5,15 @@
 
 
 from typing import List, Dict, Tuple, Any, Optional
-
+from natsort import natsorted
 import collections
 import copy
 
-from natsort import natsorted
-
 from . import lpinterface
-from .common import log, AldyException, json, sorted_tuple
-from .cn import MAX_CN
+from .common import log, json, sorted_tuple
 from .gene import MajorAllele, Mutation, Gene
 from .coverage import Coverage
 from .solutions import CNSolution, MajorSolution, SolvedAllele
-
-
-# Model parameters
-NOVEL_MUTATION_PENAL = MAX_CN + 1
-"""Penalty for each novel functional mutation (0 for no penalty).
-   Should be large enough to prevent novel mutations unless really necessary."""
 
 
 def estimate_major(
@@ -30,7 +21,6 @@ def estimate_major(
     coverage: Coverage,
     cn_solution: CNSolution,
     solver: str,
-    gap: float = 0,
     identifier: int = 0,
     debug: Optional[str] = None,
 ) -> List[MajorSolution]:
@@ -38,37 +28,29 @@ def estimate_major(
     Estimate optimal major star-alleles.
 
     :param gene: Gene instance.
-    :param coverage: Read coverage data.
-    :param cn_solution:
-        Copy-number solution that will be used for major star-allele calling.
-    :param solver:
-        ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
-    :param gap:
-        Relative optimality gap. Use non-zero values to allow non-optimal solutions.
-        Default is 0 (reports only optimal solutions).
-    :param identifier:
-        Unique solution identifier. Used for generating debug information.
-        Default is 0.
-    :param debug:
-        If set, create a "`debug`.major`identifier`.lp" file for debug purposes.
-        Default is ``None``.
+    :param profile: Profile instance.
+    :param coverage: Read coverage instance.
+    :param cn_solution: Copy-number solution for major star-allele calling.
+    :param solver: ILP solver (see :py:mod:`aldy.lpinterface` for supported solvers).
+    :param identifier: Unique solution identifier. Used for debug purposes.
+        Default: 0.
+    :param debug: When set, create a `{debug}.major{identifier}.lp` model description
+        file for debug purposes.
+        Default: `None` (no debug dumps).
     """
 
     log.debug("*" * 80)
     log.debug("[major] struct= {}", cn_solution._solution_nice())
 
-    if sum(cn_solution.solution.values()) < 2:
-        raise AldyException(
-            "estimate_major requires at least two valid gene configurations"
-        )
-
     alleles, coverage = _filter_alleles(gene, coverage, cn_solution)
+    coverage.dump(log.trace)
+
     # Check if some CN solution has no matching allele
     if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):
         results: List[MajorSolution] = []
     else:
         results = solve_major_model(
-            gene, alleles, coverage, cn_solution, solver, gap, identifier, debug
+            gene, coverage, cn_solution, alleles, solver, identifier, debug
         )
     # TODO: Check for novel functional mutations and do something with them
 
@@ -77,11 +59,10 @@ def estimate_major(
 
 def solve_major_model(
     gene: Gene,
-    allele_dict: Dict[str, MajorAllele],
     coverage: Coverage,
     cn_solution: CNSolution,
+    allele_dict: Dict[str, MajorAllele],
     solver: str,
-    gap: float = 0,
     identifier: int = 0,
     debug: Optional[str] = None,
 ) -> List[MajorSolution]:
@@ -89,22 +70,15 @@ def solve_major_model(
     Solves the major star-allele detection problem via integer linear programming.
 
     :param gene: Gene instance.
-    :param allele_dict: Dictionary of the candidate major star-alleles.
-    :param coverage: Mutation coverage data.
-    :param cn_solution:
-        Copy-number solution that will be used for calling major star-alleles
-        (:obj:`aldy.solutions.CNSolution`).
-    :param solver:
-        ILP solver. Check :obj:`aldy.lpinterface` for the list of supported solvers.
-    :param gap:
-        Relative optimality gap. Use non-zero values to allow non-optimal solutions.
-        Default is 0 (reports only optimal solutions).
-    :param identifier:
-        Unique solution identifier. Used for generating debug information.
-        Default is 0.
-    :param debug:
-        If set, create a "`debug`.major`identifier`.lp" file for debug purposes.
-        Default is ``None``.
+    :param coverage: Read coverage instance.
+    :param cn_solution: Copy-number solution for major star-allele calling.
+    :param allele_dict: Candidate major star-alleles.
+    :param solver: ILP solver (see :py:mod:`aldy.lpinterface` for supported solvers).
+    :param identifier: Unique solution identifier. Used for debug purposes.
+        Default: 0.
+    :param debug: When set, create a `{debug}.major{identifier}.lp` model description
+        file for debug purposes.
+        Default: `None` (no debug dumps).
 
     .. note::
         Please see `Aldy paper <https://www.nature.com/articles/s41467-018-03273-1>`_
@@ -112,7 +86,7 @@ def solve_major_model(
     """
 
     model = lpinterface.model("AldyMajor", solver)
-    debug_info = json["major"][len(json["major"])]
+    debug_info = json[gene.name]["major"][len(json[gene.name]["major"])]
 
     # Get the list of _all_ functional mutations present in the sample
     # and the database (intersection)
@@ -123,10 +97,10 @@ def solve_major_model(
     }
     _print_candidates(gene, allele_dict, coverage, cn_solution, func_muts)
 
-    a: Any = 0  # HACK: silence type checker
+    a: Any = 0
 
     # Create a binary variable for every possible allele copy
-    alleles = {(a, 0): allele_dict[a] for a in allele_dict}
+    alleles = {(a, int(0)): allele_dict[a] for a in allele_dict}
     for (an, _), a in list(alleles.items()):
         max_cn = cn_solution.solution[a.cn_config]
         for i in range(1, max_cn):
@@ -211,17 +185,18 @@ def solve_major_model(
         model.addConstr(VXOR >= 1, name="CXOR")
 
     # Objective: minimize the absolute sum of errors and the number of novel mutations
-    objective = model.abssum(e for e in VERR.values())
+    objective = 0
+    objective += model.abssum(e for e in VERR.values())
 
     z = model.addVar(vtype="B", name="NOVEL")
     for m in VNEW:
         model.addConstr(z >= VNEW[m], name=f"NOVEL_UB_{VNEW[m]}")
     model.addConstr(z <= model.quicksum(VNEW[m] for m in VNEW), name="NOVEL_LB")
-    objective += NOVEL_MUTATION_PENAL * z
+    objective += coverage.profile.major_novel * z
     objective += 0.1 * model.quicksum(VNEW[m] for m in VNEW)
     model.setObjective(objective)
     if debug:
-        model.dump(f"{debug}.major{identifier}.lp")
+        model.dump(f"{debug}.{gene.name}.major{identifier}.lp")
 
     # Solve the model
     lookup = {
@@ -230,7 +205,7 @@ def solve_major_model(
     }
     result: Dict[Any, MajorSolution] = {}
     debug_info["sol"] = []
-    for status, opt, sol in model.solutions(gap):
+    for status, opt, sol in model.solutions(coverage.profile.gap):
         solved_alleles = sorted_tuple(
             [lookup[s][0] for s in sol if s in lookup and s.startswith("A_")]
         )
@@ -266,17 +241,20 @@ def _filter_alleles(
     """
     Filter out low-quality mutations and alleles that are not expressed.
 
-    :return: Tuple of allele dictionary describing the feasible alleles,
-             and the coverage description of high-confidence variants.
+    :returns: Expressed alleles and the coverage of high-quality variants.
     """
 
-    def filter_fns(mut, cov, total, thres):
-        z = Coverage.basic_filter(
-            mut, cov, total, thres / MAX_CN, coverage.min_cov
-        ) and Coverage.cn_filter(mut, cov, total, thres, cn_solution, coverage.min_cov)
-        return z
+    def filter_fns(cov, mut):
+        cond = cov.basic_filter(mut, cn=coverage.profile.cn_max)
+        if mut.op != "_":
+            cond = cond and cov.basic_filter(
+                mut, cn=cn_solution.position_cn(mut.pos) + 0.5
+            )
+        return cond
 
-    cov = coverage.filtered(filter_fns)
+    cov = coverage.filtered(Coverage.quality_filter)
+    cov = cov.filtered(filter_fns)
+
     alleles = copy.deepcopy(gene.alleles)
     for an, a in natsorted(gene.alleles.items()):
         if a.cn_config not in cn_solution.solution:
@@ -295,10 +273,8 @@ def _print_candidates(
     coverage: Coverage,
     cn_solution: CNSolution,
     muts: set,
-) -> None:
-    """
-    Pretty-prints the list of allele candidates and their functional mutations.
-    """
+):
+    """Pretty-prints the list of allele candidates and their functional mutations."""
 
     def print_mut(m):
         copies = (
@@ -306,11 +282,14 @@ def _print_candidates(
             if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
             else 0
         )
+        g = gene.region_at(m.pos)
         return (
             f"  {gene.get_rsid(m):12} {str(m):15} "
             + f"{gene.get_refseq(m, from_atg=True):10} "
             + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
-            + f"impact={gene.get_functional(m)})"
+            + f"region={g[1] if g else '?'}; "
+            + f"impact={gene.get_functional(m)}; "
+            + ")"
         )
 
     log.debug("[major] candidate mutations=")

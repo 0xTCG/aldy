@@ -15,6 +15,14 @@ aldy.gene module
     :undoc-members:
     :show-inheritance:
 
+aldy.profile module
+-------------------
+
+.. automodule:: aldy.profile
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 aldy.sam module
 ---------------
 

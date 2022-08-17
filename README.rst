@@ -18,21 +18,24 @@
   </p>
 
 
-Aldy calls genotypes of many highly polymorphic pharmacogenes and reports them in a phased star-allele nomenclature.
-It can also call copy number of a given pharmacogene, and genotype each copy present in the sample—something that standard genotype callers like GATK cannot do.
+Aldy 4 calls genotypes of many highly polymorphic pharmacogenes and reports them in a phased star-allele nomenclature.
+It can also call copy number of a given pharmacogene and genotype each copy present in the sample—something that standard
+genotype callers like GATK cannot do.
 
 Algorithm details
 =================
 
-TL;DR: Aldy uses star-allele databases to guide the process of detecting the most likely genotype.
+TL;DR: Aldy 4 uses star-allele databases to guide the process of detecting the most likely genotype.
 The optimization is done in three stages via integer linear programming.
 
-Aldy has been published in `Nature Communications <https://www.nature.com/articles/s41467-018-03273-1>`_
-(`doi:10.1038/s41467-018-03273-1 <http://doi.org/10.1038/s41467-018-03273-1>`_).
-Preprint `is available here <https://github.com/inumanag/aldy/blob/master/docs/preprint.pdf>`_.
-Full experimental pipeline `is available here <https://github.com/inumanag/aldy-paper-resources>`_.
+More details, together with the API documentation, are available
+`at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
 
-Documentation is available `at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
+Experimental data is available `here <paper>`_.
+
+If you are using Aldy, please cite our papers in the
+`Nature Communications <https://www.nature.com/articles/s41467-018-03273-1>`_
+and `bioRxiv <https://www.biorxiv.org/content/10.1101/2022.08.11.503701v1>`_.
 
 
 Gene Support
@@ -44,166 +47,166 @@ Gene Support
    * - Gene
      - Version
      - Status
-     - Copy number & Fusion
+     - Details
    * - *CYP2D6*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ✅
+     - Copy number and structural variation support
    * - *CYP2A6*
-     - cypalleles.ki.se (Jan 2012)
+     - PharmVar 5.2.3
      - ✅
-     - ✅
+     - Copy number and structural variation support
    * - *CYP2B6*
-     - PharmVar 4.1.7
-     - ⚠️ (possible mapping conflicts with *CYP2B7*; needs more validation)
-     - 🚫
+     - PharmVar 5.2.3
+     - ✅
+     - Some allele calls should be validated (e.g., \*6/\*9)
    * - *CYP1A1*
      - PharmGKB (Dec 2014)
      - ✅
-     - ❓ (no reported CN/fusion events in the database)
+     -
    * - *CYP1A2*
      - PharmGKB (Mar 2014)
      - ✅
-     - ❓
+     -
    * - *CYP2A13*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP2C19*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - 🚫
+     -
    * - *CYP2C8*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP2C9*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP2E1*
      - PharmGKB (Nov 2013)
-     - ⚠️ (not tested on real data yet)
-     - ❓
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *CYP2F1*
-     - PharmVar 4.1.7
-     - ⚠️ (not tested on real data yet)
-     - ❓
+     - PharmVar 5.2.3
+     - ✅
+     -
    * - *CYP2J2*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP2R1*
-     - PharmVar 4.1.7
-     - ⚠️ (not tested on real data yet)
-     - ❓
+     - PharmVar 5.2.3
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *CYP2S1*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP2W1*
-     - PharmVar 4.1.7
-     - ⚠️ (not tested on real data yet)
-     - ❓
+     - PharmVar 5.2.3
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *CYP3A43*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP3A4*
-     - cypalleles.ki.se (2020)
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP3A5*
-     - PharmVar 4.2.4
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP3A7*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CYP4F2*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *CFTR*
      - PharmGKB (Jun 2020)
      - ✅
-     - ❓
+     -
    * - *COMT*
      - Pharmacoscan
      - ✅
-     - ❓
+     -
    * - *DPYD*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *G6PD*
      - PharmGKB (Sep 2018)
-     - ✅
-     - ❓
+     - ⚠️
+     - Thorough testing on real data sets pending; Null allele calling is unstable
    * - *GSTM1*
      - Pharmacoscan
      - ✅
-     - ❓
+     -
    * - *GSTP1*
      - Pharmacoscan
      - ✅
-     - ❓
+     -
    * - *IFNL3*
      - PharmGKB
      - ✅
-     - ❓
+     -
    * - *NAT1*
      - PharmGKB (Mar 2014)
      - ✅
-     - ❓
+     -
    * - *NAT2*
      - PharmGKB (Mar 2014)
      - ✅
-     - ❓
+     -
    * - *NUDT15*
-     - PharmVar 4.1.7
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *SLCO1B1*
-     - PharmGKB (Oct 2019)
+     - PharmVar 5.2.3
      - ✅
-     - ❓
+     -
    * - *TPMT*
      - PharmGKB (Jun 2020)
      - ✅
-     - ❓
+     -
    * - *UGT1A1*
      - PharmGKB (Feb 2020)
-     - ✅
-     - ❓
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *UGT2B7*
      - pharmacogenomics.pha.ulaval.ca (Apr 2015) / Pharmacoscan
-     - ✅
-     - ❓
+     - ⚠️
+     - Thorough testing on real data sets pending
    * - *VKORC1*
      - PharmGKB (Jan 2021)
-     - ✅
-     - ❓
+     - ⚠️
+     - Thorough testing on real data sets pending
 
 ⚠️ Warning
 ==========
 
-If you are using Aldy in a clinical or commercial environment, **please read this carefully**.
+**Please read this carefully** if you are using Aldy in a clinical or commercial environment.
 
-Aldy is a computational tool whose purpose is to *aid the genotype detection process*. It can be of tremendous help in that process, however it is not perfect, and it can easily make a wrong call if the data is noisy, ambigious or if the target sample contains a previously unknown allele.
+Aldy is a computational tool whose purpose is to *aid the genotype detection process*. It can be of tremendous help in that process. However, it is not perfect, and it can easily make a wrong call if the data is noisy, ambiguous or if the target sample contains a previously unknown allele.
 
 ☣️🚨 **Do not use the raw output of Aldy (or any other computational tool for that matter) to diagnose a disease or prescribe a drug!**
-**It is your responsibility to validate every result manually or (ideally) in a wetlab before doing something that can have major consequences.** 🚨☣️
+**You are responsibe for inspecting and validating the results (ideally) in a wet lab before doing something that can have major consequences.** 🚨☣️
 
 We really mean it.
 
-Finally, note that the allele databases are still work in progress, and that we still do not know the downstream impact of vast majority of genotypes.
+Finally, note that the allele databases are still a work in progress and that we still do not know the downstream impact of the vast majority of genotypes.
 
 Installation
 ============
 
-Aldy is written in Python, and requires Python 3.7+.
+Aldy is written in Python and requires Python 3.7+.
 It is intended to be run on POSIX-based systems
 (so far, only Linux and macOS have been tested).
 
@@ -235,19 +238,10 @@ The following solvers are currently supported:
   Most thoroughly tested solver: if you encounter any issues with CBC, try Gurobi.
   After installing it, don't forget to install ``gurobipy`` package by going to
   Gurobi's installation directory
-  (e.g. ``/opt/gurobi/linux64`` on Linux or ``/Library/gurobi751/mac64/`` on macOS)
+  (e.g., ``/opt/gurobi/linux64`` on Linux or ``/Library/gurobi751/mac64/`` on macOS)
   and typing::
 
       python3 setup.py install
-
-* `SCIP <http://scip.zib.de>`_: another solver which is also free for academic purposes.
-  SCIP is easier to install than Gurobi (no registration or activation required).
-  However, it might be slower than Gurobi.
-  Once you you install SCIP, please install
-  `PySCIPPpt <https://github.com/SCIP-Interfaces/PySCIPOpt>`_ module for the Python
-  SCIP bindings via `pip`: ``pip install pyscipopt``. If it fails, make sure to set
-  `SCIPOPTDIR` environmental variable to point to SCIP's install directory.
-
 
 
 Sanity check
@@ -260,34 +254,31 @@ the installation by issuing the following command (this should take a few minute
 
 In case everything is set up properly, you should see something like this::
 
-    🐿  Aldy v3.0 (Python 3.7.5 on macOS 10.16)
-      (c) 2016-2020 Aldy Authors. All rights reserved.
-       Free for non-commercial/academic use only.
-    =============================================== test session starts ================================================
+    🐿  Aldy v4.0 (Python 3.7.5 on macOS 12.4)
+        (c) 2016-2022 Aldy Authors. All rights reserved.
+        Free for non-commercial/academic use only.
+    ================================ test session starts ================================
     platform darwin -- Python 3.7.5, pytest-5.3.1, py-1.8.0, pluggy-0.13.1
-    rootdir: /Users/inumanag/Projekti/aldy/devel, inifile: setup.cfg
-    plugins: xdist-1.31.0, forked-1.1.3
-    collected 73 items
-
-    tests/test_cn_real.py ........                                                                    [ 12%]
-    tests/test_cn_synthetic.py .....                                                                  [ 20%]
-    tests/test_diplotype_real.py ....                                                                 [ 27%]
-    tests/test_diplotype_synthetic.py ......                                                          [ 37%]
-    tests/test_full.py .....                                                                          [ 45%]
-    tests/test_gene.py ....                                                                           [ 51%]
-    tests/test_major_real.py ...........                                                              [ 69%]
-    tests/test_major_synthetic.py .......                                                             [ 80%]
-    tests/test_minor_real.py ......                                                                   [ 90%]
-    tests/test_minor_synthetic.py .....                                                               [ 98%]
-    tests/test_paper.py s                                                                             [100%]
-
-    =============================== 73 passed, 1 skipped in 106.83s (0:01:46) ===============================
-
+    rootdir: aldy, inifile: setup.cfg
+    plugins: anyio-3.6.1, xdist-1.31.0, cov-2.10.1, forked-1.1.3
+    collected 76 items
+    aldy/tests/test_cn_real.py ........                                            [ 10%]
+    aldy/tests/test_cn_synthetic.py .....                                          [ 17%]
+    aldy/tests/test_diplotype_real.py ....                                         [ 22%]
+    aldy/tests/test_diplotype_synthetic.py ......                                  [ 30%]
+    aldy/tests/test_full.py ...........                                            [ 44%]
+    aldy/tests/test_gene.py .......                                                [ 53%]
+    aldy/tests/test_major_real.py ...........                                      [ 68%]
+    aldy/tests/test_major_synthetic.py .......                                     [ 77%]
+    aldy/tests/test_minor_real.py .......                                          [ 86%]
+    aldy/tests/test_minor_synthetic.py ......                                      [ 94%]
+    aldy/tests/test_query.py ....                                                  [100%]
+    =========================== 76 passed in 131.10s (0:02:11) ==========================
 
 Running
 =======
 
-Aldy needs a SAM, BAM, or a CRAM file for genotyping.
+Aldy needs a SAM, BAM, CRAM or VCF file for genotyping.
 We will be using BAM as an example.
 
 .. attention::
@@ -307,38 +298,55 @@ Sequencing profile selection
 The ``[profile]`` argument refers to the sequencing profile.
 The following profiles are available:
 
-- ``illumina`` for Illumina WGS or exome (WXS) data (or any uniform-coverage technology).
-
-.. attention::
-  It is highly recommended to use samples with at least 40x coverage.
-  Anything lower than 20x will result in tears and agony.
-
-- ``pgx1`` for PGRNseq v.1 capture protocol data
-- ``pgx2`` for PGRNseq v.2 capture protocol data
-- ``pgx3`` for PGRNseq v.3 capture protocol data
-
-- ``wxs`` for whole-exome sequencing data
+- ``illumina`` or ``wgs`` for the Illumina WGS or exome (WXS) data (or any uniform-coverage technology).
 
    .. attention::
-   ⚠️ **Be warned!:** whole-exome data is incomplete *by definition*, and Aldy will not be able to call majoe star-alleles that are
-   defined by their intronic or upstream variants.
-   Aldy also assumes that there are only two (2) gene copies if `wxs` profile is used, as it cannot call copy number changes nor fusions from exome data.
 
-If you are using different technology (e.g. some home-brewed capture kit),
+    It is highly recommended to use samples with at least 40x coverage.
+    Anything below 20x might result in noisy copy number calls and missed variants.
+
+- ``pgx1`` for the PGRNseq v.1 capture protocol data
+- ``pgx2`` for the PGRNseq v.2 capture protocol data
+- ``pgx3`` for the PGRNseq v.3 capture protocol data
+
+- ``10x`` for 10X Genomics data
+
+   .. attention::
+
+    For the best results on the 10X Genomics datasets, use the `EMA aligner <https://github.com/arshajii/ema/>`_,
+    especially if doing *CYP2D6* analysis. Aldy will also use the EMA read cloud information for
+    improved variant phasing.
+
+- ``exome``, ``wxs``, ``wes`` for the whole-exome sequencing data
+
+   .. attention::
+
+    ⚠️ **Be warned!:** whole-exome data is incomplete *by definition*, and Aldy will not be able to call major star-alleles
+    defined by their intronic or upstream variants.
+    Aldy also assumes that there are only two (2) gene copies if the `wxs` profile is used, as it cannot call copy number changes nor fusions from exome data.
+
+- ``pacbio-hifi-targeted``, ``pacbio-hifi-targeted-twist`` for PacBio HiFi target capture data
+
+   .. attention::
+
+    The provided PacBio capture profiles are custom and are not standard.
+    Please ensure to generate a custom profile if using different PacBio HiFi capture protocols.
+
+
+If you are using a different technology (e.g., some home-brewed capture kit),
 you can proceed provided that the following requirements are met:
 
-- all samples have the similar coverage distribution
-  (i.e. two sequenced samples with the same copy number configuration
-  MUST have similar coverage profiles; please consult us if you are not sure about this)
+- all samples have a similar coverage distribution
+  (i.e., two sequenced samples with the same copy number configuration
+  **must** have similar coverage profiles; please consult us if you are not sure about this)
 - your panel includes a copy-number neutral region
-  (currently, Aldy uses *CYP2D8* as a copy-number neutral region,
-  but it can be overridden).
+  (currently, Aldy uses *CYP2D8* as a copy-number neutral region, but it can be overridden).
 
 Having said that, you can use a sample BAM that is known to have two copies
 of the genes you wish to genotype (without any fusions or copy number alterations)
 as a profile as follows::
 
-    aldy genotype -p profile-sample.bam -g [gene] file.bam
+    aldy genotype -p profile-sample.bam -g [gene] file.bam -n [cn-neutral-region]
 
 Alternatively, you can generate a profile for your panel/technology by running::
 
@@ -351,84 +359,75 @@ Alternatively, you can generate a profile for your panel/technology by running::
 Output
 ======
 
-Aldy will by default generate the following file: ``file-[gene].aldy``
-(default location can be changed via ``-o`` parameter).
-Aldy also supports VCF file output: just append `.vcf` to the output file name.
-The summary of results are shown at the end of the output::
+By default, Aldy will generate ``file-[gene].aldy``
+(the default location can be changed via ``-o`` parameter).
+Aldy also supports VCF file output: to enable it, just append `.vcf` to the output file name.
+The summary of the calls is shown at the end of the output::
 
-    $ aldy -p pgrnseq-v2 -g cyp2d6 NA19788.bam
-    *** Aldy v2.0 (Python 3.7.4) ***
-    *** (c) 2016-2019 Aldy Authors & Indiana University Bloomington. All rights reserved.
-    *** Free for non-commercial/academic use only.
+    $ aldy -p pgx2 -g cyp2d6 NA19788.bam
+    🐿  Aldy v4.0 (Python 3.8.2 on Linux 3.10.0-1160.71.1.el7.x86_64-x86_64-with-glibc2.2.5)
+        (c) 2016-2022 Aldy Authors. All rights reserved.
+        Free for non-commercial/academic use only.
     Genotyping sample NA07048.cram...
-    Potential CYP2D6 copy number configurations for NA07048:
-      1: 2x*1
-          Confidence: 1.00 (score = 3.22)
-
+    Potential CYP2D6 gene structures for NA07048:
+      1: 2x*1 (confidence: 100%)
     Potential major CYP2D6 star-alleles for NA07048:
-      1: 1x*1 +42525810:SNP.TC*, 1x*4.b
-          Confidence: 1.00 (score = 22.47)
-      2: 1x*1, 1x*4.b +42525810:SNP.TC*
-          Confidence: 1.00 (score = 22.47)
-
+      1: 1x*1, 1x*4.021 (confidence: 100%)
+      2: 1x*4, 1x*139 (confidence: 100%)
+      3: 1x*4.021.ALDY_2, 1x*74 (confidence: 100%)
     Best CYP2D6 star-alleles for NA07048:
-      1: *1-like/*4
-          Minor: *1 +42525810:SNP.TC*, *4EW
-          Confidence: 1.00 (score = 25.73)
-      2: *1/*4-like
-          Minor: *1, *4EW +42525810:SNP.TC*
-          Confidence: 1.00 (score = 25.73)
+      1: *1 / *4.021 (confidence=100%)
+          Minor alleles: *(1.016 +rs112568578 +rs113889384 +rs28371713 +rs28633410), *(4.021 +rs28371729 -rs28371702 -rs28588594)
     CYP2D6 results:
-      *1-like/*4                     (*1 +42525810:SNP.TC*, *4.b)
-      *1/*4-like                     (*1, *4.b +42525810:SNP.TC*)
+      - *1 / *4.021
+        Minor: [*1.016 +rs112568578 +rs113889384 +rs28371713 +rs28633410] / [*4.021 +rs28371729 -rs28371702 -rs28588594]
+        Legacy notation: [*1.016 +rs112568578 +rs113889384 +rs28371713 +rs28633410] / [*4.021 +rs28371729 -rs28371702 -rs28588594]
 
-In this example, *CYP2D6* genotype is \*1/\*4 as expressed in terms of
-major star-alleles.
-Minor star-alleles are given after each "best" star-allele (here, \*1 and \*4EW).
-Note that there is a novel SNP here (42525810:SNP.TC) that Aldy assigned to \*1
-(and \*4 in the second solution). The presence of a novel functional SNP causes Aldy to
-report modified allele with the suffix `-like` (e.g. `*1-like`).
-Minor alleles might have additional mutations, or might lose some default mutations.
-Additions are marked with `+` in front (e.g. `*1 +42525810:SNP.TC*`).
-Losses carry `-` in front.
+In this example, the *CYP2D6* genotype is \*1/\*4 in terms of major star-alleles.
+The minor star-alleles are given after each major star-allele call (here, \*1.016 and \*4.021).
+The minor alleles might also have additional or removed mutations.
+The additions are marked with `+` in front (e.g., `+rs112568578`), while the losses carry `-` in front (e.g., `-rs28588594`).
+In some instances, even the major alleles might contain additions (e.g., `(*1 +rs1234)`).
+This indicates the presence of a novel star-allele that has not been cataloged yet.
 
-Confidence scores express Aldy's confidence in a solution.
-Maximum score is 1.0. By default, Aldy only reports solutions that have the
-confidence score of 1.0. Use `--gap` to report more solutions.
+By default, Aldy only reports solutions with the maximum confidence.
+Use `--param gap=XY` (where `XY` is greater than 0) to report less likely solutions.
 
 Explicit decomposition is given in the ``file-[gene].aldy``
 (in the example above, it is ``NA19788_x.CYP2D6.aldy``).
-An example of such file is::
+An example of such a file is::
 
-    #Sample	Gene	SolutionID	Major	Minor	Copy	Allele	Location	Type	Coverage	Effect	dbSNP	Code	Status
-    #Solution 1: *1 +42528223:SNP.GA, *4AW, *4N -42522391:SNP.GA
-    NA10860	CYP2D6	1	*1/*4+*4	1;4AW;4N	0	1	42528223	SNP.GA	-1	NEUTRAL	rs28588594	-1426:C>T
-    NA10860	CYP2D6	1	*1/*4+*4	1;4AW;4N	1	4AW	42522391	SNP.GA	-1	NEUTRAL	rs28371738	4401:C>T
-    NA10860	CYP2D6	1	*1/*4+*4	1;4AW;4N	1	4AW	42522612	SNP.CG	-1	DISRUPTING	rs1135840	4180:G>C    ...[redacted]...
+    #Sample Gene    SolutionID      Major   Minor   Copy    Allele  Location        Type    Coverage        Effect  dbSNP   Code    Status
+    #Solution 1: *1.001, *4, *4.021
+    NA10860 CYP2D6  1       *1/*4+*4.021    1.001;4;4.021   0       1.001
+    NA10860 CYP2D6  1       *1/*4+*4.021    1.001;4;4.021   1       4       42522612        C>G     15      S486T   rs1135840
     ...[redacted]...
-    #Solution 2: *1, *4AW +42528223:SNP.GA, *4N -42522391:SNP.GA
-    NA10860	CYP2D6	2	*1/*4+*4	1;4AW;4N	0	1
-    NA10860	CYP2D6	2	*1/*4+*4	1;4AW;4N	1	4AW	42522391	SNP.GA	-1	NEUTRAL	rs28371738	4401:C>T
+    #Solution 2: *4, *4, *139.001
+    NA10860 CYP2D6  2       *4+*4/*139      4;139.001;4     0       4       42522612        C>G     15      S486T   rs1135840
+    NA10860 CYP2D6  2       *4+*4/*139      4;139.001;4     0       4       42524946        C>T     32      splicing defect/169frameshift    rs3892097
     ...[redacted]...
 
-The columns stand for:
-- sample name,
-- gene name,
-- solution count (different solutions have different counts),
-- major star-allele call,
-- minor star-allele call,
-- allele copy identifier (0 for the first allele in the minor column, 1 for the second and so on)
-- mutation locus,
-- mutation type (SNP or indel),
-- mutation coverage,
-- mutation functionality:
-  - ``DISRUPTING`` for gene-disrupting
-  - ``NEUTRAL`` for neutral mutation,
-- dbSNP ID (if available),
-- traditional Karolinska-style mutation code from CYP allele database, and
-- mutation status, which indicates the status of the mutation in the decomposition:
+The columns are:
 
-    + ``NORMAL``: mutation is associated with the star-allele in the database, and is found in the sample
+- the sample name,
+- the gene name,
+- the solution count (different solutions have different counts),
+- the major star-allele call,
+- the minor star-allele call,
+- the allele copy identifier (0 for the first allele in the minor column, 1 for the second and so on)
+- the mutation location,
+- the mutation type (SNP or indel),
+- the mutation coverage,
+- the mutation functionality:
+
+  - ``DISRUPTING`` for gene-disrupting (functional) mutations, and
+  - ``NEUTRAL`` for neutral (silent) mutations
+
+- the dbSNP ID (if available),
+- traditional Karolinska-style mutation code from the CYP allele database (if available); and
+- the mutation status, which indicates the status of the mutation in the decomposition:
+
+    + ``NORMAL``: mutation is associated with the star-allele in the database and is found in the sample
     + ``NOVEL``: gene-disrupting mutation is **NOT** associated with the star-allele in the database,
       but is found in the sample (this indicates that Aldy found a novel major star-allele)
     + ``EXTRA``: neutral mutation is **NOT** associated with the star-allele in the database,
@@ -440,10 +439,10 @@ VCF support
 -----------
 
 The output will be a VCF file if the output file extension is `.vcf`.
-Aldy will report a VCF sample for each potential solution, and the appropriate genotypes.
+Aldy will report a VCF sample for each potential solution and the appropriate genotypes.
 Aldy will also output tags `MA` and `MI` for major and minor solutions.
 
-  **Note:** VCF is not optimal format for star-allele reporting. Unless you really need it,
+  **Note:** VCF is not an optimal format for star-allele reporting. Unless you really need it,
   we recommend using Aldy's default format.
 
 
@@ -454,11 +453,11 @@ If you encounter any issues with Aldy, please run Aldy with debug parameter:
 
    aldy genotype ... --debug debuginfo
 
-This will produce `debuginfo.tar.gz` file that contains sample and LP model dumps.
-Please send us this file and we will try to resolve the issue.
+This will produce `debuginfo.tar.gz` file that contains the sample and LP model dumps.
+Please send us this file, and we will try to resolve the issue.
 
-This file contains no private information of any kind except for the mutation counts
-at the target gene locus and the file name.
+This file contains no private information of any kind except for the phasing information
+and mutation counts at the target gene locus as well as the file name.
 
 
 Sample datasets
@@ -470,9 +469,9 @@ Sample datasets are also available for download. They include:
 - `NA19790 <http://cb.csail.mit.edu/cb/aldy/data/NA19790.bam>`_ (PGRNseq v.2), containing a fusion between *CYP2D6* and *CYP2D7* deletion (\*78 allele)
 - `NA24027 <http://cb.csail.mit.edu/cb/aldy/data/NA24027.bam>`_ (PGRNseq v.1), containing novel *DPYD* allele and multiple copies of *CYP2D6*
 - `NA10856 <http://cb.csail.mit.edu/cb/aldy/data/NA10856.bam>`_ (PGRNseq v.1), containing *CYP2D6* deletion (\*5 allele)
-- `NA10860 <http://cb.csail.mit.edu/cb/aldy/data/NA10860.bam>`_ (Illumina WGS), containing 3 copies of *CYP2D6*. This sample contains only *CYP2D6* region.
+- `NA10860 <http://cb.csail.mit.edu/cb/aldy/data/NA10860.bam>`_ (Illumina WGS), containing three copies of *CYP2D6*. This sample contains only the *CYP2D6* region.
 
-Expected results are:
+The expected results are:
 
 ============= ===================== ================ ================= ============ ==============
 Gene (`-g`)   HG00463               NA19790          NA24027           NA10856      NA10860
@@ -493,10 +492,10 @@ Gene (`-g`)   HG00463               NA19790          NA24027           NA10856  
 License
 =======
 
-© 2016-2019 Aldy Authors, Indiana University Bloomington. All rights reserved.
+© 2016-2022 Aldy Authors, Indiana University Bloomington. All rights reserved.
 
 **Aldy is NOT free software.**
-Complete legal license is available in :ref:`aldy_license`.
+A complete legal license is available in :ref:`aldy_license`.
 
 For non-legal folks, here is a TL;DR version:
 
@@ -510,7 +509,7 @@ Parameters & Usage
 **NAME**:
 ---------
 
-Aldy --- tool for allelic decomposition (haplotype reconstruction) and exact genotyping
+Aldy --- a tool for allelic decomposition (haplotype reconstruction) and exact genotyping
          of highly polymorphic and structurally variant genes.
 
 **SYNOPSIS**:
@@ -523,26 +522,13 @@ Commands::
     aldy help
     aldy test
     aldy license
-    aldy query
-    aldy q
+    aldy query (q)
     aldy profile [FILE]
-    aldy genotype [-h]
-                  --profile PROFILE
-                  [--verbosity VERBOSITY]
-                  [--gene GENE]
-                  [--threshold THRESHOLD]
-                  [--reference REFERENCE]
-                  [--cn-neutral-region CN_NEUTRAL_REGION]
-                  [--output OUTPUT]
-                  [--solver SOLVER]
-                  [--gap GAP]
-                  [--debug DEBUG]
-                  [--log LOG]
-                  [--fusion-penalty FUSION_PENALTY]
-                  [--max-minor-solutions MAX_MINOR_SOLUTIONS]
-                  [--multiple-warn-level MULTIPLE_WARN_LEVEL]
-                  [--phase PHASE]
-                  [--cn CN]
+    aldy genotype [-h] [--verbosity VERBOSITY] [--gene GENE] [--profile PROFILE]
+                  [--reference REFERENCE] [--genome GENOME] [--cn-neutral-region CN_NEUTRAL_REGION]
+                  [--output OUTPUT] [--solver SOLVER] [--debug DEBUG] [--cn CN] [--log LOG]
+                  [--multiple-warn-level MULTIPLE_WARN_LEVEL] [--simple]
+                  [--param PARAM=VALUE [PARAM2=VALUE2 ...]]
                   [FILE]
 
 **OPTIONS**:
@@ -603,31 +589,26 @@ Commands:
 
 * ``genotype``
 
-  Genotype a SAM/BAM sample. Arguments:
+  Genotype a sequencing sample. Arguments:
 
   - ``FILE``
 
-    SAM, BAM, or CRAM file. CRAM requires ``--reference`` as well.
-
-  - ``-T, --threshold THRESHOLD``
-
-    Cut-off rate for variations (percent per copy).
-    Any variation with normalized coverage less than the threshold will be ignored.
-
-    *Default:* `50`
+    A SAM, BAM, CRAM or VCF file. A CRAM file requires ``--reference`` as well.
 
   - ``-p, --profile PROFILE``
 
     Sequencing profile. Supported values are:
 
-    + ``illumina``
-    + ``wxs``
-    + ``pgx1``
-    + ``pgx2``
-    + ``pgx3``.
+    + ``illumina`` (or ``wgs``)
+    + ``exome`` (or ``wxs`` or ``wes``)
+    + ``pgx1`` (or ``pgrnseq-v1``)
+    + ``pgx2`` (or ``pgrnseq-v2``)
+    + ``pgx3`` (or ``pgrnseq-v3``)
+    + ``10x``
+    + ``pacbio-hifi-targeted``
+    + ``pacbio-hifi-targeted-twist``
 
-    You can also pass a SAM/BAM file
-    (please check the documentation quick-start for more details).
+    You can also pass a SAM/BAM file as a profile(please check the documentation quick-start for more details).
     Also consult ``profile`` command.
 
   - ``-g, --gene GENE``
@@ -644,10 +625,10 @@ Commands:
 
   - ``-s, --solver SOLVER``
 
-    ILP Solver. Currently supported solvers are Gurobi, SCIP and CBC.
+    ILP Solver. Currently supported solvers are Gurobi and CBC.
     You can also pass ``any`` to let Aldy choose the best (available) solver.
 
-    *Default:* ``any`` (uses CBC if available, then Gurobi, then SCIP).
+    *Default:* ``any`` (uses CBC if available, then Gurobi).
 
   - ``-c, --cn CN``
 
@@ -659,7 +640,7 @@ Commands:
 
   - ``-r, --reference REF``
 
-    FASTA reference for reference-encoded CRAM files.
+    FASTA reference for the reference-encoded CRAM files.
 
   - ``-n, --cn-neutral-region CN_NEUTRAL``
 
@@ -668,34 +649,11 @@ Commands:
 
     *Default:* *CYP2D8* (22:42547463-42548249 for hg19)
 
-  - ``-G, --gap GAP``
-
-    Solution gap.
-    By setting this to any positive value, Aldy will also report solutions whose score
-    is less than (1+GAP) times the optimal solution score.
-    Useful for exploring the solution space.
-
-    *Default:* 0 (only optimal solutions allowed)
-
   - ``-d, --debug DEBUG``
 
-    Create a DEBUG.tar.gz file that can be shared with the authors for easier debugging.
+    Create a `DEBUG.tar.gz`` file that can be shared with the authors for easier debugging.
     Contains no private information except the file name and sample mutation counts in
     the gene of interest.
-
-  - ``-f, --fusion-penalty FUSION_PENALTY``
-
-    Penalize each fusion additional FUSION_PENALTY times.
-    Larger values mean lower likelihood of seeing fusions.
-
-    *Default:* 0.1
-
-  - ``--max-minor-solutions MAX_MINOR_SOLUTIONS``
-
-    Maximum number of minor solutions to report.
-    Default setting is to output only one even if there are multiple minor (non-functional) phases.
-
-    *Default:* 1
 
   - ``--multiple-warn-level MULTIPLE_WARN_LEVEL``
 
@@ -707,14 +665,25 @@ Commands:
 
     *Default:* 1
 
-  - ``--phase PHASE``
+  - ``--param PARAM1=VAL1 [PARAM2=VAL2 ...]``
 
-    Path to `HapTree-X_<https://github.com/0xTCG/haptreex>` or `HapCUT2_<https://github.com/vibansal/HapCUT2>` phase file
-    that can be used to properly resolve multiple optimal solutions and generate more accurate phasing.
-
+    Additional model parameters. Please check
+    `the parameter documentation <https://aldy.readthedocs.io/en/latest/source/aldy.html#aldy.profile.Profile>`_
+    for the list of the available parameters.
 
 Change log
 ==========
+
+- Aldy v4.0 (Aug 17th, 2022)
+   - Major model changes
+   - Phasing support
+   - Long-read sequencing support (PacBio HiFi, 10X Genomics)
+   - Support for new pharmacogenes
+   - New allele databases
+   - New profile format (**⚠️ WARNING:** Please make sure to re-generate custom profiles if using older Aldy profiles.)
+   - Major API changes
+   - New debug format
+   - Various small fixes
 
 - Aldy v3.0 (Nov 30th, 2020)
    - Support for hg38
@@ -723,16 +692,19 @@ Change log
    - Better genotype calling models
    - Major API changes
 
-Acknowledgements
-================
+Acknowledgments
+===============
 
 The following people made Aldy much better software:
 
+- Ananth Hari
+- Qinghui Zhou
 - Michael Ford `@michael-ford <https://github.com/michael-ford>`_
 - Farid Rashidi `@faridrashidi <https://github.com/faridrashidi>`_
 - David Twesigomwe `@twesigomwedavid <https://github.com/twesigomwedavid>`_
 - Tyler Shrug `@tshugg <https://github.com/tshugg>`_
 - Reynold C. Ly
+- Pieter W. Smit
 - Lawrence Hon `@lhon <https://github.com/lhon>`_
 - Zach Langley `@zlangley <https://github.com/zlangley>`_
 

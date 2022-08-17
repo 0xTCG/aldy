@@ -15,7 +15,6 @@ from tempfile import NamedTemporaryFile as tmpfile
 
 from aldy.__main__ import get_version, main
 from aldy.common import script_path, log
-from aldy.cn import LEFT_FUSION_PENALTY
 from aldy.version import __version__
 
 
@@ -39,8 +38,10 @@ def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
     lines = []
 
     def log_info(*args):
+        nonlocal lines
+
         s = str.format(*args)
-        lines.append(s)
+        lines += s.split("\n")  # type: ignore
 
     monkeypatch.setattr(log, "info", log_info)
     if warn:
@@ -48,19 +49,18 @@ def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
 
     args = {
         **{
-            "--gene": "CYP2D6",
+            "--gene": "pharma-cyp2d6",
             "--profile": "illumina",
-            "--threshold": "50",
-            "--gap": "0",
+            "--param": "threshold=0.5",
+            "--param": "gap=0",
+            "--param": "max-minor-solutions=3",
             "--solver": solver,
-            "--fusion-penalty": f"{LEFT_FUSION_PENALTY}",
-            "--max-minor-solutions": "3",
         },
         **(params or {}),
     }
     main(["genotype", file] + [i for k, v in args.items() for i in [k, v]])
-    expected = expected.strip()
-    lines = escape_ansi("\n".join(lines)).strip()
+    expected = "\n".join(e.strip() for e in expected.strip().split("\n"))
+    lines = "\n".join(escape_ansi(l).strip() for l in lines).strip()
     assert lines == expected
 
 
@@ -68,21 +68,22 @@ EXPECTED_NA10860 = f"""
 {HEADER}
 Genotyping sample NA10860.bam...
 Potential CYP2D6 gene structures for NA10860:
-   1: 2x*1,1x*36.ALDY (confidence: 100%)
-   2: 2x*1,1x*61 (confidence: 100%)
+1: 3x*1 (confidence: 100%)
 Potential major CYP2D6 star-alleles for NA10860:
-   1: 1x*1, 1x*4.021, 1x*4N.ALDY (confidence: 100%)
-   2: 1x*4, 1x*4N.ALDY, 1x*139 (confidence: 100%)
-   3: 1x*4.021, 1x*4J, 1x*61 (confidence: 100%)
-   4: 1x*4.021, 1x*4J, 1x*83.ALDY (confidence: 100%)
-   5: 1x*4.021, 1x*4M, 1x*36.ALDY (confidence: 100%)
-Best CYP2D6 star-alleles for NA10860:
-   1: *1 / *4.021 + *4N.ALDY (confidence=100%)
-      Minor alleles: *1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713, *4.021, *4.1013 -rs28371738
+1: 1x*1, 1x*4, 1x*4.021 (confidence: 100%)
+2: 2x*4, 1x*139 (confidence: 100%)
+Potential CYP2D6 star-alleles for NA10860:
+1: *1 / *4 + *4.021 (confidence=100%)
+    Minor alleles: *1.001, *4, *4.021
+2: *4 + *4 / *139 (confidence=100%)
+    Minor alleles: *4, *4, *139.001
 CYP2D6 results:
-  - *1 / *4.021 + *4N.ALDY
-    Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.1013 -rs28371738]
-    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4N.ALDY -rs28371738]
+- *1 / *4 + *4.021
+    Minor: [*1.001] / [*4] + [*4.021]
+    Legacy notation: [*1] / [*4] + [*4.021]
+- *4 + *4 / *139
+    Minor: [*4] + [*4] / [*139.001]
+    Legacy notation: [*4] + [*4] / [*139]
 """
 
 
@@ -91,115 +92,16 @@ def test_NA10860(monkeypatch, solver):
     assert_file(monkeypatch, file, solver, EXPECTED_NA10860)
 
 
-def test_NA10860_hg38(monkeypatch, solver):
-    file = script_path("aldy.tests.resources/NA10860_hg38.bam")
-    assert_file(
-        monkeypatch, file, solver, EXPECTED_NA10860.replace("NA10860", "NA10860_hg38")
-    )
-
-
-EXPECTED_NA10860_GAP = f"""
-{HEADER}
-Genotyping sample NA10860.bam...
-Potential CYP2D6 gene structures for NA10860:
-   1: 2x*1,1x*36.ALDY (confidence: 100%)
-   2: 2x*1,1x*61 (confidence: 100%)
-   3: 2x*1,1x*5,1x*36.ALDY (confidence: 94%)
-   4: 2x*1,1x*5,1x*61 (confidence: 94%)
-Potential major CYP2D6 star-alleles for NA10860:
-   1: 1x*1, 1x*4.021, 1x*4N.ALDY (confidence: 100%)
-   2: 1x*4, 1x*4N.ALDY, 1x*139 (confidence: 100%)
-   3: 1x*4.021, 1x*4J, 1x*61 (confidence: 100%)
-   4: 1x*4.021, 1x*4J, 1x*83.ALDY (confidence: 100%)
-   5: 1x*4.021, 1x*4M, 1x*36.ALDY (confidence: 100%)
-   6: 1x*1, 1x*4.021, 1x*4N.ALDY, 1x*5 (confidence: 96%)
-   7: 1x*4, 1x*4N.ALDY, 1x*5, 1x*139 (confidence: 96%)
-   8: 1x*4.021, 1x*4J, 1x*5, 1x*61 (confidence: 96%)
-   9: 1x*4.021, 1x*4J, 1x*5, 1x*83.ALDY (confidence: 96%)
-  10: 1x*4.021, 1x*4M, 1x*5, 1x*36.ALDY (confidence: 96%)
-Best CYP2D6 star-alleles for NA10860:
-   1: *1 / *4.021 + *4N.ALDY (confidence=100%)
-      Minor alleles: *1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713, *4.021, *4.1013 -rs28371738
-CYP2D6 results:
-  - *1 / *4.021 + *4N.ALDY
-    Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.1013 -rs28371738]
-    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4N.ALDY -rs28371738]
-"""
-
-
-def test_NA10860_gap(monkeypatch, solver):
-    file = script_path("aldy.tests.resources/NA10860.bam")
-    assert_file(monkeypatch, file, solver, EXPECTED_NA10860_GAP, {"--gap": "0.1"})
-
-
-EXPECTED_HARD = f"""
-{HEADER}
-Genotyping sample HARD.dump...
-Potential CYP2D6 gene structures for HARD:
-   1: 3x*1,1x*68,1x*80 (confidence: 100%)
-Potential major CYP2D6 star-alleles for HARD:
-   1: 1x*2, 1x*4, 1x*39, 1x*68, 1x*80#4K (confidence: 100%)
-   2: 2x*2, 1x*4, 1x*68, 1x*80#4 (confidence: 100%)
-Best CYP2D6 star-alleles for HARD:
-   1: *2 + *2 / *68 + *4 + *80 (confidence=100%)
-      Minor alleles: *2.001, *2.001, *4.001 +rs4987144 -rs28588594, *68.001 -rs28371699 -rs28588594, *80#4.001
-CYP2D6 results:
-  - *2 + *2 / *68 + *4 + *80
-    Minor: [*2.001] + [*2.001] / [*68.001 -rs28371699 -rs28588594] + [*4.001 +rs4987144 -rs28588594] + [*80#4.001]
-    Legacy notation: [*2A] + [*2A] / [*68 -rs28371699 -rs28588594] + [*4A +rs4987144 -rs28588594] + [*80#4.001]
-"""
-
-
-def test_hard(monkeypatch, solver):
-    file = script_path("aldy.tests.resources/HARD.dump")
-    assert_file(monkeypatch, file, solver, EXPECTED_HARD, {"--profile": "pgrnseq-v1"})
-
-
-EXPECTED_HARD_FUSION = f"""
-{HEADER}
-Genotyping sample HARD.dump...
-Potential CYP2D6 gene structures for HARD:
-   1: 4x*1 (confidence: 100%)
-Potential major CYP2D6 star-alleles for HARD:
-   1: 1x*2, 1x*4, 1x*4K, 1x*39 (confidence: 100%)
-   2: 2x*2, 1x*4, 1x*4C (confidence: 100%)
-Best CYP2D6 star-alleles for HARD:
-   1: *2 + *2 / *4 + *4C (confidence=100%)
-      Minor alleles: *2.001 +rs28371738 +rs2004511 +rs2267447 +rs1080989, *2.001, *4.001 +rs4987144 -rs28588594, *4.011 +rs1985842 +rs28371702 +rs28371701 +rs28371699 +rs28735595
-CYP2D6 results:
-  - *2 + *2 / *4 + *4C
-    Minor: [*2.001 +rs28371738 +rs2004511 +rs2267447 +rs1080989] + [*2.001] / [*4.001 +rs4987144 -rs28588594] + [*4.011 +rs1985842 +rs28371702 +rs28371701 +rs28371699 +rs28735595]
-    Legacy notation: [*2A +rs28371738 +rs2004511 +rs2267447 +rs1080989] + [*2A] / [*4A +rs4987144 -rs28588594] + [*4L +rs1985842 +rs28371702 +rs28371701 +rs28371699 +rs28735595]
-"""
-
-
-def test_hard_fusion(monkeypatch, solver):
-    file = script_path("aldy.tests.resources/HARD.dump")
-    assert_file(
-        monkeypatch,
-        file,
-        solver,
-        EXPECTED_HARD_FUSION,
-        {"--profile": "pgrnseq-v1", "--fusion-penalty": "5"},
-    )
-
-
-EXPECTED_NA10860_DEBUG_TAR = """
-./
-./NA10860.cn.lp
-./NA10860.dump
-./NA10860.log
-./NA10860.major0.lp
-./NA10860.major1.lp
-./NA10860.minor0.lp
-./NA10860.minor1.lp
-./NA10860.minor2.lp
-./NA10860.minor3.lp
-./NA10860.yml
-"""
-
-
 def test_NA10860_debug(monkeypatch, solver):
+    expected_tar = """
+    ./
+    ./NA10860.CYP2D6.cn.lp
+    ./NA10860.CYP2D6.dump
+    ./NA10860.CYP2D6.genome
+    ./NA10860.CYP2D6.major0.lp
+    ./NA10860.log
+    ./NA10860.yml
+    """
     file = script_path("aldy.tests.resources/NA10860.bam")
     with tmpfile(suffix=".tar.gz") as tmp:
         with tmpfile(mode="w") as out, tmpfile(mode="w") as out_log:
@@ -221,36 +123,74 @@ def test_NA10860_debug(monkeypatch, solver):
             with open(out_log.name) as f:
                 log = f.read()
             s = "    rs1058172    42523528.C>T    3267G>A    "
-            s += "(cov=  21, cn= 0.9; impact=R365H)\n"
-            s = "[major] status= optimal; opt= 1.48; solution= 1x*4.021, 1x*4J, 1x*61\n"
+            s += "(cov=  17, cn= 0.8; region=e7; impact=R365H; )\n"
+            s = "[major] status= optimal; opt= 2.04; solution= 1x*1, 1x*4, 1x*4.021\n"
             assert s in log
-
         out = subprocess.check_output(f"tar tzf {tmp.name}", shell=True).decode("utf-8")
-        out = "\n".join(sorted(out.strip().split("\n")))
-        assert out == EXPECTED_NA10860_DEBUG_TAR.strip()
+        out = "\n".join(i.strip() for i in sorted(out.strip().split("\n")))
+        assert out == "\n".join(i.strip() for i in expected_tar.strip().split("\n"))
 
 
-EXPECTED_NA10860_CN = f"""
-{HEADER}
-Genotyping sample NA10860.bam...
-Potential CYP2D6 gene structures for NA10860:
-   1: 2x*1 (confidence: 100%)
-Potential major CYP2D6 star-alleles for NA10860:
-   1: 1x*1, 1x*4.021 (confidence: 100%)
-   2: 1x*4, 1x*139 (confidence: 100%)
-Best CYP2D6 star-alleles for NA10860:
-   1: *1 / *4.021 (confidence=100%)
-      Minor alleles: *1.018 +rs28371713, *4.021
-CYP2D6 results:
-  - *1 / *4.021
-    Minor: [*1.018 +rs28371713] / [*4.021]
-    Legacy notation: [*1.018 +rs28371713] / [*4.021]
-"""
+def test_NA10860_hg38(monkeypatch, solver):
+    file = script_path("aldy.tests.resources/NA10860_hg38.bam")
+    assert_file(
+        monkeypatch, file, solver, EXPECTED_NA10860.replace("NA10860", "NA10860_hg38")
+    )
+
+
+def test_NA10860_gap(monkeypatch, solver):
+    expected = f"""
+    {HEADER}
+    Genotyping sample NA10860.bam...
+    Potential CYP2D6 gene structures for NA10860:
+    1: 3x*1 (confidence: 100%)
+    2: 2x*1 (confidence: 84%)
+    Potential major CYP2D6 star-alleles for NA10860:
+    1: 1x*1, 1x*4, 1x*4.021 (confidence: 100%)
+    2: 2x*4, 1x*139 (confidence: 100%)
+    3: 1x*1, 1x*4.009, 1x*4.021 (confidence: 92%)
+    4: 1x*4, 1x*4.009, 1x*139 (confidence: 92%)
+    Potential CYP2D6 star-alleles for NA10860:
+    1: *1 / *4 + *4.021 (confidence=100%)
+        Minor alleles: *1.001, *4, *4.021
+    2: *4 + *4 / *139 (confidence=100%)
+        Minor alleles: *4, *4, *139.001
+    CYP2D6 results:
+    - *1 / *4 + *4.021
+        Minor: [*1.001] / [*4] + [*4.021]
+        Legacy notation: [*1] / [*4] + [*4.021]
+    - *4 + *4 / *139
+        Minor: [*4] + [*4] / [*139.001]
+        Legacy notation: [*4] + [*4] / [*139]
+    """
+    file = script_path("aldy.tests.resources/NA10860.bam")
+    assert_file(monkeypatch, file, solver, expected, {"--param": "gap=0.3"})
 
 
 def test_NA10860_cn(monkeypatch, solver):
+    expected = f"""
+    {HEADER}
+    Genotyping sample NA10860.bam...
+    Potential CYP2D6 gene structures for NA10860:
+    1: 2x*1 (confidence: 100%)
+    Potential major CYP2D6 star-alleles for NA10860:
+    1: 1x*1, 1x*4.021 (confidence: 100%)
+    2: 1x*4, 1x*139 (confidence: 100%)
+    Potential CYP2D6 star-alleles for NA10860:
+    1: *1 / *4.021 (confidence=100%)
+        Minor alleles: *1.001, *4.021
+    2: *4 / *139 (confidence=100%)
+        Minor alleles: *4, *139.001
+    CYP2D6 results:
+    - *1 / *4.021
+        Minor: [*1.001] / [*4.021]
+        Legacy notation: [*1] / [*4.021]
+    - *4 / *139
+        Minor: [*4] / [*139.001]
+        Legacy notation: [*4] / [*139]
+    """
     file = script_path("aldy.tests.resources/NA10860.bam")
-    assert_file(monkeypatch, file, solver, EXPECTED_NA10860_CN, {"--cn": "1,1"})
+    assert_file(monkeypatch, file, solver, expected, {"--cn": "1,1"})
 
 
 def test_NA10860_vcf_out(monkeypatch, solver):
@@ -265,150 +205,193 @@ def test_NA10860_vcf_out(monkeypatch, solver):
         assert produced == expected.replace("aldy-v3.1", f"aldy-v{__version__}")
 
 
-EXPECTED_NA07000 = f"""
-{HEADER}
-Genotyping sample NA07000_SLCO1B1.vcf.gz...
-WARNING: Cannot detect genome, defaulting to hg19.
-WARNING: Using VCF file. Copy-number calling is not available.
-Using VCF sample NA07000
-Potential SLCO1B1 gene structures for NA07000_SLCO1B1.vcf:
-   1: 2x*1 (confidence: 100%)
-Potential major SLCO1B1 star-alleles for NA07000_SLCO1B1.vcf:
-   1: 1x*1, 1x*15 & rs4149057, rs2291075 (confidence: 100%)
-   2: 1x*1B, 1x*5 & rs4149057, rs2291075 (confidence: 100%)
-WARNING: multiple optimal solutions found!
-Potential SLCO1B1 star-alleles for NA07000_SLCO1B1.vcf:
-   1: *1+rs4149057+rs2291075 / *15 (confidence=100%)
-      Minor alleles: *1.001 +rs4149057 +rs2291075, *15.001
-   2: *1B+rs4149057+rs2291075 / *5 (confidence=100%)
-      Minor alleles: *1.002 +rs4149057 +rs2291075, *5.001
-SLCO1B1 results:
-  - *1+rs4149057+rs2291075 / *15
-    Minor: [*1.001 +rs4149057 +rs2291075] / [*15.001]
-    Legacy notation: [*1A +rs4149057 +rs2291075] / [*15]
-  - *1B+rs4149057+rs2291075 / *5
-    Minor: [*1.002 +rs4149057 +rs2291075] / [*5.001]
-    Legacy notation: [*1B +rs4149057 +rs2291075] / [*5]
-WARNING: mutations rs2291075, rs4149057 suggest presence of a novel major star-allele.
-However, such alleles cannot be determined without phasing data.
-Please provide --phase parameter for Aldy to accurately call novel major star-alleles.
-The above-reported assignments of these mutations are random.
-"""
+def test_fusion(monkeypatch, solver):
+    expected = f"""
+    {HEADER}
+    Genotyping sample HARD.dump.tar.gz...
+    Potential CYP2D6 gene structures for NA19785:
+    1: 2x*1,1x*79 (confidence: 100%)
+    Potential major CYP2D6 star-alleles for NA19785:
+    1: 1x*1, 1x*2, 1x*79#2 (confidence: 100%)
+    2: 1x*2, 1x*34, 1x*79#10 (confidence: 100%)
+    3: 2x*2, 1x*79#1 (confidence: 100%)
+    Potential CYP2D6 star-alleles for NA19785:
+    1: *1 / *79 + *2 (confidence=100%)
+        Minor alleles: *1.001, *2.001, *79#11.001
+    2: *2 / *79 + *2 (confidence=100%)
+        Minor alleles: *2.001, *2.001, *79#1.001
+    3: *34 / *79 + *2 (confidence=100%)
+        Minor alleles: *2.001, *34.001, *79#10.001
+    CYP2D6 results:
+    - *1 / *79 + *2
+        Minor: [*1.001] / [*79#11.001] + [*2.001]
+        Legacy notation: [*1] / [*79#11.001] + [*2]
+    - *2 / *79 + *2
+        Minor: [*2.001] / [*79#1.001] + [*2.001]
+        Legacy notation: [*2] / [*79#1.001] + [*2]
+    - *34 / *79 + *2
+        Minor: [*34.001] / [*79#10.001] + [*2.001]
+        Legacy notation: [*34] / [*79#10.001] + [*2]
+    """
+    file = script_path("aldy.tests.resources/HARD.dump.tar.gz")
+    assert_file(
+        monkeypatch,
+        file,
+        solver,
+        expected,
+        {"--profile": "pgrnseq-v1"},
+    )
+
+
+def test_fusion_off(monkeypatch, solver):
+    expected = f"""
+    {HEADER}
+    Genotyping sample HARD.dump.tar.gz...
+    Potential CYP2D6 gene structures for NA19785:
+    1: 3x*1 (confidence: 100%)
+    Potential major CYP2D6 star-alleles for NA19785:
+    1: 1x*1, 2x*2 (confidence: 100%)
+    Best CYP2D6 star-alleles for NA19785:
+    1: *1 / *2 + *2 (confidence=100%)
+        Minor alleles: *1.001, *2.001, *2.001
+    CYP2D6 results:
+    - *1 / *2 + *2
+        Minor: [*1.001] / [*2.001] + [*2.001]
+        Legacy notation: [*1] / [*2] + [*2]
+    """
+    file = script_path("aldy.tests.resources/HARD.dump.tar.gz")
+    assert_file(
+        monkeypatch,
+        file,
+        solver,
+        expected,
+        {"--profile": "pgrnseq-v1", "--param": "cn-fusion-left=10"},
+    )
 
 
 def test_NA07000_vcf_in(monkeypatch, solver):
+    expected = f"""
+    {HEADER}
+    Genotyping sample NA07000_SLCO1B1.vcf.gz...
+    WARNING: Cannot detect genome, defaulting to hg19.
+    WARNING: Using VCF file. Copy-number calling is not available.
+    Using VCF sample NA07000
+    Potential SLCO1B1 gene structures for NA07000:
+    1: 2x*1 (confidence: 100%)
+    Potential major SLCO1B1 star-alleles for NA07000:
+    1: 1x*1, 1x*15 (confidence: 100%)
+    2: 1x*5, 1x*37 (confidence: 100%)
+    Best SLCO1B1 star-alleles for NA07000:
+    1: *1 / *15 (confidence=100%)
+        Minor alleles: *1.003, *15.001
+    SLCO1B1 results:
+    - *1 / *15
+        Minor: [*1.003] / [*15.001]
+        Legacy notation: [*1.003] / [*15A, SLCO1B1*15B, SLCO1B1*17]
+    """
     file = script_path("aldy.tests.resources/NA07000_SLCO1B1.vcf.gz")
     assert_file(
         monkeypatch,
         file,
         solver,
-        EXPECTED_NA07000,
-        {"--max-minor-solutions": "1", "--gene": "SLCO1B1"},
+        expected,
+        {"--param": "max-minor-solutions=1", "--gene": "SLCO1B1"},
         warn=True,
     )
-
-
-EXPECTED_NA07000_PHASE = f"""
-{HEADER}
-Genotyping sample NA07000_SLCO1B1.vcf.gz...
-WARNING: Cannot detect genome, defaulting to hg19.
-WARNING: Using VCF file. Copy-number calling is not available.
-Using VCF sample NA07000
-Potential SLCO1B1 gene structures for NA07000_SLCO1B1.vcf:
-   1: 2x*1 (confidence: 100%)
-Potential major SLCO1B1 star-alleles for NA07000_SLCO1B1.vcf:
-   1: 1x*1, 1x*15 & rs4149057, rs2291075 (confidence: 100%)
-   2: 1x*1B, 1x*5 & rs4149057, rs2291075 (confidence: 100%)
-Using phasing information
-Using phasing information
-Best SLCO1B1 star-alleles for NA07000_SLCO1B1.vcf:
-   1: *1+rs4149057 / *15+rs2291075 (confidence=100%)
-      Minor alleles: *1.001 +rs4149057, *15.001 +rs2291075
-SLCO1B1 results:
-  - *1+rs4149057 / *15+rs2291075
-    Minor: [*1.001 +rs4149057] / [*15.001 +rs2291075]
-    Legacy notation: [*1A +rs4149057] / [*15 +rs2291075]
-"""
-
-
-def test_NA07000_phase(monkeypatch, solver):
-    file = script_path("aldy.tests.resources/NA07000_SLCO1B1.vcf.gz")
-    assert_file(
-        monkeypatch,
-        file,
-        solver,
-        EXPECTED_NA07000_PHASE,
-        {
-            "--max-minor-solutions": "1",
-            "--gene": "SLCO1B1",
-            "--phase": script_path("aldy.tests.resources/NA07000_SLCO1B1.phase"),
-        },
-        warn=True,
-    )
-
-
-EXPECTED_INS = f"""
-{HEADER}
-Genotyping sample INS.dump...
-Potential CYP2D6 gene structures for INS:
-   1: 2x*1 (confidence: 100%)
-Potential major CYP2D6 star-alleles for INS:
-   1: 1x*1, 1x*40 (confidence: 100%)
-Best CYP2D6 star-alleles for INS:
-   1: *1 / *40 (confidence=100%)
-      Minor alleles: *1.006, *40.001
-CYP2D6 results:
-  - *1 / *40
-    Minor: [*1.006] / [*40.001]
-    Legacy notation: [*1.006] / [*40]
-"""
 
 
 def test_fix_insertions(monkeypatch, solver):
-    file = script_path("aldy.tests.resources/INS.dump")
+    expected = f"""
+    {HEADER}
+    Genotyping sample INS.dump.tar.gz...
+    Potential CYP2D6 gene structures for NA17102:
+    1: 2x*1 (confidence: 100%)
+    Potential major CYP2D6 star-alleles for NA17102:
+    1: 1x*1, 1x*40 (confidence: 100%)
+    Best CYP2D6 star-alleles for NA17102:
+    1: *1 / *40 (confidence=100%)
+        Minor alleles: *1.001, *40.001
+    CYP2D6 results:
+    - *1 / *40
+        Minor: [*1.001] / [*40.001]
+        Legacy notation: [*1] / [*40]
+    """
+    file = script_path("aldy.tests.resources/INS.dump.tar.gz")
     assert_file(
         monkeypatch,
         file,
         solver,
-        EXPECTED_INS,
-        {"--profile": "pgrnseq-v3", "--max-minor-solutions": "1"},
+        expected,
+        {"--profile": "pgrnseq-v3", "--param": "max-minor-solutions=1"},
     )
-
-
-EXPECTED_PROFILE = f"""
-{HEADER}
-Scanning 1:60355979-110239367...
-Scanning 2:234492389-234684945...
-Scanning 4:69916092-69980005...
-Scanning 6:18125541-18161374...
-Scanning 7:1016834-117359025...
-Scanning 8:18021970-18261723...
-Scanning 10:96516437-135355620...
-Scanning 11:14896554-67357124...
-Scanning 12:21278127-21395730...
-Scanning 13:48605702-48629878...
-Scanning 15:75008882-75051948...
-Scanning 16:31099174-31112276...
-Scanning 19:15985833-41716444...
-Scanning 22:19923262-42549249...
-Scanning X:153756605-153781787...
-"""
 
 
 def test_profile(monkeypatch, capsys):
     lines = []
 
     def log_info(*args):
+        nonlocal lines
+
         s = str.format(*args)
-        lines.append(s)
+        lines += s.split("\n")  # type: ignore
 
     monkeypatch.setattr(log, "info", log_info)
 
+    expected = f"""
+    {HEADER}
+    Scanning 1:60355979-110239367...
+    Scanning 2:234492389-234684945...
+    Scanning 4:69916092-69980005...
+    Scanning 6:18125541-18161374...
+    Scanning 7:1016834-117359025...
+    Scanning 8:18021970-18261723...
+    Scanning 10:96516437-135355620...
+    Scanning 11:14896554-67357124...
+    Scanning 12:21278127-21395730...
+    Scanning 13:48605702-48629878...
+    Scanning 15:75008882-75051948...
+    Scanning 16:31099174-31112276...
+    Scanning 19:15985833-41716444...
+    Scanning 22:19923262-42549249...
+    Scanning X:153756605-153781787...
+    """
     main(["profile", script_path("aldy.tests.resources/NA10860.bam")])
-    lines = escape_ansi("\n".join(lines)).strip()
-    assert lines == EXPECTED_PROFILE.strip()
+    lines = "\n".join(escape_ansi(l).strip() for l in lines).strip()
+    expected = "\n".join(e.strip() for e in expected.strip().split("\n"))
+    assert lines == expected
 
     captured = capsys.readouterr()
     with open(script_path("aldy.tests.resources/NA10860.profile")) as f:
+        expected = f.read()
+    assert captured.out == expected
+
+    lines = []
+    expected = f"""
+    {HEADER}
+    Scanning 1:59890307-109696745...
+    Scanning 2:233583743-233776299...
+    Scanning 4:69050374-69114287...
+    Scanning 6:18125310-18161143...
+    Scanning 7:977198-117718971...
+    Scanning 8:18164461-18404213...
+    Scanning 10:94756680-133542116...
+    Scanning 11:14875008-67589653...
+    Scanning 12:21125193-21242796...
+    Scanning 13:48031566-48055742...
+    Scanning 15:74716541-74759607...
+    Scanning 16:31087853-31100955...
+    Scanning 19:15875023-41210539...
+    Scanning 22:19935739-42153258...
+    Scanning X:154528390-154553572...
+    """
+    main(
+        ["profile", script_path("aldy.tests.resources/NA10860.bam"), "--genome", "hg38"]
+    )
+    lines = "\n".join(escape_ansi(l).strip() for l in lines).strip()
+    expected = "\n".join(e.strip() for e in expected.strip().split("\n"))
+    assert lines == expected
+
+    captured = capsys.readouterr()
+    with open(script_path("aldy.tests.resources/NA10860.profile.hg38")) as f:
         expected = f.read()
     assert captured.out == expected

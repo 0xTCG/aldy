@@ -4,14 +4,19 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
+from typing import Any, List
 import pytest  # noqa
 import collections
 
+
+from aldy.profile import Profile
 from aldy.major import estimate_major
 from aldy.solutions import CNSolution
 from aldy.coverage import Coverage
-from aldy.major import NOVEL_MUTATION_PENAL
 from aldy.common import SOLUTION_PRECISION
+
+
+profile = Profile("test")
 
 
 def assert_major(gene, solver, major):
@@ -19,18 +24,18 @@ def assert_major(gene, solver, major):
 
     cov = collections.defaultdict(dict)
     for (pos, op), c in major["data"].items():
-        cov[pos][op] = c
-    cov = Coverage(cov, 0.5, {})
+        cov[pos][op] = [(60, 60)] * c
+    cov = Coverage(gene, profile, None, cov, {})
     sols = estimate_major(gene, cov, cn_sol, solver)
 
     if "score" in major:
         for s in sols:
             assert abs(major["score"] - s.score) < SOLUTION_PRECISION, "Score"
 
-    sols_parsed = [
+    sols_parsed: List[Any] = [
         dict(
             collections.Counter(
-                [i.major for i, v in s.solution.items() for j in range(v)]
+                [i.major for i, v in s.solution.items() for _ in range(v)]
             )
         )
         for s in sols
@@ -114,8 +119,8 @@ def test_two_copies(toy_gene, solver):
                 (100_000_110, "delAC"): 9,
                 (100_000_118, "_"): 22,
                 (100_000_118, "insTT"): 8,
-                (100_000_150, "_"): 10.5,
-                (100_000_150, "C>T"): 9.5,
+                (100_000_150, "_"): 10,
+                (100_000_150, "C>T"): 9,
             },
             "sol": [{"2": 1, "3": 1}],
             "score": 2 / 10 + 3 / 11 + 1 / 10,
@@ -259,7 +264,7 @@ def test_novel_mutations(toy_gene, solver):
             "cn": {"1": 1, "6": 1},
             "data": {(100_000_110, "_"): 0, (100_000_110, "delAC"): 20},
             "sol": [({"1": 1, "6": 1}, (100_000_110, "delAC"))],
-            "score": NOVEL_MUTATION_PENAL + 0.1 + 1,
+            "score": profile.major_novel + 0.1 + 1,
             # Last 1 is needed as the model right now considers novel mutations
             # as "independent" alleles and still (incorrectly) counts the '_'
             # for both *1 here.
@@ -273,6 +278,6 @@ def test_novel_mutations(toy_gene, solver):
             "cn": {"1": 2},
             "data": {(100_000_110, "_"): 10, (100_000_110, "delAC"): 10},
             "sol": [({"1": 2}, (100_000_110, "delAC"))],
-            "score": NOVEL_MUTATION_PENAL + 0.1 + 1,
+            "score": profile.major_novel + 0.1 + 1,
         },
     )

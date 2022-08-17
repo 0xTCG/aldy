@@ -6,8 +6,9 @@
 
 
 from typing import Optional, Any
-
+import logbook
 import logbook.more
+import logbook.base
 import argparse
 import os
 import sys
@@ -15,15 +16,13 @@ import platform
 import yaml
 import datetime
 import tempfile
-import pkg_resources
 import traceback
 import pytest
 
 from . import common
 from .common import log, script_path, AldyException, td, parse_cn_region
 from .gene import Gene
-from .cn import LEFT_FUSION_PENALTY
-from .sam import load_sam_profile
+from .profile import Profile
 from .genotype import genotype
 from .query import query
 from .version import __version__
@@ -93,31 +92,34 @@ def main(argv):
                 db_file = gene
             with open(db_file):  # Check if file exists
                 pass
-            query(Gene(db_file), q)
+            query(Gene(db_file, genome=args.genome), q)
         elif args.subparser == "profile":
-            p = load_sam_profile(
-                args.file, cn_region=parse_cn_region(args.cn_neutral_region)
-            )
-            print(yaml.dump(p, default_flow_style=None))
+            params = {}
+            if args.param:
+                for pl in args.param:
+                    for p in pl:
+                        if "=" not in p:
+                            raise AldyException(f"Invalid parameter {p}")
+                        k, v = p.split("=", 1)
+                        params[k.replace("-", "_")] = v
+            try:
+                p = Profile.get_sam_profile_data(
+                    args.file,
+                    cn_region=parse_cn_region(args.cn_neutral_region),
+                    genome=args.genome,
+                    params=params,
+                )
+                print(yaml.dump(p, default_flow_style=None))
+            except AldyException as ex:
+                log.error("ERROR: {}", str(ex))
         elif args.subparser in ["genotype", "g"]:
-            # Prepare the list of available genes
-            if args.gene.lower() == "all":
-                avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
-                avail_genes = [
-                    i[:-4] for i in avail_genes if len(i) > 4 and i[-4:] == ".yml"
-                ]
-                avail_genes = sorted(avail_genes)
-            else:
-                avail_genes = args.gene.lower().split(",")
-
             # Prepare the output file
             output = args.output
             if output == "-":
                 output = sys.stdout
             elif output:
                 output = open(output, "w")
-            for gene in avail_genes:
-                _genotype(gene, output, args)
+            _genotype(args.gene, output, args)
             if output and output != sys.stdout:
                 output.close()
         else:
@@ -135,17 +137,15 @@ def main(argv):
         log.debug(traceback.format_exc())
         exit(ex.code)
     except Exception as ex:
-        log.critical(
-            f"ERROR: gene= {args.gene}, file= {args.file if 'file' in args else '-'}"
-        )
+        gene = "" if "gene" not in args else f"gene= {args.gene}, "
+        log.critical(f"ERROR: {gene}file= {args.file if 'file' in args else '-'}")
         log.critical(repr(ex))
         log.warn(traceback.format_exc())
         exit(1)
     except:  # noqa
+        gene = "" if "gene" not in args else f"gene= {args.gene}, "
         exc = sys.exc_info()[0]
-        log.critical(
-            f"ERROR: gene= {args.gene}, file= {args.file if 'file' in args else '-'}"
-        )
+        log.critical(f"ERROR: {gene}file= {args.file if 'file' in args else '-'}")
         log.critical("Unrecoverable error: {}", repr(exc))
         log.warn(traceback.format_exc())
         exit(1)
@@ -197,30 +197,30 @@ def _get_args(argv):
     genotype_parser.add_argument(
         "--profile",
         "-p",
-        required=True,
         help=td(
             """Sequencing profile. The following profiles are supported:
-               - illumina
-               - wgs (same as illumina)
-               - pgrnseq-v1
-               - pgrnseq-v2,
-               - pgrnseq-v3, and
-               - exome.
+               - illumina (also: wgs),
+               - pgrnseq-v1 (also: pgx1),
+               - pgrnseq-v2 (also: pgx2),
+               - pgrnseq-v3 (also: pgx3),
+               - 10x,
+               - pacbio-hifi-targeted,
+               - pacbio-hifi-targeted-twist,
+               - exome (also: wxs, wes).
                You can also provide a custom SAM/BAM file as a profile.
                Please check documentation for more details."""
         ),
-    )
-    genotype_parser.add_argument(
-        "--threshold",
-        "-T",
-        default=50,
-        help="Cut-off rate for variations (percent per copy). Default is 50.",
     )
     genotype_parser.add_argument(
         "--reference",
         "-r",
         default=None,
         help="Genome reference used for reading CRAM files",
+    )
+    genotype_parser.add_argument(
+        "--genome",
+        default=None,
+        help="SAM/BAM reference genome (hg19 or hg38; none for auto-detection)",
     )
     genotype_parser.add_argument(
         "--cn-neutral-region",
@@ -244,45 +244,16 @@ def _get_args(argv):
         help=td(
             """ILP solver:
                - gurobi (Gurobi)
-               - scip (SCIP)
                - cbc (Google OR-Tools/CBC)
-               - any (attempts to use Gurobi, then SCIP, then CBC).
+               - any (attempts to use Gurobi and then CBC).
                Default is "any"."""
         ),
     )
-    genotype_parser.add_argument(
-        "--gap",
-        "-G",
-        default=0,
-        help=td(
-            """Solver optimality gap.
-               Any solution whose score is less than (1+gap) times the optimal solution
-               score will be reported.
-               Default is 0 (report only optimal solutions)."""
-        ),
-    )
-    # genotype_parser.add_argument('--remap', default=0,
-    #   help='Realign reads for better mutation calling.
-    # Requires samtools and bowtie2 in $PATH.')
     genotype_parser.add_argument(
         "--debug",
         default=None,
         help="Create a directory that will contain the debug information "
         + "and core dumps.",
-    )
-    genotype_parser.add_argument("--log", "-l", default=None, help="Log file location")
-    genotype_parser.add_argument(
-        "--fusion-penalty",
-        "-f",
-        default=LEFT_FUSION_PENALTY,
-        help="Fusion penalty. Use higher values to avoid fusions. "
-        + f"Default is {LEFT_FUSION_PENALTY}.",
-    )
-    genotype_parser.add_argument(
-        "--max-minor-solutions",
-        default=1,
-        help="Maximum number of minor solutions to report for each major solution. "
-        + "Default is 1.",
     )
     genotype_parser.add_argument(
         "--cn",
@@ -296,21 +267,24 @@ def _get_args(argv):
                (e.g. two copies of the main gene), use 1,1."""
         ),
     )
+    genotype_parser.add_argument("--log", "-l", default=None, help="Log file location")
     genotype_parser.add_argument(
         "--multiple-warn-level",
         "-W",
         default=1,
+        type=int,
         help="Show warning if multiple solutions are found. "
         + "Can be 1 (warn after genotyping) or 2 "
         + "(also warn if there are multiple major solutions)."
         + "Default is 1 (warn after the genotyping).",
     )
     genotype_parser.add_argument(
-        "--min-coverage",
-        default=None,
-        help=td("""Minimum mutation read coverage. Default is 1."""),
+        "--simple",
+        action="store_true",
+        default=False,
+        help=td("""Print one-line result per gene (debug). Default is off."""),
     )
-    genotype_parser.add_argument("--phase", help="Use phase file.")
+    genotype_parser.add_argument("--param", action="append", nargs="+")
 
     _ = subparsers.add_parser(
         "test",
@@ -327,6 +301,7 @@ def _get_args(argv):
         help="Query database definitions for a given gene.",
     )
     show_parser.add_argument("--gene", "-g", default=None, help="Gene file.")
+    show_parser.add_argument("--genome", default="hg19", help="Reference genome.")
     show_parser.add_argument("query", help="Gene or allele to show.")
 
     profile_parser = subparsers.add_parser(
@@ -348,6 +323,12 @@ def _get_args(argv):
                Default is CYP2D8 region within hg19 (22:42547463-42548249)."""
         ),
     )
+    profile_parser.add_argument(
+        "--genome",
+        default=None,
+        help="SAM/BAM reference genome (hg19 or hg38; hg19 by default)",
+    )
+    profile_parser.add_argument("--param", action="append", nargs="+")
 
     _ = subparsers.add_parser(
         "help", parents=[base], help="Show program usage and exit."
@@ -369,13 +350,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
     """
     Genotype a file.
 
-    Args:
-        gene (str)
-        output (str, optional)
-        args: remaining command-line arguments
-
-    Raises:
-        :obj:`aldy.common.AldyException` if ``cn_region`` is invalid.
+    :raise: :py:class:`aldy.common.AldyException` if `cn_region` is invalid.
     """
 
     cn_region = parse_cn_region(args.cn_neutral_region)
@@ -383,33 +358,49 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
     if cn_solution:
         cn_solution = cn_solution.split(",")
 
-    threshold = float(args.threshold) / 100
-
     def run(debug):
         log.trace(
             "\n[main] arguments= {}",
             " ".join(k + "=" + str(v) for k, v in vars(args).items() if k is not None),
         )
         log.info("Genotyping sample {}...", os.path.basename(args.file))
+
+        if args.profile in ["exome", "wxs"]:
+            log.warn("WARNING: Copy-number calling is not available for exome data.")
+            log.warn(
+                "WARNING: Aldy will NOT be able to detect gene duplications, "
+                + "deletions and fusions."
+            )
+            log.warn(
+                "WARNING: Calling of alleles that are defined by non-exonic mutations "
+                + "is not available."
+            )
+            log.warn("         Results might not be biologically relevant!")
+
         try:
+            params = {
+                k: v
+                for k, v in vars(args).items()
+                if k in ["solver", "reference", "multiple_warn_level", "genome"]
+            }
+            if args.param:
+                for pl in args.param:
+                    for p in pl:
+                        if "=" not in p:
+                            raise AldyException(f"Invalid parameter {p}")
+                        k, v = p.split("=", 1)
+                        params[k.replace("-", "_")] = v
             _ = genotype(
                 gene_db=gene,
                 sam_path=args.file,
-                profile=args.profile,
+                profile_name=args.profile,
                 output_file=output,
                 cn_region=cn_region,
                 cn_solution=cn_solution,
-                threshold=threshold,
-                solver=args.solver,
-                fusion_penalty=float(args.fusion_penalty),
-                reference=args.reference,
-                gap=float(args.gap),
-                max_minor_solutions=int(args.max_minor_solutions),
-                debug=debug,
-                multiple_warn_level=int(args.multiple_warn_level),
-                phase=args.phase,
                 report=True,
-                min_cov=args.min_coverage,
+                is_simple=args.simple,
+                debug=debug,
+                **{k: v for k, v in params.items() if v is not None},
             )
         except AldyException as ex:
             log.critical(
@@ -418,8 +409,10 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
             log.error(str(ex))
 
     if args.log:
-        fh = logbook.FileHandler(args.log, mode="w", bubble=True, level="DEBUG")
-        fh.formatter = lambda record, _: record.message
+        fh = logbook.FileHandler(
+            args.log, mode="w", bubble=True, level="TRACE"  # type: ignore
+        )
+        fh.formatter = lambda record, _: record.message  # type: ignore
         fh.push_application()
     if args.debug:
         with tempfile.TemporaryDirectory() as tmp:
@@ -428,9 +421,9 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 prefix = f"{tmp}/{os.path.splitext(os.path.basename(args.file))[0]}"
                 log_output = f"{prefix}.log"
                 fh = logbook.FileHandler(
-                    log_output, mode="w", bubble=True, level="TRACE"
+                    log_output, mode="w", bubble=True, level="TRACE"  # type: ignore
                 )
-                fh.formatter = lambda record, _: "[{}:{}/{}] {}".format(
+                fh.formatter = lambda record, _: "[{}:{}/{}] {}".format(  # type: ignore
                     record.level_name[0],
                     os.path.splitext(os.path.basename(record.filename))[0],
                     record.func_name,
@@ -443,7 +436,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 if prefix:
                     log.info("Preparing debug archive...")
                     with open(f"{prefix}.yml", "w") as f:
-                        yaml.Dumper.ignore_aliases = lambda *args: True  # type: ignore
+                        yaml.Dumper.ignore_aliases = lambda *_: True  # type: ignore
                         yaml.dump(common.json, f, default_flow_style=None)
                     os.system(f"tar czf {args.debug}.tar.gz -C {tmp} .")
     else:
@@ -463,6 +456,4 @@ def console():
 
 
 if __name__ == "__main__":
-    # import cProfile
-    # cProfile.run("console()")
     console()

@@ -11,10 +11,10 @@ on:
     branches: [ master ]
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9']
+        python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -25,21 +25,13 @@ jobs:
       run: |
         sudo apt-get install libgfortran4
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest pytest-cov codecov black mypy types-pkg_resources types-pyyaml
+        python -m pip install flake8 pytest pytest-cov codecov black
         python -m pip install setuptools wheel twine
-        # SCIP
-        export VERSION=7.0.1
-        export DEBFILE=SCIPOptSuite-${VERSION}-Linux.deb
-        wget http://scip.zib.de/download/release/$DEBFILE
-        sudo apt-get install ./$DEBFILE
-        python -m pip install pyscipopt
         python -m pip install .
     - name: Format with black
       run: black aldy
     - name: Lint with flake8
       run: flake8 aldy
-    - name: Typecheck with mypy
-      run: mypy aldy
     - name: Run Aldy tests
       run: |
         mkdir -p tmp
@@ -48,7 +40,7 @@ jobs:
         cd ..
     - name: Run code coverage tests
       run: |
-        pytest --cov=./ -v aldy --solvers=scip,any
+        pytest --cov=./ -v aldy
     - name: Upload code coverage data
       uses: codecov/codecov-action@v1
     - name: Build package
