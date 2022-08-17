@@ -16,7 +16,7 @@ aldy.gene module
     :show-inheritance:
 
 aldy.profile module
----------------
+-------------------
 
 .. automodule:: aldy.profile
     :members:

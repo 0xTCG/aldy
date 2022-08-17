@@ -21,7 +21,7 @@ from .profile import Profile
 
 
 class Sample:
-    """Parse read alignments in SAM/BAM/CRAM/VCF/dump format"""
+    """Parse read alignments in a SAM/BAM/CRAM/VCF/dump format"""
 
     def __init__(
         self,

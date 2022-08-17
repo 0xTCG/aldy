@@ -197,8 +197,8 @@ class Profile:
                     try:
                         typ = type(self.__dict__[n])
                         self.__dict__[n] = typ(v)
-                    except:
-                        raise AldyException(f"Invalid parameter {n}") from None
+                    except (ValueError, TypeError):
+                        raise AldyException(f"Invalid parameter {n}: {v}") from None
                 params[n] = self.__dict__[n]
         ps = "; ".join(f"{n}={v}" for n, v in params.items())
         log.debug(f"[params] {ps}")
