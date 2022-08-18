@@ -530,6 +530,7 @@ class Gene:
                     yield Mutation(self.ref_to_chr[pos], op)
 
         self.mutations = {}
+        self.yml_mutations = yml["alleles"]
         self.random_mutations = set()
         for name, allele in yml["alleles"].items():
             if name == "random":

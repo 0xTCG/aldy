@@ -102,7 +102,8 @@ class Sample:
 
         with Timing("[sam] Read SAM"):
             group_indels = False
-            self.kind, self.genome = detect_genome(path)
+            self.kind, _ = detect_genome(path)
+            self.genome = gene.genome
 
             if self.kind == "vcf":
                 try:
@@ -925,8 +926,9 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
             chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
             is_hg19, is_hg38 = True, True
             for c in "1 10 22".split():
-                is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
-                is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
+                if _prefix + c in chrs:
+                    is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
+                    is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
             if is_hg19:
                 return "sam", "hg19"
             elif is_hg38:
