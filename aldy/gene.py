@@ -169,7 +169,7 @@ class Gene:
     """Aminoacid sequence of the main gene."""
 
     # Mutations
-    mutations: Dict[Tuple[int, str], Tuple[Optional[str], str, int, str]]
+    mutations: Dict[Tuple[int, str], Tuple[Optional[str], str, int, int, str]]
     """Maps `(position, mutation)` to the corresponding :py:class:`Mutation`."""
     random_mutations: Set[Mutation]
     """Set of mutations that can occur in any allele."""
@@ -252,6 +252,7 @@ class Gene:
             elif op[:3] == "ins":
                 return f"ins{rev_comp(op[3:])}"
             elif op[:3] == "del":
+                assert "ins" not in op, "del+ins not yet supported"
                 return f"del{rev_comp(op[3:])}"
             return op
 
@@ -301,13 +302,13 @@ class Gene:
         else:
             pos, op = args[0]
         if (pos, op) in self.mutations:
-            pos, op = self.mutations[pos, op][2:4]
+            pos, op = self.mutations[pos, op][3:5]
             if from_atg:
                 if pos >= atg_start:
                     pos = pos - atg_start + 1
                 else:
                     pos = pos - atg_start
-            return f"{pos}{op}"
+            return f"{pos + 1}{op}"
         return "-"
 
     def deletion_allele(self) -> Optional[str]:
@@ -499,7 +500,7 @@ class Gene:
                         op = op[:-1]
                     fusions_right[name] = op
             else:
-                orig_op = op
+                orig_op, orig_pos = op, pos
                 if info == []:
                     info = ["-"]
                 rsid, function = info[0], info[1] if len(info) > 1 else None
@@ -509,14 +510,16 @@ class Gene:
                         op = f"{rev_comp(l)}>{rev_comp(r)}"
                         pos = pos + len(l) - 1
                     elif op[:3] == "ins":
-                        ins = op[3:]
-                        while self.seq[pos - len(ins) : pos] == ins:
-                            pos -= len(ins)
-                        pos += 1
                         op = f"ins{rev_comp(op[3:])}"
+                        pos += 1
                     elif op[:3] == "del":
-                        pos = pos + len(op) - 4
-                        op = f"del{rev_comp(op[3:])}"
+                        if "ins" in op[3:]:
+                            pd, pi = op[3:].split("ins")
+                            op = f"del{rev_comp(pd)}ins{rev_comp(pi)}"
+                            pos = pos + len(pd) - 1
+                        else:
+                            pos = pos + len(op) - 4
+                            op = f"del{rev_comp(op[3:])}"
                 pos -= 1  # Cast to 0-based index
                 if pos not in self.ref_to_chr:
                     log.warn(f"Ignoring {pos}.{op} in {name} (not in {self.refseq})")
@@ -525,18 +528,25 @@ class Gene:
                 else:
                     self.mutations.setdefault(
                         (self.ref_to_chr[pos], op),
-                        (function, rsid, pos, orig_op),
+                        (function, rsid, pos, orig_pos - 1, orig_op),
                     )
                     yield Mutation(self.ref_to_chr[pos], op)
 
         self.mutations = {}
         self.yml_mutations = yml["alleles"]
         self.random_mutations = set()
+        for pos, op, *info in yml["alleles"].get("random", []):
+            for m in process_mutation(pos, op, info):
+                self.random_mutations.add(m)
+        self.mutation_groups = {}
+        for name, muts in yml["alleles"].get("groups", {}).items():
+            self.mutation_groups[name] = set()
+            for pos, op, *info in muts:
+                for m in process_mutation(pos, op, info):
+                    self.mutation_groups[name].add(m)
+
         for name, allele in yml["alleles"].items():
-            if name == "random":
-                for pos, op, *info in allele:
-                    for m in process_mutation(pos, op, info):
-                        self.random_mutations.add(m)
+            if name in ["random", "groups"]:
                 continue
             if allele.get("ignored", False):
                 continue
@@ -547,6 +557,9 @@ class Gene:
             else:
                 for pos, op, *info in allele["mutations"]:
                     if isinstance(pos, str) and pos == "ignored":
+                        continue
+                    if pos == self.name and op in self.mutation_groups:
+                        log.warn(f"Ignoring {op} in {name}")
                         continue
                     for m in process_mutation(pos, op, info):
                         mutations.add(m)
@@ -775,6 +788,13 @@ class Gene:
             for s in a.minors:
                 key = sorted_tuple(a.minors[s].neutral_muts)
                 minors[key].append(s)
+            for sa in minors.values():
+                if len(sa) > 1:
+                    for s in sa:
+                        if s != min(sa) and "#" not in s:
+                            log.debug(
+                                f"Removing {self.name}*{s} as it is the same as {min(sa)}"
+                            )
             self.alleles[an] = MajorAllele(
                 self.alleles[an].name,
                 self.alleles[an].cn_config,

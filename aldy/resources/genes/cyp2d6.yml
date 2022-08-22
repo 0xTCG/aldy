@@ -2849,7 +2849,7 @@ alleles:
     - [5861, T>G, rs28371702]
     - [6041, C>T, rs28371706, T107I]
     - [6681, G>C, rs1058164]
-    - [6882, insTTTCGCCCCTTTCGCCCC, rs72549356, 174_175insFRPx2]
+    - [6883, insTTTCGCCCCTTTCGCCCC, rs72549356, 174_175insFRPx2]
     - [7870, C>T, rs16947, R296C]
     - [8404, A>C, rs1985842]
     - [8604, G>A, rs28371730]
@@ -4813,6 +4813,31 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9213, T>C, rs61731577]
     - [9414, delAG, rs202032066]
+  CYP2D6*141.1001:
+    pharmvar: https://www.pharmvar.org/haplotype/1365
+    activity: function not assigned
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5672, C>T, rs376217512]
+    - [5861, T>G, rs28371702]
+    - [6041, C>T, rs28371706, T107I]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8565, insA, rs1269631565]
+    - [8572, C>T, rs879173025]
+    - [8602, A>G, rs2004511]
+    - [8873, G>A, rs769157652, E410K]
+    - [CYP2D7, e9+]
   CYP2D6*142.001:
     pharmvar: https://www.pharmvar.org/haplotype/1439
     activity: function not assigned

@@ -59,13 +59,6 @@ alleles:
     mutations:
     - [5235, insGAGTCG, rs746071566, V18_V19insGV]
     - [13153, C>T, rs116855232, R139C]
-  NUDT15*2.002:
-    pharmvar: https://www.pharmvar.org/haplotype/349
-    activity: no function
-    evidence: D
-    mutations:
-    - [5235, insGGAGTC, rs746071566, V18_V19insGV]
-    - [13153, C>T, rs116855232, R139C]
   NUDT15*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/364
     activity: no function
@@ -90,12 +83,6 @@ alleles:
     evidence: D
     mutations:
     - [5235, insGAGTCG, rs746071566, V18_V19insGV]
-  NUDT15*6.002:
-    pharmvar: https://www.pharmvar.org/haplotype/351
-    activity: uncertain function
-    evidence: D
-    mutations:
-    - [5235, insGGAGTC, rs746071566, V18_V19insGV]
   NUDT15*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/360
     activity: uncertain function
@@ -114,12 +101,6 @@ alleles:
     evidence: D
     mutations:
     - [5230, delGAGTCG, rs746071566, del17_18GV]
-  NUDT15*9.002:
-    pharmvar: https://www.pharmvar.org/haplotype/345
-    activity: no function
-    evidence: D
-    mutations:
-    - [5230, delGGAGTC, rs746071566, del17_18GV]
   NUDT15*10.001:
     pharmvar: https://www.pharmvar.org/haplotype/346
     activity: function not assigned

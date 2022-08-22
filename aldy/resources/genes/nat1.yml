@@ -117,7 +117,7 @@ alleles:
     mutations:
     - [57373, A>G, rs72554611, I263V]
   NAT1*26.001:
-    label: NAT1*26
+    label: NAT1*26B
     mutations:
     - [57653, insAAT, rs567144265, UTR]
   NAT1*26.002:

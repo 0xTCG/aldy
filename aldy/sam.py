@@ -4,6 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
+import tempfile
 from typing import Tuple, Dict, List, Optional, Any
 from collections import defaultdict, Counter
 from statistics import mean
@@ -13,6 +14,8 @@ import os.path
 import gzip
 import tarfile
 import pickle
+import tempfile
+import indelpost
 
 from .common import log, GRange, AldyException, script_path, Timing, chr_prefix
 from .gene import Gene, Mutation, CNConfigType
@@ -62,18 +65,9 @@ class Sample:
         self._dump_reads: List[Tuple[Tuple, List]] = []
         """list[tuple[tuple, list]]: Read information."""
 
-        self._insertion_sites = {
-            m for a in gene.alleles.values() for m in a.func_muts if m.op[:3] == "ins"
-        }  # TODO: currently considers only functional indels
-        """Indel sites whose coverage should be corrected."""
-
-        self._insertion_counts: Dict[Tuple[int, int], int] = defaultdict(int)
-        """Indel coverage (number of reads covering a given indel)."""
-
-        self._insertion_reads: Dict[Mutation, Dict[Any, int]] = {
-            m: defaultdict(int) for m in self._insertion_sites
+        self._indel_sites = {
+            (pos, op): (0, 0) for pos, op in gene.mutations if op[:3] in ["ins", "del"]
         }
-        """Indel coverage (number of reads covering a given indel)."""
 
         self._multi_sites = {
             m.pos: m.op
@@ -90,9 +84,6 @@ class Sample:
 
         self.phases: Dict[str, Dict[int, str]] = {}
         """Phasing information."""
-
-        self.moved: Dict = {}  # TODO: get rid of
-        """Phasing information for corrected/moved indels."""
 
         self._fusion_counter: Dict = {}
         """Fusion read coverage (for long reads)."""
@@ -112,19 +103,17 @@ class Sample:
                     raise AldyException(f"VCF {path} is not indexed")
             elif self.kind == "dump":
                 norm, muts = self._load_dump(path)
-                group_indels = True
             else:
                 if self.profile.sam_long_reads:
                     self.is_long_read = True
                     norm, muts = self._load_long_sam(path, reference, debug)
                 else:
                     norm, muts = self._load_sam(path, reference, debug)
-                    group_indels = True
                 if self.profile.cn_region:
                     self._dump_cn = self._load_cn_region(
                         path, reference, self.profile.cn_region
                     )
-            self._make_coverage(norm, muts, group_indels=group_indels)
+            self._make_coverage(norm, muts)
             if self.kind == "sam" and debug:
                 self._dump_alignments(f"{debug}.{gene.name}", norm, muts)
 
@@ -166,6 +155,49 @@ class Sample:
             self._prefix = chr_prefix(
                 self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
             )
+
+            # Fetch indel counts
+            with tempfile.TemporaryDirectory() as tmp:
+                rname = f"{self._prefix}{self.gene.chr}"
+                if not reference:
+                    reference = f"{tmp}/ref.fa"
+                    with open(reference, "w") as f:
+                        print(f">{rname}", file=f)
+                        print("N" * self.gene._lookup_range[0], end="", file=f)
+                        print(self.gene._lookup_seq, end="", file=f)
+                        sz = sam.get_reference_length(rname)
+                        print("N" * (sz - self.gene._lookup_range[1]), file=f)
+                    os.system("samtools faidx " + reference)
+                ref = pysam.FastaFile(reference)  # type: ignore
+                for pos, op in self._indel_sites:
+                    # print(pos, op, *self.gene.mutations[pos, op][1:3], "-->", end=" ")
+                    p = pos
+                    if op.startswith("del"):
+                        if "ins" in op:
+                            pd, pi = op[3:].split("ins")
+                            o1, o2 = pd, pi
+                        else:
+                            p -= 1
+                            o = self.gene[p]
+                            o1, o2 = o + op[3:], o
+                    else:
+                        o = self.gene[p]
+                        o1, o2 = o, o + op[3:]
+                    valn = indelpost.VariantAlignment(  # type: ignore
+                        indelpost.Variant(rname, p + 1, o1, o2, ref),  # type: ignore
+                        sam,
+                        mapping_quality_threshold=self.profile.min_mapq,
+                        base_quality_threshold=self.profile.min_quality,
+                    )
+                    self._indel_sites[pos, op] = valn.count_alleles()
+                    # print(p + 1, o1, o2, self._indel_sites[pos, op])
+                    if self._indel_sites[pos, op][1]:
+                        log.debug(
+                            "[indel] {}:{} -> {}",
+                            pos + 1,
+                            op,
+                            self._indel_sites[pos, op],
+                        )
 
             if has_index:
                 iter = sam.fetch(
@@ -314,17 +346,13 @@ class Sample:
             muts,
             phases,
             self._fusion_counter,
-            self._insertion_reads,
+            _,
         ) = pickle.load(
-            fd  # type: ignore
-        )
+            fd
+        )  # type: ignore
         self.phases = {f"r{i}": v for i, v in enumerate(phases)}
         norm = {p: [q for q, n in c.items() for _ in range(n)] for p, c in norm.items()}
         muts = {p: [q for q, n in c.items() for _ in range(n)] for p, c in muts.items()}
-        for (start, op), quals in muts.items():
-            if op.startswith("ins"):
-                self._insertion_counts[start, len(op) - 3] += len(quals)
-
         return norm, muts
 
     def _dump_alignments(self, debug: str, norm, muts):
@@ -340,7 +368,7 @@ class Sample:
                     {p: Counter(q) for p, q in muts.items()},
                     [v for v in self.phases.values() if len(v) > 1],
                     self._fusion_counter,
-                    self._insertion_reads,
+                    None,  # TODO: remove
                 ),
                 fd,  # type: ignore
             )
@@ -387,7 +415,7 @@ class Sample:
                             start += size
         return self._dump_cn
 
-    def _make_coverage(self, norm, muts, group_indels=True):
+    def _make_coverage(self, norm, muts):
         """Populate coverage data."""
 
         coverage: Dict[int, Dict[str, List]] = dict()
@@ -396,123 +424,26 @@ class Sample:
                 continue
             coverage.setdefault(pos, {})["_"] = cov
         bounds = min(self.gene.chr_to_ref), max(self.gene.chr_to_ref)
-        for m, cov in muts.items():
-            pos, mut = m
+        for (pos, mut), cov in muts.items():
             if pos not in coverage:
                 coverage[pos] = {}
             if not bounds[0] <= pos <= bounds[1] and mut[:3] != "ins":
                 mut = "_"  # ignore mutations outside of the region of interest
             coverage.setdefault(pos, {}).setdefault(mut, []).extend(cov)
-        if group_indels:
-            self._group_indels(coverage)
         for pos, op in self._multi_sites.items():
             if pos in coverage and op in coverage[pos]:
-                log.debug(
-                    f"[sam] multi-SNP {pos}{op} with {len(coverage[pos][op])} reads"
-                )
-        for mut in self._insertion_sites:
-            if mut.pos in coverage and mut.op in coverage[mut.pos]:
-                total = sum(
-                    len(v) for o, v in coverage[mut.pos].items() if o[:3] != "ins"
-                )
-                if total > 0:
-                    corrected = self._correct_ins_coverage(mut, total)
-                    diff = corrected - len(coverage[mut.pos][mut.op])
-                    coverage[mut.pos][mut.op].extend(
-                        [(mean(mq for mq, _ in coverage[mut.pos][mut.op]), 10)] * diff
-                    )
-
+                log.debug(f"[sam] multi-SNP {pos}{op}: {len(coverage[pos][op])} reads")
         self.coverage = Coverage(
             self.gene,
             self.profile,
             self,
             {p: {m: v for m, v in coverage[p].items() if len(v) > 0} for p in coverage},
+            self._indel_sites,
             self._dump_cn,
         )
         """Sample coverage data."""
 
         return self.coverage
-
-    def _group_indels(self, coverage):
-        """
-        Group ambiguous indels (e.g., ensure that all `insAA` in `AAA...AAA` region
-        are treated equally).
-        """
-
-        # Group ambiguous deletions
-        indels = defaultdict(set)
-        for m in self.gene.mutations:
-            if "del" in m[1]:
-                indels[m[0]].add(m[1])
-        for pos in coverage:
-            for mut in coverage[pos]:
-                if mut[:3] != "del" or "N" in mut[3:]:
-                    continue
-                potential = [pos]
-                sz = len(mut[3:])
-                deleted = self.gene[pos : pos + sz]
-                for p in range(pos - sz, -1, -sz):
-                    if self.gene[p : p + sz] != deleted:
-                        break
-                    potential.append(p)
-                for p in range(pos + sz, max(coverage), sz):
-                    if self.gene[p : p + sz] != deleted:
-                        break
-                    potential.append(p)
-                potential = [
-                    p
-                    for p in set(potential) & set(indels)
-                    for m in indels[p]
-                    if m == mut
-                ]
-                if len(potential) == 1 and potential[0] != pos:
-                    new_pos = potential[0]
-                    log.trace(
-                        f"[sam] relocate {len(coverage[pos][mut])} "
-                        + f"from {pos+1}{mut} to {new_pos+1}{mut}"
-                    )
-                    coverage[new_pos].setdefault(mut, []).extend(coverage[pos][mut])
-                    coverage[pos][mut] = []
-                    self.moved[pos, mut] = (new_pos, mut)
-
-        # Group ambiguous insertions
-        indels = defaultdict(set)
-        for m in self.gene.mutations:
-            if "ins" in m[1]:
-                indels[m[0]].add(m[1])
-        for pos in coverage:
-            for mut in coverage[pos]:
-                if mut[:3] != "ins":
-                    continue
-                inserted, sz = mut[3:], len(mut[3:])
-                potential = []
-                for p in range(pos, -1, -sz):
-                    potential.append(p)
-                    if self.gene[p : p + sz] != inserted:
-                        break
-                for p in range(pos, max(coverage), sz):
-                    potential.append(p)
-                    if self.gene[p : p + sz] != inserted:
-                        break
-                potential = [
-                    p
-                    for p in set(potential) & set(indels)
-                    for m in indels[p]
-                    if m == mut
-                ]
-                if len(potential) == 1 and potential[0] != pos:
-                    new_pos = potential[0]
-                    log.debug(
-                        f"[sam] relocate {len(coverage[pos][mut])} "
-                        + f"from {pos+1}{mut} to {new_pos+1}{mut}"
-                    )
-                    coverage[new_pos].setdefault(mut, []).extend(coverage[pos][mut])
-                    coverage[pos][mut] = []
-
-                    L = len(mut) - 3
-                    self._insertion_counts[new_pos, L] += self._insertion_counts[pos, L]
-                    self._insertion_counts[pos, L] = 0
-                    self.moved[pos, mut] = (new_pos, mut)
 
     def _parse_read(
         self,
@@ -567,7 +498,8 @@ class Sample:
         for op, size in cigar:
             if op == 2:  # Deletion
                 mut = (start, "del" + self.gene[start : start + size])
-                muts[mut].append((bin_quality(mq), bin_quality(prev_q)))
+                for i in range(size):
+                    muts[start + i, "-"].append((bin_quality(mq), bin_quality(prev_q)))
                 dump_arr.append(mut)
                 if start in self.grid_columns:
                     phase[start] = mut[1]
@@ -577,8 +509,6 @@ class Sample:
                 q = mean(qual[s_start : s_start + size]) if qual else prev_q
                 muts[mut].append((bin_quality(mq), bin_quality(q)))
                 prev_q = q
-                # HACK: just store the length due to seq. errors
-                self._insertion_counts[start, size] += 1
                 dump_arr.append(mut)
                 if start in self.grid_columns:
                     phase[start] = mut[1]
@@ -626,50 +556,7 @@ class Sample:
                     (mean(mq for mq, _ in items), mean(q for _, q in items))
                 )
         read_pos = (ref_start, start, len(seq))
-        for (pos, _), data in self._insertion_reads.items():
-            if pos >= ref_start - 100 and pos < start + 100:
-                data[read_pos] += 1
         return read_pos, dump_arr
-
-    def _correct_ins_coverage(self, mut: Mutation, total):
-        """
-        Fix low coverage of large tandem insertions.
-
-        Targets the cases where reference looks like
-            `...X...`
-        and the donor genome looks like
-            `...XX...` (i.e., `X` is a tandem insertion).
-
-        Any read that covers only one tandem (e.g. read `X...`) will get perfectly
-        aligned (without trigerring an insertion) to the tail of the tandem insertion.
-        This results in under-estimation of the insertion abundance will (as aligner
-        could not assign `I` CIGAR to the correct insertion).
-
-        This function attempts to correct this bias.
-        """
-
-        MARGIN_RATIO = 0.20
-        INSERT_LEN_RESCALE = 10.0
-        INSERT_LEN_AMPLIFY = 3
-
-        orig_cov = self._insertion_counts[mut.pos, len(mut.op) - 3]
-        new_total = 0.0
-        for (orig_start, orig_end, read_len), cov in self._insertion_reads[mut].items():
-            ins_len = len(mut.op) - 3
-            # HACK: This is horrible way of detecting *40 (min 20% on the sides? max??)
-            min_margin = MARGIN_RATIO * max(1, ins_len / INSERT_LEN_RESCALE) * read_len
-            if orig_end >= mut.pos + max(
-                INSERT_LEN_AMPLIFY * ins_len, min_margin
-            ) and orig_start <= mut.pos - max(
-                (INSERT_LEN_AMPLIFY - 1) * ins_len, min_margin
-            ):
-                new_total += cov
-        new_total += orig_cov
-        new_cov = int(total * (orig_cov / new_total))
-        if new_cov > orig_cov:
-            log.debug(f"[sam] rescale {mut} from {orig_cov} to {new_cov}")
-            return new_cov
-        return orig_cov
 
     def _load_long_sam(self, sam_path: str, reference=None, debug=None):
         """

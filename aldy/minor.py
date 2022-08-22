@@ -263,7 +263,7 @@ def solve_minor_model(
     debug_info["major"] = {s.major: v for s, v in major_sol.solution.items()}
     debug_info["data"] = []
     for m, expr in sorted(constraints.items()):
-        scov = coverage.single_copy(m.pos, major_sol.cn_solution)
+        scov = coverage.single_copy(m, major_sol.cn_solution)
         # If scov = 0, no mutations should be selected at that locus
         # (enforced by other constraints)
         cov = coverage[m] / scov if scov > 0 else 0
@@ -373,8 +373,8 @@ def solve_minor_model(
             for k, v in rv.items():
                 if k in mut_pos:
                     c.append((k, v))
-                elif (k, v) in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
-                    c.append(coverage.sam.moved[k, v])
+                # elif (k, v) in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
+                #    c.append(coverage.sam.moved[k, v])
             c = sorted(c)
             if len(c) > 1:
                 modes[tuple(c)] += 1
@@ -493,7 +493,7 @@ def solve_minor_model(
                     if model.getValue(mv[0]):
                         added.append(m)
                     else:
-                        copies = coverage.single_copy(m.pos, major_sol.cn_solution)
+                        copies = coverage.single_copy(m, major_sol.cn_solution)
                         copies = coverage[m] / copies if copies > 0 else 0
                         if abs(copies - major_sol.cn_solution.max_cn()) > 1e-5:
                             continue
@@ -541,7 +541,7 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
     """Pretty-print the list of allele candidates and their mutations."""
 
     def print_mut(m):
-        copies = coverage.single_copy(m.pos, cn_sol)
+        copies = coverage.single_copy(m, cn_sol)
         copies = coverage[m] / copies if copies > 0 else 0
         impact = gene.get_functional(m)
         return (

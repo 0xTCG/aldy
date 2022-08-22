@@ -158,7 +158,7 @@ def solve_major_model(
         if coverage.single_copy(m.pos, cn_solution) == 0:
             cov = 0.0
         else:
-            cov = coverage[m] / coverage.single_copy(m.pos, cn_solution)
+            cov = coverage[m] / coverage.single_copy(m, cn_solution)
         model.addConstr(expr + VERR[m] <= cov, name=f"CFUNC_{m.pos}_{m.op}")
         model.addConstr(expr + VERR[m] >= cov, name=f"CFUNC_{m.pos}_{m.op}")
         debug_info["data"].append((m[0], m[1], cov))
@@ -278,8 +278,8 @@ def _print_candidates(
 
     def print_mut(m):
         copies = (
-            coverage[m] / (coverage.total(m.pos) / cn_solution.position_cn(m.pos))
-            if cn_solution.position_cn(m.pos) and coverage.total(m.pos)
+            coverage[m] / (coverage.total(m) / cn_solution.position_cn(m.pos))
+            if cn_solution.position_cn(m.pos) and coverage.total(m)
             else 0
         )
         g = gene.region_at(m.pos)

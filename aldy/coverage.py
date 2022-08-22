@@ -22,6 +22,7 @@ class Coverage:
         profile: Profile,
         sam,
         coverage: Dict[int, Dict[str, List]],
+        indel_coverage: Dict,
         cnv_coverage: Dict[int, int],
     ) -> None:
         """
@@ -33,6 +34,8 @@ class Coverage:
             `_`) to the list of read quality scores that cover it. For example,
             `coverage[10]['A>G'] = [(10, 20), (10, 10)]` indicates that 2 reads have G
             (instead of A) at the location 10.
+        :param indel_coverage: Number of reads that do not support and that do support the
+            indel for each indel in the gene database.
         :param cnv_coverage: Coverage of the copy-number neutral region within the
             sample. Each location is represented by the total corresponsing read
             coverage. Used for coverage rescaling.
@@ -40,7 +43,13 @@ class Coverage:
         self.gene = gene
         self.profile = profile
         self.sam = sam
-        self._coverage = coverage
+        self._coverage = {}
+        for pos, ops in coverage.items():
+            self._coverage[pos] = {}
+            for op, quals in ops.items():
+                if not op.startswith("ins"):
+                    self._coverage[pos][op] = quals
+        self._indels = {k: (n, y) for k, (n, y) in indel_coverage.items() if y}
         self._cnv_coverage = cnv_coverage
         self._region_coverage: Dict[Tuple[int, str], float] = {}
 
@@ -50,13 +59,22 @@ class Coverage:
 
     def coverage(self, mut: Mutation) -> float:
         """:returns: Mutation coverage."""
+        if (mut.pos, mut.op) in self._indels:
+            return self._indels[mut.pos, mut.op][1]
         if mut.pos in self._coverage and mut.op in self._coverage[mut.pos]:
             return len(self._coverage[mut.pos][mut.op])
         else:
             return 0
 
-    def total(self, pos: int) -> float:
+    def total(self, m) -> float:
         """:returns: Location coverage."""
+        if isinstance(m, Mutation):
+            if (m.pos, m.op) in self._indels:
+                return sum(self._indels[m.pos, m.op])
+            pos = m.pos
+        else:
+            assert isinstance(m, int)
+            pos = m
         if pos not in self._coverage:
             return 0
         return float(
@@ -65,20 +83,25 @@ class Coverage:
 
     def percentage(self, m: Mutation) -> float:
         """:returns: Mutation coverage expressed as percentage (0-100%)."""
-        total = self.total(m.pos)
+        total = self.total(m)
         if total == 0:
             return 0
         return 100.0 * self.coverage(m) / total
 
-    def single_copy(self, pos: int, cn_solution: CNSolution) -> float:
+    def single_copy(self, m, cn_solution: CNSolution) -> float:
         """
         :param pos: Genomic locus.
         :param cn_solution: Copy-number solution.
         :returns: Coverage of a *single* gene copy at the given location.
         """
+        if isinstance(m, Mutation):
+            pos = m.pos
+        else:
+            assert isinstance(m, int)
+            pos = m
         if cn_solution.position_cn(pos) == 0:
             return 0
-        return max(1, self.total(pos)) / cn_solution.position_cn(pos)
+        return max(1, self.total(m)) / cn_solution.position_cn(pos)
 
     def region_coverage(self, gene: int, region: str) -> float:
         """:returns: Average coverage of a gene region."""
@@ -135,8 +158,16 @@ class Coverage:
             new_cov._coverage[pos] = {}
             for o in pos_mut:
                 f = filter_fn(self, Mutation(pos, o))
-                if f:
+                if isinstance(f, list) and f:
                     new_cov._coverage[pos][o] = f
+                elif f:
+                    assert isinstance(f, bool)
+                    new_cov._coverage[pos][o] = pos_mut[o]
+        new_cov._indels = {}
+        for (pos, o), v in self._indels.items():
+            f = filter_fn(self, Mutation(pos, o))
+            if not (isinstance(f, bool) and not f):
+                new_cov._indels[pos, o] = v
         return new_cov
 
     def diploid_avg_coverage(self) -> float:
@@ -173,16 +204,18 @@ class Coverage:
                 p /= 2  # profile has 2 copies, so divide it with 2 for normalization
                 self._region_coverage[gene, region] = (ratio * s / p) if p != 0 else 0.0
 
-    def basic_filter(self, mut: Mutation, cn=None, thres=None) -> List:
+    def basic_filter(self, mut: Mutation, cn=None, thres=None):
         """Basic threshold-based filter."""
         thres = (thres or self.profile.threshold) / (cn or 1)
-        quals = self._coverage[mut.pos][mut.op]
-        min_cov = max(self.profile.min_coverage, self.total(mut.pos) * thres)
-        return quals if len(quals) >= min_cov else []
+        min_cov = max(self.profile.min_coverage, self.total(mut) * thres)
+        # if (mut.pos, mut.op) in self._indels:
+        #     print(mut, self.coverage(mut), min_cov)
+        sz = self.coverage(mut)
+        return sz >= min_cov
 
     def quality_filter(self, mut: Mutation) -> List:
         """Basic quality filter."""
-        quals = self._coverage[mut.pos].get(mut.op, [])
+        quals = self._coverage.get(mut.pos, {}).get(mut.op, [])
         return [
             (m, q)
             for m, q in quals
