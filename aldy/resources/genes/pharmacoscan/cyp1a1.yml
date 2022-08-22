@@ -1,66 +1,54 @@
 name: CYP1A1
-version: pharmgkb-karolinska+pharmacoscan-r9
+version: pharmacoscan-r9
 generated: '2022-08-21'
 ensembl: ENSG00000140465
 alleles:
-  CYP1A1*1.001:
-    label: CYP1A1*1
+  CYP1A1*1:
     mutations: []
-  CYP1A1*2.001:
-    label: CYP1A1*2A
+  CYP1A1*2A:
     mutations:
-    - [11229, T>C, rs4646903, MspI]
-  CYP1A1*2.002:
-    label: CYP1A1*2B
-    mutations:
-    - [9885, A>G, rs1048943, I462V]
-    - [11229, T>C, rs4646903, MspI]
-  CYP1A1*2.003:
-    label: CYP1A1*2C
+    - [ignored, 11229, T>C, rs4646903, MspI]
+    ignored: true
+  CYP1A1*2B:
     mutations:
     - [9885, A>G, rs1048943, I462V]
-  CYP1A1*3.001:
-    label: CYP1A1*3
+    - [ignored, 11229, T>C, rs4646903, MspI]
+    ignored: true
+  CYP1A1*2C:
+    mutations:
+    - [9885, A>G, rs1048943, I462V]
+  CYP1A1*3:
     mutations:
     - [10635, T>C, rs1800031, 3'UTR]
-  CYP1A1*4.001:
-    label: CYP1A1*4
+  CYP1A1*4:
     mutations:
     - [9883, C>A, rs1799814, T461N]
-  CYP1A1*5.001:
-    label: CYP1A1*5
+  CYP1A1*5:
     mutations:
     - [9891, C>A, rs41279188, R464S]
-  CYP1A1*6.001:
-    label: CYP1A1*6
+  CYP1A1*6:
     mutations:
     - [9066, G>T, rs56313657, M331I]
-  CYP1A1*7.001:
-    label: CYP1A1*7
+  CYP1A1*7:
     mutations:
-    - [9776, insT, rs72547510, 426Frameshift]
-  CYP1A1*8.001:
-    label: CYP1A1*8
+    - [9776, insT, rs72547510, E426Frameshift]
+  CYP1A1*8:
     mutations:
     - [9844, T>A, rs72547509, I448N]
-  CYP1A1*9.001:
-    label: CYP1A1*9
+  CYP1A1*9:
     mutations:
     - [9891, C>T, rs41279188, R464C]
-  CYP1A1*10.001:
-    label: CYP1A1*10
+  CYP1A1*10:
     mutations:
     - [9930, C>T, rs56240201, R477W]
-  CYP1A1*11.001:
-    label: CYP1A1*11
+  CYP1A1*11:
     mutations:
     - [9976, C>G, rs28399430, P492R]
-  CYP1A1*12.001:
-    label: CYP1A1*12
+  CYP1A1*12:
     mutations:
-    - [7615, G>C, rs143070677, A62P]
-  CYP1A1*13.001:
-    label: CYP1A1*13
+    - [ignored, 7615, G>C, rs143070677, A62P]
+    ignored: true
+  CYP1A1*13:
     mutations:
     - [7565, G>A, rs4646422, G45D]
   CYP1A1*A463G:
@@ -82,26 +70,28 @@ structure:
   genes: [CYP1A1]
   regions:
     hg19:
-      up: [75017952, 75022870]
-      utr5: [75015439, 75017952]
-      e1: [75014614, 75015439]
-      e2: [75013932, 75014059]
-      e3: [75013755, 75013845]
-      e4: [75013540, 75013664]
-      e5: [75013308, 75013395]
-      e6: [75012830, 75013116]
-      utr3: [75011883, 75012830]
-      down: [75009883, 75011883]
+      up: [74725536, 75022870]
+      utr5: [75017878, 74725536]
+      e1: [75017782, 75017878]
+      e2: [75014614, 75015465]
+      e3: [75013932, 75014059]
+      e4: [75013755, 75013845]
+      e5: [75013540, 75013664]
+      e6: [75013308, 75013395]
+      e7: [75011883, 75013116]
+      utr3: [74719542, 75011883]
+      down: [75009883, 74719542]
     hg38:
-      up: [74725537, 74730529]
-      utr5: [74723098, 74725537]
-      e1: [74722273, 74723098]
-      e2: [74721591, 74721718]
-      e3: [74721414, 74721504]
-      e4: [74721199, 74721323]
-      e5: [74720967, 74721054]
-      e6: [74720489, 74720775]
-      utr3: [74719542, 74720489]
+      up: [74725536, 74730529]
+      utr5: [74725537, 74725536]
+      e1: [74725441, 74725537]
+      e2: [74722273, 74723124]
+      e3: [74721591, 74721718]
+      e4: [74721414, 74721504]
+      e5: [74721199, 74721323]
+      e6: [74720967, 74721054]
+      e7: [74719542, 74720775]
+      utr3: [74719542, 74719542]
       down: [74717542, 74719542]
   cn_regions: [e1, e2, e3, e4, e5, e6]
 reference:

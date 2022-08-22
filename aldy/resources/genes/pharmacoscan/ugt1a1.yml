@@ -1,5 +1,5 @@
 name: UGT1A1
-version: pharmgkb+pharmacoscan-r9
+version: pharmacoscan-r9
 generated: '2022-08-21'
 ensembl: ENSG00000241635
 alleles:
@@ -39,10 +39,6 @@ alleles:
   UGT1A1*28:
     mutations:
     - [175492, insTA, rs3064744, Promoter]
-  UGT1A1*28_80:
-    mutations:
-    - [175181, C>T, rs887829, 5'UTR]
-    - [175492, insTA, rs3064744, Promoter]
   UGT1A1*28_60_80:
     mutations:
     - [172270, T>G, rs4124874, 5'UTR]
@@ -57,6 +53,7 @@ alleles:
   UGT1A1*36:
     mutations:
     - [175492, delTA, rs3064744, Promoter]
+    ignored: true
   UGT1A1*36_60:
     mutations:
     - [172270, T>G, rs4124874, 5'UTR]
@@ -64,10 +61,7 @@ alleles:
   UGT1A1*37:
     mutations:
     - [175492, insTATA, rs3064744, Promoter]
-  UGT1A1*37_80:
-    mutations:
-    - [175181, C>T, rs887829, 5'UTR]
-    - [175492, insTATA, rs3064744, Promoter]
+    ignored: true
   UGT1A1*43:
     mutations:
     - [176242, T>G, rs72551344, L233R]
@@ -87,9 +81,11 @@ alleles:
   UGT1A1*80:
     mutations:
     - [175181, C>T, rs887829, 5'UTR]
+    ignored: true
   UGT1A1*93:
     mutations:
     - [172393, G>A, rs10929302, 5'UTR]
+    ignored: true
   UGT1A1*112:
     mutations:
     - [174193, A>C, rs3755319, 5'UTR]
@@ -100,25 +96,25 @@ structure:
   genes: [UGT1A1]
   regions:
     hg19:
-      up: [234493390, 234637773]
-      utr5: [234637773, 234637773]
-      e1: [234637773, 234638640]
+      up: [234493390, 233760270]
+      utr5: [233760270, 234668894]
+      e1: [234668894, 234669798]
       e2: [234675680, 234675812]
       e3: [234676495, 234676583]
       e4: [234676866, 234677086]
-      e5: [234680908, 234681206]
-      utr3: [234681206, 234681950]
-      down: [234681950, 234683946]
+      e5: [234680908, 234681946]
+      utr3: [234681946, 233773300]
+      down: [233773300, 234683946]
     hg38:
       up: [233584744, 233760270]
-      utr5: [233760270, 233760288]
-      e1: [233760288, 233761152]
+      utr5: [233760270, 233760270]
+      e1: [233760270, 233761152]
       e2: [233767034, 233767166]
       e3: [233767849, 233767937]
       e4: [233768220, 233768440]
-      e5: [233772262, 233772560]
-      utr3: [233772560, 233773301]
-      down: [233773301, 233775300]
+      e5: [233772262, 233773301]
+      utr3: [233773301, 233773300]
+      down: [233773300, 233775300]
   cn_regions: [e1, e2, e3, e4, e5]
 reference:
   name: NG_002601.2

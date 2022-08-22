@@ -1,644 +1,183 @@
 name: CYP2C19
-version: pharmvar-5.2.3
-generated: '2022-08-12'
-pharmvar: 18207
+version: pharmacoscan-r9
+generated: '2022-08-21'
 ensembl: ENSG00000165841
 alleles:
-  CYP2C19*1.002:
-    pharmvar: https://www.pharmvar.org/haplotype/76
-    activity: normal function
-    label: CYP2C19*1B
-    evidence: D
+  CYP2C19*1:
+    mutations: []
+  CYP2C19*2:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*1.003:
-    pharmvar: https://www.pharmvar.org/haplotype/77
-    activity: normal function
-    label: CYP2C19*1C
-    evidence: L
-    mutations:
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*1.004:
-    pharmvar: https://www.pharmvar.org/haplotype/421
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3608, C>T, rs3814637]
-    - [4137, T>G, rs11568732]
-    - [85186, A>G, rs3758581, I331V]
-    - [85254, C>T, rs17882744]
-    - [92338, A>C, rs17886522]
-  CYP2C19*1.005:
-    pharmvar: https://www.pharmvar.org/haplotype/425
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3608, C>T, rs3814637]
-    - [4137, T>G, rs11568732]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*1.006:
-    pharmvar: https://www.pharmvar.org/haplotype/73
-    activity: uncertain function
-    label: CYP2C19*27
-    evidence: D
-    mutations:
-    - [3985, G>A, rs7902257]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*1.007:
-    pharmvar: https://www.pharmvar.org/haplotype/1541
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3608, C>T, rs3814637]
-    - [3635, T>G, rs11568730]
-    - [4137, T>G, rs11568732]
-    - [85186, A>G, rs3758581, I331V]
-    - [92338, A>C, rs17886522]
-  CYP2C19*1.008:
-    pharmvar: https://www.pharmvar.org/haplotype/1531
-    activity: normal function
-    evidence: D
-    mutations:
-    - [4251, T>A, rs185375194]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*1.009:
-    pharmvar: https://www.pharmvar.org/haplotype/1542
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3854, delT, rs771491246]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*1.010:
-    pharmvar: https://www.pharmvar.org/haplotype/1537
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3098, G>A, rs141540628]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*2.001:
-    pharmvar: https://www.pharmvar.org/haplotype/111
-    activity: no function
-    label: CYP2C19*2A
-    evidence: L
-    mutations:
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*2.002:
-    pharmvar: https://www.pharmvar.org/haplotype/112
-    activity: no function
-    label: CYP2C19*2B
-    evidence: D
-    mutations:
-    - [4928, T>C, rs4986894]
-    - [5124, C>T, rs17885098]
-    - [17485, G>C, rs17878459, E92D]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*2.003:
-    pharmvar: https://www.pharmvar.org/haplotype/106
-    activity: no function
-    label: CYP2C19*2C
-    evidence: D
-    mutations:
-    - [4928, T>C, rs4986894]
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [17859, G>C, rs181297724, A161P]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*2.004:
-    pharmvar: https://www.pharmvar.org/haplotype/107
-    activity: no function
-    label: CYP2C19*2D
-    evidence: L
-    mutations:
-    - [4928, T>C, rs4986894]
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-    - [92300, G>A, rs780225316]
-  CYP2C19*2.005:
-    pharmvar: https://www.pharmvar.org/haplotype/104
-    activity: no function
-    label: CYP2C19*2E
-    evidence: L
-    mutations:
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [24311, G>A, rs778258371]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*2.006:
-    pharmvar: https://www.pharmvar.org/haplotype/105
-    activity: no function
-    label: CYP2C19*2F
-    evidence: L
-    mutations:
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-    - [85216, G>A, rs770829708]
-  CYP2C19*2.007:
-    pharmvar: https://www.pharmvar.org/haplotype/109
-    activity: no function
-    label: CYP2C19*2G
-    evidence: L
-    mutations:
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-    - [85274, A>T, rs550527959]
-  CYP2C19*2.008:
-    pharmvar: https://www.pharmvar.org/haplotype/110
-    activity: no function
-    label: CYP2C19*2H
-    evidence: L
-    mutations:
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-    - [92273, C>G, rs1564686367]
-  CYP2C19*2.009:
-    pharmvar: https://www.pharmvar.org/haplotype/108
-    activity: no function
-    label: CYP2C19*2J
-    evidence: L
-    mutations:
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-    - [92348, A>C, '-']
-  CYP2C19*2.010:
-    pharmvar: https://www.pharmvar.org/haplotype/422
-    activity: no function
-    evidence: L
-    mutations:
-    - [4928, T>C, rs4986894]
-    - [5124, C>T, rs17885098]
-    - [17485, G>C, rs17878459, E92D]
-    - [17687, A>G, rs12769205, splice defect]
-    - [17827, G>A, rs58973490, R150H]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*2.011:
-    pharmvar: https://www.pharmvar.org/haplotype/1529
-    activity: no function
-    evidence: D
-    mutations:
-    - [4928, T>C, rs4986894]
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*2.012:
-    pharmvar: https://www.pharmvar.org/haplotype/1543
-    activity: no function
-    evidence: D
-    mutations:
-    - [4928, T>C, rs4986894]
-    - [5124, C>T, rs17885098]
-    - [17485, G>C, rs17878459, E92D]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*3.001:
-    pharmvar: https://www.pharmvar.org/haplotype/85
-    activity: no function
-    label: CYP2C19*3A
-    evidence: L
+    - [17687, A>G, rs12769205, SpliceDefect]
+    - [24179, G>A, rs4244285, SpliceDefect_P227=]
+    - [85185, C>T, rs3758580, V330=]
+  CYP2C19*3:
     mutations:
     - [22973, G>A, rs4986893, W212X]
-    - [85186, A>G, rs3758581, I331V]
-    - [92338, A>C, rs17886522]
-  CYP2C19*3.002:
-    pharmvar: https://www.pharmvar.org/haplotype/79
-    activity: no function
-    label: CYP2C19*3B
-    evidence: L
-    mutations:
-    - [4137, T>G, rs11568732]
-    - [22973, G>A, rs4986893, W212X]
-    - [23936, A>G, rs7088784]
-    - [85186, A>G, rs3758581, I331V]
-    - [85273, G>A, rs144036596, D360N]
-    - [92338, A>C, rs17886522]
-  CYP2C19*3.003:
-    pharmvar: https://www.pharmvar.org/haplotype/82
-    activity: no function
-    label: CYP2C19*3C
-    evidence: L
-    mutations:
-    - [17785, T>A, rs763625282, M136K]
-    - [22973, G>A, rs4986893, W212X]
-    - [85186, A>G, rs3758581, I331V]
-    - [92338, A>C, rs17886522]
-  CYP2C19*3.004:
-    pharmvar: https://www.pharmvar.org/haplotype/1539
-    activity: no function
-    evidence: D
-    mutations:
-    - [3608, C>T, rs3814637]
-    - [4137, T>G, rs11568732]
-    - [22973, G>A, rs4986893, W212X]
-    - [85186, A>G, rs3758581, I331V]
-    - [92338, A>C, rs17886522]
   CYP2C19*4.001:
-    pharmvar: https://www.pharmvar.org/haplotype/113
-    activity: no function
-    label: CYP2C19*4A
-    evidence: D
     mutations:
     - [5026, A>G, rs28399504, M1V]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
   CYP2C19*4.002:
-    pharmvar: https://www.pharmvar.org/haplotype/855
-    activity: no function
-    label: CYP2C19*4B
-    evidence: L
     mutations:
-    - [4220, C>T, rs12248560, expression]
+    - [4220, C>T, rs12248560, 5'UTR]
     - [5026, A>G, rs28399504, M1V]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*5.001:
-    pharmvar: https://www.pharmvar.org/haplotype/78
-    activity: no function
-    label: CYP2C19*5A
-    evidence: L
+  CYP2C19*5:
     mutations:
     - [95058, C>T, rs56337013, R433W]
-  CYP2C19*5.002:
-    pharmvar: https://www.pharmvar.org/haplotype/84
-    activity: no function
-    label: CYP2C19*5B
-    evidence: L
+  CYP2C19*6:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-    - [95058, C>T, rs56337013, R433W]
-  CYP2C19*6.001:
-    pharmvar: https://www.pharmvar.org/haplotype/89
-    activity: no function
-    label: CYP2C19*6
-    evidence: D
-    mutations:
-    - [5124, C>T, rs17885098]
     - [17773, G>A, rs72552267, R132Q]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*7.001:
-    pharmvar: https://www.pharmvar.org/haplotype/83
-    activity: no function
-    label: CYP2C19*7
-    evidence: L
+  CYP2C19*7:
     mutations:
-    - [24319, T>A, rs72558186, splice defect]
-  CYP2C19*8.001:
-    pharmvar: https://www.pharmvar.org/haplotype/80
-    activity: no function
-    label: CYP2C19*8
-    evidence: L
+    - [24319, T>A, rs72558186, SpliceDefect]
+  CYP2C19*8:
     mutations:
     - [17736, T>C, rs41291556, W120R]
-  CYP2C19*8.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1538
-    activity: no function
-    evidence: D
+  CYP2C19*9:
     mutations:
-    - [3041, C>T, rs117673124]
-    - [3608, C>T, rs3814637]
-    - [4120, A>G, rs186694202]
-    - [17736, T>C, rs41291556, W120R]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*9.001:
-    pharmvar: https://www.pharmvar.org/haplotype/86
-    activity: decreased function
-    label: CYP2C19*9
-    evidence: M
-    mutations:
-    - [5124, C>T, rs17885098]
     - [17809, G>A, rs17884712, R144H]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*9.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1533
-    activity: decreased function
-    evidence: D
+  CYP2C19*10:
     mutations:
-    - [4243, C>T, rs11568729]
-    - [5124, C>T, rs17885098]
-    - [17809, G>A, rs17884712, R144H]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*10.001:
-    pharmvar: https://www.pharmvar.org/haplotype/98
-    activity: decreased function
-    label: CYP2C19*10
-    evidence: M
-    mutations:
-    - [5124, C>T, rs17885098]
     - [24178, C>T, rs6413438, P227L]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*11.001:
-    pharmvar: https://www.pharmvar.org/haplotype/100
-    activity: normal function
-    label: CYP2C19*11
-    evidence: M
+  CYP2C19*11:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [17827, G>A, rs58973490, R150H]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*12.001:
-    pharmvar: https://www.pharmvar.org/haplotype/90
-    activity: uncertain function
-    label: CYP2C19*12
-    evidence: M
+    - [ignored, 17827, G>A, rs58973490, R150H]
+    ignored: true
+  CYP2C19*12:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
     - [95234, A>C, rs55640102, X491C]
-  CYP2C19*13.001:
-    pharmvar: https://www.pharmvar.org/haplotype/92
-    activity: normal function
-    label: CYP2C19*13
-    evidence: M
+  CYP2C19*13:
     mutations:
-    - [85186, A>G, rs3758581, I331V]
     - [92315, C>T, rs17879685, R410C]
-  CYP2C19*13.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1530
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3041, C>T, rs117673124]
-    - [3608, C>T, rs3814637]
-    - [85186, A>G, rs3758581, I331V]
-    - [92315, C>T, rs17879685, R410C]
-  CYP2C19*14.001:
-    pharmvar: https://www.pharmvar.org/haplotype/87
-    activity: uncertain function
-    label: CYP2C19*14
-    evidence: M
+  CYP2C19*14:
     mutations:
     - [5075, T>C, rs55752064, L17P]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*15.001:
-    pharmvar: https://www.pharmvar.org/haplotype/88
-    activity: normal function
-    label: CYP2C19*15
-    evidence: D
+  CYP2C19*15:
     mutations:
-    - [3587, T>C, rs17878739]
-    - [3608, C>T, rs3814637]
     - [5080, A>C, rs17882687, I19L]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*15.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1535
-    activity: normal function
-    evidence: D
-    mutations:
-    - [3123, G>T, rs150732393]
-    - [3587, T>C, rs17878739]
-    - [3608, C>T, rs3814637]
-    - [3918, G>C, rs140164087]
-    - [4193, delT, rs17880036]
-    - [4243, C>T, rs11568729]
-    - [5080, A>C, rs17882687, I19L]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*16.001:
-    pharmvar: https://www.pharmvar.org/haplotype/96
-    activity: decreased function
-    label: CYP2C19*16
-    evidence: L
+  CYP2C19*16:
     mutations:
     - [95085, C>T, rs192154563, R442C]
-  CYP2C19*17.001:
-    pharmvar: https://www.pharmvar.org/haplotype/856
-    activity: increased function
-    label: CYP2C19*17
-    evidence: D
+  CYP2C19*17:
     mutations:
-    - [4220, C>T, rs12248560, expression]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*18.001:
-    pharmvar: https://www.pharmvar.org/haplotype/94
-    activity: normal function
-    label: CYP2C19*18
-    evidence: L
+    - [4220, C>T, rs12248560, 5'UTR]
+  CYP2C19*18:
     mutations:
-    - [5124, C>T, rs17885098]
     - [85181, G>A, rs138142612, R329H]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*19.001:
-    pharmvar: https://www.pharmvar.org/haplotype/95
-    activity: decreased function
-    label: CYP2C19*19
-    evidence: L
+  CYP2C19*19:
     mutations:
-    - [5124, C>T, rs17885098]
     - [5176, A>G, rs1564657013, S51G]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*22.001:
-    pharmvar: https://www.pharmvar.org/haplotype/75
-    activity: no function
-    label: CYP2C19*22
-    evidence: L
+  CYP2C19*22:
     mutations:
     - [22894, G>C, rs140278421, R186P]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*23.001:
-    pharmvar: https://www.pharmvar.org/haplotype/70
-    activity: uncertain function
-    label: CYP2C19*23
-    evidence: M
+  CYP2C19*23:
     mutations:
-    - [5124, C>T, rs17885098]
     - [17480, G>C, rs118203756, G91R]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*24.001:
-    pharmvar: https://www.pharmvar.org/haplotype/71
-    activity: no function
-    label: CYP2C19*24
-    evidence: M
+  CYP2C19*24:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-    - [85199, G>A, rs118203757, R335Q]
-    - [92284, A>G, rs377184510]
-  CYP2C19*25.001:
-    pharmvar: https://www.pharmvar.org/haplotype/68
-    activity: decreased function
-    label: CYP2C19*25
-    evidence: M
+    - [ignored, 85199, G>A, rs118203757, R335Q]
+    ignored: true
+  CYP2C19*25:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
     - [95105, C>G, rs118203759, F448L]
-  CYP2C19*26.001:
-    pharmvar: https://www.pharmvar.org/haplotype/69
-    activity: decreased function
-    label: CYP2C19*26
-    evidence: L
+  CYP2C19*26:
     mutations:
-    - [5124, C>T, rs17885098]
     - [24264, G>A, rs375781227, D256N]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*28.001:
-    pharmvar: https://www.pharmvar.org/haplotype/727
-    activity: normal function
-    label: CYP2C19*28
-    evidence: M
+  CYP2C19*28:
     mutations:
-    - [3587, T>C, rs17878739]
     - [5080, A>C, rs17882687, I19L]
-    - [85186, A>G, rs3758581, I331V]
     - [85315, G>A, rs113934938, V374I]
-  CYP2C19*29.001:
-    pharmvar: https://www.pharmvar.org/haplotype/72
-    activity: uncertain function
-    label: CYP2C19*29
-    evidence: L
+  CYP2C19*29:
     mutations:
-    - [5108, A>T, rs1564656981, K28I]
-    - [5124, C>T, rs17885098]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*30.001:
-    pharmvar: https://www.pharmvar.org/haplotype/102
-    activity: uncertain function
-    label: CYP2C19*30
-    evidence: L
+    - [ignored, 5108, A>T, rs1564656981, K28I]
+    ignored: true
+  CYP2C19*30:
     mutations:
-    - [17426, C>T, rs145328984, R73C]
-  CYP2C19*31.001:
-    pharmvar: https://www.pharmvar.org/haplotype/103
-    activity: uncertain function
-    label: CYP2C19*31
-    evidence: L
+    - [ignored, 17426, C>T, rs145328984, R73C]
+    ignored: true
+  CYP2C19*31:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [17441, C>T, rs1564660997, H78Y]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*32.001:
-    pharmvar: https://www.pharmvar.org/haplotype/99
-    activity: uncertain function
-    label: CYP2C19*32
-    evidence: L
+    - [ignored, 17441, C>T, rs1564660997, H78Y]
+    ignored: true
+  CYP2C19*32:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [17505, A>G, rs1288601658, H99R]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*33.001:
-    pharmvar: https://www.pharmvar.org/haplotype/101
-    activity: uncertain function
-    label: CYP2C19*33
-    evidence: L
+    - [ignored, 17505, A>G, rs1288601658, H99R]
+    ignored: true
+  CYP2C19*33:
     mutations:
-    - [5124, C>T, rs17885098]
-    - [22899, G>A, rs370803989, D188N]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*34.001:
-    pharmvar: https://www.pharmvar.org/haplotype/91
-    activity: uncertain function
-    label: CYP2C19*34
-    evidence: D
+    - [ignored, 22899, G>A, rs370803989, D188N]
+    ignored: true
+  CYP2C19*34:
     mutations:
-    - [5013, G>A, rs367543001]
+    - [5013, G>A, rs367543001, 5'UTR]
     - [5032, C>T, rs367543002, P3S]
     - [5035, T>C, rs367543003, F4L]
-  CYP2C19*35.001:
-    pharmvar: https://www.pharmvar.org/haplotype/93
-    activity: no function
-    label: CYP2C19*35
-    evidence: D
+  CYP2C19*35:
     mutations:
-    - [4113, G>A, rs76822098]
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*35.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1540
-    activity: no function
-    evidence: D
+    - [17687, A>G, rs12769205, SpliceDefect]
+  CYP2C19*A161P:
     mutations:
-    - [5080, A>C, rs17882687, I19L]
-    - [5124, C>T, rs17885098]
-    - [17687, A>G, rs12769205, splice defect]
-    - [85186, A>G, rs3758581, I331V]
-  CYP2C19*36.001:
-    activity: unknown
+    - [17859, G>C, rs181297724, A161P]
+  CYP2C19*D341N:
     mutations:
-    - [CYP2C19, deletion]
+    - [ignored, 85216, G>A, rs770829708, D341N]
     ignored: true
-  # CYP2C19*37.001:
-  #   partial deletion
-  CYP2C19*38.001:
-    pharmvar: https://www.pharmvar.org/haplotype/81
-    activity: normal function
-    label: CYP2C19*1A
-    evidence: D
-    mutations: []
-  CYP2C19*38.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1534
-    activity: normal function
-    evidence: D
+  CYP2C19*D360N:
     mutations:
-    - [3608, C>T, rs3814637]
-    - [4137, T>G, rs11568732]
-    - [4956, T>C, rs17886301]
-  CYP2C19*38.003:
-    pharmvar: https://www.pharmvar.org/haplotype/1536
-    activity: normal function
-    evidence: D
+    - [85273, G>A, rs144036596, D360N]
+  CYP2C19*D360V:
     mutations:
-    - [3608, C>T, rs3814637]
-    - [4137, T>G, rs11568732]
-  CYP2C19*39.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1532
-    activity: function not assigned
-    evidence: D
+    - [ignored, 85274, A>T, rs550527959, D360V]
+    ignored: true
+  CYP2C19*E92D:
     mutations:
-    - [3587, T>C, rs17878739]
-    - [3608, C>T, rs3814637]
-    - [4193, delT, rs17880036]
-    - [5080, A>C, rs17882687, I19L]
-    - [17743, A>C, rs17885179, E122A]
-    - [17768, G>T, rs17882291]
-    - [62899, A>G, rs17879239]
-    - [85186, A>G, rs3758581, I331V]
-    - [85254, C>T, rs17882744]
-    - [95316, T>C, rs17882796]
+    - [17485, G>C, rs17878459, E92D]
+  CYP2C19*E241FS:
+    mutations:
+    - [24219, insG, rs72558185, E241Frameshift]
+  CYP2C19*E405K:
+    mutations:
+    - [ignored, 92300, G>A, rs780225316, E405K]
+    ignored: true
+  CYP2C19*F168L:
+    mutations:
+    - [22839, T>C, rs28399510, F168L]
+  CYP2C19*G439FS:
+    mutations:
+    - [95077, delG, rs1412546060, G439Frameshift]
+  CYP2C19*H396D:
+    mutations:
+    - [ignored, 92273, C>G, '-', H396D]
+    ignored: true
+  CYP2C19*M74T:
+    mutations:
+    - [17430, T>C, rs28399505, M74T]
+  CYP2C19*M136K:
+    mutations:
+    - [ignored, 17785, T>A, rs763625282, M136K]
+    ignored: true
+  CYP2C19*M271I:
+    mutations:
+    - [ignored, 24311, G>A, rs778258371, M271I]
+    ignored: true
+  CYP2C19*T302R:
+    mutations:
+    - [62901, C>G, rs58259047, T302R]
+  CYP2C19*V113I:
+    mutations:
+    - [17715, G>A, rs145119820, V113I]
+  CYP2C19*V331I:
+    mutations:
+    - [85186, G>A, rs3758581, V331I]
+  CYP2C19*V394M:
+    mutations:
+    - [92267, G>A, rs55948420, V394M]
 structure:
   genes: [CYP2C19]
   regions:
     hg19:
-      up: [96517438, 96522381]
-      utr5: [96522381, 96522463]
-      e1: [96522463, 96522631]
+      up: [96517438, 94762681]
+      utr5: [94762681, 96522381]
+      e1: [96522381, 96522631]
       e2: [96534815, 96534978]
       e3: [96535147, 96535297]
       e4: [96540256, 96540417]
@@ -646,13 +185,13 @@ structure:
       e6: [96580253, 96580395]
       e7: [96602594, 96602782]
       e8: [96609674, 96609816]
-      e9: [96612490, 96612672]
-      utr3: [96612672, 96613018]
-      down: [96613018, 96617309]
+      e9: [96612490, 96613018]
+      utr3: [96613018, 94855547]
+      down: [94855547, 96617309]
     hg38:
       up: [94757681, 94762681]
-      utr5: [94762681, 94762706]
-      e1: [94762706, 94762874]
+      utr5: [94762681, 94762681]
+      e1: [94762681, 94762874]
       e2: [94775058, 94775221]
       e3: [94775390, 94775540]
       e4: [94780499, 94780660]
@@ -660,9 +199,9 @@ structure:
       e6: [94820496, 94820638]
       e7: [94842837, 94843025]
       e8: [94849917, 94850059]
-      e9: [94852733, 94852915]
-      utr3: [94852915, 94855548]
-      down: [94855548, 94857552]
+      e9: [94852733, 94855548]
+      utr3: [94855548, 94855547]
+      down: [94855547, 94857552]
   cn_regions: [e1, e2, e3, e4, e5, e6, e7, e8, e9]
 reference:
   name: NG_008384.3

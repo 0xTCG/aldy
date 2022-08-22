@@ -538,12 +538,16 @@ class Gene:
                     for m in process_mutation(pos, op, info):
                         self.random_mutations.add(m)
                 continue
+            if allele.get("ignored", False):
+                continue
             name = allele_name(name)
             mutations: Set[Mutation] = set()
             if [self.name, "deletion"] in allele["mutations"]:
                 deletion_allele = name
             else:
                 for pos, op, *info in allele["mutations"]:
+                    if isinstance(pos, str) and pos == "ignored":
+                        continue
                     for m in process_mutation(pos, op, info):
                         mutations.add(m)
 

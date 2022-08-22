@@ -1,542 +1,211 @@
 name: NAT2
-version: pharmgkb-karolinska+pharmacoscan-r9
+version: pharmacoscan-r9
 generated: '2022-08-21'
 ensembl: ENSG00000156006
 alleles:
-  NAT2*4.001:
-    label: NAT2*4
+  NAT2*4:
     mutations: []
-  NAT2*5.001:
-    label: NAT2*5
+  NAT2*5:
     mutations:
     - [14100, T>C, rs1801280, I114T]
-  NAT2*5.002:
-    label: NAT2*5A
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-  NAT2*5.003:
-    label: NAT2*5B
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.004:
-    label: NAT2*5C
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.005:
-    label: NAT2*5D
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-  NAT2*5.006:
-    label: NAT2*5E
+  NAT2*5E:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14349, G>A, rs1799930, R197Q]
-  NAT2*5.007:
-    label: NAT2*5F
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-    - [14518, C>T, rs56011192, V253V]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.008:
-    label: NAT2*5G
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.009:
-    label: NAT2*5H
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-    - [14618, delA, '-', S287 Frameshift]
-  NAT2*5.010:
-    label: NAT2*5I
+  NAT2*5I:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14170, A>T, rs4986997, L137F]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.011:
-    label: NAT2*5J
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14100, T>C, rs1801280, I114T]
-    - [14349, G>A, rs1799930, R197Q]
-  NAT2*5.012:
-    label: NAT2*5K
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14100, T>C, rs1801280, I114T]
-  NAT2*5.013:
-    label: NAT2*5L
+  NAT2*5L:
     mutations:
     - [13829, T>A, rs45477599, L24I]
     - [14100, T>C, rs1801280, I114T]
-  NAT2*5.014:
-    label: NAT2*5M
+  NAT2*5M:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14597, G>A, rs56393504, V280M]
-  NAT2*5.015:
-    label: NAT2*5N
+  NAT2*5N:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14231, A>C, rs139351995, I158L]
-  NAT2*5.016:
-    label: NAT2*5O
+  NAT2*5O:
     mutations:
     - [13962, G>A, rs72466458, C68Y]
     - [14100, T>C, rs1801280, I114T]
-  NAT2*5.017:
-    label: NAT2*5P
+  NAT2*5P:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14337, C>T, rs79050330, T193M]
     - [14349, G>A, rs1799930, R197Q]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.018:
-    label: NAT2*5Q
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14349, G>A, rs1799930, R197Q]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.019:
-    label: NAT2*5R
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14100, T>C, rs1801280, I114T]
-    - [14349, G>A, rs1799930, R197Q]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.020:
-    label: NAT2*5S
+  NAT2*5S:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14616, G>A, rs1799931, G286E]
-  NAT2*5.021:
-    label: NAT2*5T
+  NAT2*5X:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14162, C>G, rs12720065, L135V]
-  NAT2*5.022:
-    label: NAT2*5U
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-    - [14349, G>A, rs1799930, R197Q]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*5.023:
-    label: NAT2*5V
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-  NAT2*5.024:
-    label: NAT2*5X
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14162, C>G, rs12720065, L135V]
-  NAT2*5.025:
-    label: NAT2*5Y
+  NAT2*5Y:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14381, T>C, rs56387565, Y208H]
-  NAT2*6.001:
-    label: NAT2*6A
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.002:
-    label: NAT2*6B
+  NAT2*6:
     mutations:
     - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.003:
-    label: NAT2*6C
+  NAT2*6G:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14349, G>A, rs1799930, R197Q]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*6.004:
-    label: NAT2*6D
-    mutations:
-    - [13870, T>C, rs72554615, F37F]
-    - [14041, C>T, rs1041983, T94=]
-    - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.005:
-    label: NAT2*6E
-    mutations:
-    - [14240, C>T, rs1799929, L161L]
-    - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.006:
-    label: NAT2*6F
-    mutations:
-    - [14349, G>A, rs1799930, R197Q]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*6.007:
-    label: NAT2*6G
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14277, A>G, rs369500066, K173R]
     - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.008:
-    label: NAT2*6H
+  NAT2*6H:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14349, G>A, rs1799930, R197Q]
     - [14525, A>G, rs55700793, K256E]
-  NAT2*6.009:
-    label: NAT2*6I
+  NAT2*6I:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14349, G>A, rs1799930, R197Q]
     - [14597, G>A, rs56393504, V280M]
     - [14616, G>A, rs1799931, G286E]
-  NAT2*6.010:
-    label: NAT2*6J
+  NAT2*6J:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14349, G>A, rs1799930, R197Q]
     - [14616, G>A, rs1799931, G286E]
-  NAT2*6.011:
-    label: NAT2*6K
+  NAT2*6K:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14349, G>A, rs1799930, R197Q]
     - [14397, C>T, rs138707146, P213L]
-  NAT2*6.012:
-    label: NAT2*6L
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14104, C>T, rs45532639, D115D]
-    - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.013:
-    label: NAT2*6M
+  NAT2*6M:
     mutations:
     - [13911, G>T, rs72466457, G51V]
     - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.014:
-    label: NAT2*6O
+  NAT2*6O:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14349, G>A, rs1799930, R197Q]
     - [14597, G>A, rs56393504, V280M]
-  NAT2*6.015:
-    label: NAT2*6N
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14240, C>T, rs1799929, L161L]
-    - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.017:
-    label: NAT2*6P
+  NAT2*6P:
     mutations:
     - [14162, C>G, rs12720065, L135V]
     - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.018:
-    label: NAT2*6Q
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14067, C>T, '-', T103I]
-    - [14349, G>A, rs1799930, R197Q]
-  NAT2*6.019:
-    label: NAT2*6R
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14240, C>T, rs1799929, L161L]
-    - [14349, G>A, rs1799930, R197Q]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*6.020:
-    label: NAT2*6S
+  NAT2*6Q:
     mutations:
     - [14349, G>A, rs1799930, R197Q]
-    - [14616, G>A, rs1799931, G286E]
-  NAT2*6.021:
-    label: NAT2*6T
-    mutations:
-    - [14240, C>T, rs1799929, L161L]
-    - [14349, G>A, rs1799930, R197Q]
-    - [14616, G>A, rs1799931, G286E]
-  NAT2*6.022:
-    label: NAT2*6V
+    - [ignored, 14067, C>T, '-', T103I]
+    ignored: true
+  NAT2*6V:
     mutations:
     - [14162, C>G, rs12720065, L135V]
     - [14349, G>A, rs1799930, R197Q]
     - [14597, G>A, rs56393504, V280M]
-  NAT2*7.001:
-    label: NAT2*7A
+  NAT2*7:
     mutations:
     - [14616, G>A, rs1799931, G286E]
-  NAT2*7.002:
-    label: NAT2*7B
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14616, G>A, rs1799931, G286E]
-  NAT2*7.003:
-    label: NAT2*7C
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14562, A>G, rs1208, K268R]
-    - [14616, G>A, rs1799931, G286E]
-  NAT2*7.004:
-    label: NAT2*7D
+  NAT2*7D:
     mutations:
     - [13950, G>A, rs1801279, R64Q]
-    - [14041, C>T, rs1041983, T94=]
     - [14616, G>A, rs1799931, G286E]
-  NAT2*7.005:
-    label: NAT2*7E
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14240, C>T, rs1799929, L161L]
-    - [14616, G>A, rs1799931, G286E]
-  NAT2*7.006:
-    label: NAT2*7F
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-    - [14616, G>A, rs1799931, G286E]
-  NAT2*7.007:
-    label: NAT2*7G
+  NAT2*7G:
     mutations:
     - [13985, T>G, '-', Y76D]
-    - [14041, C>T, rs1041983, T94=]
     - [14616, G>A, rs1799931, G286E]
-  NAT2*10.001:
-    label: NAT2*10
+    ignored: true
+  NAT2*10:
     mutations:
     - [14258, G>A, rs72554617, E167K]
-  NAT2*11.001:
-    label: NAT2*11A
-    mutations:
-    - [14240, C>T, rs1799929, L161L]
-  NAT2*11.002:
-    label: NAT2*11B
-    mutations:
-    - [14240, C>T, rs1799929, L161L]
-    - [14618, delA, '-', S287Frameshift]
-  NAT2*12.001:
-    label: NAT2*12A
-    mutations:
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.002:
-    label: NAT2*12B
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.003:
-    label: NAT2*12C
-    mutations:
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.004:
-    label: NAT2*12D
+  NAT2*12D:
     mutations:
     - [14123, G>A, rs4986996, D122N]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.005:
-    label: NAT2*12E
+  NAT2*12E:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14337, C>T, rs79050330, T193M]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.006:
-    label: NAT2*12F
+  NAT2*12F:
     mutations:
     - [14381, T>C, rs56387565, Y208H]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.007:
-    label: NAT2*12G
+  NAT2*12G:
     mutations:
     - [14368, G>T, rs45618543, E203D]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.008:
-    label: NAT2*12H
+  NAT2*12H:
     mutations:
     - [14162, C>G, rs12720065, L135V]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.009:
-    label: NAT2*12I
-    mutations:
-    - [13987, C>T, rs72466459, Y76Y]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.010:
-    label: NAT2*12J
+  NAT2*12J:
     mutations:
     - [13788, T>C, rs72466456, I10T]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.011:
-    label: NAT2*12K
+  NAT2*12K:
     mutations:
     - [14231, A>C, rs139351995, I158L]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.012:
-    label: NAT2*12L
+  NAT2*12N:
     mutations:
-    - [14424, T>G, '-', F222C]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.013:
-    label: NAT2*12M
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.014:
-    label：NAT2*12N
-    mutations:
-    - [13880, A>T, rs149283608, N41Y]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*12.015:
-    label：NAT2*12O
+    - [ignored, 13880, A>T, rs149283608, N41Y]
+    ignored: true
+  NAT2*12O:
     mutations:
     - [13788, T>C, rs72466456, I10T]
     - [14368, G>T, rs45618543, E203D]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*13.001:
-    label: NAT2*13A
+  NAT2*13D:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
-  NAT2*13.002:
-    label: NAT2*13B
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14337, C>T, rs79050330, T193M]
-  NAT2*13.003:
-    label: NAT2*13C
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14424, T>G, '-', F222C]
-  NAT2*13.004:
-    label: NAT2*13D
-    mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14525, A>G, rs55700793, K256E]
-  NAT2*13.005:
-    label: NAT2*13E
+  NAT2*13E:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
-    - [14400, C>T, '-', T214I]
+    - [ignored, 14400, C>T, '-', T214I]
     ignored: true
-  NAT2*13.006:
-    label: NAT2*13F
+  NAT2*13F:
     mutations:
-    - [14041, C>T, rs1041983, T94=]
     - [14597, G>A, rs56393504, V280M]
-  NAT2*14.001:
-    label: NAT2*14A
+  NAT2*14:
     mutations:
     - [13950, G>A, rs1801279, R64Q]
-  NAT2*14.002:
-    label: NAT2*14B
+  NAT2*14D:
     mutations:
     - [13950, G>A, rs1801279, R64Q]
-    - [14041, C>T, rs1041983, T94=]
-  NAT2*14.003:
-    label: NAT2*14C
-    mutations:
-    - [13950, G>A, rs1801279, R64Q]
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*14.004:
-    label: NAT2*14D
-    mutations:
-    - [13950, G>A, rs1801279, R64Q]
-    - [14041, C>T, rs1041983, T94=]
     - [14349, G>A, rs1799930, R197Q]
-  NAT2*14.005:
-    label: NAT2*14E
-    mutations:
-    - [13950, G>A, rs1801279, R64Q]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*14.006:
-    label: NAT2*14F
+  NAT2*14F:
     mutations:
     - [13950, G>A, rs1801279, R64Q]
     - [14100, T>C, rs1801280, I114T]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*14.007:
-    label: NAT2*14G
+  NAT2*14H:
     mutations:
     - [13950, G>A, rs1801279, R64Q]
-    - [14041, C>T, rs1041983, T94=]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*14.008:
-    label: NAT2*14H
-    mutations:
-    - [13950, G>A, rs1801279, R64Q]
-    - [14041, C>T, rs1041983, T94=]
     - [14442, C>T, rs45518335, P228L]
-  NAT2*14.009:
-    label: NAT2*14I
-    mutations:
-    - [13950, G>A, rs1801279, R64Q]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-  NAT2*14.010:
-    label: NAT2*14J
-    mutations:
-    - [13950, G>A, rs1801279, R64Q]
-    - [14041, C>T, rs1041983, T94=]
-    - [14392, G>A, '-', T211T]
-  NAT2*14.011:
-    label: NAT2*14K
+  NAT2*14K:
     mutations:
     - [13950, G>A, rs1801279, R64Q]
     - [14597, G>A, rs56393504, V280M]
-  NAT2*14.012:
-    label: NAT2*14L
+  NAT2*14L:
     mutations:
     - [13950, G>A, rs1801279, R64Q]
-    - [13766, A>G, rs200893121, I3V]
-  NAT2*17.001:
-    label: NAT2*17
+    - [ignored, 13766, A>G, rs200893121, I3V]
+    ignored: true
+  NAT2*17:
     mutations:
     - [14193, A>C, rs72554616, Q145P]
-  NAT2*18.001:
-    label: NAT2*18
+  NAT2*18:
     mutations:
     - [14604, A>C, rs56054745, K282T]
-  NAT2*19.001:
-    label: NAT2*19
+  NAT2*19:
     mutations:
     - [13949, C>T, rs1805158, R64W]
-  NAT2*20.001:
-    label: NAT2*20
-    mutations:
-    - [14359, A>G, rs72466461, E200E]
-  NAT2*21.001:
-    label: NAT2*21
+  NAT2*21:
     mutations:
     - [14217, C>T, rs72466460, T153I]
-  NAT2*22.001:
-    label: NAT2*22
-    mutations:
-    - [14368, G>T, rs45618543, E203D]
-  NAT2*23.001:
-    label: NAT2*23
+  NAT2*23:
     mutations:
     - [13829, T>A, rs45477599, L24I]
-  NAT2*24.001:
-    label: NAT2*24
+  NAT2*24:
     mutations:
     - [14162, C>G, rs12720065, L135V]
-  NAT2*25.001:
-    label: NAT2*25
+  NAT2*25:
     mutations:
-    - [14414, T>G, '-', F222C]
+    - [ignored, 14414, T>G, '-', F222C]
+    ignored: true
   NAT2*26:
     mutations:
-    - [14568, T>C, rs868725509, I270T]
+    - [ignored, 14568, T>C, rs868725509, I270T]
+    ignored: true
   NAT2*27:
-    - [14348, C>T, rs375746304, R197X]
-
+    mutations:
+    - [ignored, 14348, C>T, rs375746304, R197X]
+    ignored: true
+  NAT2*K268R:
+    mutations:
+    - [14562, A>G, rs1208, K268R]
   NAT2*M205L:
     mutations:
     - [14372, A>T, rs45607939, M205L]
@@ -547,18 +216,20 @@ structure:
   genes: [NAT2]
   regions:
     hg19:
-      up: [18243755, 18248755]
-      utr5: [18248755, 18257514]
-      e1: [18257514, 18258387]
-      utr3: [18258387, 18258729]
-      down: [18258729, 18260724]
+      up: [18243755, 18391282]
+      utr5: [18391282, 18248755]
+      e1: [18248755, 18248856]
+      e2: [18257508, 18258729]
+      utr3: [18258729, 18401218]
+      down: [18401218, 18260724]
     hg38:
       up: [18386245, 18391282]
-      utr5: [18391282, 18400004]
-      e1: [18400004, 18400877]
-      utr3: [18400877, 18401219]
-      down: [18401219, 18403214]
-  cn_regions: [e1]
+      utr5: [18391282, 18391282]
+      e1: [18391282, 18391346]
+      e2: [18399998, 18401219]
+      utr3: [18401219, 18401218]
+      down: [18401218, 18403214]
+  cn_regions: [e1, e2]
 reference:
   name: NG_012246.1
   mappings:

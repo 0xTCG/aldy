@@ -1,232 +1,199 @@
 name: TPMT
-version: pharmgkb+pharmacoscan-r9
+version: pharmacoscan-r9
 generated: '2022-08-21'
 ensembl: ENSG00000137364
 alleles:
-  TPMT*1.001:
-    label: TPMT*1
+  TPMT*1:
     mutations: []
-  TPMT*2.001:
-    label: TPMT*2
+  TPMT*1S:
+    mutations: []
+    ignored: true
+  TPMT*2:
     mutations:
     - [16420, G>C, rs1800462, A80P]
-  TPMT*3.001:
-    label: TPMT*3A
+  TPMT*3A:
     mutations:
     - [21147, G>A, rs1800460, A154T]
     - [29457, A>G, rs1142345, Y240C]
-  TPMT*3.002:
-    label: TPMT*3B
+  TPMT*3B:
     mutations:
     - [21147, G>A, rs1800460, A154T]
-  TPMT*3.003:
-    label: TPMT*3C
+  TPMT*3C:
     mutations:
     - [29457, A>G, rs1142345, Y240C]
-  TPMT*3.004:
-    label: TPMT*3D
+  TPMT*3D:
     mutations:
     - [16474, G>T, rs72552739, E98X]
     - [21147, G>A, rs1800460, A154T]
     - [29457, A>G, rs1142345, Y240C]
-  TPMT*3.005:
-    label: TPMT*3E
+  TPMT*3E:
     mutations:
     - [21147, G>A, rs1800460, A154T]
     - [29457, A>G, rs1142345, Y240C]
-  TPMT*4.001:
-    label: TPMT*4
+    ignored: true
+  TPMT*4:
     mutations:
     - [29363, G>A, rs1800584, SpliceVariant]
-  TPMT*5.001:
-    label: TPMT*5
+  TPMT*5:
     mutations:
     - [12234, T>C, rs72552740, L49S]
-  TPMT*6.001:
-    label: TPMT*6
+  TPMT*6:
     mutations:
     - [26299, A>T, rs75543815, Y180F]
-  TPMT*7.001:
-    label: TPMT*7
+  TPMT*7:
     mutations:
-    - [29419, A>G, rs72552736, H227Q]
-  TPMT*8.001:
-    label: TPMT*8
+    - [29419, T>G, rs72552736, H227Q]
+  TPMT*8:
     mutations:
     - [29382, G>A, rs56161402, R215H]
-  TPMT*9.001:
-    label: TPMT*9
+  TPMT*9:
     mutations:
     - [16538, A>C, rs151149760, K119T]
-  TPMT*10.001:
-    label: TPMT*10
+  TPMT*10:
     mutations:
     - [21117, G>C, rs72552737, G144R]
-  TPMT*11.001:
-    label: TPMT*11
+  TPMT*11:
     mutations:
     - [20455, G>A, rs72552738, C132Y]
-  TPMT*12.001:
-    label: TPMT*12
+  TPMT*12:
     mutations:
     - [20434, C>T, rs200220210, S125L]
-  TPMT*13.001:
-    label: TPMT*13
+  TPMT*13:
     mutations:
     - [11099, A>T, rs72552742, E28V]
-  TPMT*14.001:
-    label: TPMT*14
+  TPMT*14:
     mutations:
     - [11017, A>G, rs9333569, M1V]
-  TPMT*15.001:
-    label: TPMT*15
+  TPMT*15:
     mutations:
     - [26254, G>A, rs9333570, SpliceVariant]
-  TPMT*16.001:
-    label: TPMT*16
+  TPMT*16:
     mutations:
     - [21175, G>A, rs144041067, R163H]
-  TPMT*17.001:
-    label: TPMT*17
+  TPMT*17:
     mutations:
     - [11140, C>G, '-', Q42E]
-  TPMT*18.001:
-    label: TPMT*18
+  TPMT*18:
     mutations:
     - [12299, G>A, rs777686348, G71R]
-  TPMT*19.001:
-    label: TPMT*19
+  TPMT*19:
     mutations:
     - [16547, A>C, '-', K122T]
-  TPMT*20.001:
-    label: TPMT*20
+  TPMT*20:
     mutations:
     - [29450, A>G, rs150900439, K238E]
-  TPMT*21.001:
-    label: TPMT*21
+  TPMT*21:
     mutations:
     - [12293, C>G, rs200591577, L69V]
-  TPMT*22.001:
-    label: TPMT*22
+  TPMT*22:
     mutations:
-    - [21175, G>C, rs144041067, R163P]
-  TPMT*23.001:
-    label: TPMT*23
+    - [ignored, 21175, G>C, '-', R163P]
+    ignored: true
+  TPMT*23:
     mutations:
     - [26260, C>G, rs74423290, A167G]
-  TPMT*24.001:
-    label: TPMT*24
+  TPMT*24:
     mutations:
     - [26297, G>T, rs6921269, Q179H]
-  TPMT*25.001:
-    label: TPMT*25
+  TPMT*25:
     mutations:
     - [29372, T>C, rs377085266, C212R]
-  TPMT*26.001:
-    label: TPMT*26
+  TPMT*26:
     mutations:
     - [28008, T>C, rs72556347, F208L]
-  TPMT*27.001:
-    label: TPMT*27
+  TPMT*27:
     mutations:
     - [16501, T>G, '-', Y107D]
-  TPMT*28.001:
-    label: TPMT*28
+  TPMT*28:
     mutations:
     - [16531, G>C, rs1183234651, G117R]
-  TPMT*29.001:
-    label: TPMT*29
+  TPMT*29:
     mutations:
     - [11018, T>C, rs267607275, M1T]
-  TPMT*30.001:
-    label: TPMT*30
+  TPMT*30:
     mutations:
     - [11122, G>A, rs750424422, G36S]
-  TPMT*31.001:
-    label: TPMT*31
+  TPMT*31:
     mutations:
     - [27997, T>C, rs79901429, I204T]
-  TPMT*32.001:
-    label: TPMT*32
+  TPMT*32:
     mutations:
-    - [16522, G>A, rs115106679, E114K]
-  TPMT*33.001:
-    label: TPMT*33
+    - [ignored, 16522, G>A, rs115106679, E114K]
+    ignored: true
+  TPMT*33:
     mutations:
     - [21174, C>T, rs112339338, R163C]
-  TPMT*34.001:
-    label: TPMT*34
+  TPMT*34:
     mutations:
     - [16426, C>T, rs111901354, R82W]
-  TPMT*35.001:
-    label: TPMT*35
+  TPMT*35:
     mutations:
     - [12288, T>C, '-', F67S]
-  TPMT*36.001:
-    label: TPMT*36
+  TPMT*36:
     mutations:
     - [27981, G>A, '-', V199I]
-  TPMT*37.001:
-    label: TPMT*37
+  TPMT*37:
     mutations:
     - [29386, T>A, rs398122996, C216X]
-  TPMT*38.001:
-    label: TPMT*38
+  TPMT*38:
     mutations:
-    - [26274, T>C, rs772832951, S172P]
-  TPMT*39.001:
-    label: TPMT*39
+    - [ignored, 26274, T>C, rs772832951, S172P]
+    ignored: true
+  TPMT*39:
     mutations:
-    - [12306, C>T, rs281874771, A73V]
-  TPMT*40.001:
-    label: TPMT*40
+    - [ignored, 12306, C>T, rs281874771, A73V]
+    ignored: true
+  TPMT*40:
     mutations:
-    - [29415, G>A, rs139392616, R226Q]
-  TPMT*41.001:
-    label: TPMT*41
+    - [ignored, 29415, G>A, rs139392616, R226Q]
+    ignored: true
+  TPMT*41:
     mutations:
-    - [29457, A>C, rs1142345, Y240S]
-  TPMT*42.001:
-    label: TPMT*42
+    - [ignored, 29457, A>C, rs1142345, Y240S]
+    ignored: true
+  TPMT*42:
     mutations:
-    - [11111, insA, rs759836180, K32KfsX58]
-  TPMT*43.001:
-    label: TPMT*43
+    - [ignored, 11111, insA, rs759836180, K33Frameshift]
+    ignored: true
+  TPMT*43:
     mutations:
-    - [16416, G>T, rs1256618794, W78C]
-    - [16444, G>A, rs753545734, G88S]
-  TPMT*44.001:
-    label: TPMT*44
+    - [ignored, 16416, G>T, rs1256618794, W78C]
+    - [ignored, 16444, G>A, rs753545734, G88S]
+    ignored: true
+  TPMT*44:
     mutations:
-    - [26257, A>G, rs201695576, Y166C]
+    - [ignored, 26257, A>G, rs201695576, Y166C]
+    ignored: true
 structure:
   genes: [TPMT]
   regions:
     hg19:
-      up: [18155306, 18160375]
-      utr5: [18149359, 18155306]
-      e1: [18149219, 18149359]
-      e2: [18148054, 18148147]
-      e3: [18143827, 18143960]
-      e4: [18139896, 18139949]
-      e5: [18139194, 18139269]
-      e6: [18134035, 18134121]
-      e7: [18132364, 18132409]
-      e8: [18130899, 18131012]
-      utr3: [18128542, 18130899]
-      down: [18126542, 18128542]
+      up: [18155077, 18160375]
+      utr5: [18155306, 18155077]
+      e1: [18155264, 18155306]
+      e2: [18149219, 18149403]
+      e3: [18148054, 18148147]
+      e4: [18143827, 18143960]
+      e5: [18139896, 18139949]
+      e6: [18139194, 18139269]
+      e7: [18134035, 18134121]
+      e8: [18132364, 18132409]
+      e9: [18128542, 18131012]
+      utr3: [18128311, 18128542]
+      down: [18126542, 18128311]
     hg38:
-      up: [18155078, 18160144]
-      utr5: [18149128, 18155078]
-      e1: [18148988, 18149128]
-      e2: [18147823, 18147916]
-      e3: [18143596, 18143729]
-      e4: [18139665, 18139718]
-      e5: [18138963, 18139038]
-      e6: [18133804, 18133890]
-      e7: [18132133, 18132178]
-      e8: [18130668, 18130781]
-      utr3: [18128311, 18130668]
+      up: [18155077, 18160144]
+      utr5: [18155078, 18155077]
+      e1: [18155033, 18155078]
+      e2: [18148988, 18149172]
+      e3: [18147823, 18147916]
+      e4: [18143596, 18143729]
+      e5: [18139665, 18139718]
+      e6: [18138963, 18139038]
+      e7: [18133804, 18133890]
+      e8: [18132133, 18132178]
+      e9: [18128311, 18130781]
+      utr3: [18128311, 18128311]
       down: [18126311, 18128311]
   cn_regions: [e1, e2, e3, e4, e5, e6, e7, e8]
 reference:

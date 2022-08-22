@@ -1,53 +1,58 @@
 name: CFTR
-version: pharmgkb+pharmacoscan-r9
+version: pharmacoscan-r9
 generated: '2022-08-21'
 ensembl: ENSG00000001626
 alleles:
   CFTR*A455E:
     mutations:
-    - [88012, C>A, rs74551128, A455E]
+    - [ignored, 88012, C>A, rs74551128, A455E]
+    ignored: true
   CFTR*A1067T:
     mutations:
-    - [150857, G>A, rs121909020, A1067T]
+    - [ignored, 150857, G>A, rs121909020, A1067T]
+    ignored: true
   CFTR*D110E:
     mutations:
-    - [70172, C>A, rs397508537, D110E]
+    - [ignored, 70172, C>A, rs397508537, D110E]
+    ignored: true
   CFTR*D110H:
     mutations:
-    - [70170, G>C, rs113993958, D110H]
+    - [ignored, 70170, G>C, rs113993958, D110H]
+    ignored: true
   CFTR*D579G:
     mutations:
-    - [129626, A>G, rs397508288, D579G]
+    - [ignored, 129626, A>G, rs397508288, D579G]
+    ignored: true
   CFTR*D1152H:
     mutations:
-    - [153916, G>C, rs75541969, D1152H]
+    - [ignored, 153916, G>C, rs75541969, D1152H]
+    ignored: true
   CFTR*D1270N:
     mutations:
-    - [181745, G>A, rs11971167, D1270N]
+    - [ignored, 181745, G>A, rs11971167, D1270N]
+    ignored: true
   CFTR*E56K:
     mutations:
-    - [48252, G>A, rs397508256, E56K]
-  CFTR*E193K:
-    mutations:
-    - [73580, G>A, rs397508759, E193K]
-  CFTR*E831X:
-    mutations:
-    - [134147, G>T, rs397508387, E831X]
+    - [ignored, 48252, G>A, rs397508256, E56K]
+    ignored: true
   CFTR*F508del:
     mutations:
     - [98809, delCTT, rs113993960, F508del]
   CFTR*F1052V:
     mutations:
-    - [150812, T>G, rs150212784, F1052V]
+    - [ignored, 150812, T>G, rs150212784, F1052V]
+    ignored: true
   CFTR*F1074L:
     mutations:
-    - [150880, T>A, rs186045772, F1074L]
+    - [ignored, 150880, T>A, rs186045772, F1074L]
+    ignored: true
   CFTR*G178R:
     mutations:
     - [73535, G>A, rs80282562, G178R]
   CFTR*G542X:
     mutations:
-    - [126995, G>T, rs113993959, G542X]
+    - [ignored, 126995, G>T, rs113993959, G542X]
+    ignored: true
   CFTR*G551D:
     mutations:
     - [127023, G>A, rs75527207, G551D]
@@ -56,52 +61,66 @@ alleles:
     - [127022, G>A, rs121909013, G551S]
   CFTR*G1069R:
     mutations:
-    - [150863, G>A, rs200321110, G1069R]
+    - [ignored, 150863, G>A, rs200321110, G1069R]
+    ignored: true
   CFTR*G1244E:
     mutations:
     - [181668, G>A, rs267606723, G1244E]
+    - [ignored, 181668, G>A, rs267606723, G1244E]
   CFTR*G1244V:
     mutations:
-    - [181668, G>T, rs267606723, G1244V]
+    - [ignored, 181668, G>T, rs267606723, G1244V]
+    ignored: true
   CFTR*G1349D:
     mutations:
     - [203987, G>A, rs193922525, G1349D]
   CFTR*K1060T:
     mutations:
-    - [150837, A>C, rs397508513, K1060T]
+    - [ignored, 150837, A>C, rs397508513, K1060T]
+    ignored: true
   CFTR*L206W:
     mutations:
-    - [74502, T>G, rs121908752, L206W]
+    - [ignored, 74502, T>G, rs121908752, L206W]
+    ignored: true
   CFTR*P67L:
     mutations:
-    - [48286, C>T, rs368505753, P67L]
+    - [ignored, 48286, C>T, rs368505753, P67L]
+    ignored: true
   CFTR*R74W:
     mutations:
-    - [48306, C>T, rs115545701, R74W]
+    - [ignored, 48306, C>T, rs115545701, R74W]
+    ignored: true
   CFTR*R117C:
     mutations:
-    - [70191, C>T, rs77834169, R117C]
+    - [ignored, 70191, C>T, rs77834169, R117C]
+    ignored: true
   CFTR*R117H:
     mutations:
-    - [70192, G>A, rs78655421, R117H]
+    - [ignored, 70192, G>A, rs78655421, R117H]
+    ignored: true
   CFTR*R347H:
     mutations:
-    - [79487, G>A, rs77932196, R347H]
+    - [ignored, 79487, G>A, rs77932196, R347H]
+    ignored: true
   CFTR*R352Q:
     mutations:
-    - [79502, G>A, rs121908753, R352Q]
+    - [ignored, 79502, G>A, rs121908753, R352Q]
+    ignored: true
   CFTR*R1070Q:
     mutations:
-    - [150867, G>A, rs78769542, R1070Q]
+    - [ignored, 150867, G>A, rs78769542, R1070Q]
+    ignored: true
   CFTR*R1070W:
     mutations:
-    - [150866, C>T, rs202179988, R1070W]
+    - [ignored, 150866, C>T, rs202179988, R1070W]
+    ignored: true
   CFTR*R1158X:
     mutations:
     - [166742, C>T, rs79850223, R1158X]
   CFTR*S549I:
     mutations:
     - [127017, G>T, rs121908755, S549I]
+    - [ignored, 127017, G>T, rs121908755, S549I]
   CFTR*S549N:
     mutations:
     - [127017, G>A, rs121908755, S549N]
@@ -109,15 +128,16 @@ alleles:
     mutations:
     - [127016, A>C, rs121908757, S549R]
   CFTR*S549R.002:
-    label: CFTR*S549R(T>G)
     mutations:
     - [127018, T>G, rs121909005, S549R]
   CFTR*S945L:
     mutations:
-    - [142925, C>T, rs397508442, S945L]
+    - [ignored, 142925, C>T, rs397508442, S945L]
+    ignored: true
   CFTR*S977F:
     mutations:
-    - [145912, C>T, rs141033578, S977F]
+    - [ignored, 145912, C>T, rs141033578, S977F]
+    ignored: true
   CFTR*S1251N:
     mutations:
     - [181689, G>A, rs74503330, S1251N]
@@ -129,18 +149,12 @@ alleles:
   CFTR*Y563N:
     mutations:
     - [129577, T>A, rs121909006, Y563N]
-  random:
-    - [179178, C>T, rs75039782, intron]
-    - [150772, A>G, rs76151804, intron]
-    - [142085, G>A, rs80224560, intron]
-    - [73585, A>G, rs397508761, intron]
 structure:
   genes: [CFTR]
   regions:
     hg19:
-      up: [117100838, 117120017]
-      utr5: [117120017, 117120149]
-      e1: [117120149, 117120202]
+      up: [117100838, 117480025]
+      e1: [117120017, 117120202]
       e2: [117144307, 117144418]
       e3: [117149088, 117149197]
       e4: [117170953, 117171169]
@@ -166,13 +180,14 @@ structure:
       e24: [117292896, 117292986]
       e25: [117304742, 117304915]
       e26: [117305513, 117305619]
-      e27: [117306962, 117307163]
-      utr3: [117307163, 117308716]
-      down: [117308716, 117358026]
+      e27: [117306962, 117308716]
+      utr3: [117308716, 117668665]
+      utr5: [117480025, 117120017]
+      down: [117668665, 117358026]
     hg38:
       up: [117460784, 117480025]
-      utr5: [117480025, 117480095]
-      e1: [117480095, 117480148]
+      e1: [117480025, 117480148]
+      utr5: [117480025, 117480025]
       e2: [117504253, 117504364]
       e3: [117509034, 117509143]
       e4: [117530899, 117531115]
@@ -198,9 +213,9 @@ structure:
       e24: [117652842, 117652932]
       e25: [117664688, 117664861]
       e26: [117665459, 117665565]
-      e27: [117666908, 117667109]
-      utr3: [117667109, 117668666]
-      down: [117668666, 117717972]
+      e27: [117666908, 117668666]
+      utr3: [117668666, 117668665]
+      down: [117668665, 117717972]
   cn_regions: [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16,
     e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27]
 reference:
