@@ -958,10 +958,6 @@ alleles:
     activity: I/Deficient with CNSHA
     mutations:
     - [20513, delGAA, '-', K497del]
-  G6PD*hektoen:
-    label: Hektoen
-    activity: V/Normal
-    mutations: []
 structure:
   genes: [G6PD]
   regions:

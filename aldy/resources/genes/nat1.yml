@@ -60,7 +60,7 @@ alleles:
     - [57226, T>G, rs4986783]
     - [57651, delAAAAAAAA, '-']
   NAT1*14.001:
-    label: NAT1*14
+    label: NAT1*14B
     mutations:
     - [57146, G>A, rs4986782, R187Q]
   NAT1*14.002:
@@ -68,10 +68,6 @@ alleles:
     mutations:
     - [57681, C>A, rs15561, UTR]
     - [57674, T>A, rs1057126, UTR]
-    - [57146, G>A, rs4986782, R187Q]
-  NAT1*14.003:
-    label: NAT1*14B
-    mutations:
     - [57146, G>A, rs4986782, R187Q]
   NAT1*15.001:
     label: NAT1*15
@@ -87,7 +83,7 @@ alleles:
     mutations:
     - [56776, C>T, rs56379106, R64W]
   NAT1*18.001:
-    label: NAT1*18
+    label: NAT1*18B
     mutations:
     - [57650, delAAA, rs4646271, UTR]
   NAT1*18.002:
@@ -96,19 +92,11 @@ alleles:
     - [57681, C>A, rs15561, UTR]
     - [57674, T>A, rs1057126, UTR]
     - [57650, delAAA, rs4646271, UTR]
-  NAT1*18.003:
-    label: NAT1*18B
-    mutations:
-    - [57650, delAAA, rs4646271, UTR]
   NAT1*19.001:
-    label: NAT1*19
-    mutations:
-    - [56683, C>T, rs56318881, R33Stop]
-  NAT1*19.002:
     label: NAT1*19A
     mutations:
     - [56683, C>T, rs56318881, R33Stop]
-  NAT1*19.003:
+  NAT1*19.002:
     label: NAT1*19B
     mutations:
     - [56776, C>T, rs56379106, R64W]
@@ -138,17 +126,13 @@ alleles:
     mutations:
     - [57373, A>G, rs72554611, I263V]
   NAT1*26.001:
-    label: NAT1*26
+    label: NAT1*26B
     mutations:
     - [57651, insTAA, rs567144265, UTR]
   NAT1*26.002:
     label: NAT1*26A
     mutations:
     - [57681, C>A, rs15561, UTR]
-    - [57651, insTAA, rs567144265, UTR]
-  NAT1*26.003:
-    label: NAT1*26B
-    mutations:
     - [57651, insTAA, rs567144265, UTR]
   NAT1*27.001:
     label: NAT1*27
