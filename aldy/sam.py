@@ -29,14 +29,14 @@ class Sample:
     def __init__(
         self,
         gene: Gene,
-        profile: Profile,
+        profile: Optional[Profile],
         path: str,
         reference: Optional[str] = None,
         debug: Optional[str] = None,
     ):
         """
         :param gene: Gene instance.
-        :param profile: Profile instance.
+        :param profile: Profile instance. `None` if loading a dump file.
         :param path: Path to a SAM/BAM/CRAM/VCF/dump file.
         :param reference: Reference genome path for reading CRAM files.
             Default: None.
@@ -92,7 +92,6 @@ class Sample:
         """Set if long-read data is used."""
 
         with Timing("[sam] Read SAM"):
-            group_indels = False
             self.kind, _ = detect_genome(path)
             self.genome = gene.genome
 
@@ -341,12 +340,13 @@ class Sample:
         log.warn("Loading debug dump from {}", dump_path)
         (
             self.name,
+            self.profile,
             self._dump_cn,
             norm,
             muts,
             phases,
             self._fusion_counter,
-            _,
+            self._indel_sites,
         ) = pickle.load(
             fd
         )  # type: ignore
@@ -363,12 +363,13 @@ class Sample:
             pickle.dump(
                 (
                     self.name,
+                    self.profile,
                     self._dump_cn,
                     {p: Counter(q) for p, q in norm.items()},
                     {p: Counter(q) for p, q in muts.items()},
                     [v for v in self.phases.values() if len(v) > 1],
                     self._fusion_counter,
-                    None,  # TODO: remove
+                    self._indel_sites,  # TODO: remove
                 ),
                 fd,  # type: ignore
             )

@@ -214,18 +214,6 @@ alleles:
     - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
-  CYP2C19*2.012:
-    pharmvar: https://www.pharmvar.org/haplotype/1543
-    activity: no function
-    evidence: D
-    mutations:
-    - [4928, T>C, rs4986894]
-    - [5124, C>T, rs17885098]
-    - [17485, G>C, rs17878459, E92D]
-    - [17687, A>G, rs12769205, splice defect]
-    - [24179, G>A, rs4244285, splice defect]
-    - [85185, C>T, rs3758580]
-    - [85186, A>G, rs3758581, I331V]
   CYP2C19*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/85
     activity: no function

@@ -185,9 +185,9 @@ class Profile:
         Default: 1
         """
 
-        self._parse_params(kwargs)
+        self.update(kwargs)
 
-    def _parse_params(self, kwargs):
+    def update(self, kwargs):
         params = {}
         for n, v in kwargs.items():
             if v is not None and n in self.__dict__:
@@ -292,8 +292,9 @@ class Profile:
 
             gene_regions = {}
             for g in sorted(pkg_resources.resource_listdir("aldy.resources", "genes")):
-                if g[-4:] != ".yml":
+                if not g.endswith(".yml"):
                     continue
+                log.debug("Loading {}...", g)
                 gg = Gene(script_path(f"aldy.resources.genes/{g}"), genome=genome)
                 for gi, gr in enumerate(gg.regions):
                     for r, rng in gr.items():

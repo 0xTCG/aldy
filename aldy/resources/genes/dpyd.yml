@@ -922,11 +922,6 @@ alleles:
     activity: function not assigned
     mutations:
     - [846993, G>T, rs672601273, C996F]
-  DPYD*rs672601273.1:
-    pharmvar: https://www.pharmvar.org/haplotype/1022
-    activity: function not assigned
-    mutations:
-    - [846993, G>T, rs672601273, C996F]
   DPYD*rs672601273.2:
     pharmvar: https://www.pharmvar.org/haplotype/1023
     activity: function not assigned

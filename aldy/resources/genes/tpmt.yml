@@ -29,11 +29,6 @@ alleles:
     - [16474, G>T, rs72552739, E98X]
     - [21147, G>A, rs1800460, A154T]
     - [29457, A>G, rs1142345, Y240C]
-  TPMT*3.005:
-    label: TPMT*3E
-    mutations:
-    - [21147, G>A, rs1800460, A154T]
-    - [29457, A>G, rs1142345, Y240C]
   TPMT*4.001:
     label: TPMT*4
     mutations:

@@ -62,17 +62,17 @@ Major star-alleles:
     Minor alleles: *1.001 (*1),
                    *1.002 (*1B)
   *1C:
-    Key mutations: 20:100000105.T>A (-6T>A, NG_TEST:104T>A, functional)
+    Key mutations: 20:100000105.T>A (-5T>A, NG_TEST:105T>A, functional)
     Minor alleles: *1.003 (*1C)
   *2:
-    Key mutations: 20:100000111.delAC (1delAC, NG_TEST:110delAC, frameshift),
-                   20:100000119.insTT (9insTT, NG_TEST:118insTT, frameshift)
+    Key mutations: 20:100000111.delAC (2delAC, NG_TEST:111delAC, frameshift),
+                   20:100000119.insTT (10insTT, NG_TEST:119insTT, frameshift)
     Minor alleles: *2.001 (*2)
   *3:
-    Key mutations: 20:100000151.C>T (41C>T, NG_TEST:150C>T, functional)
+    Key mutations: 20:100000151.C>T (42C>T, NG_TEST:151C>T, functional)
     Minor alleles: *3.001 (*3)
   *5:
-    Key mutations: 20:100000111.delAC (1delAC, NG_TEST:110delAC, frameshift)
+    Key mutations: 20:100000111.delAC (2delAC, NG_TEST:111delAC, frameshift)
     Minor alleles: *5.001 (*5)
   *6:
     Key mutations: none
@@ -88,8 +88,8 @@ EXPECTED_SHOW_MAJOR = f"""
 {HEADER}
 Gene TOY, major star-allele TOY*2:
   Structure: 1
-  Key mutations: 20:100000111.delAC (1delAC, NG_TEST:110delAC, frameshift),
-                 20:100000119.insTT (9insTT, NG_TEST:118insTT, frameshift)
+  Key mutations: 20:100000111.delAC (2delAC, NG_TEST:111delAC, frameshift),
+                 20:100000119.insTT (10insTT, NG_TEST:119insTT, frameshift)
   Minor star-alleles:
     *2.001:
       Legacy name: *2
@@ -100,7 +100,7 @@ EXPECTED_SHOW_MAJOR_2 = f"""
 {HEADER}
 Gene TOY, major star-allele TOY*1C:
   Structure: 1
-  Key mutations: 20:100000105.T>A (-6T>A, NG_TEST:104T>A, functional)
+  Key mutations: 20:100000105.T>A (-5T>A, NG_TEST:105T>A, functional)
   Minor star-alleles:
     *1.003:
       Legacy name: *1C
@@ -121,7 +121,7 @@ Gene TOY, minor star-allele TOY*1.002:
   Major star-allele: TOY*1
   Legacy name: *1B
   Key mutations: none
-  Silent mutations: 20:100000115.T>A (rs28371732, 5T>A, NG_TEST:114T>A)
+  Silent mutations: 20:100000115.T>A (rs28371732, 6T>A, NG_TEST:115T>A)
 
 """  # noqa
 

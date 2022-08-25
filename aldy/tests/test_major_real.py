@@ -24,8 +24,8 @@ def test_different_1(real_gene, solver):  # NA17102/v1
                 (42522612, "C>G"): 279,
                 (42523942, "_"): 266,
                 (42523942, "G>A"): 291,
-                (42524929, "_"): 575,
-                (42524929, "insGGGGCGAAAGGGGCGAAA"): 161,
+                (42524928, "_"): 575,
+                (42524928, "insGGGGCGAAAGGGGCGAAA"): 161,
                 (42525771, "_"): 123,
                 (42525771, "G>A"): 127,
             },
@@ -97,7 +97,7 @@ def test_right_fusion_1(real_gene, solver):  # NA23878/v1
         real_gene,
         solver,
         {
-            "cn": {"1": 2, "36.ALDY": 1},
+            "cn": {"1": 2, "141.1001": 1},
             "data": data,
             "sol": [{"4": 2, "83.ALDY": 1}, {"39": 1, "4": 1, "4N.ALDY": 1}],
         },
@@ -206,8 +206,8 @@ def test_different_2(real_gene, solver):
                 (42523942, "G>A"): 492,
                 (42525771, "_"): 363,
                 (42525771, "G>A"): 328,
-                (42526656, "_"): 572,
-                (42526656, "insA"): 207,
+                (42526655, "_"): 572,
+                (42526655, "insA"): 207,
             },
             "sol": [{"15": 1, "17": 1}],
         },
@@ -245,13 +245,13 @@ def test_many_alleles_2(real_gene, solver):  # HG00463/v2
     assert_major(
         real_gene,
         solver,
-        {"cn": {"1": 2, "36.ALDY": 2}, "data": data, "sol": [{"10": 2, "36.ALDY": 2}]},
+        {"cn": {"1": 2, "141.1001": 2}, "data": data, "sol": [{"10": 2, "36.ALDY": 2}]},
     )
     assert_major(
         real_gene,
         solver,
         {
-            "cn": {"1": 2, "36.ALDY": 1, "61": 1},
+            "cn": {"1": 2, "141.1001": 1, "61": 1},
             "data": data,
             "sol": [{"10": 2, "36.ALDY": 1, "61": 1}],
         },

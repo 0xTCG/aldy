@@ -33,6 +33,8 @@ def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0.0):
         ) < SOLUTION_PRECISION, "Gap violation"
     sols = sorted([sorted(s.solution.items()) for s in sols])
     expected = sorted([sorted(s.items()) for s in expected])
+    print(sols)
+    print(expected)
     assert sols == expected, "Solution mismatch"
 
 

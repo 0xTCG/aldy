@@ -27,13 +27,12 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
         cov[pos][op] = [(60, 60)] * c
 
     profile = Profile("test")
-    cov = Coverage(gene, profile, None, cov, {})
+    cov = Coverage(gene, profile, None, cov, None, {})
     if "phase" in data:
         cov.sam = Sample.__new__(Sample)
         cov.sam.phases = {
             r: {k: v for k, v in ph.items()} for r, ph in data["phase"].items()
         }
-        cov.sam.moved = {}
 
     if isinstance(data["major"], tuple):
         major = MajorSolution(

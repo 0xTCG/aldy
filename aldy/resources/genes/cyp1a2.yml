@@ -26,10 +26,6 @@ alleles:
     label: CYP1A2*1F
     mutations:
     - [5732, C>A, rs762551]
-  CYP1A2*1.007:
-    label: CYP1A2*1G
-    mutations:
-    - [5156, T>G, rs2069526]
   CYP1A2*1.008:
     label: CYP1A2*1H
     mutations:
@@ -138,10 +134,6 @@ alleles:
     - [9427, G>A, rs56107638, Splicing defect]
   CYP1A2*8.001:
     label: CYP1A2*8
-    mutations:
-    - [11060, G>A, rs72547517, R456H]
-  CYP1A2*8.1001:
-    label: CYP1A2*8.ALDY
     mutations:
     - [11060, G>A, rs72547517, R456H]
   CYP1A2*9.001:

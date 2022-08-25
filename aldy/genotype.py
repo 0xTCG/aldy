@@ -181,9 +181,16 @@ def genotype(
     else:
         if cn_solution:
             profile = Profile("user_provided", cn_solution=cn_solution)
-        else:
+        elif kind != "dump":
+            if not profile_name:
+                raise AldyException("Profile not provided")
             profile = Profile.load(gene, profile_name, cn_region, **params)
+        else:
+            profile = None
         sample = sam.Sample(gene, profile, sam_path, reference, debug)
+    profile = sample.profile  # if loaded for a dump
+    if kind == "dump":
+        profile.update(params)
 
     json[gene.name].update({"sample": sample.name})
     is_vcf = output_file and output_file.name.endswith(".vcf")

@@ -463,7 +463,10 @@ def test_comparison(real_gene, solver):  # NA10846/v1
         for major in [{"1": 1, "4": 1}, {"10": 1, "4M": 1}, {"39": 1, "4J": 1}]
     ]
     sols = estimate_minor(
-        real_gene, Coverage(real_gene, Profile("test"), None, cov, {}), majors, solver
+        real_gene,
+        Coverage(real_gene, Profile("test"), None, cov, None, {}),
+        majors,
+        solver,
     )
     assert len(sols) == 3
     sols.sort(key=lambda x: x.score)

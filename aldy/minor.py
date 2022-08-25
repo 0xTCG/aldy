@@ -373,8 +373,6 @@ def solve_minor_model(
             for k, v in rv.items():
                 if k in mut_pos:
                     c.append((k, v))
-                # elif (k, v) in coverage.sam.moved and coverage.sam.moved[0] in mut_pos:
-                #    c.append(coverage.sam.moved[k, v])
             c = sorted(c)
             if len(c) > 1:
                 modes[tuple(c)] += 1

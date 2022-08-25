@@ -52,7 +52,7 @@ class Coverage:
         if indel_coverage:
             self._indels = {k: (n, y) for k, (n, y) in indel_coverage.items() if y}
         else:
-            self._indels = 0
+            self._indels = None
         self._cnv_coverage = cnv_coverage
         self._region_coverage: Dict[Tuple[int, str], float] = {}
 
@@ -168,6 +168,7 @@ class Coverage:
                     new_cov._coverage[pos][o] = pos_mut[o]
         new_cov._indels = None
         if self._indels:
+            new_cov._indels = {}
             for (pos, o), v in self._indels.items():
                 f = filter_fn(self, Mutation(pos, o))
                 if not (isinstance(f, bool) and not f):

@@ -7,7 +7,7 @@ alleles:
     label: NAT2*4
     mutations: []
   NAT2*5.001:
-    label: NAT2*5
+    label: NAT2*5D
     mutations:
     - [14100, T>C, rs1801280, I114T]
   NAT2*5.002:
@@ -26,10 +26,6 @@ alleles:
     mutations:
     - [14100, T>C, rs1801280, I114T]
     - [14562, A>G, rs1208, K268R]
-  NAT2*5.005:
-    label: NAT2*5D
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
   NAT2*5.006:
     label: NAT2*5E
     mutations:
@@ -138,11 +134,6 @@ alleles:
     - [14041, C>T, rs1041983, T94=]
     - [14100, T>C, rs1801280, I114T]
     - [14240, C>T, rs1799929, L161L]
-  NAT2*5.024:
-    label: NAT2*5X
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14162, C>G, rs12720065, L135V]
   NAT2*5.025:
     label: NAT2*5Y
     mutations:
@@ -388,12 +379,12 @@ alleles:
     - [14240, C>T, rs1799929, L161L]
     - [14562, A>G, rs1208, K268R]
   NAT2*12.014:
-    label：NAT2*12N
+    label: NAT2*12N
     mutations:
     - [13880, A>T, rs149283608, N41Y]
     - [14562, A>G, rs1208, K268R]
   NAT2*12.015:
-    label：NAT2*12O
+    label: NAT2*12O
     mutations:
     - [13788, T>C, rs72466456, I10T]
     - [14368, G>T, rs45618543, E203D]
@@ -535,8 +526,8 @@ alleles:
     mutations:
     - [14568, T>C, rs868725509, I270T]
   NAT2*27:
+    mutations:
     - [14348, C>T, rs375746304, R197X]
-
   NAT2*M205L:
     mutations:
     - [14372, A>T, rs45607939, M205L]
