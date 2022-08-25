@@ -182,12 +182,24 @@ def test_gene_alleles(toy_gene):
 
     # Test mutations
     assert toy_gene.mutations == {
-        (100_000_000 + 105 - 1, "T>A"): ("functional", "-", 105 - 1, "T>A"),
-        (100_000_000 + 111 - 1, "delAC"): ("frameshift", "-", 111 - 1, "delAC"),
-        (100_000_000 + 115 - 1, "T>A"): (None, "rs28371732", 115 - 1, "T>A"),
-        (100_000_000 + 119 - 1, "insTT"): ("frameshift", "-", 119 - 1, "insTT"),
-        (100_000_000 + 148 - 1, "insA"): (None, "-", 148 - 1, "insA"),
-        (100_000_000 + 151 - 1, "C>T"): ("functional", "-", 151 - 1, "C>T"),
+        (100_000_000 + 105 - 1, "T>A"): ("functional", "-", 105 - 1, 105 - 1, "T>A"),
+        (100_000_000 + 111 - 1, "delAC"): (
+            "frameshift",
+            "-",
+            111 - 1,
+            111 - 1,
+            "delAC",
+        ),
+        (100_000_000 + 115 - 1, "T>A"): (None, "rs28371732", 115 - 1, 115 - 1, "T>A"),
+        (100_000_000 + 119 - 1, "insTT"): (
+            "frameshift",
+            "-",
+            119 - 1,
+            119 - 1,
+            "insTT",
+        ),
+        (100_000_000 + 148 - 1, "insA"): (None, "-", 148 - 1, 148 - 1, "insA"),
+        (100_000_000 + 151 - 1, "C>T"): ("functional", "-", 151 - 1, 151 - 1, "C>T"),
     }, "Mutations"
     assert toy_gene.has_coverage("1", 100_000_147)
     assert not toy_gene.has_coverage("5", 100_000_147)
@@ -224,5 +236,5 @@ def test_get_rsid(toy_gene):
 
 
 def test_get_refseq(toy_gene):
-    assert toy_gene.get_refseq(100_000_114, "T>A") == "114T>A"
-    assert toy_gene.get_refseq(100_000_114, "T>A", from_atg=True) == "5T>A"
+    assert toy_gene.get_refseq(100_000_114, "T>A") == "115T>A"
+    assert toy_gene.get_refseq(100_000_114, "T>A", from_atg=True) == "6T>A"

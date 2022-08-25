@@ -4,7 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, Tuple, Callable, List, Any
+from typing import Dict, Tuple, Callable, List, Any, Optional
 import copy
 
 from .profile import Profile
@@ -22,7 +22,7 @@ class Coverage:
         profile: Profile,
         sam,
         coverage: Dict[int, Dict[str, List]],
-        indel_coverage: Dict,
+        indel_coverage: Optional[Dict],
         cnv_coverage: Dict[int, int],
     ) -> None:
         """
@@ -47,9 +47,12 @@ class Coverage:
         for pos, ops in coverage.items():
             self._coverage[pos] = {}
             for op, quals in ops.items():
-                if not op.startswith("ins"):
+                if not (indel_coverage and op.startswith("ins")):
                     self._coverage[pos][op] = quals
-        self._indels = {k: (n, y) for k, (n, y) in indel_coverage.items() if y}
+        if indel_coverage:
+            self._indels = {k: (n, y) for k, (n, y) in indel_coverage.items() if y}
+        else:
+            self._indels = 0
         self._cnv_coverage = cnv_coverage
         self._region_coverage: Dict[Tuple[int, str], float] = {}
 
@@ -59,7 +62,7 @@ class Coverage:
 
     def coverage(self, mut: Mutation) -> float:
         """:returns: Mutation coverage."""
-        if (mut.pos, mut.op) in self._indels:
+        if self._indels and (mut.pos, mut.op) in self._indels:
             return self._indels[mut.pos, mut.op][1]
         if mut.pos in self._coverage and mut.op in self._coverage[mut.pos]:
             return len(self._coverage[mut.pos][mut.op])
@@ -69,7 +72,7 @@ class Coverage:
     def total(self, m) -> float:
         """:returns: Location coverage."""
         if isinstance(m, Mutation):
-            if (m.pos, m.op) in self._indels:
+            if self._indels and (m.pos, m.op) in self._indels:
                 return sum(self._indels[m.pos, m.op])
             pos = m.pos
         else:
@@ -163,11 +166,12 @@ class Coverage:
                 elif f:
                     assert isinstance(f, bool)
                     new_cov._coverage[pos][o] = pos_mut[o]
-        new_cov._indels = {}
-        for (pos, o), v in self._indels.items():
-            f = filter_fn(self, Mutation(pos, o))
-            if not (isinstance(f, bool) and not f):
-                new_cov._indels[pos, o] = v
+        new_cov._indels = None
+        if self._indels:
+            for (pos, o), v in self._indels.items():
+                f = filter_fn(self, Mutation(pos, o))
+                if not (isinstance(f, bool) and not f):
+                    new_cov._indels[pos, o] = v
         return new_cov
 
     def diploid_avg_coverage(self) -> float:
@@ -208,7 +212,7 @@ class Coverage:
         """Basic threshold-based filter."""
         thres = (thres or self.profile.threshold) / (cn or 1)
         min_cov = max(self.profile.min_coverage, self.total(mut) * thres)
-        # if (mut.pos, mut.op) in self._indels:
+        # if self._indels and (mut.pos, mut.op) in self._indels:
         #     print(mut, self.coverage(mut), min_cov)
         sz = self.coverage(mut)
         return sz >= min_cov

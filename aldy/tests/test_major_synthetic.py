@@ -25,7 +25,7 @@ def assert_major(gene, solver, major):
     cov = collections.defaultdict(dict)
     for (pos, op), c in major["data"].items():
         cov[pos][op] = [(60, 60)] * c
-    cov = Coverage(gene, profile, None, cov, {})
+    cov = Coverage(gene, profile, None, cov, None, {})
     sols = estimate_major(gene, cov, cn_sol, solver)
 
     if "score" in major:
