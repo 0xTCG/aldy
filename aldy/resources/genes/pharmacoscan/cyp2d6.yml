@@ -126,9 +126,9 @@ alleles:
     - [6041, C>T, rs28371706, T107I]
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
-  CYP2D6*18:
+  CYP2D6*18.001:
     mutations:
-    - [9146, insGTGCCCACT, rs765776661, 468dupVPT]
+    - [9154, insTGCCCACTG, rs765776661, 468_470dupVPT]
   CYP2D6*19:
     mutations:
     - [7559, delAACT, rs72549353, L255Frameshift]
@@ -144,8 +144,7 @@ alleles:
     mutations:
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
-    - [ignored, 7593, insC, '-', R269Frameshift]
-    - [ignored, 7597, insC, rs72549352, R269Frameshift]
+    - [ignored, 7599, insC, rs72549352, R269Frameshift]
     ignored: true
   CYP2D6*22:
     mutations:
@@ -184,7 +183,7 @@ alleles:
     mutations:
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
-    - [ignored, 6875, insTTTCGCCCC, rs72549356, 174_175insFRP]
+    - [ignored, 6883, insTTTCGCCCC, rs72549356, 174_175insFRP]
     ignored: true
   CYP2D6*31:
     mutations:
@@ -235,7 +234,7 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*38:
     mutations:
-    - [7605, delGACT, rs72549351, L271Frameshift]
+    - [7609, delCTGA, rs72549351, T272fs]
   CYP2D6*39:
     mutations:
     - [9200, G>C, rs1135840, S486T]
@@ -243,7 +242,7 @@ alleles:
   CYP2D6*40:
     mutations:
     - [6041, C>T, rs28371706, T107I]
-    - [6875, insTTTCGCCCCTTTCGCCCC, rs72549356, 174_175insFRPx2]
+    - [6883, insTTTCGCCCCTTTCGCCCC, rs72549356, 174_175insFRPx2]
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*41:
@@ -254,7 +253,7 @@ alleles:
   CYP2D6*42:
     mutations:
     - [7870, C>T, rs16947, R296C]
-    - [8279, insGT, rs72549346, V363Frameshift]
+    - [8280, insGT, rs72549346, Q364fs]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*43:
     mutations:
@@ -351,7 +350,7 @@ alleles:
     - [6041, C>T, rs28371706, T107I]
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
-    - [ignored, 6875, insTTTCGCCCC, rs72549356, 174_175insFRP]
+    - [ignored, 6883, insTTTCGCCCC, rs72549356, 174_175insFRP]
     ignored: true
   CYP2D6*59:
     mutations:
