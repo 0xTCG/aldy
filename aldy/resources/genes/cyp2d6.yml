@@ -515,7 +515,7 @@ alleles:
     evidence: D
     mutations:
     - [3785, A>G, rs28735595]
-    - [4264, delGA, rs536645539]
+    - [4270, delGA, rs536645539]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -985,7 +985,7 @@ alleles:
     label: CYP2D6*3A
     evidence: D
     mutations:
-    - [7569, delA, rs35742686, 259frameshift]
+    - [7569, delA, rs35742686, R259fs]
   CYP2D6*3.002:
     pharmvar: https://www.pharmvar.org/haplotype/220
     activity: no function
@@ -993,7 +993,7 @@ alleles:
     evidence: L
     mutations:
     - [6769, A>G, rs1135824, N166D]
-    - [7569, delA, rs35742686, 259frameshift]
+    - [7569, delA, rs35742686, R259fs]
   CYP2D6*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/235
     activity: no function
@@ -1658,14 +1658,14 @@ alleles:
     evidence: D
     mutations:
     - [5468, A>C, rs867984132]
-    - [6727, delT, rs5030655, 152frameshift]
+    - [6727, delT, rs5030655, W152fs]
   CYP2D6*6.002:
     pharmvar: https://www.pharmvar.org/haplotype/196
     activity: no function
     label: CYP2D6*6B
     evidence: D
     mutations:
-    - [6727, delT, rs5030655, 152frameshift]
+    - [6727, delT, rs5030655, W152fs]
     - [6996, G>A, rs5030866, G212E]
   CYP2D6*6.003:
     pharmvar: https://www.pharmvar.org/haplotype/195
@@ -1673,7 +1673,7 @@ alleles:
     label: CYP2D6*6C
     evidence: L
     mutations:
-    - [6727, delT, rs5030655, 152frameshift]
+    - [6727, delT, rs5030655, W152fs]
     - [6996, G>A, rs5030866, G212E]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*6.004:
@@ -1683,7 +1683,7 @@ alleles:
     evidence: D
     mutations:
     - [5468, A>C, rs867984132]
-    - [6727, delT, rs5030655, 152frameshift]
+    - [6727, delT, rs5030655, W152fs]
     - [8308, G>A, rs61737946, G373S]
   CYP2D6*6.005:
     pharmvar: https://www.pharmvar.org/haplotype/383
@@ -1691,7 +1691,7 @@ alleles:
     evidence: D
     mutations:
     - [6266, C>T, rs267608277]
-    - [6727, delT, rs5030655, 152frameshift]
+    - [6727, delT, rs5030655, W152fs]
     - [6996, G>A, rs5030866, G212E]
   CYP2D6*6.006:
     pharmvar: https://www.pharmvar.org/haplotype/1410
@@ -1700,7 +1700,7 @@ alleles:
     mutations:
     - [4283, delAAGT, rs1294135932]
     - [6266, C>T, rs267608277]
-    - [6727, delT, rs5030655, 152frameshift]
+    - [6727, delT, rs5030655, W152fs]
     - [6996, G>A, rs5030866, G212E]
   CYP2D6*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/155
@@ -1965,7 +1965,7 @@ alleles:
     label: CYP2D6*15
     evidence: D
     mutations:
-    - [5156, insT, rs774671100, 47frameshift]
+    - [5156, insT, rs774671100, L47fs]
     - [6188, G>A, rs1081004]
   CYP2D6*15.002:
     pharmvar: https://www.pharmvar.org/haplotype/393
@@ -1973,7 +1973,7 @@ alleles:
     evidence: D
     mutations:
     - [4976, insG, rs28371695]
-    - [5156, insT, rs774671100, 47frameshift]
+    - [5156, insT, rs774671100, L47fs]
     - [7378, A>T, rs749867663]
   CYP2D6*15.003:
     pharmvar: https://www.pharmvar.org/haplotype/1747
@@ -1983,7 +1983,7 @@ alleles:
     - [5096, G>A, rs28371696, R26H]
     - [5121, A>G, rs151226748]
     - [5127, C>T, rs143218187]
-    - [5156, insT, rs774671100, 47frameshift]
+    - [5156, insT, rs774671100, L47fs]
     - [5233, G>C, rs1080995]
     - [5240, C>A, rs1080996]
     - [5242, C>G, rs1080997]
@@ -2148,7 +2148,7 @@ alleles:
     label: CYP2D6*18
     evidence: D
     mutations:
-    - [9153, insGTGCCCACT, rs765776661, insertion]
+    - [9154, insTGCCCACTG, rs765776661, 468_470dupVPT]
   CYP2D6*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/115
     activity: no function
@@ -2156,7 +2156,7 @@ alleles:
     evidence: L
     mutations:
     - [6681, G>C, rs1058164]
-    - [7559, delAACT, rs72549353, 255frameshift]
+    - [7559, delAACT, rs72549353, T256fs]
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*20.001:
@@ -2166,7 +2166,7 @@ alleles:
     evidence: L
     mutations:
     - [6681, G>C, rs1058164]
-    - [6996, insG, rs72549354, 213frameshift]
+    - [6996, insG, rs72549354, L213fs]
     - [6998, C>T, rs150163869]
     - [6999, T>C, rs199535154, L213P]
     - [7870, C>T, rs16947, R296C]
@@ -2189,7 +2189,7 @@ alleles:
     - [5246, T>C, rs1080998]
     - [5329, G>T, rs28371699]
     - [6681, G>C, rs1058164]
-    - [7599, insC, rs72549352, 267frameshift]
+    - [7599, insC, rs72549352, R269fs]
     - [7870, C>T, rs16947, R296C]
     - [8604, G>A, rs28371730]
     - [9200, G>C, rs1135840, S486T]
@@ -2214,7 +2214,7 @@ alleles:
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
     - [6681, G>C, rs1058164]
-    - [7599, insC, rs72549352, 267frameshift]
+    - [7599, insC, rs72549352, R269fs]
     - [7870, C>T, rs16947, R296C]
     - [8404, A>C, rs1985842]
     - [8604, G>A, rs28371730]
@@ -2352,7 +2352,7 @@ alleles:
     evidence: L
     mutations:
     - [6681, G>C, rs1058164]
-    - [6882, insTTTCGCCCC, rs72549356, 174_175insFRP]
+    - [6883, insTTTCGCCCC, rs72549356, 174_175insFRP]
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*31.001:
@@ -2799,7 +2799,7 @@ alleles:
     label: CYP2D6*38
     evidence: L
     mutations:
-    - [7607, delGACT, rs72549351, 272frameshift]
+    - [7609, delCTGA, rs72549351, T272fs]
   CYP2D6*39.001:
     pharmvar: https://www.pharmvar.org/haplotype/1807
     activity: normal function
@@ -3014,7 +3014,7 @@ alleles:
     - [6248, G>A, rs570742137]
     - [6681, G>C, rs1058164]
     - [7870, C>T, rs16947, R296C]
-    - [8279, insGT, rs72549346, 364frameshift]
+    - [8280, insGT, rs72549346, Q364fs]
     - [8404, A>C, rs1985842]
     - [8604, G>A, rs28371730]
     - [8810, C>T, rs4987144]
@@ -3462,7 +3462,7 @@ alleles:
     - [5861, T>G, rs28371702]
     - [6041, C>T, rs28371706, T107I]
     - [6681, G>C, rs1058164]
-    - [6882, insTTTCGCCCC, rs72549356, 174_175insFRP]
+    - [6883, insTTTCGCCCC, rs72549356, 174_175insFRP]
     - [7870, C>T, rs16947, R296C]
     - [8404, A>C, rs1985842]
     - [8604, G>A, rs28371730]
@@ -3985,7 +3985,7 @@ alleles:
     label: CYP2D6*92
     evidence: L
     mutations:
-    - [7015, delC, '-', 219frameshift]
+    - [7015, delC, '-', L220fs]
   CYP2D6*93.001:
     pharmvar: https://www.pharmvar.org/haplotype/174
     activity: uncertain function
@@ -4105,7 +4105,7 @@ alleles:
     - [6057, C>T, rs1081003]
     - [6681, G>C, rs1058164]
     - [7117, A>G, rs2267447]
-    - [7848, delC, rs267608279, 288frameshift]
+    - [7848, delC, rs267608279, S288fs]
     - [8404, A>C, rs1985842]
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
@@ -4125,7 +4125,7 @@ alleles:
     - [6057, C>T, rs1081003]
     - [6681, G>C, rs1058164]
     - [7117, A>G, rs2267447]
-    - [7947, delGATCCTACATCCGGATGTG, rs730882170, 321frameshift]
+    - [7947, delGATCCTACATCCGGATGTG, rs730882170, M321fs]
     - [8404, A>C, rs1985842]
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
@@ -4405,7 +4405,7 @@ alleles:
     activity: no function
     evidence: D
     mutations:
-    - [5082, delC, '-', L22X]
+    - [5083, delC, '-', L22X]
   CYP2D6*121.001:
     pharmvar: https://www.pharmvar.org/haplotype/637
     activity: unknown function
@@ -4475,14 +4475,14 @@ alleles:
     activity: function not assigned
     evidence: D
     mutations:
-    - [8829, delTC, rs757396767, 395frameshift]
+    - [8829, delTC, rs757396767, L395fs]
   CYP2D6*124.002:
     pharmvar: https://www.pharmvar.org/haplotype/1729
     activity: no function
     evidence: D
     mutations:
     - [6998, C>T, rs150163869]
-    - [8829, delTC, rs757396767, 395frameshift]
+    - [8829, delTC, rs757396767, L395fs]
   CYP2D6*125.001:
     pharmvar: https://www.pharmvar.org/haplotype/703
     activity: unknown function
@@ -4891,7 +4891,7 @@ alleles:
     - [5329, G>T, rs28371699]
     - [5861, T>G, rs28371702]
     - [6085, T>G, rs78854695]
-    - [6882, insTTTCGCCCC, rs72549356, 174_175insFRP]
+    - [6883, insTTTCGCCCC, rs72549356, 174_175insFRP]
   CYP2D6*146.001:
     pharmvar: https://www.pharmvar.org/haplotype/1722
     activity: function not assigned
@@ -4928,7 +4928,7 @@ alleles:
     - [5861, T>G, rs28371702]
     - [6057, C>T, rs1081003]
     - [6681, G>C, rs1058164]
-    - [6882, insTTTCGCCCC, rs72549356, 174_175insFRP]
+    - [6883, insTTTCGCCCC, rs72549356, 174_175insFRP]
     - [7117, A>G, rs2267447]
     - [8404, A>C, rs1985842]
     - [8602, A>G, rs2004511]

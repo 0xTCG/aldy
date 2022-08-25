@@ -254,7 +254,7 @@ alleles:
     activity: function not assigned
     evidence: L
     mutations:
-    - [7162, delAA, rs568811809, frameshift]
+    - [7162, delAA, rs568811809, K196fs]
     - [7317, C>T, rs72549439]
     - [10705, T>C, rs28399461]
     - [11713, C>G, rs7248240]

@@ -124,13 +124,13 @@ alleles:
     activity: function not assigned
     evidence: D
     mutations:
-    - [8538, insG, rs761191455, 115frameshift]
+    - [8538, insG, rs761191455, E115fs]
   NUDT15*14.001:
     pharmvar: https://www.pharmvar.org/haplotype/359
     activity: function not assigned
     evidence: M
     mutations:
-    - [5260, insCGGG, rs777311140, 28frameshift]
+    - [5260, insCGGG, rs777311140, C28fs]
   NUDT15*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/350
     activity: function not assigned
@@ -154,7 +154,7 @@ alleles:
     activity: function not assigned
     evidence: D
     mutations:
-    - [8416, delA, rs1457579126, 74frameshift]
+    - [8416, delA, rs1457579126, N74fs]
   NUDT15*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/352
     activity: function not assigned

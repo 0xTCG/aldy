@@ -139,13 +139,6 @@ alleles:
     mutations:
     - [5071, C>T, rs8192709, R22C]
     - [17747, G>C, rs2279341]
-  CYP2B6*2.003:
-    pharmvar: https://www.pharmvar.org/haplotype/1397
-    activity: normal function
-    evidence: D
-    mutations:
-    - [5071, C>T, rs8192709, R22C]
-    - [17747, G>C, rs2279341]
     - [30813, C>T, rs3181842]
     - [31100, T>C, rs7246465]
     - [31601, G>T, rs28969420]

@@ -105,9 +105,11 @@ def genotype(
             if len(i) > 4 and i.endswith(".yml") and not i.startswith("pharma-")
         ]
         avail_genes = sorted(avail_genes)
-    elif gene_db == "pharma":
-        avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
-        avail_genes = [i[:-4] for i in avail_genes if i.startswith("pharma-")]
+    elif gene_db == "pharmacoscan":
+        avail_genes = pkg_resources.resource_listdir(
+            "aldy.resources.genes", "pharmacoscan"
+        )
+        avail_genes = [i[:-4] for i in avail_genes if i.endswith(".yml")]
         avail_genes = sorted(avail_genes)
     else:
         avail_genes = gene_db.lower().split(",")

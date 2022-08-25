@@ -50,7 +50,7 @@ alleles:
     activity: function not assigned
     label: CYP3A7*3
     mutations:
-    - [9116, insT, rs755093770, 48frameshift]
+    - [9116, insT, rs755093770, L47fs]
 structure:
   genes: [CYP3A7]
   regions:

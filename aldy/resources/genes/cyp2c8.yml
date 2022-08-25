@@ -190,7 +190,7 @@ alleles:
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
-    - [7284, delA, rs72558196, 159frameshift]
+    - [7284, delA, rs72558196, T159fs]
   CYP2C8*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/1573
     activity: function not assigned

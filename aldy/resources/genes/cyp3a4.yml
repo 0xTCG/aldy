@@ -87,7 +87,7 @@ alleles:
     evidence: L
     mutations:
     - [4713, G>A, rs2740574]
-    - [22774, insA, rs4646438, 277Frameshift]
+    - [22774, insA, rs4646438, D277fs]
   CYP3A4*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/1526
     activity: function not assigned
@@ -197,7 +197,7 @@ alleles:
     evidence: L
     mutations:
     - [4713, G>A, rs2740574]
-    - [31002, insA, rs67666821, 488Frameshift]
+    - [31002, insA, rs67666821, P488fs]
   CYP3A4*21.001:
     pharmvar: https://www.pharmvar.org/haplotype/1506
     activity: function not assigned

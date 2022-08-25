@@ -20,13 +20,13 @@ alleles:
     activity: function not assigned
     label: CYP3A43*2A
     mutations:
-    - [13443, delA, rs61469810, 25frameshift]
+    - [13443, delA, rs61469810, Y25fs]
   CYP3A43*2.002:
     pharmvar: https://www.pharmvar.org/haplotype/335
     activity: function not assigned
     label: CYP3A43*2B
     mutations:
-    - [13443, delA, rs61469810, 25frameshift]
+    - [13443, delA, rs61469810, Y25fs]
     - [36970, C>G, rs680055, P340A]
   CYP3A43*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/331

@@ -162,7 +162,7 @@ alleles:
     label: CYP2C9*6
     evidence: L
     mutations:
-    - [16126, delA, rs9332131, 273frameshift]
+    - [16126, delA, rs9332131, K273fs]
   CYP2C9*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/28
     activity: uncertain function
@@ -350,7 +350,7 @@ alleles:
     label: CYP2C9*25
     evidence: D
     mutations:
-    - [9056, delAGAAATGGAA, rs1304490498, 118frameshift]
+    - [9056, delAGAAATGGAA, rs1304490498, K118fs]
   CYP2C9*26.001:
     pharmvar: https://www.pharmvar.org/haplotype/41
     activity: decreased function

@@ -52,7 +52,7 @@ alleles:
     evidence: D
     mutations:
     - [8807, C>T, rs28383468, H30Y]
-    - [8811, insG, rs28383469, frameshift]
+    - [8811, insG, rs28383469, G31fs]
     - [12083, A>G, rs776746, splice defect]
   CYP3A5*3.003:
     pharmvar: https://www.pharmvar.org/haplotype/1353
@@ -175,7 +175,7 @@ alleles:
     label: CYP3A5*7
     evidence: D
     mutations:
-    - [32228, insT, rs41303343, 346fs]
+    - [32228, insT, rs41303343, T346fs]
     - [36708, T>C, rs15524]
   CYP3A5*8.001:
     pharmvar: https://www.pharmvar.org/haplotype/1341
