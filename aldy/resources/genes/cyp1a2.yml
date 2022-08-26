@@ -1,6 +1,6 @@
 name: CYP1A2
 version: pharmgkb-karolinska+pharmacoscan-r9
-generated: '2022-08-21'
+generated: '2022-08-26'
 ensembl: ENSG00000140505
 alleles:
   CYP1A2*1.001:
@@ -104,7 +104,6 @@ alleles:
   CYP1A2*1.021:
     label: CYP1A2*1W
     mutations:
-    - [2782, A>G, '-']
     - [3428, delT, rs35694136]
     - [5156, T>G, rs2069526]
     - [5732, C>A, rs762551]

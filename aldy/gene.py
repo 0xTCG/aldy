@@ -384,7 +384,7 @@ class Gene:
             seq = list(self.seq)
             for [pos, nuc] in yml["reference"]["patches"]:
                 seq[pos - 1] = nuc
-            self.seq = "".join(self.seq)
+            self.seq = "".join(seq)
 
         self.chr, start, end, strand, cigar = yml["reference"]["mappings"][self.genome]
         self.chr_to_ref = {}

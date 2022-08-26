@@ -1,6 +1,6 @@
 name: CYP2E1
 version: pharmgkb-karolinska+pharmacoscan-r9
-generated: '2022-08-21'
+generated: '2022-08-26'
 ensembl: ENSG00000130649
 alleles:
   CYP2E1*1.001:
@@ -91,7 +91,6 @@ alleles:
     mutations:
     - [12678, T>A, rs6413432, intron]
   CYP2E1*6.002:
-
     mutations:
     - [15271, G>C, rs2070676]
     - [12678, T>A, rs6413432, intron]
@@ -172,6 +171,8 @@ reference:
   mappings:
     hg19: ['10', 135335867, 135354621, +, M18754]
     hg38: ['10', 133522363, 133541117, +, M18754]
+  patches:
+  - [4701, T]
   exons:
   - [5033, 5210]
   - [6118, 6278]

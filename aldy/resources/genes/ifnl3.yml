@@ -1,6 +1,6 @@
 name: IFNL3
 version: pharmgkb-karolinska+pharmacoscan-r9
-generated: '2022-08-21'
+generated: '2022-08-26'
 ensembl: ENSG00000197110
 alleles:
   IFNL3*K70R:

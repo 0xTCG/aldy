@@ -1,6 +1,6 @@
 name: G6PD
 version: pharmgkb+pharmacoscan-r9
-generated: '2022-08-21'
+generated: '2022-08-26'
 ensembl: ENSG00000160211
 alleles:
   G6PD*202:
@@ -502,7 +502,7 @@ alleles:
     activity: Not reported/Unknown
     mutations:
     - [18154, C>T, rs5030868, S188F]
-    - [20134, C>T, rs2230037, Y437Y]
+    - [20134, T>C, rs2230037, Y437Y]  # seems T>C, not C>T as originally reported
   G6PD*mediterranean.002:
     label: Mediterranean, Dallas, Panama / Sassari, Cagliari, Birmingham
     activity: II/Deficient

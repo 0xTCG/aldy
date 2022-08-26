@@ -1,6 +1,6 @@
 name: NAT1
 version: pharmgkb-karolinska+pharmacoscan-r9
-generated: '2022-08-21'
+generated: '2022-08-26'
 ensembl: ENSG00000171428
 alleles:
   NAT1*3.001:
@@ -14,7 +14,9 @@ alleles:
     label: NAT1*5
     mutations:
     - [56936, GG>CC, rs72554606, R117T]
-    - [57083, GGG>CCC, rs72554608]
+    - [57083, G>C, rs72554608]
+    - [57084, G>C, rs72554608]
+    - [57085, G>C, rs72554608]
     - [57470, A>G, rs55793712]
     - [57562, delA, rs72554612]
     - [57691, delT, rs72554613]
@@ -31,7 +33,7 @@ alleles:
     - [57031, G>A, rs4987076, V149I]
     - [57045, G>A, rs4986990]
     - [57226, T>G, rs4986783, S214A]
-    - [57668, delAATAATAAA, rs367921464]
+    - [57668, delTAATAATAAA, rs367921464]
     - [57681, C>A, rs15561, UTR]
   NAT1*11B:
     label: NAT1*11B
@@ -41,7 +43,7 @@ alleles:
     - [57031, G>A, rs4987076, V149I]
     - [57045, G>A, rs4986990]
     - [57226, T>G, rs4986783, S214A]
-    - [57668, delAATAATAAA, rs367921464]
+    - [57668, delTAATAATAAA, rs367921464]
   NAT1*11.003:
     label: NAT1*11C
     mutations:
@@ -49,7 +51,7 @@ alleles:
     - [56547, A>T, rs4986989]
     - [57045, G>A, rs4986990]
     - [57226, T>G, rs4986783, S214A]
-    - [57668, delAATAATAAA, rs367921464]
+    - [57668, delTAATAATAAA, rs367921464]
   NAT1*14.001:
     label: NAT1*14A
     mutations:
@@ -64,11 +66,12 @@ alleles:
     label: NAT1*15
     mutations:
     - [57145, C>T, rs5030839, R187Stop]
-  NAT1*16.001:
-    label: NAT1*16
-    mutations:
-    - [57677, insAAA, '-', UTR]
-    - [57681, C>A, rs15561, UTR]
+  # RefSeq has this by default? Unclear, needs more validation for inclusion
+  # NAT1*16.001:
+  #   label: NAT1*16
+  #   mutations:
+  #   - [57677, insAAA, '-', UTR]
+  #   - [57681, C>A, rs15561, UTR]
   NAT1*17.001:
     label: NAT1*17
     mutations:
@@ -133,7 +136,7 @@ alleles:
   NAT1*28.001:
     label: NAT1*28
     mutations:
-    - [57653, delAATAAT, rs1392827840, UTR]
+    - [57653, delTAATAA, rs1392827840, UTR]
   NAT1*29.001:
     label: NAT1*29
     mutations:
@@ -175,6 +178,9 @@ reference:
   mappings:
     hg19: ['8', 18022971, 18083199, +, M60228]
     hg38: ['8', 18165462, 18225690, +, M60228]
+  patches:
+  - [57681, C]
+  - [57674, T]
   exons:
   - [56586, 57459]
   seq: |-

@@ -1,6 +1,6 @@
 name: NAT2
 version: pharmgkb-karolinska+pharmacoscan-r9
-generated: '2022-08-21'
+generated: '2022-08-26'
 ensembl: ENSG00000156006
 alleles:
   NAT2*4.001:
@@ -45,13 +45,6 @@ alleles:
     - [14100, T>C, rs1801280, I114T]
     - [14240, C>T, rs1799929, L161L]
     - [14562, A>G, rs1208, K268R]
-  NAT2*5.009:
-    label: NAT2*5H
-    mutations:
-    - [14100, T>C, rs1801280, I114T]
-    - [14240, C>T, rs1799929, L161L]
-    - [14562, A>G, rs1208, K268R]
-    - [14618, delA, '-', S287 Frameshift]
   NAT2*5.010:
     label: NAT2*5I
     mutations:
@@ -307,11 +300,6 @@ alleles:
     label: NAT2*11A
     mutations:
     - [14240, C>T, rs1799929, L161L]
-  NAT2*11.002:
-    label: NAT2*11B
-    mutations:
-    - [14240, C>T, rs1799929, L161L]
-    - [14618, delA, '-', S287Frameshift]
   NAT2*12.001:
     label: NAT2*12A
     mutations:
@@ -555,6 +543,9 @@ reference:
   mappings:
     hg19: ['8', 18243755, 18260724, +, M16969]
     hg38: ['8', 18386245, 18403214, +, M16969]
+  patches:
+  - [14562, A]
+  - [14414, T]
   exons:
   - [13759, 14632]
   seq: |-

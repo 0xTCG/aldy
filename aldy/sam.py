@@ -187,9 +187,11 @@ class Sample:
                         sam,
                         mapping_quality_threshold=self.profile.min_mapq,
                         base_quality_threshold=self.profile.min_quality,
+                        exact_match_for_shiftable=False,
+                        retarget_similarity_cutoff=0.8,
                     )
                     self._indel_sites[pos, op] = valn.count_alleles()
-                    # print(p + 1, o1, o2, self._indel_sites[pos, op])
+                    # print("  ", p + 1, o1, o2, self._indel_sites[pos, op])
                     if self._indel_sites[pos, op][1]:
                         log.debug(
                             "[indel] {}:{} -> {}",
@@ -197,7 +199,6 @@ class Sample:
                             op,
                             self._indel_sites[pos, op],
                         )
-
             if has_index:
                 iter = sam.fetch(
                     region=self.gene.get_wide_region().samtools(prefix=self._prefix)

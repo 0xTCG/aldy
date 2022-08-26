@@ -1,6 +1,6 @@
 name: CYP1A1
 version: pharmgkb-karolinska+pharmacoscan-r9
-generated: '2022-08-21'
+generated: '2022-08-26'
 ensembl: ENSG00000140465
 alleles:
   CYP1A1*1.001:

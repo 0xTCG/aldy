@@ -1,6 +1,6 @@
 name: VKORC1
 version: pharmgkb+pharmacoscan-r9
-generated: '2022-08-21'
+generated: '2022-08-26'
 ensembl: ENSG00000167397
 alleles:
   VKORC1*T:
@@ -103,6 +103,9 @@ reference:
   mappings:
     hg19: ['16', 31100175, 31111277, '-', M11102]
     hg38: ['16', 31088854, 31099956, '-', M11102]
+  patches:
+  - [296, T]
+  - [7481, C]
   exons:
   - [5226, 5399]
   - [6534, 6644]
