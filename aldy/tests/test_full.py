@@ -407,3 +407,25 @@ def test_profile(monkeypatch, capsys):
     with open(script_path("aldy.tests.resources/NA10860.profile.hg38")) as f:
         expected = f.read()
     assert captured.out == expected
+
+
+def test_pacbio(monkeypatch, solver):
+    expected = f"""
+    {HEADER}
+    Genotyping sample HG03166.pb.bam...
+    Potential CYP2D6 gene structures for HG03166:
+    1: 2x*1 (confidence: 100%)
+    Potential major CYP2D6 star-alleles for HG03166:
+    1: 1x*2, 1x*40 (confidence: 100%)
+    Best CYP2D6 star-alleles for HG03166:
+    1: *2 / *40 (confidence=100%)
+        Minor alleles: *2.023, *40.001
+    CYP2D6 results:
+    - *2 / *40
+        Minor: [*2.023] / [*40.001]
+        Legacy notation: [*2.023] / [*40]
+    """
+    file = script_path("aldy.tests.resources/HG03166.pb.bam")
+    assert_file(
+        monkeypatch, file, solver, expected, {"--profile": "pacbio-hifi-targeted"}
+    )

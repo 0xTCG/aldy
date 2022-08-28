@@ -502,7 +502,7 @@ alleles:
     activity: Not reported/Unknown
     mutations:
     - [18154, C>T, rs5030868, S188F]
-    - [20134, T>C, rs2230037, Y437Y]  # seems T>C, not C>T as originally reported
+    - [20134, C>T, rs2230037, Y437Y]
   G6PD*mediterranean.002:
     label: Mediterranean, Dallas, Panama / Sassari, Cagliari, Birmingham
     activity: II/Deficient
@@ -1003,6 +1003,8 @@ reference:
   mappings:
     hg19: [X, 153757606, 153780788, '-', M8600 I1 M2647 D1 M11934]
     hg38: [X, 154529391, 154552573, '-', M23182]
+  patches:
+  - [20134, C]
   exons:
   - [5702, 5784]
   - [6409, 6537]

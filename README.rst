@@ -1,5 +1,5 @@
     **If you are looking for a pre-release of Aldy 4 (beta), please** `go here <https://github.com/0xTCG/aldy/tree/aldy-4>`_
-    
+
 .. raw:: html
 
    <h1 align="center">
@@ -27,6 +27,7 @@ Algorithm details
 
 TL;DR: Aldy 4 uses star-allele databases to guide the process of detecting the most likely genotype.
 The optimization is done in three stages via integer linear programming.
+See `Gene Support` for more details about the supported pharmacogene databases.
 
 More details, together with the API documentation, are available
 `at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
@@ -36,158 +37,6 @@ Experimental data is available `here <paper>`_.
 If you are using Aldy, please cite our papers in the
 `Nature Communications <https://www.nature.com/articles/s41467-018-03273-1>`_
 and `bioRxiv <https://www.biorxiv.org/content/10.1101/2022.08.11.503701v1>`_.
-
-
-Gene Support
-============
-
-.. list-table::
-   :header-rows: 1
-
-   * - Gene
-     - Version
-     - Status
-     - Details
-   * - *CYP2D6*
-     - PharmVar 5.2.3
-     - ✅
-     - Copy number and structural variation support
-   * - *CYP2A6*
-     - PharmVar 5.2.3
-     - ✅
-     - Copy number and structural variation support
-   * - *CYP2B6*
-     - PharmVar 5.2.3
-     - ✅
-     - Some allele calls should be validated (e.g., \*6/\*9)
-   * - *CYP1A1*
-     - PharmGKB (Dec 2014)
-     - ✅
-     -
-   * - *CYP1A2*
-     - PharmGKB (Mar 2014)
-     - ✅
-     -
-   * - *CYP2A13*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP2C19*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP2C8*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP2C9*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP2E1*
-     - PharmGKB (Nov 2013)
-     - ⚠️
-     - Thorough testing on real data sets pending
-   * - *CYP2F1*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP2J2*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP2R1*
-     - PharmVar 5.2.3
-     - ⚠️
-     - Thorough testing on real data sets pending
-   * - *CYP2S1*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP2W1*
-     - PharmVar 5.2.3
-     - ⚠️
-     - Thorough testing on real data sets pending
-   * - *CYP3A43*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP3A4*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP3A5*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP3A7*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CYP4F2*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *CFTR*
-     - PharmGKB (Jun 2020)
-     - ✅
-     -
-   * - *COMT*
-     - Pharmacoscan
-     - ✅
-     -
-   * - *DPYD*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *G6PD*
-     - PharmGKB (Sep 2018)
-     - ⚠️
-     - Thorough testing on real data sets pending; Null allele calling is unstable
-   * - *GSTM1*
-     - Pharmacoscan
-     - ✅
-     -
-   * - *GSTP1*
-     - Pharmacoscan
-     - ✅
-     -
-   * - *IFNL3*
-     - PharmGKB
-     - ✅
-     -
-   * - *NAT1*
-     - PharmGKB (Mar 2014)
-     - ✅
-     -
-   * - *NAT2*
-     - PharmGKB (Mar 2014)
-     - ✅
-     -
-   * - *NUDT15*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *SLCO1B1*
-     - PharmVar 5.2.3
-     - ✅
-     -
-   * - *TPMT*
-     - PharmGKB (Jun 2020)
-     - ✅
-     -
-   * - *UGT1A1*
-     - PharmGKB (Feb 2020)
-     - ⚠️
-     - Thorough testing on real data sets pending
-   * - *UGT2B7*
-     - pharmacogenomics.pha.ulaval.ca (Apr 2015) / Pharmacoscan
-     - ⚠️
-     - Thorough testing on real data sets pending
-   * - *VKORC1*
-     - PharmGKB (Jan 2021)
-     - ⚠️
-     - Thorough testing on real data sets pending
 
 ⚠️ Warning
 ==========
@@ -671,8 +520,171 @@ Commands:
     `the parameter documentation <https://aldy.readthedocs.io/en/latest/source/aldy.html#aldy.profile.Profile>`_
     for the list of the available parameters.
 
+Gene Support
+============
+
+.. list-table::
+   :header-rows: 1
+
+   * - Gene
+     - Version
+     - Status
+     - Details
+   * - *CYP2D6*
+     - PharmVar 5.2.3
+     - ✅
+     - Copy number and structural variation support;
+       Some alleles (e.g., those with _CYP2D7_ exon 9 such as _CYP2D6\*36_, _CYP2D6\*57_, _CYP2D6\*83_ and _CYP2D6\*141_)
+       can be accurately called only when the copy number detection is enabled (i.e., they cannot be called in WES mode);
+       Detection of the non-functional _CYP2D7_ intron 1 retention is spotty.
+   * - *CYP2A6*
+     - PharmVar 5.2.3
+     - ✅
+     - Copy number and structural variation support;
+       Detection of the _CYP2A7_ 3' UTR retention is not yet supported.
+   * - *CYP2B6*
+     - PharmVar 5.2.3
+     - ✅
+     - Some allele calls should be further validated (e.g., \*6/\*9)
+   * - *CYP1A1*
+     - PharmGKB (Dec 2014)
+     - ✅
+     -
+   * - *CYP1A2*
+     - PharmGKB (Mar 2014)
+     - ✅
+     -
+   * - *CYP2A13*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP2C19*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP2C8*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP2C9*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP2E1*
+     - PharmGKB (Nov 2013)
+     - ⚠️
+     - Thorough testing on the real datasets pending
+   * - *CYP2F1*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP2J2*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP2R1*
+     - PharmVar 5.2.3
+     - ⚠️
+     - Thorough testing on the real datasets pending
+   * - *CYP2S1*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP2W1*
+     - PharmVar 5.2.3
+     - ⚠️
+     - Thorough testing on the real datasets pending
+   * - *CYP3A43*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP3A4*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP3A5*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP3A7*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CYP4F2*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *CFTR*
+     - PharmGKB (Jun 2020)
+     - ✅
+     -
+   * - *COMT*
+     - Pharmacoscan
+     - ✅
+     -
+   * - *DPYD*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *G6PD*
+     - PharmGKB (Sep 2018)
+     - ⚠️
+     - Thorough testing on the real datasets pending; Null allele calling is unstable
+   * - *GSTM1*
+     - Pharmacoscan
+     - ✅
+     -
+   * - *GSTP1*
+     - Pharmacoscan
+     - ✅
+     -
+   * - *IFNL3*
+     - PharmGKB
+     - ✅
+     -
+   * - *NAT1*
+     - PharmGKB (Mar 2014)
+     - ✅
+     -
+   * - *NAT2*
+     - PharmGKB (Mar 2014)
+     - ✅
+     -
+   * - *NUDT15*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *SLCO1B1*
+     - PharmVar 5.2.3
+     - ✅
+     -
+   * - *TPMT*
+     - PharmGKB (Jun 2020)
+     - ✅
+     -
+   * - *UGT1A1*
+     - PharmGKB (Feb 2020)
+     - ⚠️
+     - Thorough testing on the real datasets pending
+   * - *UGT2B7*
+     - pharmacogenomics.pha.ulaval.ca (Apr 2015) / Pharmacoscan
+     - ⚠️
+     - Thorough testing on the real datasets pending
+   * - *VKORC1*
+     - PharmGKB (Jan 2021)
+     - ⚠️
+     - Thorough testing on the real datasets pending
+
 Change log
 ==========
+
+- Aldy v4.1 (Aug 28th, 2022)
+   - Output allele's activity and/or impact when available
+   - Updated and tested gene definitions
+     * Major changes to _NAT1_, _NAT2_, _UGT1A1_, _CYP2E1_ and _CYP2A6_
+   - Indel realignment support via `indelpost <https://github.com/stjude/indelPost>`_
+   - New debug format
+   - Various small fixes
 
 - Aldy v4.0 (Aug 17th, 2022)
    - Major model changes

@@ -66,8 +66,9 @@ class Sample:
         """list[tuple[tuple, list]]: Read information."""
 
         self._indel_sites = {
-            (pos, op): (0, 0) for pos, op in gene.mutations if op[:3] in ["ins", "del"]
+            (pos, op): [0, 0] for pos, op in gene.mutations if op[:3] in ["ins", "del"]
         }
+        self._indel_sites_eqs = {}
 
         self._multi_sites = {
             m.pos: m.op
@@ -77,7 +78,7 @@ class Sample:
         }
         """Multi-substitutions (e.g., `A.C>T.G`)."""
 
-        self.grid_columns = {
+        self.phaseable = {
             pos: i for i, pos in enumerate(sorted({pos for pos, _ in gene.mutations}))
         }
         """Locations that should be phased."""
@@ -103,12 +104,12 @@ class Sample:
             elif self.kind == "dump":
                 norm, muts = self._load_dump(path)
             else:
-                if self.profile.sam_long_reads:
+                if self.profile and self.profile.sam_long_reads:
                     self.is_long_read = True
                     norm, muts = self._load_long_sam(path, reference, debug)
                 else:
                     norm, muts = self._load_sam(path, reference, debug)
-                if self.profile.cn_region:
+                if self.profile and self.profile.cn_region:
                     self._dump_cn = self._load_cn_region(
                         path, reference, self.profile.cn_region
                     )
@@ -116,6 +117,7 @@ class Sample:
             if self.kind == "sam" and debug:
                 self._dump_alignments(f"{debug}.{gene.name}", norm, muts)
 
+        assert self.profile, "profile not set"
         if self.profile.cn_region:
             self.coverage._normalize_coverage()
         log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
@@ -135,6 +137,7 @@ class Sample:
         log.debug("[sam] path= {}", os.path.abspath(sam_path))
         if reference:
             log.debug("[sam] reference= {}", os.path.abspath(reference))
+        assert self.profile, "profile not set"
 
         norm: dict = defaultdict(list)
         muts: dict = defaultdict(list)
@@ -155,50 +158,8 @@ class Sample:
                 self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
             )
 
-            # Fetch indel counts
             with tempfile.TemporaryDirectory() as tmp:
-                rname = f"{self._prefix}{self.gene.chr}"
-                if not reference:
-                    reference = f"{tmp}/ref.fa"
-                    with open(reference, "w") as f:
-                        print(f">{rname}", file=f)
-                        print("N" * self.gene._lookup_range[0], end="", file=f)
-                        print(self.gene._lookup_seq, end="", file=f)
-                        sz = sam.get_reference_length(rname)
-                        print("N" * (sz - self.gene._lookup_range[1]), file=f)
-                    os.system("samtools faidx " + reference)
-                ref = pysam.FastaFile(reference)  # type: ignore
-                for pos, op in self._indel_sites:
-                    # print(pos, op, *self.gene.mutations[pos, op][1:3], "-->", end=" ")
-                    p = pos
-                    if op.startswith("del"):
-                        if "ins" in op:
-                            pd, pi = op[3:].split("ins")
-                            o1, o2 = pd, pi
-                        else:
-                            p -= 1
-                            o = self.gene[p]
-                            o1, o2 = o + op[3:], o
-                    else:
-                        o = self.gene[p]
-                        o1, o2 = o, o + op[3:]
-                    valn = indelpost.VariantAlignment(  # type: ignore
-                        indelpost.Variant(rname, p + 1, o1, o2, ref),  # type: ignore
-                        sam,
-                        mapping_quality_threshold=self.profile.min_mapq,
-                        base_quality_threshold=self.profile.min_quality,
-                        exact_match_for_shiftable=False,
-                        retarget_similarity_cutoff=0.8,
-                    )
-                    self._indel_sites[pos, op] = valn.count_alleles()
-                    # print("  ", p + 1, o1, o2, self._indel_sites[pos, op])
-                    if self._indel_sites[pos, op][1]:
-                        log.debug(
-                            "[indel] {}:{} -> {}",
-                            pos + 1,
-                            op,
-                            self._indel_sites[pos, op],
-                        )
+                self._realign_indels(tmp, sam, reference)
             if has_index:
                 iter = sam.fetch(
                     region=self.gene.get_wide_region().samtools(prefix=self._prefix)
@@ -375,6 +336,86 @@ class Sample:
                 fd,  # type: ignore
             )
 
+    def _realign_indels(self, tmp, sam, reference, long_reads=False):
+        """Realign reads around database indels via indelpost module."""
+
+        assert self.profile, "profile not loaded"
+
+        rname = f"{self._prefix}{self.gene.chr}"
+        if not reference:
+            reference = f"{tmp}/ref.fa"
+            with open(reference, "w") as f:
+                print(f">{rname}", file=f)
+                print("N" * self.gene._lookup_range[0], end="", file=f)
+                print(self.gene._lookup_seq, end="", file=f)
+                sz = sam.get_reference_length(rname)
+                print("N" * (sz - self.gene._lookup_range[1]), file=f)
+            os.system("samtools faidx " + reference)
+        ref = pysam.FastaFile(reference)  # type: ignore
+
+        prev_indel = None
+        for pos, op in sorted(self._indel_sites, key=lambda x: (x[0], -len(x[1]))):
+            p = pos
+            if op.startswith("del"):
+                if "ins" in op:
+                    pd, pi = op[3:].split("ins")
+                    o1, o2 = pd, pi
+                else:
+                    p -= 1
+                    o = self.gene[p]
+                    o1, o2 = o + op[3:], o
+            else:
+                o = self.gene[p]
+                o1, o2 = o, o + op[3:]
+
+            v = indelpost.Variant(rname, p + 1, o1, o2, ref)  # type: ignore
+
+            if long_reads:
+                # Speed-up: just generate equivalent indels, no need for the realignment
+                for ev in v.generate_equivalents():
+                    np, no = ev.pos - 1, ""
+                    if len(ev.ref) < len(ev.alt) and ev.alt.startswith(ev.ref):
+                        np += len(ev.ref)
+                        no = "ins" + ev.alt[len(ev.ref) :]
+                    elif len(ev.ref) > len(ev.alt) and ev.ref.startswith(ev.alt):
+                        np += len(ev.alt)
+                        no = "del" + ev.ref[len(ev.alt) :]
+                    if no:
+                        self._indel_sites_eqs[np, no] = (pos, op)
+                continue
+
+            valn = indelpost.VariantAlignment(  # type: ignore
+                v,
+                sam,
+                mapping_quality_threshold=self.profile.min_mapq,
+                base_quality_threshold=self.profile.min_quality,
+                # needed to account for indel and database errors
+                exact_match_for_shiftable=True,
+            )
+
+            phased = valn.phase()
+            if len(phased.ref) - len(phased.alt) != len(v.ref) - len(v.alt):
+                continue  # HACK: this indicates a subsumed indel
+
+            self._indel_sites[pos, op] = list(valn.count_alleles())
+            on_target = {r.query_name for r in valn.fetch_reads("target")}
+            if (
+                prev_indel
+                and pos == prev_indel[0]
+                and op.startswith("ins")
+                and prev_indel[1].startswith(op)  # handle indel repeats
+            ):
+                # do not consider previously used reads
+                off, on = self._indel_sites[pos, op]
+                x = len(on_target & prev_indel[2])
+                self._indel_sites[pos, op] = [off + x, on - x]
+            if self._indel_sites[pos, op][1]:
+                log.debug(
+                    "[indel] {}:{} -> {}", pos + 1, op, self._indel_sites[pos, op]
+                )
+                prev_indel = (pos, op, on_target)
+        # assert False
+
     def _load_cn_region(self, path, reference, cn_region):
         """
         Load the copy-number neutral coverage data from a SAM/BAM/CRAM file.
@@ -435,6 +476,7 @@ class Sample:
         for pos, op in self._multi_sites.items():
             if pos in coverage and op in coverage[pos]:
                 log.debug(f"[sam] multi-SNP {pos}{op}: {len(coverage[pos][op])} reads")
+        assert self.profile, "profile not set"
         self.coverage = Coverage(
             self.gene,
             self.profile,
@@ -503,8 +545,10 @@ class Sample:
                 for i in range(size):
                     muts[start + i, "-"].append((bin_quality(mq), bin_quality(prev_q)))
                 dump_arr.append(mut)
-                if start in self.grid_columns:
+                if start in self.phaseable:
                     phase[start] = mut[1]
+                if self._indel_sites_eqs and mut in self._indel_sites_eqs:
+                    self._indel_sites[self._indel_sites_eqs[mut]][1] += 1
                 start += size
             elif op == 1:  # Insertion
                 mut = (start, "ins" + seq[s_start : s_start + size])
@@ -512,8 +556,10 @@ class Sample:
                 muts[mut].append((bin_quality(mq), bin_quality(q)))
                 prev_q = q
                 dump_arr.append(mut)
-                if start in self.grid_columns:
+                if start in self.phaseable:
                     phase[start] = mut[1]
+                if self._indel_sites_eqs and mut in self._indel_sites_eqs:
+                    self._indel_sites[self._indel_sites_eqs[mut]][1] += 1
                 s_start += size
             elif op == 4:  # Soft-clip
                 s_start += size
@@ -527,11 +573,11 @@ class Sample:
                         mut = (start + i, f"{self.gene[start + i]}>{seq[s_start + i]}")
                         dump_arr.append(mut)
                         muts[mut].append((bin_quality(mq), bin_quality(q)))
-                        if start + i in self.grid_columns:
+                        if start + i in self.phaseable:
                             phase[start + i] = mut[1]
                     else:  # We ignore all mutations outside the RefSeq region
                         norm[start + i].append((bin_quality(mq), bin_quality(q)))
-                        if start + i in self.grid_columns:
+                        if start + i in self.phaseable:
                             phase[start + i] = "_"
                     prev_q = q
                 start += size
@@ -557,6 +603,10 @@ class Sample:
                 muts[pos, op].append(
                     (mean(mq for mq, _ in items), mean(q for _, q in items))
                 )
+
+        for pos, op in self._indel_sites:
+            if ref_start <= pos < start:
+                self._indel_sites[pos, op][0] += 1
         read_pos = (ref_start, start, len(seq))
         return read_pos, dump_arr
 
@@ -572,6 +622,7 @@ class Sample:
         log.debug("[sam] pacbio_path= {}", os.path.abspath(sam_path))
         assert self.genome, "Genome not provided"
         assert self.genome == "hg38", "Only hg38 supported at this moment"
+        assert self.profile, "profile not set"
 
         norm: dict = defaultdict(list)
         muts: dict = defaultdict(list)
@@ -626,6 +677,12 @@ class Sample:
             self._prefix = chr_prefix(
                 self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
             )
+
+            with tempfile.TemporaryDirectory() as tmp:
+                self._realign_indels(tmp, sam, reference, True)
+                for po, (off, on) in self._indel_sites.items():
+                    self._indel_sites[po] = [off - on, on]
+
             wide = self.gene.get_wide_region()
             end = wide.end
             if self.gene.name == "CYP2D6":
