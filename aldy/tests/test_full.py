@@ -62,8 +62,6 @@ def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
     main(["genotype", file] + [i for k, v in args.items() for i in [k, v]])
     expected = "\n".join(e.strip() for e in expected.strip().split("\n"))
     lines = "\n".join(escape_ansi(l).strip() for l in lines).strip()
-    print(lines)
-    print(expected)
     assert lines == expected
 
 
@@ -92,9 +90,15 @@ CYP2D6 results:
   - *1 / *4 + *4.021.ALDY
     Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.001] + [*4.1021 -rs28371738]
     Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4A] + [*4.021.ALDY -rs28371738]
+    Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
+    Estimated activity for *4: no function (evidence: D); see https://www.pharmvar.org/haplotype/235 for details
+    Estimated activity for *4.021.ALDY: no function (evidence: D)
   - *1 / *4.021 + *4N.ALDY
     Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4.1013 -rs28371738]
     Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4N.ALDY -rs28371738]
+    Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
+    Estimated activity for *4.021: no function (evidence: D); see https://www.pharmvar.org/haplotype/652 for details
+    Estimated activity for *4N.ALDY: no function (evidence: D)
 """
 
 
@@ -180,9 +184,15 @@ def test_NA10860_gap(monkeypatch, solver):
     - *1 / *4 + *4.021.ALDY
         Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.001] + [*4.1021 -rs28371738]
         Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4A] + [*4.021.ALDY -rs28371738]
+        Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
+        Estimated activity for *4: no function (evidence: D); see https://www.pharmvar.org/haplotype/235 for details
+        Estimated activity for *4.021.ALDY: no function (evidence: D)
     - *1 / *4.021 + *4N.ALDY
         Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4.1013 -rs28371738]
-    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4N.ALDY -rs28371738]
+        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4N.ALDY -rs28371738]
+        Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
+        Estimated activity for *4.021: no function (evidence: D); see https://www.pharmvar.org/haplotype/652 for details
+        Estimated activity for *4N.ALDY: no function (evidence: D)
     """
     file = script_path("aldy.tests.resources/NA10860.bam")
     assert_file(monkeypatch, file, solver, expected, {"--param": "gap=0.3"})
@@ -205,6 +215,8 @@ def test_NA10860_cn(monkeypatch, solver):
     - *1 / *4.021
         Minor: [*1.018 +rs113889384 +rs28371713] / [*4.021]
         Legacy notation: [*1.018 +rs113889384 +rs28371713] / [*4.021]
+        Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
+        Estimated activity for *4.021: no function (evidence: D); see https://www.pharmvar.org/haplotype/652 for details
     """
     file = script_path("aldy.tests.resources/NA10860.bam")
     assert_file(monkeypatch, file, solver, expected, {"--cn": "1,1"})
@@ -244,12 +256,21 @@ def test_fusion(monkeypatch, solver):
     - *1 / *79 + *2
         Minor: [*1] / [*79#11] + [*2]
         Legacy notation: [*1] / [*79#11] + [*2]
+        Estimated activity for *1: unknown
+        Estimated activity for *2: unknown
+        Estimated activity for *79#2: unknown
     - *2 / *79 + *2
         Minor: [*2] / [*79#1] + [*2]
         Legacy notation: [*2] / [*79#1] + [*2]
+        Estimated activity for *2: unknown
+        Estimated activity for *79#1: unknown
+        Estimated activity for *2: unknown
     - *34 / *79 + *2
         Minor: [*34] / [*79#10] + [*2]
         Legacy notation: [*34] / [*79#10] + [*2]
+        Estimated activity for *2: unknown
+        Estimated activity for *34: unknown
+        Estimated activity for *79#10: unknown
     """
     file = script_path("aldy.tests.resources/HARD.dump.tar.gz")
     assert_file(monkeypatch, file, solver, expected, {"--gene": "pharmacoscan/cyp2d6"})
@@ -270,6 +291,9 @@ def test_fusion_off(monkeypatch, solver):
     - *1 / *2 + *2
         Minor: [*1] / [*2] + [*2]
         Legacy notation: [*1] / [*2] + [*2]
+        Estimated activity for *1: unknown
+        Estimated activity for *2: unknown
+        Estimated activity for *2: unknown
     """
     file = script_path("aldy.tests.resources/HARD.dump.tar.gz")
     assert_file(
@@ -300,6 +324,8 @@ def test_NA07000_vcf_in(monkeypatch, solver):
     - *1 / *15
         Minor: [*1.003] / [*15.001]
         Legacy notation: [*1.003] / [*15A, SLCO1B1*15B, SLCO1B1*17]
+        Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/1713 for details
+        Estimated activity for *15: function not assigned (evidence: D); see https://www.pharmvar.org/haplotype/1704 for details
     """
     file = script_path("aldy.tests.resources/NA07000_SLCO1B1.vcf.gz")
     assert_file(
@@ -327,6 +353,8 @@ def test_fix_insertions(monkeypatch, solver):
     - *1 / *40
         Minor: [*1] / [*40]
         Legacy notation: [*1] / [*40]
+        Estimated activity for *1: unknown
+        Estimated activity for *40: unknown
     """
     file = script_path("aldy.tests.resources/INS.dump.tar.gz")
     assert_file(
@@ -424,6 +452,8 @@ def test_pacbio(monkeypatch, solver):
     - *2 / *40
         Minor: [*2.023] / [*40.001]
         Legacy notation: [*2.023] / [*40]
+        Estimated activity for *2: normal function (evidence: D); see https://www.pharmvar.org/haplotype/1370 for details
+        Estimated activity for *40: no function (evidence: D); see https://www.pharmvar.org/haplotype/231 for details
     """
     file = script_path("aldy.tests.resources/HG03166.pb.bam")
     assert_file(

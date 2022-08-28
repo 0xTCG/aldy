@@ -45,6 +45,8 @@ setup(
             "aldy/tests/resources/*.yml",
             "*.profile",
             "aldy/tests/resources/*.profile",
+            "*.hg38",
+            "aldy/tests/resources/*.hg38",
             "*.vcf",
             "aldy/tests/resources/*.vcf",
             "*.gz",

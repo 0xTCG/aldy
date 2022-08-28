@@ -1,6 +1,6 @@
 .. role:: raw-html(raw)
     :format: html
-    
+
 .. raw:: html
 
    <h1 align="center">
@@ -536,7 +536,7 @@ Gene Support
      - ✅
      - Copy number and structural variation support; :raw-html:`<br />`
        Alleles with the *CYP2D7* exon 9 retention such as \*36, \*57, \*83 and \*141
-       can be accurately called only when the copy number detection is enabled 
+       can be accurately called only when the copy number detection is enabled
        (i.e., they cannot be called in WES mode); :raw-html:`<br />`
        Detection of the non-functional *CYP2D7* intron 1 retention is spotty.
    * - *CYP2A6*
@@ -685,7 +685,7 @@ Change log
    - Output allele's activity and/or impact when available
    - Updated and tested gene definitions
      - Major changes to *NAT1*, *NAT2*, *UGT1A1*, *CYP2E1* and *CYP2A6*
-   
+
    - Indel realignment support via `indelpost <https://github.com/stjude/indelPost>`_
    - New debug format
    - Various small fixes

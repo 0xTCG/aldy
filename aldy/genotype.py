@@ -189,6 +189,7 @@ def genotype(
             profile = None
         sample = sam.Sample(gene, profile, sam_path, reference, debug)
     profile = sample.profile  # if loaded for a dump
+    assert profile, "Profile not set"
     if kind == "dump":
         profile.update(params)
 
@@ -378,16 +379,35 @@ def genotype(
                 log.info(f"    Minor: {r.get_minor_diplotype()}")
                 log.info(f"    Legacy notation: {r.get_minor_diplotype(legacy=True)}")
                 reported.add(st)
+                # Output the activity
+                for m in r.solution:
+                    mn = [
+                        ma.minors[m.minor]
+                        for ma in gene.alleles.values()
+                        if m.minor in ma.minors
+                    ]
+                    msg = f"Estimated activity for {m.major_repr()}"
+                    if len(mn) == 1 and mn[0].activity:
+                        msg = f"{msg}: {mn[0].activity}"
+                        if mn[0].evidence:
+                            msg = f"{msg} (evidence: {mn[0].evidence})"
+                        if mn[0].pharmvar:
+                            msg = f"{msg}; see {mn[0].pharmvar} for details"
+                    else:
+                        msg = f"{msg}: unknown"
+                    log.info(f"    {msg}")
                 # Calculate coverage of each mutation in a solution
-                for m, mc, sc in r.get_mutation_coverages(sample.coverage):
-                    if abs(mc - sc) > 0.5:
-                        log.warn(
-                            "    Warning: Coverage of {} is not in line with "
-                            "the prediction (predicted: {:.1f}, observed: {:.1f})",
-                            gene.get_rsid(m),
-                            mc,
-                            sc,
-                        )
+                if multiple_warn_level >= 2:
+                    for m, mc, sc in r.get_mutation_coverages(sample.coverage):
+                        if abs(mc - sc) > 0.5:
+                            log.warn(
+                                "    Warning: Coverage of {} is not in line with "
+                                "the prediction (predicted: {:.1f}, observed: {:.1f})",
+                                gene.get_rsid(m),
+                                mc,
+                                sc,
+                            )
+
     if (
         any(len(m.major_solution.added) > 0 for m in minor_sols)
         and not sample.is_long_read

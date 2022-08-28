@@ -525,13 +525,13 @@ class Sample:
             """
             if q < 2:
                 return int(q)
-            if 2 <= q < 10:
+            if q < 10:
                 return 6
-            if 10 <= q < 20:
+            if q < 20:
                 return 15
-            if 20 <= q < 29:
+            if q < 29:
                 return 25
-            if 30 <= q < 39:
+            if q < 39:
                 return 35
             return 40
 

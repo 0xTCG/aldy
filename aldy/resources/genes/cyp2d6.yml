@@ -1578,7 +1578,6 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.1013:
-    pharmvar: https://www.pharmvar.org/haplotype/250
     activity: no function
     label: CYP2D6*4N.ALDY
     evidence: D
@@ -1601,7 +1600,6 @@ alleles:
     - [9421, C>T, rs28371738]
     - [CYP2D7, e9+]
   CYP2D6*4.1021:
-    pharmvar: https://www.pharmvar.org/haplotype/250
     activity: no function
     label: CYP2D6*4.021.ALDY
     evidence: D
@@ -1625,7 +1623,6 @@ alleles:
     - [9421, C>T, rs28371738]
     - [CYP2D7, e9+]
   CYP2D6*4.2021:
-    pharmvar: https://www.pharmvar.org/haplotype/250
     activity: no function
     label: CYP2D6*4.021.ALDY_2
     evidence: D
@@ -2764,7 +2761,6 @@ alleles:
     - [9414, delAG, rs202032066]
     - [9464, A>G, rs148648640]
   CYP2D6*36.1001:
-    pharmvar: https://www.pharmvar.org/haplotype/222
     activity: no function
     label: CYP2D6*36.ALDY
     evidence: D
@@ -3428,7 +3424,6 @@ alleles:
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*57.1001:
-    pharmvar: https://www.pharmvar.org/haplotype/183
     activity: no function
     label: CYP2D6*57.ALDY
     evidence: L
@@ -3827,7 +3822,6 @@ alleles:
     - [9414, delAG, rs202032066]
     - [9464, A>G, rs148648640]
   CYP2D6*83.1003:
-    pharmvar: https://www.pharmvar.org/haplotype/665
     label: CYP2D6*83.ALDY
     activity: uncertain function
     evidence: D
