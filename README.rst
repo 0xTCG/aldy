@@ -1,5 +1,6 @@
-    **If you are looking for a pre-release of Aldy 4 (beta), please** `go here <https://github.com/0xTCG/aldy/tree/aldy-4>`_
-
+.. role:: raw-html(raw)
+    :format: html
+    
 .. raw:: html
 
    <h1 align="center">
@@ -27,7 +28,7 @@ Algorithm details
 
 TL;DR: Aldy 4 uses star-allele databases to guide the process of detecting the most likely genotype.
 The optimization is done in three stages via integer linear programming.
-See `Gene Support` for more details about the supported pharmacogene databases.
+See `Gene Support`_ for more details about the supported pharmacogene databases.
 
 More details, together with the API documentation, are available
 `at Read the Docs <https://aldy.readthedocs.io/en/latest/>`_.
@@ -529,29 +530,30 @@ Gene Support
    * - Gene
      - Version
      - Status
-     - Details
+     - Notes
    * - *CYP2D6*
      - PharmVar 5.2.3
      - ✅
-     - Copy number and structural variation support;
-       Some alleles (e.g., those with _CYP2D7_ exon 9 such as _CYP2D6\*36_, _CYP2D6\*57_, _CYP2D6\*83_ and _CYP2D6\*141_)
-       can be accurately called only when the copy number detection is enabled (i.e., they cannot be called in WES mode);
-       Detection of the non-functional _CYP2D7_ intron 1 retention is spotty.
+     - Copy number and structural variation support; :raw-html:`<br />`
+       Alleles with the *CYP2D7* exon 9 retention such as \*36, \*57, \*83 and \*141
+       can be accurately called only when the copy number detection is enabled 
+       (i.e., they cannot be called in WES mode); :raw-html:`<br />`
+       Detection of the non-functional *CYP2D7* intron 1 retention is spotty.
    * - *CYP2A6*
      - PharmVar 5.2.3
      - ✅
-     - Copy number and structural variation support;
-       Detection of the _CYP2A7_ 3' UTR retention is not yet supported.
+     - Copy number and structural variation support; :raw-html:`<br />`
+       Detection of the *CYP2A7* 3' UTR retention is not yet supported.
    * - *CYP2B6*
      - PharmVar 5.2.3
      - ✅
      - Some allele calls should be further validated (e.g., \*6/\*9)
    * - *CYP1A1*
-     - PharmGKB (Dec 2014)
+     - PharmGKB (Dec 2014) and Pharmacoscan R9
      - ✅
      -
    * - *CYP1A2*
-     - PharmGKB (Mar 2014)
+     - PharmGKB (Mar 2014) and Pharmacoscan R9
      - ✅
      -
    * - *CYP2A13*
@@ -615,11 +617,11 @@ Gene Support
      - ✅
      -
    * - *CFTR*
-     - PharmGKB (Jun 2020)
+     - PharmGKB (Jun 2020) and Pharmacoscan R9
      - ✅
      -
    * - *COMT*
-     - Pharmacoscan
+     - Pharmacoscan R9
      - ✅
      -
    * - *DPYD*
@@ -627,27 +629,28 @@ Gene Support
      - ✅
      -
    * - *G6PD*
-     - PharmGKB (Sep 2018)
+     - PharmGKB and Pharmacoscan R9 (Sep 2018)
      - ⚠️
-     - Thorough testing on the real datasets pending; Null allele calling is unstable
+     - Thorough testing on the real datasets pending; :raw-html:`<br />`
+       Null allele calling is unstable
    * - *GSTM1*
-     - Pharmacoscan
+     - Pharmacoscan R9
      - ✅
      -
    * - *GSTP1*
-     - Pharmacoscan
+     - Pharmacoscan R9
      - ✅
      -
    * - *IFNL3*
-     - PharmGKB
+     - PharmGKB and Pharmacoscan R9
      - ✅
      -
    * - *NAT1*
-     - PharmGKB (Mar 2014)
+     - PharmGKB (Mar 2014) and Pharmacoscan R9
      - ✅
      -
    * - *NAT2*
-     - PharmGKB (Mar 2014)
+     - PharmGKB (Mar 2014) and Pharmacoscan R9
      - ✅
      -
    * - *NUDT15*
@@ -659,19 +662,19 @@ Gene Support
      - ✅
      -
    * - *TPMT*
-     - PharmGKB (Jun 2020)
+     - PharmGKB (Jun 2020) and Pharmacoscan R9
      - ✅
      -
    * - *UGT1A1*
-     - PharmGKB (Feb 2020)
+     - PharmGKB (Feb 2020) and Pharmacoscan R9
      - ⚠️
      - Thorough testing on the real datasets pending
    * - *UGT2B7*
-     - pharmacogenomics.pha.ulaval.ca (Apr 2015) / Pharmacoscan
+     - pharmacogenomics.pha.ulaval.ca (Apr 2015) / Pharmacoscan R9
      - ⚠️
      - Thorough testing on the real datasets pending
    * - *VKORC1*
-     - PharmGKB (Jan 2021)
+     - PharmGKB (Jan 2021) and Pharmacoscan R9
      - ⚠️
      - Thorough testing on the real datasets pending
 
@@ -681,7 +684,8 @@ Change log
 - Aldy v4.1 (Aug 28th, 2022)
    - Output allele's activity and/or impact when available
    - Updated and tested gene definitions
-     * Major changes to _NAT1_, _NAT2_, _UGT1A1_, _CYP2E1_ and _CYP2A6_
+     - Major changes to *NAT1*, *NAT2*, *UGT1A1*, *CYP2E1* and *CYP2A6*
+   
    - Indel realignment support via `indelpost <https://github.com/stjude/indelPost>`_
    - New debug format
    - Various small fixes
