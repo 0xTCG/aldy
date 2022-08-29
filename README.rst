@@ -56,7 +56,7 @@ Finally, note that the allele databases are still a work in progress and that we
 Installation
 ============
 
-Aldy is written in Python and requires Python 3.7+.
+Aldy is written in Python and requires Python 3.7+ and `Samtools <https://www.htslib.org/>`_ to run.
 It is intended to be run on POSIX-based systems
 (so far, only Linux and macOS have been tested).
 
@@ -67,6 +67,9 @@ The easiest way to install Aldy is to use `pip`::
 Append ``--user`` to the previous command to install Aldy locally
 if you cannot write to the system-wide Python directory.
 
+      If you are getting ssw-py errors on Python 3.9+, install ssw-py as follows::
+
+        pip install cython git+https://github.com/wyss/ssw-py
 
 Prerequisite: ILP solver
 ------------------------
