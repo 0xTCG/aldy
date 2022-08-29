@@ -1,6 +1,3 @@
-.. role:: raw-html(raw)
-    :format: html
-
 .. raw:: html
 
    <h1 align="center">
@@ -537,16 +534,16 @@ Gene Support
    * - *CYP2D6*
      - PharmVar 5.2.3
      - ✅
-     - Copy number and structural variation support; :raw-html:`<br />`
-       Alleles with the *CYP2D7* exon 9 retention such as \*36, \*57, \*83 and \*141
-       can be accurately called only when the copy number detection is enabled
-       (i.e., they cannot be called in WES mode); :raw-html:`<br />`
-       Detection of the non-functional *CYP2D7* intron 1 retention is spotty.
+     - - Copy number and structural variation supported
+       - Alleles with the *CYP2D7* exon 9 retention such as \*36, \*57, \*83 and \*141
+         can be accurately called only when the copy number detection is enabled
+         (i.e., they cannot be called in WES mode)
+       - Detection of the non-functional *CYP2D7* intron 1 retention is spotty
    * - *CYP2A6*
      - PharmVar 5.2.3
      - ✅
-     - Copy number and structural variation support; :raw-html:`<br />`
-       Detection of the *CYP2A7* 3' UTR retention is not yet supported.
+     - - Copy number and structural variation supported
+       - Detection of the *CYP2A7* 3' UTR retention not yet supported
    * - *CYP2B6*
      - PharmVar 5.2.3
      - ✅
@@ -634,8 +631,8 @@ Gene Support
    * - *G6PD*
      - PharmGKB and Pharmacoscan R9 (Sep 2018)
      - ⚠️
-     - Thorough testing on the real datasets pending; :raw-html:`<br />`
-       Null allele calling is unstable
+     - - Thorough testing on the real datasets pending
+       - Null allele calling is unstable
    * - *GSTM1*
      - Pharmacoscan R9
      - ✅
