@@ -4,8 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import tempfile
-from typing import Tuple, Dict, List, Optional, Any
+from typing import Tuple, Dict, List, Optional
 from collections import defaultdict, Counter
 from statistics import mean
 import pysam
@@ -18,7 +17,7 @@ import tempfile
 import indelpost
 
 from .common import log, GRange, AldyException, script_path, Timing, chr_prefix
-from .gene import Gene, Mutation, CNConfigType
+from .gene import Gene, CNConfigType
 from .coverage import Coverage
 from .profile import Profile
 

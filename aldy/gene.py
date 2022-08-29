@@ -793,7 +793,8 @@ class Gene:
                     for s in sa:
                         if s != min(sa) and "#" not in s:
                             log.debug(
-                                f"Removing {self.name}*{s} as it is the same as {min(sa)}"
+                                f"Removing {self.name}*{s} as it is the same as"
+                                f" {min(sa)}"
                             )
             self.alleles[an] = MajorAllele(
                 self.alleles[an].name,

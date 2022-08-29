@@ -34,8 +34,8 @@ class Coverage:
             `_`) to the list of read quality scores that cover it. For example,
             `coverage[10]['A>G'] = [(10, 20), (10, 10)]` indicates that 2 reads have G
             (instead of A) at the location 10.
-        :param indel_coverage: Number of reads that do not support and that do support the
-            indel for each indel in the gene database.
+        :param indel_coverage: Number of reads that do not support and that do support
+            the indel for each indel in the gene database.
         :param cnv_coverage: Coverage of the copy-number neutral region within the
             sample. Each location is represented by the total corresponsing read
             coverage. Used for coverage rescaling.
