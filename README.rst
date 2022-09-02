@@ -53,7 +53,7 @@ Finally, note that the allele databases are still a work in progress and that we
 Installation
 ============
 
-Aldy is written in Python and requires Python 3.7+ and `Samtools <https://www.htslib.org/>`_ to run.
+Aldy is written in Python and requires Python 3.7+ to run.
 It is intended to be run on POSIX-based systems
 (so far, only Linux and macOS have been tested).
 

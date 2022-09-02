@@ -349,7 +349,8 @@ class Sample:
                 print(self.gene._lookup_seq, end="", file=f)
                 sz = sam.get_reference_length(rname)
                 print("N" * (sz - self.gene._lookup_range[1]), file=f)
-            os.system("samtools faidx " + reference)
+            with open(f"{reference}.fai", "w") as f:
+                print(rname, sz, len(rname) + 2, sz, sz + 1, sep="\t", file=f)
         ref = pysam.FastaFile(reference)  # type: ignore
 
         prev_indel = None
