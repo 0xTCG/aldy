@@ -109,7 +109,9 @@ def genotype(
         avail_genes = pkg_resources.resource_listdir(
             "aldy.resources.genes", "pharmacoscan"
         )
-        avail_genes = [i[:-4] for i in avail_genes if i.endswith(".yml")]
+        avail_genes = [
+            f"pharmacoscan/{i[:-4]}" for i in avail_genes if i.endswith(".yml")
+        ]
         avail_genes = sorted(avail_genes)
     else:
         avail_genes = gene_db.lower().split(",")
