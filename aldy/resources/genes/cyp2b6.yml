@@ -442,6 +442,21 @@ alleles:
     mutations:
     - [23790, C>G, rs34698757, T306S]
     - [26167, C>T, rs34097093, R378X]
+  # CYP2B6*29.001:
+  #   activity: decreased
+  #   label: CYP2B6*29
+  #   mutations:
+  #   - [CYP2B7, i4-]
+  # CYP2B6*30.001:
+  #   activity: none
+  #   label: CYP2B6*30
+  #   mutations:
+  #   - [CYP2B7, i4+]
+  # CYP2B6*NULL:
+  #   activity: none
+  #   label: CYP2B6*NULL
+  #   mutations:
+  #   - [CYP2B6, deletion]
   CYP2B6*31.001:
     pharmvar: https://www.pharmvar.org/haplotype/795
     activity: normal function
