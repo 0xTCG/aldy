@@ -5,9 +5,7 @@ from typing import (
     Union
 )
 
-from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from cython.operator cimport postincrement as inc
-from cpython.bytes import PyBytes_Check
 from libc.stdint cimport int32_t, uint32_t, uint16_t, int8_t, uint8_t
 
 """
@@ -38,8 +36,11 @@ cdef inline str _str(s):
         return s
 
 cdef extern from "Python.h":
+    cdef int PyBytes_Check(object)
     cdef int PyBytes_AsStringAndSize(object, char **, Py_ssize_t *)
     cdef char* PyUnicode_AsUTF8AndSize(object, Py_ssize_t *)
+    cdef void* PyMem_Malloc(size_t)
+    cdef void PyMem_Free(void*)
 
 cdef inline char* obj_to_cstr_len(object o1, Py_ssize_t *length):
     cdef char* c_str1
