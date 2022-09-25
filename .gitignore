@@ -38,3 +38,5 @@ Untitled*
 new_defs/*
 aldy_old/*
 scripts
+aldy/indelpost/*.c
+build/*
