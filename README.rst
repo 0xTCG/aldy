@@ -681,6 +681,10 @@ Gene Support
 Change log
 ==========
 
+- Aldy v4.2 (Sep 25th, 2022)
+   - Fix indelpost setup errors
+   - Various small fixes
+
 - Aldy v4.1 (Aug 28th, 2022)
    - Output allele's activity and/or impact when available
    - Updated and tested gene definitions
