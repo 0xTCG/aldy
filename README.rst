@@ -64,9 +64,6 @@ The easiest way to install Aldy is to use `pip`::
 Append ``--user`` to the previous command to install Aldy locally
 if you cannot write to the system-wide Python directory.
 
-      If you are getting ssw-py errors on Python 3.9+, install ssw-py as follows::
-
-        pip install cython git+https://github.com/wyss/ssw-py
 
 Prerequisite: ILP solver
 ------------------------
