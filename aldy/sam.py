@@ -14,8 +14,8 @@ import gzip
 import tarfile
 import pickle
 import tempfile
-import indelpost
 
+from .indelpost import Variant, VariantAlignment
 from .common import log, GRange, AldyException, script_path, Timing, chr_prefix
 from .gene import Gene, CNConfigType
 from .coverage import Coverage
@@ -368,7 +368,7 @@ class Sample:
                 o = self.gene[p]
                 o1, o2 = o, o + op[3:]
 
-            v = indelpost.Variant(rname, p + 1, o1, o2, ref)  # type: ignore
+            v = Variant(rname, p + 1, o1, o2, ref)  # type: ignore
 
             if long_reads:
                 # Speed-up: just generate equivalent indels, no need for the realignment
@@ -384,7 +384,7 @@ class Sample:
                         self._indel_sites_eqs[np, no] = (pos, op)
                 continue
 
-            valn = indelpost.VariantAlignment(  # type: ignore
+            valn = VariantAlignment(  # type: ignore
                 v,
                 sam,
                 mapping_quality_threshold=self.profile.min_mapq,
