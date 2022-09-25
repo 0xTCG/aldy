@@ -47,7 +47,7 @@ jobs:
       uses: codecov/codecov-action@v1
     - name: Build package
       run: |
-        python setup.py sdist bdist_wheel
+        python setup.py sdist
     - name: Publish on TestPyPI
       if: matrix.python-version == '3.7'
       uses: pypa/gh-action-pypi-publish@master
