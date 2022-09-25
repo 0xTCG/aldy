@@ -2,4 +2,4 @@
 omit =
     aldy/tests/*
     setup.py
-    aldy/indelpost
+    aldy/indelpost/*
