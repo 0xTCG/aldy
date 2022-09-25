@@ -178,11 +178,11 @@ def genotype(
 
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
-        profile = Profile("user_provided", cn_solution=["1", "1"])
+        profile = Profile("user_provided", cn_solution=["1", "1"], **params)
         sample = sam.Sample(gene, profile, sam_path, debug=debug)
     else:
         if cn_solution:
-            profile = Profile("user_provided", cn_solution=cn_solution)
+            profile = Profile("user_provided", cn_solution=cn_solution, **params)
         elif kind != "dump":
             if not profile_name:
                 raise AldyException("Profile not provided")
@@ -255,6 +255,8 @@ def genotype(
         conf = 100 * (min_cn_score + SLACK) / (cn_sol.score + SLACK)
         log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
+
+    # return []
 
     for i, cn_sol in enumerate(cn_sols):
         sols = major.estimate_major(
