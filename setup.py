@@ -122,9 +122,13 @@ setup(
             "*.tbi",
             "aldy/tests/resources/*.tbi",
         ],
-        "aldy.indelpost.ssw": [
+        "aldy.indelpost": [
+            "*.pyx",
+            "aldy/indelpost/*.pyx",
+            "*.pxd",
+            "aldy/indelpost/*.pxd",
+            "*.h",
             "aldy/indelpost/ssw.h",
-            "aldy/indelpost/ssw.py",
             "aldy/indelpost/sse2neon.h",
         ],
     },
