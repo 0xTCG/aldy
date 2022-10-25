@@ -214,7 +214,7 @@ class Coverage:
         thres = (thres or self.profile.threshold) / (cn or 1)
         min_cov = max(self.profile.min_coverage, self.total(mut) * thres)
         # if self._indels and (mut.pos, mut.op) in self._indels:
-        #     print(mut, self.coverage(mut), min_cov)
+        #     print(mut, self.coverage(mut), min_cov, thres, self.profile.threshold)
         sz = self.coverage(mut)
         return sz >= min_cov
 

@@ -68,6 +68,7 @@ class Sample:
             (pos, op): [0, 0] for pos, op in gene.mutations if op[:3] in ["ins", "del"]
         }
         self._indel_sites_eqs = {}
+        """indel equivalents (used for long reads because indelpost is too slow)"""
 
         self._multi_sites = {
             m.pos: m.op
@@ -604,9 +605,10 @@ class Sample:
                     (mean(mq for mq, _ in items), mean(q for _, q in items))
                 )
 
-        for pos, op in self._indel_sites:
-            if ref_start <= pos < start:
-                self._indel_sites[pos, op][0] += 1
+        if self._indel_sites_eqs:  # long-read hack
+            for pos, op in self._indel_sites:
+                if ref_start <= pos < start:
+                    self._indel_sites[pos, op][0] += 1
         read_pos = (ref_start, start, len(seq))
         return read_pos, dump_arr
 
