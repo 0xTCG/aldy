@@ -98,7 +98,11 @@ setup(
     packages=find_packages(),
     package_data={
         "aldy.resources": ["*.rst", "aldy/resources/*.rst"],
-        "aldy.resources.genes": ["*.yml", "aldy/resources/genes/*.yml"],
+        "aldy.resources.genes": [
+            "*.yml",
+            "aldy/resources/genes/*.yml",
+            "aldy/tests/resources/pharmacoscan/*.yml",
+        ],
         "aldy.resources.profiles": ["*.yml", "aldy/resources/profiles/*.yml"],
         "aldy.tests.resources": [
             "*.json",
