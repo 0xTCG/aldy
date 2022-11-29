@@ -3,12 +3,6 @@ version: pharmacoscan-r9
 generated: '2022-08-21'
 ensembl: ENSG00000093010
 alleles:
-  COMT*A72S:
-    mutations:
-    - [26001, G>T, rs6267, A72S]
-  COMT*A102T:
-    mutations:
-    - [26841, G>A, rs5031015, A102T]
   COMT*Met:
     mutations:
     - [25973, C>T, rs4633, H62=]
@@ -36,6 +30,9 @@ alleles:
   COMT*ValE:
     mutations:
     - [25973, C>T, rs4633, H62=]
+  random:
+    - [26001, G>T, rs6267, A72S]
+    - [26841, G>A, rs5031015, A102T]
 structure:
   genes: [COMT]
   regions:

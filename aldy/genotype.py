@@ -157,13 +157,6 @@ def genotype(
         pass
     gene = Gene(gene_db, genome=genome)
 
-    if "/wgs/" in sam_path:
-        profile_name = "wgs"
-    elif "/10x/" in sam_path:
-        profile_name = "10x"
-    elif "/pgx3/" in sam_path:
-        profile_name = "pgx3"
-
     if profile_name in ["exome", "wxs", "wes"]:
         gene.do_copy_number = False
         profile_name = "illumina"

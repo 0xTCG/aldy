@@ -203,14 +203,9 @@ alleles:
     mutations:
     - [ignored, 14348, C>T, rs375746304, R197X]
     ignored: true
-  NAT2*K268R:
-    mutations:
+  random:
     - [14562, A>G, rs1208, K268R]
-  NAT2*M205L:
-    mutations:
     - [14372, A>T, rs45607939, M205L]
-  NAT2*S287P:
-    mutations:
     - [14618, T>C, rs72554618, S287P]
 structure:
   genes: [NAT2]

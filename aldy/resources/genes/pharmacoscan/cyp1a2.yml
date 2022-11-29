@@ -92,27 +92,12 @@ alleles:
     mutations:
     - [5732, C>A, rs762551, 5'UTR]
     - [11178, C>A, rs143193369, Y495X]
-  CYP1A2*F432S:
-    mutations:
+  random:
     - [ignored, 10988, T>C, rs201485133, F432S]
-    ignored: true
-  CYP1A2*I314V:
-    mutations:
     - [ignored, 7453, A>G, rs28399418, I314V]
-    ignored: true
-  CYP1A2*L65P:
-    mutations:
     - [6088, T>C, rs71651689, L65P]
-  CYP1A2*P485R:
-    mutations:
     - [ignored, 11147, C>G, '-', P485R]
-    ignored: true
-  CYP1A2*S18C:
-    mutations:
     - [ignored, 5947, C>G, rs17861152, S18C]
-    ignored: true
-  CYP1A2*S298R:
-    mutations:
     - [7407, C>A, rs17861157, S298R]
 structure:
   genes: [CYP1A2]

@@ -45,38 +45,17 @@ alleles:
   CYP3A5*9:
     mutations:
     - [24483, G>A, rs28383479, A337T]
-  CYP3A5*F203C:
-    mutations:
+  random:
     - [ignored, 19771, T>G, rs147489136, F203C]
-    ignored: true
-  CYP3A5*F446S:
-    mutations:
     - [34850, T>C, rs41279854, F446S]
-  CYP3A5*G31FS:
-    mutations:
     - [8811, insG, rs28383469, frameshift]
-  CYP3A5*H30Y:
-    mutations:
     - [8807, C>T, rs28383468, H30Y]
-  CYP3A5*I465V:
-    mutations:
     - [ignored, 34879, A>G, '-', I465V]
-    ignored: true
-  CYP3A5*I488T:
-    mutations:
     - [36648, T>C, rs28365085, I488T]
-  CYP3A5*L82R:
-    mutations:
     - [12346, T>G, rs56244447, L82R]
-  CYP3A5*S100C:
-    mutations:
     - [12400, C>G, rs41279857, S100C]
     - [ignored, 32228, delT, rs76293380, P345Frameshift]
-  CYP3A5*S100Y:
-    mutations:
     - [12400, C>A, rs41279857, S100Y]
-  CYP3A5*Y53C:
-    mutations:
     - [8877, A>G, rs72552791, Y53C]
 structure:
   genes: [CYP3A5]

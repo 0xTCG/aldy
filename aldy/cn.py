@@ -46,11 +46,13 @@ def estimate_cn(
     if profile.cn_solution:
         return [_parse_user_solution(gene, profile.cn_solution)]
     elif not gene.do_copy_number:
-        basic = list(gene.cn_configs.keys())[0]
+        basic = [
+            k for k, v in gene.cn_configs.items() if v.kind == CNConfigType.DEFAULT
+        ]
         cn = 2
         if profile.male and gene.chr in ["X", "Y"]:
             cn = 1
-        return [_parse_user_solution(gene, [basic] * cn)]
+        return [_parse_user_solution(gene, [basic[0]] * cn)]
     else:
         assert coverage, "Coverage not provided"
 

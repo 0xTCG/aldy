@@ -27,40 +27,40 @@ alleles:
     mutations:
     - [172270, T>G, rs4124874, 5'UTR]
     - [175181, C>T, rs887829, 5'UTR]
-    - [175492, insTA, rs3064744, Promoter]
+    - [175491, insTA, rs3064744, Promoter]
     - [176230, C>A, rs35350960, P229Q]
   UGT1A1*27_28_60_80_93:
     mutations:
     - [172270, T>G, rs4124874, 5'UTR]
     - [172393, G>A, rs10929302, 5'UTR]
     - [175181, C>T, rs887829, 5'UTR]
-    - [175492, insTA, rs3064744, Promoter]
+    - [175491, insTA, rs3064744, Promoter]
     - [176230, C>A, rs35350960, P229Q]
   UGT1A1*28:
     mutations:
-    - [175492, insTA, rs3064744, Promoter]
+    - [175491, insTA, rs3064744, Promoter]
   UGT1A1*28_60_80:
     mutations:
     - [172270, T>G, rs4124874, 5'UTR]
     - [175181, C>T, rs887829, 5'UTR]
-    - [175492, insTA, rs3064744, Promoter]
+    - [175491, insTA, rs3064744, Promoter]
   UGT1A1*28_60_80_93:
     mutations:
     - [172270, T>G, rs4124874, 5'UTR]
     - [172393, G>A, rs10929302, 5'UTR]
     - [175181, C>T, rs887829, 5'UTR]
-    - [175492, insTA, rs3064744, Promoter]
+    - [175491, insTA, rs3064744, Promoter]
   UGT1A1*36:
     mutations:
-    - [175492, delTA, rs3064744, Promoter]
+    - [175491, delTA, rs3064744, Promoter]
     ignored: true
   UGT1A1*36_60:
     mutations:
     - [172270, T>G, rs4124874, 5'UTR]
-    - [175492, delTA, rs3064744, Promoter]
+    - [175491, delTA, rs3064744, Promoter]
   UGT1A1*37:
     mutations:
-    - [175492, insTATA, rs3064744, Promoter]
+    - [175491, insTATA, rs3064744, Promoter]
     ignored: true
   UGT1A1*43:
     mutations:
@@ -86,11 +86,8 @@ alleles:
     mutations:
     - [172393, G>A, rs10929302, 5'UTR]
     ignored: true
-  UGT1A1*112:
-    mutations:
+  random:
     - [174193, A>C, rs3755319, 5'UTR]
-  UGT1A1*F83I:
-    mutations:
     - [175791, T>A, rs56059937, F83I]
 structure:
   genes: [UGT1A1]

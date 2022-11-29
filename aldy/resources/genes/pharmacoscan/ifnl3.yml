@@ -2,8 +2,7 @@ name: IFNL3
 ensembl: ENSG00000197110
 version: pharmacoscan-r9
 alleles:
-  IFNL3*K70R:
-    mutations:
+  random:
     - [5506, A>G, rs8103142, K70R]
   IFNL3*C:
     mutations: []

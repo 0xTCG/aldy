@@ -385,16 +385,20 @@ class Sample:
                         self._indel_sites_eqs[np, no] = (pos, op)
                 continue
 
+            exact_match_for_shiftable = True
+            # if self.gene.name == "UGT1A1":
+            #     exact_match_for_shiftable = False
             valn = VariantAlignment(  # type: ignore
                 v,
                 sam,
                 mapping_quality_threshold=self.profile.min_mapq,
                 base_quality_threshold=self.profile.min_quality,
                 # needed to account for indel and database errors
-                exact_match_for_shiftable=True,
+                exact_match_for_shiftable=exact_match_for_shiftable,
             )
 
             phased = valn.phase()
+            # print(phased.ref, phased.alt, v.ref, v.alt, exact_match_for_shiftable)
             if len(phased.ref) - len(phased.alt) != len(v.ref) - len(v.alt):
                 continue  # HACK: this indicates a subsumed indel
 

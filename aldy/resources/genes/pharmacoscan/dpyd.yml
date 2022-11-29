@@ -3,18 +3,13 @@ version: pharmacoscan-r9
 generated: '2022-08-21'
 ensembl: ENSG00000188641
 alleles:
-  DPYD*C29R:
-    mutations:
+  random:
     - [42731, T>C, rs1801265, C29R]
-  DPYD*I543V:
-    mutations:
     - [410221, A>G, rs1801159, I543V]
-  DPYD*K259E:
-    mutations:
-    - [246890, A>G, rs45589337, K259E]
-  DPYD*M166V:
-    mutations:
     - [226525, A>G, rs2297595, M166V]
+    - [410195, G>A, rs1801158, S534N]
+    - [246890, A>G, rs45589337, K259E]
+    - [620696, G>A, rs1801160, V732I]
   DPYD*N635K:
     mutations:
     - [476001, C>G, rs3918289, N635K]
@@ -27,15 +22,9 @@ alleles:
   DPYD*R886H:
     mutations:
     - [827462, G>A, rs1801267, R886H]
-  DPYD*S534N:
-    mutations:
-    - [410195, G>A, rs1801158, S534N]
   DPYD*V335L:
     mutations:
     - [332717, G>T, rs72549306, V335L]
-  DPYD*V732I:
-    mutations:
-    - [620696, G>A, rs1801160, V732I]
   DPYD*61C>T:
     mutations:
     - [42707, C>T, rs72549310, R21X]
@@ -51,7 +40,7 @@ alleles:
   DPYD*1129_5923C>G:
     mutations:
     - [346167, C>G, rs75017182, SpliceVariant]
-    - [352197, G>A, rs56038477, E412=]
+    - [352197, G>A, rs56038477]
   DPYD*1156G>T:
     mutations:
     - [352117, G>T, rs78060119, E386X]

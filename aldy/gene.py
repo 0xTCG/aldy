@@ -536,6 +536,8 @@ class Gene:
         self.yml_mutations = yml["alleles"]
         self.random_mutations = set()
         for pos, op, *info in yml["alleles"].get("random", []):
+            if isinstance(pos, str) and pos == "ignored":
+                continue
             for m in process_mutation(pos, op, info):
                 self.random_mutations.add(m)
         self.mutation_groups = {}
