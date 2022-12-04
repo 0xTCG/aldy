@@ -194,10 +194,28 @@ class MinorSolution:
         if i == -1:
             return gene.deletion_allele()
         n = str(self.solution[i].major).split("#")[0:1]
+
+        def get_nice_snp_name(m):
+            rsid = gene.get_rsid(m)
+            effect = gene.mutations[m][0]
+            al = [
+                an
+                for an, a in gene.alleles.items()
+                if m in a.func_muts and len(a.func_muts) == 1
+            ]
+            if al:
+                return f"{al[0]}.{rsid}"
+            elif effect:
+                return f"{effect}.{rsid}"
+            return rsid
+
         for m in sorted(self.solution[i].added):
             if gene.is_functional(m, infer=False):
-                n.append(gene.get_rsid(m))
-        return "+".join(n)
+                n.append(get_nice_snp_name(m))
+        if len(n) == 1:
+            return n[0]
+        else:
+            return "(" + " ^".join(n) + ")"
 
     def get_minor_name(self, i, legacy=False):
         gene = self.major_solution.cn_solution.gene

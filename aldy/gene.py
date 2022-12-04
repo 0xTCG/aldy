@@ -293,6 +293,12 @@ class Gene:
             res = self.mutations[pos, op][1]
         return res if res != "-" or not default else f"{pos + 1}.{op}"
 
+    def get_allele(self, name):
+        for an, a in self.alleles.items():
+            if name in a.minors:
+                return (a, a.minors[name])
+        return None
+
     def get_refseq(self, *args, from_atg=False) -> str:
         """:returns: `True` if a mutation is functional."""
         assert 1 <= len(args) <= 2
