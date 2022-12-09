@@ -789,6 +789,7 @@ class Gene:
             del self.alleles[f]
             self.alleles.update({a.name: a for a in add.values()})
 
+        self.removed = set()
         for an, a in self.alleles.items():
             # Clean up minor alleles (as many might be identical after a fusion).
             # Put a reference to the cleaned-up alleles in `alt_name` field.
@@ -800,6 +801,7 @@ class Gene:
                 if len(sa) > 1:
                     for s in sa:
                         if s != min(sa) and "#" not in s:
+                            self.removed.add(s)
                             log.debug(
                                 f"Removing {self.name}*{s} as it is the same as"
                                 f" {min(sa)}"

@@ -169,8 +169,9 @@ class Timing:
     it is completed.
     """
 
-    def __init__(self, name="Block"):
+    def __init__(self, name="Block", fn=None):
         self.name = name
+        self.fn = fn if fn else log.debug
 
     def __enter__(self):
         self.start = time.time()
@@ -178,7 +179,7 @@ class Timing:
 
     def __exit__(self, *_):
         self.end = time.time()
-        log.debug("{} took {}", self.name, self.end - self.start)
+        self.fn(f"{self.name} took {self.end - self.start:.2f}s")
 
 
 def pp(x) -> str:

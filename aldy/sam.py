@@ -386,8 +386,6 @@ class Sample:
                 continue
 
             exact_match_for_shiftable = True
-            # if self.gene.name == "UGT1A1":
-            #     exact_match_for_shiftable = False
             valn = VariantAlignment(  # type: ignore
                 v,
                 sam,
@@ -398,7 +396,7 @@ class Sample:
             )
 
             phased = valn.phase()
-            # print(phased.ref, phased.alt, v.ref, v.alt, exact_match_for_shiftable)
+            # print(pos, phased.ref, phased.alt, v.ref, v.alt, exact_match_for_shiftable)
             if len(phased.ref) - len(phased.alt) != len(v.ref) - len(v.alt):
                 continue  # HACK: this indicates a subsumed indel
 

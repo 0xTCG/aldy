@@ -343,9 +343,11 @@ def solve_minor_model(
     # 6) Do the same for non-mutations
     for pos in set(m.pos for m in constraints):
         expr = 0
+        max_mut = 0
         for a in alleles:
             e = [VKEEP[a][m][1] for m in VKEEP[a] if m.pos == pos]
             e += [VNEW[a][m][1] for m in VNEW[a] if m.pos == pos]
+            max_mut = max(max_mut, len(e))
             expr += len(e) * VA[a] - model.quicksum(e)
         if isinstance(expr, int) and expr == 0:
             continue
@@ -358,7 +360,7 @@ def solve_minor_model(
             # allow the allele to select a non-existent non-mutation to prevent
             # infeasibility. Should not happen with "sane" datasets...
             model.addConstr(
-                expr <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m]),
+                expr <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m], max_mut),
                 name=f"CMAXCOV_{m.pos}_{m.op}",
             )
 
