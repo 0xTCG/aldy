@@ -10,6 +10,7 @@ from natsort import natsorted
 from collections import Counter, defaultdict
 
 from .gene import Gene, Mutation
+from .profile import Profile
 
 
 @dataclass
@@ -166,6 +167,8 @@ class MinorSolution:
     """
     major_solution: MajorSolution
     """Major star-allele solution used for calculating minor star-allele assignments."""
+    profile: Profile = None
+    """Profile."""
 
     def _solution_nice(self):
         return ", ".join(
@@ -197,6 +200,8 @@ class MinorSolution:
 
         def get_nice_snp_name(m):
             rsid = gene.get_rsid(m)
+            if not self.profile or not self.profile.display_format:
+                return rsid
             effect = gene.mutations[m][0]
             al = [
                 an
@@ -212,7 +217,9 @@ class MinorSolution:
         for m in sorted(self.solution[i].added):
             if gene.is_functional(m, infer=False):
                 n.append(get_nice_snp_name(m))
-        if len(n) == 1:
+        if not self.profile or not self.profile.display_format:
+            return "+".join(n)
+        elif len(n) == 1:
             return n[0]
         else:
             return "(" + " ^".join(n) + ")"

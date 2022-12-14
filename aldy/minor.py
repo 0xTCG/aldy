@@ -360,7 +360,8 @@ def solve_minor_model(
             # allow the allele to select a non-existent non-mutation to prevent
             # infeasibility. Should not happen with "sane" datasets...
             model.addConstr(
-                expr <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m], max_mut),
+                expr
+                <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m], max_mut),
                 name=f"CMAXCOV_{m.pos}_{m.op}",
             )
 
@@ -512,7 +513,12 @@ def solve_minor_model(
                     )
                 )
 
-            sol = MinorSolution(score=opt, solution=solution, major_solution=major_sol)
+            sol = MinorSolution(
+                score=opt,
+                solution=solution,
+                major_solution=major_sol,
+                profile=coverage.profile,
+            )
             _ = estimate_diplotype(gene, sol)
             debug_info["sol"] = [(s.minor, s.added, s.missing) for s in solution]
             debug_info["diplotype"] = sol.diplotype

@@ -188,7 +188,6 @@ def index_bases(
 
             if event in ("M", "S", "X", "="):
                 for i in range(event_len):
-
                     if ref and event != "S":
                         indexedbases[current_pos] = (ref[0], flank[0], qual[0])
                         ref = ref[1:]
@@ -237,12 +236,10 @@ def index_bases(
 
 
 def consensus_data(indexedbases_list, left, basequalthresh):
-
     consensus_index = OrderedDict()
 
     skip_loci = []
     for locus in locus_list(indexedbases_list, left):
-
         ref, consensus_base, consensus_score, coverage = get_consensus_base(
             indexedbases_list, locus, basequalthresh
         )
@@ -264,7 +261,6 @@ def consensus_data(indexedbases_list, left, basequalthresh):
     prev_locus = -1
     ref_end = -1
     for locus, data in consensus_index.items():
-
         ref, consensus_base, consensus_score, coverage = (
             data[0],
             data[1],
@@ -352,7 +348,6 @@ def get_consensus_base(indexedbases_list, locus, basequalthresh):
 
 
 def consensus_refseq(refseq_lst, left=False):
-
     if left:
         refseq_lst = [seq[::-1].upper() for seq in refseq_lst]
     else:

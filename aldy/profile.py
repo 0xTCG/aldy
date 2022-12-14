@@ -57,7 +57,7 @@ class Profile:
         Default: 0.5
         """
 
-        self.min_coverage = 5.0 if name == "illumina" else 2.0
+        self.min_coverage = 2.0
         """
         Minimum coverage needed to call a variant.
         Default: 2 (5 for illumina/wgs)
@@ -183,6 +183,12 @@ class Profile:
         """
         Maximum number of minor solutions to report for each major solution.
         Default: 1
+        """
+
+        self.display_format = False
+        """
+        New novel allele display format.
+        Default: False
         """
 
         self.update(kwargs)

@@ -160,6 +160,7 @@ def genotype(
     if profile_name in ["exome", "wxs", "wes"]:
         gene.do_copy_number = False
         profile_name = "illumina"
+        params["min_coverage"] = 5.0
     elif profile_name == "wgs":
         profile_name = "illumina"
     elif profile_name == "pgrnseq-v1":
@@ -308,6 +309,7 @@ def genotype(
             * ((m.major_solution.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
             m.solution,
             m.major_solution,
+            profile=profile,
         )
         n.set_diplotype(m.get_diplotype())
         minor_sols.append(n)

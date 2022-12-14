@@ -21,7 +21,6 @@ def phase_nearby_variants(
     hard,
     to_complex,
 ):
-
     # no indel reads or contig construction failure
     if contig.failed:
         return NullVariant(target.chrom, target.pos, target.reference)
@@ -145,7 +144,6 @@ def make_target_obj_from_contig(target, indexed_contig):
 
 
 def greedy_phasing(target, indexed_contig):
-
     cpos = 0
     cref = ""
     calt = ""
@@ -160,7 +158,6 @@ def greedy_phasing(target, indexed_contig):
 
 
 def seq_complexity(contig, snv_neighborhood, indel_neighorhood):
-
     splits = contig.get_reference_seq(split=True)
     lt_flank, rt_flank = splits[0], splits[2]
     neighorbood = min(snv_neighborhood, indel_neighorhood, len(lt_flank), len(rt_flank))
@@ -244,7 +241,6 @@ def score_thresh(ref, alt, cov):
 def locate_mismatch_cluster_peaks(
     indexed_contig, mismatches_to_phase, target, snv_neighborhood, to_complex
 ):
-
     lt_peak, lt_peak_pos = calc_peak(
         indexed_contig, mismatches_to_phase, target, snv_neighborhood, left=True
     )
@@ -293,7 +289,6 @@ def calc_peak(indexed_contig, mismatches, target, snv_neighborhood, left):
     indel_len = len(target.indel_seq)
     scores = []
     for i, locus in enumerate(loci):
-
         if locus in snv_loci:
             score += gain
         else:
@@ -398,7 +393,6 @@ def variants_in_non_target_pileup(pileup, target, basequalthresh, to_complex):
 
 
 def is_deletable(variant, deletable_variants, indel_repeat_thresh, to_complex):
-
     if to_complex:
         if variant in deletable_variants:
             return True
@@ -455,7 +449,6 @@ def remove_deletables(indexed_contig, lt_end, target_pos, rt_end):
 
 
 def remove_common_substrings(indexed_contig, target_pos, max_common_str_len):
-
     common_sub_strs = profile_common_substrings(indexed_contig)
 
     lt_commons = [sub_str for sub_str in common_sub_strs if sub_str[1] < target_pos]
@@ -473,7 +466,6 @@ def trim_common(indexed_contig, commons, max_common_str_len, left):
 
     deletable_commons = []
     for sub_str in commons:
-
         if sub_str[0] == sub_str[-1]:
             start = sub_str[0]
         else:
@@ -528,7 +520,6 @@ def search_nearest_lt_locus(indexed_contig, pos, left=True):
 
 
 def profile_common_substrings(indexed_contig):
-
     commons = []
 
     items = list(indexed_contig.items())
@@ -575,7 +566,6 @@ def extend_sub_str(start, indexed_contig):
 
 
 def end_point(indexed_contig, mismatches, target, snv_neighborhood, left):
-
     tmp = indexed_contig.copy()
 
     if not left:

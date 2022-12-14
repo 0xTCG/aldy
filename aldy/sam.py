@@ -396,7 +396,6 @@ class Sample:
             )
 
             phased = valn.phase()
-            # print(pos, phased.ref, phased.alt, v.ref, v.alt, exact_match_for_shiftable)
             if len(phased.ref) - len(phased.alt) != len(v.ref) - len(v.alt):
                 continue  # HACK: this indicates a subsumed indel
 

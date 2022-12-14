@@ -83,19 +83,19 @@ Potential major CYP2D6 star-alleles for NA10860:
    9: 1x*4.021.ALDY_2, 1x*4N.ALDY, 1x*74 (confidence: 100%)
 Potential CYP2D6 star-alleles for NA10860:
    1: *1 / *4 + *4.021.ALDY (confidence=100%)
-      Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701), *4.001, *(4.1021 -rs28371738)
+      Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713), *4.001, *(4.1021 -rs28371738)
    2: *1 / *4.021 + *4N.ALDY (confidence=100%)
-      Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701), *4.021, *(4.1013 -rs28371738)
+      Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713), *4.021, *(4.1013 -rs28371738)
 CYP2D6 results:
   - *1 / *4 + *4.021.ALDY
-    Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.001] + [*4.1021 -rs28371738]
-    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4A] + [*4.021.ALDY -rs28371738]
+    Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.001] + [*4.1021 -rs28371738]
+    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4A] + [*4.021.ALDY -rs28371738]
     Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
     Estimated activity for *4: no function (evidence: D); see https://www.pharmvar.org/haplotype/235 for details
     Estimated activity for *4.021.ALDY: no function (evidence: D)
   - *1 / *4.021 + *4N.ALDY
-    Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4.1013 -rs28371738]
-    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4N.ALDY -rs28371738]
+    Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.1013 -rs28371738]
+    Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4N.ALDY -rs28371738]
     Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
     Estimated activity for *4.021: no function (evidence: D); see https://www.pharmvar.org/haplotype/652 for details
     Estimated activity for *4N.ALDY: no function (evidence: D)
@@ -177,19 +177,19 @@ def test_NA10860_gap(monkeypatch, solver):
     9: 1x*4.021.ALDY_2, 1x*4N.ALDY, 1x*74 (confidence: 100%)
     Potential CYP2D6 star-alleles for NA10860:
     1: *1 / *4 + *4.021.ALDY (confidence=100%)
-        Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701), *4.001, *(4.1021 -rs28371738)
+        Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713), *4.001, *(4.1021 -rs28371738)
     2: *1 / *4.021 + *4N.ALDY (confidence=100%)
-        Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701), *4.021, *(4.1013 -rs28371738)
+        Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713), *4.021, *(4.1013 -rs28371738)
     CYP2D6 results:
     - *1 / *4 + *4.021.ALDY
-        Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.001] + [*4.1021 -rs28371738]
-        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4A] + [*4.021.ALDY -rs28371738]
+        Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.001] + [*4.1021 -rs28371738]
+        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4A] + [*4.021.ALDY -rs28371738]
         Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
         Estimated activity for *4: no function (evidence: D); see https://www.pharmvar.org/haplotype/235 for details
         Estimated activity for *4.021.ALDY: no function (evidence: D)
     - *1 / *4.021 + *4N.ALDY
-        Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4.1013 -rs28371738]
-        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713 +rs28371701] / [*4.021] + [*4N.ALDY -rs28371738]
+        Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.1013 -rs28371738]
+        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4N.ALDY -rs28371738]
         Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
         Estimated activity for *4.021: no function (evidence: D); see https://www.pharmvar.org/haplotype/652 for details
         Estimated activity for *4N.ALDY: no function (evidence: D)

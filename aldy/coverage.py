@@ -71,7 +71,7 @@ class Coverage:
 
     def total(self, m) -> float:
         """:returns: Location coverage."""
-        if hasattr(m, 'pos') and hasattr(m, 'op'):
+        if hasattr(m, "pos") and hasattr(m, "op"):
             if self._indels and (m.pos, m.op) in self._indels:
                 return sum(self._indels[m.pos, m.op])
             pos = m.pos
@@ -97,7 +97,7 @@ class Coverage:
         :param cn_solution: Copy-number solution.
         :returns: Coverage of a *single* gene copy at the given location.
         """
-        if hasattr(m, 'pos'):
+        if hasattr(m, "pos"):
             pos = m.pos
         else:
             assert isinstance(m, int)
