@@ -203,6 +203,14 @@ Alternatively, you can generate a profile for your panel/technology by running::
     aldy genotype -p my-cool-tech.profile -g [gene] file.bam
 
 
+**Note**: if you are using long-read captures such as PacBio or Nanopore, make sure to add the following lines to the corresponding profile file::
+
+    options:
+      sam_long_reads: true
+
+Alternatively, you can pass this flag directly to Aldy as ``--param sam_long_reads=true``.
+
+
 Output
 ======
 
