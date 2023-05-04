@@ -191,6 +191,11 @@ class Profile:
         Default: False
         """
 
+        self.debug_probe = ""
+        """
+        (Debug) Show raw data for a given mutation (e.g., I223M)
+        """
+
         self.update(kwargs)
 
     def update(self, kwargs):

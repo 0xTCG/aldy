@@ -252,6 +252,28 @@ def _filter_alleles(
             )
         return cond
 
+    if coverage.profile.debug_probe:
+        # Check for probe mutations and show their pileup
+        probes = coverage.profile.debug_probe.split(";")
+
+        d = collections.defaultdict(set)
+        for (pos, op), (fn, rs, _, _, _) in gene.mutations.items():
+            d[fn].add((pos, op))
+            d[rs].add((pos, op))
+            d[str(pos + 1)].add((pos, op))
+
+        def pileup(pos):
+            return "".join(
+                (a if a == "_" else a[2:]) * len(c)
+                for a, c in coverage._coverage[pos].items()
+            )
+
+        for p in probes:
+            for pos, op in d.get(p, set()):
+                log.warn("{} -> {}: {}", p, pos + 1, op)
+                for i in range(pos - 5, pos + 5):
+                    log.info(" {} {} {}", i + 1, "->" if i == pos else "  ", pileup(i))
+
     cov = coverage.filtered(Coverage.quality_filter)
     cov = cov.filtered(filter_fns)
 

@@ -312,6 +312,8 @@ class Sample:
         ) = pickle.load(
             fd
         )  # type: ignore
+        self.profile.display_format = False
+        self.profile.debug_probe = ""
         self.phases = {f"r{i}": v for i, v in enumerate(phases)}
         norm = {p: [q for q, n in c.items() for _ in range(n)] for p, c in norm.items()}
         muts = {p: [q for q, n in c.items() for _ in range(n)] for p, c in muts.items()}

@@ -78,25 +78,21 @@ alleles:
     - [15271, G>C, rs2070676, Intron]
   CYP2E1*6:
     mutations:
-    - [ignored, 12678, T>A, rs6413432, Intron]
-    ignored: true
+    - [12678, T>A, rs6413432, Intron]
   CYP2E1*6_1B:
     mutations:
     - [15271, G>C, rs2070676, Intron]
-    - [ignored, 12678, T>A, rs6413432, Intron]
-    ignored: true
+    - [12678, T>A, rs6413432, Intron]
   CYP2E1*6_7A:
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
-    - [ignored, 12678, T>A, rs6413432, Intron]
-    ignored: true
+    - [12678, T>A, rs6413432, Intron]
   CYP2E1*6_7C_1B:
     mutations:
     - [4682, A>G, rs2070672, 5'UTR]
     - [4701, T>A, rs2070673, 5'UTR]
     - [15271, G>C, rs2070676, Intron]
-    - [ignored, 12678, T>A, rs6413432, Intron]
-    ignored: true
+    - [12678, T>A, rs6413432, Intron]
   CYP2E1*7A:
     mutations:
     - [4701, T>A, rs2070673, 5'UTR]
