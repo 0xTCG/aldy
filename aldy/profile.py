@@ -196,6 +196,17 @@ class Profile:
         (Debug) Show raw data for a given mutation (e.g., I223M)
         """
 
+        self.debug_novel = False
+        """
+        (Debug) Show potential novel functional mutations that are not in the database.
+        """
+
+        self.min_avg_coverage = 2.0
+        """
+        Minimum average gene coverage needed for Aldy.
+        Default: 2
+        """
+
         self.update(kwargs)
 
     def update(self, kwargs):
@@ -262,6 +273,8 @@ class Profile:
             raise AldyException("Profile missing neutral region")
         if gene.name not in prof:
             raise AldyException(f"Profile missing {gene.name}")
+        if gene.genome not in prof["neutral"]:
+            raise AldyException(f"Profile missing {gene.genome} data")
         return Profile(
             profile,
             GRange(*prof["neutral"][gene.genome]),

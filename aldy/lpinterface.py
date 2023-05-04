@@ -8,7 +8,7 @@ from typing import Optional, Dict, Tuple, Iterable, Callable
 import importlib
 import collections
 
-from .common import log, sorted_tuple, SOLUTION_PRECISION
+from .common import log, sorted_tuple, SOLUTION_PRECISION, AldyException
 
 
 SOLVER_PRECISON = 1e-5
@@ -356,6 +356,8 @@ def model(name: str, solver: str):
             log.trace("[lp] solver= gurobi")
         except ImportError:
             model = None
+        if model and not model.model:
+            model = None
         return model
 
     def test_cbc(name):
@@ -372,7 +374,7 @@ def model(name: str, solver: str):
         if model is None:
             model = test_gurobi(name)
         if model is None:
-            raise Exception(
+            raise AldyException(
                 "No ILP solver found. Aldy cannot operate without an ILP solver. "
                 + "Please install Gurobi or Google OR Tools."
             )
@@ -380,6 +382,9 @@ def model(name: str, solver: str):
     else:
         fname = "test_" + solver
         if fname in locals():
-            return locals()[fname](name)
+            m = locals()[fname](name)
+            if not m:
+                raise AldyException("ILP solver {} cannot be initialized".format(solver))
+            return m
         else:
-            raise Exception("ILP solver {} is not supported".format(solver))
+            raise AldyException("ILP solver {} is not supported".format(solver))

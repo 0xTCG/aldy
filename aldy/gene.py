@@ -236,6 +236,17 @@ class Gene:
         """:returns: Gene ID and a region that covers the position."""
         return self._region_at.get(pos, None)
 
+    def _reverse_op(self, op: str) -> str:
+        if ">" in op:
+            l, r = op.split(">")
+            return f"{rev_comp(l)}>{rev_comp(r)}"
+        elif op[:3] == "ins":
+            return f"ins{rev_comp(op[3:])}"
+        elif op[:3] == "del":
+            assert "ins" not in op, "del+ins not yet supported"
+            return f"del{rev_comp(op[3:])}"
+        return op
+
     def get_functional(self, mut, infer=True) -> Optional[str]:
         """
         :returns: String describing the mutation effect if a mutation is functional;
@@ -245,26 +256,17 @@ class Gene:
         if (pos, op) in self.mutations:
             return self.mutations[pos, op][0]
 
-        def reverse_op(op: str) -> str:
-            if ">" in op:
-                l, r = op.split(">")
-                return f"{rev_comp(l)}>{rev_comp(r)}"
-            elif op[:3] == "ins":
-                return f"ins{rev_comp(op[3:])}"
-            elif op[:3] == "del":
-                assert "ins" not in op, "del+ins not yet supported"
-                return f"del{rev_comp(op[3:])}"
-            return op
-
         # Calculate based on aminoacid change
         pos = self.chr_to_ref[pos]
         if infer and any(s <= pos < e for s, e in self.exons):
             if ">" not in op:
                 return "indel"
             if self.strand < 0:
-                op = reverse_op(op)
+                op = self._reverse_op(op)
+                # pos -= 1
             if op[2] == "N":
                 return None
+            assert(self.seq[pos] == op[0])
             seq = "".join(
                 self.seq[s:pos] + op[2] + self.seq[pos + 1 : e]
                 if s <= pos < e

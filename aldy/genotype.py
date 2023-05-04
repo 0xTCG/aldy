@@ -205,7 +205,7 @@ def genotype(
         )
     if kind != "vcf":
         avg_cov = sample.coverage.average_coverage()
-        if profile.cn_region and avg_cov < 2:
+        if profile.cn_region and avg_cov < profile.min_avg_coverage:
             if is_simple:
                 print(file=output_file)
             raise AldyException(
