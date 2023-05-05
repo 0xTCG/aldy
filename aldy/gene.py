@@ -257,6 +257,8 @@ class Gene:
             return self.mutations[pos, op][0]
 
         # Calculate based on aminoacid change
+        if pos not in self.chr_to_ref:
+            return None
         pos = self.chr_to_ref[pos]
         if infer and any(s <= pos < e for s, e in self.exons):
             if ">" not in op:
