@@ -32,6 +32,7 @@ class Sample:
         path: str,
         reference: Optional[str] = None,
         debug: Optional[str] = None,
+        idx = 0
     ):
         """
         :param gene: Gene instance.
@@ -91,6 +92,9 @@ class Sample:
 
         self.is_long_read = False
         """Set if long-read data is used."""
+
+        self.idx = idx
+        """Set the index of the used sample"""
 
         with Timing("[sam] Read SAM"):
             self.kind, _ = detect_genome(path)
@@ -239,7 +243,7 @@ class Sample:
             self._prefix = chr_prefix(self.gene.chr, list(vcf.header.contigs))
 
             samples = list(vcf.header.samples)
-            self.name = sample = samples[0]
+            self.name = sample = samples[self.idx]
             if len(samples) > 1:
                 log.warn("WARNING: Multiple VCF samples found; using the first one.")
             log.info("Using VCF sample {}", sample)

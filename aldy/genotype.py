@@ -45,6 +45,7 @@ def genotype(
     report: bool = False,
     genome=None,
     is_simple: bool = False,
+    idx = 0,
     **params,
 ) -> Dict[str, List[solutions.MinorSolution]]:
     """Genotype a sample.
@@ -173,7 +174,7 @@ def genotype(
     if kind == "vcf":
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
         profile = Profile("user_provided", cn_solution=["1", "1"], **params)
-        sample = sam.Sample(gene, profile, sam_path, debug=debug)
+        sample = sam.Sample(gene, profile, sam_path, debug=debug, idx=idx)
     else:
         if cn_solution:
             profile = Profile("user_provided", cn_solution=cn_solution, **params)
@@ -183,7 +184,7 @@ def genotype(
             profile = Profile.load(gene, profile_name, cn_region, **params)
         else:
             profile = None
-        sample = sam.Sample(gene, profile, sam_path, reference, debug)
+        sample = sam.Sample(gene, profile, sam_path, reference, debug, idx=idx)
     profile = sample.profile  # if loaded for a dump
     assert profile, "Profile not set"
     if kind == "dump":

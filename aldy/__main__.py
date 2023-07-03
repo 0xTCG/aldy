@@ -18,6 +18,7 @@ import datetime
 import tempfile
 import traceback
 import pytest
+import pysam
 
 from . import common
 from .common import log, script_path, AldyException, td, parse_cn_region
@@ -390,18 +391,26 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                             raise AldyException(f"Invalid parameter {p}")
                         k, v = p.split("=", 1)
                         params[k.replace("-", "_")] = v
-            _ = genotype(
-                gene_db=gene,
-                sam_path=args.file,
-                profile_name=args.profile,
-                output_file=output,
-                cn_region=cn_region,
-                cn_solution=cn_solution,
-                report=True,
-                is_simple=args.simple,
-                debug=debug,
-                **{k: v for k, v in params.items() if v is not None},
-            )
+
+            sampleLen = 0
+            with pysam.VariantFile(args.file) as vcf:
+                sampleLen = list(vcf.header.samples)
+
+            for i in range(sampleLen):
+                _ = genotype(
+                    gene_db=gene,
+                    sam_path=args.file,
+                    profile_name=args.profile,
+                    output_file=output,
+                    cn_region=cn_region,
+                    cn_solution=cn_solution,
+                    report=True,
+                    is_simple=args.simple,
+                    debug=debug,
+                    idx=i
+                    **{k: v for k, v in params.items() if v is not None},
+                )
+
         except AldyException as ex:
             log.critical(
                 f"ERROR: gene= {gene}, profile= {args.profile}, file= {args.file}"
