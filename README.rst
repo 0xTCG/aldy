@@ -1,5 +1,16 @@
 .. raw:: html
 
+  <hr/>
+    <h1>The docs for the forked version</h1>
+    <p>This fork adds the ability to process files with more than one sample. It also add an option to specify how many samples to process from a file, be default, it will process all the samples</p>
+    <p>Do not use the original instructions to build this forked, instead do the below</p>
+    1. Clone this repo
+    2. Create venv and install the required packages from requirements.txt after sourcing it
+    3. Build the cyx files with python3 setup.py build_ext --inplace
+    4. Run the command python3 -m aldy genotype -p pgx2 -g cyp2d6 file.vcf.gz
+    Use -i to specify how many sample to process, by default, it will process all the samples on the file.
+  <hr/>
+
    <h1 align="center">
    <img src="https://user-images.githubusercontent.com/10132487/100571499-1ee1fd00-3288-11eb-9760-75c4b0b98d2a.png" alt="Aldy" width=100px/>
    </h1>
@@ -14,7 +25,6 @@
   <br/>
   <b><i>A quick and nifty tool for genotyping and phasing popular pharmacogenes.</i></b>
   </p>
-
 
 Aldy 4 calls genotypes of many highly polymorphic pharmacogenes and reports them in a phased star-allele nomenclature.
 It can also call copy number of a given pharmacogene and genotype each copy present in the sample—something that standard

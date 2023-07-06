@@ -40,3 +40,5 @@ aldy_old/*
 scripts
 aldy/indelpost/*.c
 build/*
+venv/
+*.so

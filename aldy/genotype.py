@@ -335,14 +335,11 @@ def genotype(
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )
     log.debug("*" * 80)
-
-    if multiple_warn_level >= 1 and len(minor_sols) > 1:
-        log.warn("WARNING: multiple optimal solutions found!")
     log.info(
         f"{{}} {gene.name} star-alleles for {sample.name}:",
         "Best" if len(minor_sols) == 1 else "Potential",
     )
-    if is_aldy:
+    if is_aldy and idx == 0:
         print("#" + "\t".join(OUTPUT_COLS), file=output_file)
     simple = [sample.name, gene.name]
     for i, minor_sol in enumerate(minor_sols):

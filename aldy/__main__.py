@@ -269,6 +269,7 @@ def _get_args(argv):
         ),
     )
     genotype_parser.add_argument("--log", "-l", default=None, help="Log file location")
+    genotype_parser.add_argument("--limit", "-i", default=None, help="Limit the number of samples from a file")
     genotype_parser.add_argument(
         "--multiple-warn-level",
         "-W",
@@ -394,7 +395,9 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
 
             sampleLen = 0
             with pysam.VariantFile(args.file) as vcf:
-                sampleLen = list(vcf.header.samples)
+                sampleLen = len(list(vcf.header.samples))
+                if args.limit != None:
+                    sampleLen = min(int(args.limit), sampleLen)
 
             for i in range(sampleLen):
                 _ = genotype(
@@ -407,7 +410,7 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                     report=True,
                     is_simple=args.simple,
                     debug=debug,
-                    idx=i
+                    idx=i,
                     **{k: v for k, v in params.items() if v is not None},
                 )
 
