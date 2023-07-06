@@ -3,12 +3,12 @@
   <hr/>
     <h1>The docs for the forked version</h1>
     <p>This fork adds the ability to process files with more than one sample. It also add an option to specify how many samples to process from a file, be default, it will process all the samples</p>
-    <p>Do not use the original instructions to build this forked, instead do the below</p>
-    1. Clone this repo
-    2. Create venv and install the required packages from requirements.txt after sourcing it
-    3. Build the cyx files with python3 setup.py build_ext --inplace
-    4. Run the command python3 -m aldy genotype -p pgx2 -g cyp2d6 file.vcf.gz
-    Use -i to specify how many sample to process, by default, it will process all the samples on the file.
+    <p>Do not use the original instructions to build this forked, instead do the below</p><br>
+    1. Clone this repo<br>
+    2. Create venv and install the required packages from requirements.txt after sourcing it<br>
+    3. Build the cyx files with python3 setup.py build_ext --inplace<br>
+    4. Run the command python3 -m aldy genotype -p pgx2 -g cyp2d6 file.vcf.gz<br>
+    Use -i to specify how many sample to process, by default, it will process all the samples on the file.<br>
   <hr/>
 
    <h1 align="center">
