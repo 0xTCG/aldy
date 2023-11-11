@@ -257,6 +257,8 @@ class Profile:
             raise AldyException("Profile missing neutral region")
         if gene.name not in prof:
             raise AldyException(f"Profile missing {gene.name}")
+        if gene.genome not in prof["neutral"]:
+            raise AldyException(f"Profile {profile} not compatible with {gene.genome}")
         return Profile(
             profile,
             GRange(*prof["neutral"][gene.genome]),
