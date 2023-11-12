@@ -27,7 +27,6 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest pytest-cov codecov black
         python -m pip install setuptools wheel twine numpy cython
-        python -m pip install git+https://github.com/wyss/ssw-py
         python -m pip install .
     - name: Format with black
       run: black aldy
