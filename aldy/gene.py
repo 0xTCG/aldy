@@ -268,7 +268,8 @@ class Gene:
                 # pos -= 1
             if op[2] == "N":
                 return None
-            assert(self.seq[pos] == op[0])
+            if self.seq[pos] != op[0]:
+                log.warn(f"Bad mutation: {op[0]} != {self.seq[pos]}")
             seq = "".join(
                 self.seq[s:pos] + op[2] + self.seq[pos + 1 : e]
                 if s <= pos < e

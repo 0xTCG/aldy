@@ -98,7 +98,9 @@ class Sample:
 
             if self.kind == "vcf":
                 try:
-                    norm, muts = self._load_vcf(path, profile.vcf_sample_idx if profile else 0)
+                    norm, muts = self._load_vcf(
+                        path, profile.vcf_sample_idx if profile else 0
+                    )
                 except ValueError:
                     raise AldyException(f"VCF {path} is not indexed")
             elif self.kind == "dump":
@@ -240,8 +242,10 @@ class Sample:
 
             samples = list(vcf.header.samples)
             if sample_idx >= len(samples):
-                raise AldyException(f"Cannot fetch sample no. {sample_idx}; "
-                                    f"input VCF has {len(vcf.header.samples)} samples")
+                raise AldyException(
+                    f"Cannot fetch sample no. {sample_idx}; "
+                    f"input VCF has {len(vcf.header.samples)} samples"
+                )
             self.name = sample = samples[sample_idx]
 
             log.info("Using VCF sample {}", sample)

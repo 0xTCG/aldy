@@ -384,7 +384,9 @@ def model(name: str, solver: str):
         if fname in locals():
             m = locals()[fname](name)
             if not m:
-                raise AldyException("ILP solver {} cannot be initialized".format(solver))
+                raise AldyException(
+                    "ILP solver {} cannot be initialized".format(solver)
+                )
             return m
         else:
             raise AldyException("ILP solver {} is not supported".format(solver))

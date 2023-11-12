@@ -345,10 +345,13 @@ def _print_candidates(
         log.debug("[major] completely novel mutations=")
         for pos, muts in coverage._coverage.items():
             for op in muts:
-                if op == '_': continue
-                if (pos, op) in gene.mutations: continue
+                if op == "_":
+                    continue
+                if (pos, op) in gene.mutations:
+                    continue
                 e = gene.get_functional((pos, op), infer=True)
-                if not e: continue
+                if not e:
+                    continue
 
                 m = Mutation(pos, op)
                 copies = (
