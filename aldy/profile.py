@@ -207,6 +207,12 @@ class Profile:
         Default: 2
         """
 
+        self.vcf_sample_idx = 0
+        """
+        VCF sample index.
+        Default: 0
+        """
+
         self.update(kwargs)
 
     def update(self, kwargs):

@@ -98,7 +98,7 @@ class Sample:
 
             if self.kind == "vcf":
                 try:
-                    norm, muts = self._load_vcf(path)
+                    norm, muts = self._load_vcf(path, profile.vcf_sample_idx if profile else 0)
                 except ValueError:
                     raise AldyException(f"VCF {path} is not indexed")
             elif self.kind == "dump":
@@ -205,7 +205,7 @@ class Sample:
                     self._dump_reads.append(r)
         return norm, muts
 
-    def _load_vcf(self, vcf_path: str):
+    def _load_vcf(self, vcf_path: str, sample_idx: int = 0):
         """Load the read, mutation and coverage data from a VCF file."""
 
         log.debug("[vcf] path= {}", os.path.abspath(vcf_path))
@@ -239,9 +239,11 @@ class Sample:
             self._prefix = chr_prefix(self.gene.chr, list(vcf.header.contigs))
 
             samples = list(vcf.header.samples)
-            self.name = sample = samples[0]
-            if len(samples) > 1:
-                log.warn("WARNING: Multiple VCF samples found; using the first one.")
+            if sample_idx >= len(samples):
+                raise AldyException(f"Cannot fetch sample no. {sample_idx}; "
+                                    f"input VCF has {len(vcf.header.samples)} samples")
+            self.name = sample = samples[sample_idx]
+
             log.info("Using VCF sample {}", sample)
             for read in vcf.fetch(
                 region=self.gene.get_wide_region().samtools(prefix=self._prefix)
