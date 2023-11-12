@@ -274,11 +274,7 @@ class Profile:
         if gene.name not in prof:
             raise AldyException(f"Profile missing {gene.name}")
         if gene.genome not in prof["neutral"]:
-<<<<<<< HEAD
-            raise AldyException(f"Profile missing {gene.genome} data")
-=======
             raise AldyException(f"Profile {profile} not compatible with {gene.genome}")
->>>>>>> updates-2023
         return Profile(
             profile,
             GRange(*prof["neutral"][gene.genome]),
