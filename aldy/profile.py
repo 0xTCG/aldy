@@ -267,6 +267,7 @@ class Profile:
             raise AldyException(f"Could not load profile from {profile}")
         if is_yml and profile != "illumina" and cn_region:
             raise AldyException("-n is only valid with illumina or BAM profile")
+
         if is_yml and profile == "illumina" and cn_region:
             prof["neutral"]["value"] = cn_region.end - cn_region.start
         if "neutral" not in prof or "value" not in prof["neutral"]:
@@ -275,9 +276,11 @@ class Profile:
             raise AldyException(f"Profile missing {gene.name}")
         if gene.genome not in prof["neutral"]:
             raise AldyException(f"Profile {profile} not compatible with {gene.genome}")
+        if cn_region is None:
+            cn_region = GRange(*prof["neutral"][gene.genome])
         return Profile(
             profile,
-            GRange(*prof["neutral"][gene.genome]),
+            cn_region,
             prof,
             neutral_value=prof["neutral"].get("value"),
             **dict(prof.get("options", {}), **params),
@@ -393,6 +396,6 @@ class Profile:
         d["neutral"][genome] = [*gene_regions["neutral", "value", 0]]
         if params:
             d["options"] = {}
-            for k, v in Profile("")._parse_params(params).items():
+            for k, v in Profile("").update(params).items():
                 d["options"][k] = v
         return d
