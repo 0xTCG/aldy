@@ -687,6 +687,12 @@ Gene Support
 Change log
 ==========
 
+- Aldy v4.5 (Nov 15th, 2023)
+   - Add `min_avg_coverage` parameter
+   - Add `vcf_sample_idx` parameter for selecting VCF sample in multi-sample VCF
+   - Database cleanup
+   - Various bug fixes
+
 - Aldy v4.2 (Sep 25th, 2022)
    - Fix indelpost setup errors
    - Various small fixes
