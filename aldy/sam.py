@@ -710,6 +710,7 @@ class Sample:
                     continue
 
                 seq = read.query_sequence
+                if not seq: continue
                 qual = read.query_qualities if read.query_qualities else [40] * len(seq)
                 if self._index:
                     # Split reads

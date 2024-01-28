@@ -223,6 +223,7 @@ class Gene:
             raise AldyException("Either a path or a name should be given")
 
         yml = yaml.safe_load(yml)
+        self._yml = yml  # for debugging / raw API access
         if genome:
             self.genome = genome
         else:
