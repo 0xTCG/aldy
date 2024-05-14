@@ -125,8 +125,8 @@ class CNConfig:
         return "|".join("".join(str(g[r]) for r in self.cn[0]) for g in self.cn)
 
     def __str__(self):
-        alleles = " ".join(natsorted(self.alleles))
-        return f"CNConfig({str(self.kind)[13:]}; vector={self.vector}; alleles=[{alleles}])"
+        a = " ".join(natsorted(self.alleles))
+        return f"CNConfig({str(self.kind)[13:]}; vector={self.vector}; alleles=[{a}])"
 
 
 @dataclass

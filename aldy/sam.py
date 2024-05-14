@@ -427,8 +427,12 @@ class Sample:
                         "[indel] {}:{} -> {}", pos + 1, op, self._indel_sites[pos, op]
                     )
                     prev_indel = (pos, op, on_target)
-            except (IndexError, ValueError) as _:
-                log.error('Indel realignment error. If using long reads, try running with --param sam_long_reads=true. Otherwise, try  ')
+            except (IndexError, ValueError):
+                log.error(
+                    "Indel realignment error. If using long reads, "
+                    + "try running with --param sam_long_reads=true. "
+                    + "Otherwise, try  --param indelpost=false"
+                )
         # assert False
 
     def _load_cn_region(self, path, reference, cn_region):
