@@ -11,10 +11,11 @@
    <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black"/></a>
    <br/>
    <a href="https://www.nature.com/articles/s41467-018-03273-1"><img src="https://img.shields.io/badge/Published%20in-Nature%20Communications-red.svg" alt="Published in Nature Communications" /></a>
-   <a href="https://genome.cshlp.org/content/33/1/61.full"><img src="https://img.shields.io/badge/Published%20in-Genome%20Research-purple.svg" alt="Published in Genome Research" /></a>
-  <br/>
-  <b><i>A quick and nifty tool for genotyping and phasing popular pharmacogenes.</i></b>
-  </p>
+   <a href="https://genome.cshlp.org/content/33/1/61.full"><img src="https://img.shields.io/badge/Published%20in-Genome%20Research-purple.svg" alt="Published in Genome Research" /></a></p>
+
+.. raw:: html
+
+  <p align="center"><b><i>A quick and nifty tool for genotyping and phasing popular pharmacogenes.</i></b></p>
 
 
 Aldy 4 calls genotypes of many highly polymorphic pharmacogenes and reports them in a phased star-allele nomenclature.
