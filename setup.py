@@ -101,7 +101,7 @@ setup(
         "aldy.resources.genes": [
             "*.yml",
             "aldy/resources/genes/*.yml",
-            "aldy/tests/resources/pharmacoscan/*.yml",
+            "aldy/resources/genes/pharmacoscan/*.yml",
         ],
         "aldy.resources.profiles": ["*.yml", "aldy/resources/profiles/*.yml"],
         "aldy.tests.resources": [
@@ -115,6 +115,7 @@ setup(
             "aldy/tests/resources/*.expected",
             "*.yml",
             "aldy/tests/resources/*.yml",
+            "aldy/tests/resources/pharmacoscan/*.yml",
             "*.profile",
             "aldy/tests/resources/*.profile",
             "*.hg38",

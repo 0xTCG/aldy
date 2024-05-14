@@ -1,6 +1,6 @@
 name: CYP2A6
-version: pharmvar-5.2.3
-generated: '2022-08-26'
+version: pharmvar-6.1.2
+generated: '2024-05-14'
 pharmvar: 30670
 ensembl: ENSG00000255974
 alleles:
@@ -122,8 +122,11 @@ alleles:
     - [4009, A>G, rs4803381]
     - [4974, T>G, rs28399433, expression]
     - [5072, A>G, rs1137115]
+    - [6158, C>G, rs7250713]
     - [6641, T>C, rs8192725]
     - [6857, G>T, rs8192726]
+    - [7504, G>A, rs2388868]
+    - [8015, T>C, rs56267346]
     - [11375, T>C, rs2431413]
     - [11713, C>G, rs7248240]
   CYP2A6*10.001:
@@ -131,6 +134,9 @@ alleles:
     activity: function not assigned
     evidence: L
     mutations:
+    - [4277, A>G, rs61663607]
+    - [5043, C>T, rs8192720]
+    - [6641, T>C, rs8192725]
     - [11579, T>C, rs5031016, I471T]
     - [11621, G>T, rs28399468, R485L]
     - [CYP2A6, utr3]

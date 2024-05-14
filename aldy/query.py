@@ -67,9 +67,10 @@ def query(gene: Gene, query: str):
         s.append(f"  {r:>10}: {lg:>25} {lp:>25}")
     log.info("\n".join(s))
 
+    log.info("Copy number support: {}", "Yes" if gene.do_copy_number else "No")
     log.info("Structural alleles (deletions, conservations and fusions):")
     for c, cn in gene.cn_configs.items():
-        log.info(f"  {'*'+c+':':>8} {cn.description}")
+        log.info(f"  {'*'+c+':':>8} {cn.description} ({cn.vector})")
 
     log.info("Major star-alleles:")
     for a, allele in natsorted(gene.alleles.items()):

@@ -145,9 +145,10 @@ def seq_to_amino(seq: str) -> str:
 
 def freezekey(x):
     """Hashing support for dictionaries."""
-    return tuple(i[1] for i in sorted(x[0].items())) + tuple(
-        i[1] for i in sorted(x[1].items())
-    )
+    a = tuple(i[1] for i in sorted(x[0].items()))
+    if len(x) > 1:
+        a += tuple(i[1] for i in sorted(x[1].items()))
+    return a
 
 
 def sorted_tuple(x: Iterable) -> tuple:

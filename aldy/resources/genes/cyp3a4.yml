@@ -1,6 +1,6 @@
 name: CYP3A4
-version: pharmvar-5.2.3
-generated: '2022-08-26'
+version: pharmvar-6.1.2
+generated: '2024-05-14'
 pharmvar: 13729
 ensembl: ENSG00000160868
 alleles:
@@ -94,6 +94,7 @@ alleles:
     label: CYP3A4*7
     evidence: L
     mutations:
+    - [4713, G>A, rs2740574]
     - [11107, G>A, rs56324128, G56D]
   CYP3A4*8.001:
     pharmvar: https://www.pharmvar.org/haplotype/1754
@@ -102,15 +103,14 @@ alleles:
     evidence: L
     mutations:
     - [19021, G>A, rs72552799, R130Q]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*9.001:
     pharmvar: https://www.pharmvar.org/haplotype/1756
     activity: function not assigned
     label: CYP3A4*9
     evidence: L
     mutations:
+    - [4713, G>A, rs2740574]
     - [19405, G>A, rs72552798, V170I]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*10.001:
     pharmvar: https://www.pharmvar.org/haplotype/1519
     activity: function not assigned
@@ -132,7 +132,6 @@ alleles:
     label: CYP3A4*12
     evidence: D
     mutations:
-    - [25343, G>A, rs2242480, expression]
     - [27009, C>T, rs12721629, L373F]
   CYP3A4*13.001:
     pharmvar: https://www.pharmvar.org/haplotype/1514
@@ -156,7 +155,6 @@ alleles:
     evidence: D
     mutations:
     - [19382, G>A, rs4986907, R162Q]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*16.001:
     pharmvar: https://www.pharmvar.org/haplotype/1762
     activity: function not assigned
@@ -165,7 +163,6 @@ alleles:
     mutations:
     - [4713, G>A, rs2740574]
     - [20716, C>G, rs12721627, T185S]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*17.001:
     pharmvar: https://www.pharmvar.org/haplotype/1522
     activity: function not assigned
@@ -181,14 +178,13 @@ alleles:
     mutations:
     - [4713, G>A, rs2740574]
     - [25183, T>C, rs28371759, L293P]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/1766
     activity: function not assigned
     label: CYP3A4*19
     evidence: L
     mutations:
-    - [25343, G>A, rs2242480, expression]
+    - [4713, G>A, rs2740574]
     - [28350, C>T, rs4986913, P467S]
   CYP3A4*20.001:
     pharmvar: https://www.pharmvar.org/haplotype/1505
@@ -221,7 +217,6 @@ alleles:
     evidence: M
     mutations:
     - [19381, C>T, rs57409622, R162W]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*24.001:
     pharmvar: https://www.pharmvar.org/haplotype/1770
     activity: function not assigned
@@ -229,7 +224,6 @@ alleles:
     evidence: M
     mutations:
     - [20762, A>T, rs113667357, Q200H]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*26.001:
     pharmvar: https://www.pharmvar.org/haplotype/1501
     activity: function not assigned
@@ -246,7 +240,6 @@ alleles:
     mutations:
     - [4713, G>A, rs2740574]
     - [5168, C>G, rs570051168, L22V]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*29.001:
     pharmvar: https://www.pharmvar.org/haplotype/1510
     activity: function not assigned
@@ -303,27 +296,6 @@ alleles:
     mutations:
     - [4713, G>A, rs2740574]
     - [5111, C>G, rs188389063, L3V]
-  CYP3A4*36.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1751
-    activity: normal function
-    evidence: D
-    mutations:
-    - [25343, G>A, rs2242480, expression]
-  CYP3A4*36.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1498
-    activity: function not assigned
-    label: CYP3A4*1G
-    evidence: D
-    mutations:
-    - [4713, G>A, rs2740574]
-    - [25343, G>A, rs2242480, expression]
-  CYP3A4*36.003:
-    pharmvar: https://www.pharmvar.org/haplotype/1752
-    activity: normal function
-    evidence: D
-    mutations:
-    - [20741, C>T, rs4987159]
-    - [25343, G>A, rs2242480, expression]
   CYP3A4*37.001:
     pharmvar: https://www.pharmvar.org/haplotype/1802
     activity: function not assigned

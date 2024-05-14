@@ -51,11 +51,12 @@ Regions of interest:
           i2:    20:100000140-100000150    20:100000040-100000050
           e3:    20:100000150-100000160    20:100000050-100000060
         down:    20:100000160-100000200    20:100000060-100000100
+Copy number support: Yes
 Structural alleles (deletions, conservations and fusions):
-       *1: Standard copy-number configuration
-       *4: TOYP fusion until i2
-       *5: TOYP conservation after e2
-       *6: TOY deletion
+       *1: Standard copy-number configuration (1111111|1111111)
+       *4: TOYP fusion until i2 (0000111|1111000)
+       *5: TOYP conservation after e2 (1110000|1112222)
+       *6: TOY deletion (0000000|1111111)
 Major star-alleles:
   *1:
     Key mutations: none

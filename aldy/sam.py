@@ -381,7 +381,7 @@ class Sample:
 
             v = Variant(rname, p + 1, o1, o2, ref)  # type: ignore
 
-            if long_reads:
+            if long_reads or not self.profile.indelpost:
                 # Speed-up: just generate equivalent indels, no need for the realignment
                 for ev in v.generate_equivalents():
                     np, no = ev.pos - 1, ""
@@ -395,37 +395,40 @@ class Sample:
                         self._indel_sites_eqs[np, no] = (pos, op)
                 continue
 
-            exact_match_for_shiftable = True
-            valn = VariantAlignment(  # type: ignore
-                v,
-                sam,
-                mapping_quality_threshold=self.profile.min_mapq,
-                base_quality_threshold=self.profile.min_quality,
-                # needed to account for indel and database errors
-                exact_match_for_shiftable=exact_match_for_shiftable,
-            )
-
-            phased = valn.phase()
-            if len(phased.ref) - len(phased.alt) != len(v.ref) - len(v.alt):
-                continue  # HACK: this indicates a subsumed indel
-
-            self._indel_sites[pos, op] = list(valn.count_alleles())
-            on_target = {r.query_name for r in valn.fetch_reads("target")}
-            if (
-                prev_indel
-                and pos == prev_indel[0]
-                and op.startswith("ins")
-                and prev_indel[1].startswith(op)  # handle indel repeats
-            ):
-                # do not consider previously used reads
-                off, on = self._indel_sites[pos, op]
-                x = len(on_target & prev_indel[2])
-                self._indel_sites[pos, op] = [off + x, on - x]
-            if self._indel_sites[pos, op][1]:
-                log.debug(
-                    "[indel] {}:{} -> {}", pos + 1, op, self._indel_sites[pos, op]
+            try:
+                exact_match_for_shiftable = True
+                valn = VariantAlignment(  # type: ignore
+                    v,
+                    sam,
+                    mapping_quality_threshold=self.profile.min_mapq,
+                    base_quality_threshold=self.profile.min_quality,
+                    # needed to account for indel and database errors
+                    exact_match_for_shiftable=exact_match_for_shiftable,
                 )
-                prev_indel = (pos, op, on_target)
+
+                phased = valn.phase()
+                if len(phased.ref) - len(phased.alt) != len(v.ref) - len(v.alt):
+                    continue  # HACK: this indicates a subsumed indel
+
+                self._indel_sites[pos, op] = list(valn.count_alleles())
+                on_target = {r.query_name for r in valn.fetch_reads("target")}
+                if (
+                    prev_indel
+                    and pos == prev_indel[0]
+                    and op.startswith("ins")
+                    and prev_indel[1].startswith(op)  # handle indel repeats
+                ):
+                    # do not consider previously used reads
+                    off, on = self._indel_sites[pos, op]
+                    x = len(on_target & prev_indel[2])
+                    self._indel_sites[pos, op] = [off + x, on - x]
+                if self._indel_sites[pos, op][1]:
+                    log.debug(
+                        "[indel] {}:{} -> {}", pos + 1, op, self._indel_sites[pos, op]
+                    )
+                    prev_indel = (pos, op, on_target)
+            except (IndexError, ValueError) as _:
+                log.error('Indel realignment error. If using long reads, try running with --param sam_long_reads=true. Otherwise, try  ')
         # assert False
 
     def _load_cn_region(self, path, reference, cn_region):
@@ -710,7 +713,8 @@ class Sample:
                     continue
 
                 seq = read.query_sequence
-                if not seq: continue
+                if not seq:
+                    continue
                 qual = read.query_qualities if read.query_qualities else [40] * len(seq)
                 if self._index:
                     # Split reads

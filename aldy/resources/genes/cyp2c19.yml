@@ -1,6 +1,6 @@
 name: CYP2C19
-version: pharmvar-5.2.3
-generated: '2022-08-26'
+version: pharmvar-6.1.2
+generated: '2024-05-14'
 pharmvar: 18207
 ensembl: ENSG00000165841
 alleles:
@@ -214,6 +214,18 @@ alleles:
     - [24179, G>A, rs4244285, splice defect]
     - [85185, C>T, rs3758580]
     - [85186, A>G, rs3758581, I331V]
+  CYP2C19*2.012:
+    pharmvar: https://www.pharmvar.org/haplotype/1543
+    activity: no function
+    evidence: D
+    mutations:
+    - [4928, T>C, rs4986894]
+    - [5124, C>T, rs17885098]
+    - [17485, G>C, rs17878459, E92D]
+    - [17687, A>G, rs12769205, splice defect]
+    - [24179, G>A, rs4244285, splice defect]
+    - [85185, C>T, rs3758580]
+    - [85186, A>G, rs3758581, I331V]
   CYP2C19*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/85
     activity: no function
@@ -280,6 +292,7 @@ alleles:
     label: CYP2C19*5A
     evidence: L
     mutations:
+    - [85186, A>G, rs3758581, I331V]
     - [95058, C>T, rs56337013, R433W]
   CYP2C19*5.002:
     pharmvar: https://www.pharmvar.org/haplotype/84
@@ -306,6 +319,7 @@ alleles:
     evidence: L
     mutations:
     - [24319, T>A, rs72558186, splice defect]
+    - [85186, A>G, rs3758581, I331V]
   CYP2C19*8.001:
     pharmvar: https://www.pharmvar.org/haplotype/80
     activity: no function
@@ -313,6 +327,7 @@ alleles:
     evidence: L
     mutations:
     - [17736, T>C, rs41291556, W120R]
+    - [85186, A>G, rs3758581, I331V]
   CYP2C19*8.002:
     pharmvar: https://www.pharmvar.org/haplotype/1538
     activity: no function
@@ -582,8 +597,10 @@ alleles:
     mutations:
     - [CYP2C19, deletion]
     ignored: true
-  # CYP2C19*37.001:
-  #   partial deletion
+  CYP2C19*37.001:
+    activity: unknown
+    mutations:
+    - [CYP2C19, "deletion:e2,i2,e3,i3,e4,i4,e5"]
   CYP2C19*38.001:
     pharmvar: https://www.pharmvar.org/haplotype/81
     activity: normal function

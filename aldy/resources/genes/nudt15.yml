@@ -1,6 +1,6 @@
 name: NUDT15
-version: pharmvar-5.2.3
-generated: '2022-08-26'
+version: pharmvar-6.1.2
+generated: '2024-05-14'
 pharmvar: 22812
 ensembl: ENSG00000136159
 alleles:
@@ -167,7 +167,6 @@ alleles:
     evidence: D
     mutations:
     - [13124, C>G, rs768324690, P129R]
-    - [13240, G>A, rs61973267]
 structure:
   genes: [NUDT15]
   regions:

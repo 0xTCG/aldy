@@ -1,6 +1,6 @@
 name: CYP2B6
-version: pharmvar-5.2.3
-generated: '2022-08-26'
+version: pharmvar-6.1.2
+generated: '2024-05-14'
 pharmvar: 30674
 ensembl: ENSG00000197408
 alleles:
@@ -146,6 +146,15 @@ alleles:
     - [31928, A>C, rs12979270]
     - [31929, G>A, rs12979898]
     - [31950, T>C, rs1042389]
+  CYP2B6*2.003:
+    pharmvar: https://www.pharmvar.org/haplotype/1397
+    activity: normal function
+    evidence: D
+    mutations:
+    - [2845, G>T, rs146959232]
+    - [5071, C>T, rs8192709, R22C]
+    - [17747, G>C, rs2279341]
+    - [31357, G>T, rs4803420]
   CYP2B6*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/820
     activity: uncertain function

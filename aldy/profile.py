@@ -213,6 +213,12 @@ class Profile:
         Default: 0
         """
 
+        self.indelpost = True
+        """
+        Use indelpost for indel realignment (unless sam_long_reads is set).
+        Default: True
+        """
+
         self.update(kwargs)
 
     def update(self, kwargs):

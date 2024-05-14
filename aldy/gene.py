@@ -98,6 +98,7 @@ class CNConfigType(Enum):
     LEFT_FUSION = 1
     RIGHT_FUSION = 2
     DELETION = 3
+    CUSTOM = 4
 
 
 @dataclass
@@ -119,10 +120,13 @@ class CNConfig:
     alleles: Set[str]
     description: str = ""
 
+    @property
+    def vector(self):
+        return "|".join("".join(str(g[r]) for r in self.cn[0]) for g in self.cn)
+
     def __str__(self):
-        cov = "|".join("".join(str(g[r]) for r in self.cn[0]) for g in self.cn)
         alleles = " ".join(natsorted(self.alleles))
-        return f"CNConfig({str(self.kind)[13:]}; vector={cov}; alleles=[{alleles}])"
+        return f"CNConfig({str(self.kind)[13:]}; vector={self.vector}; alleles=[{alleles}])"
 
 
 @dataclass
@@ -500,12 +504,15 @@ class Gene:
         alleles = {}
         fusions_left = {}
         fusions_right = {}
+        custom_cn = {}
 
         # allele ID of the deletion allele (i.e. whole gene is missing).
         deletion_allele = None
 
-        def process_mutation(pos, op, info):
-            if pos in self.pseudogenes:
+        def process_mutation(name, pos, op, info):
+            if pos == self.name and op.startswith("deletion:"):
+                custom_cn[name] = op[9:].split(",")
+            elif pos in self.pseudogenes:
                 assert pos == self.pseudogenes[0]  # TODO: relax later
                 if op[-1] == "-":
                     fusions_left[name] = op[:-1]
@@ -552,13 +559,13 @@ class Gene:
         for pos, op, *info in yml["alleles"].get("random", []):
             if isinstance(pos, str) and pos == "ignored":
                 continue
-            for m in process_mutation(pos, op, info):
+            for m in process_mutation("random", pos, op, info):
                 self.random_mutations.add(m)
         self.mutation_groups = {}
         for name, muts in yml["alleles"].get("groups", {}).items():
             self.mutation_groups[name] = set()
             for pos, op, *info in muts:
-                for m in process_mutation(pos, op, info):
+                for m in process_mutation(name, pos, op, info):
                     self.mutation_groups[name].add(m)
 
         for name, allele in yml["alleles"].items():
@@ -577,7 +584,7 @@ class Gene:
                     if pos == self.name and op in self.mutation_groups:
                         log.warn(f"Ignoring {op} in {name}")
                         continue
-                    for m in process_mutation(pos, op, info):
+                    for m in process_mutation(name, pos, op, info):
                         mutations.add(m)
 
             alt_name = allele.get("label", None)
@@ -601,7 +608,7 @@ class Gene:
         # the first pseudogene. Multi-pseudogene fusions are not supported.
 
         self.do_copy_number = bool(
-            deletion_allele or len(fusions_left) or len(fusions_right)
+            deletion_allele or len(fusions_left) or len(fusions_right) or len(custom_cn)
         )
         self.cn_configs: Dict[str, CNConfig] = dict()
 
@@ -651,6 +658,22 @@ class Gene:
                     CNConfigType.RIGHT_FUSION,
                     {a},
                     f"{self.pseudogenes[0]} conservation after {brk}",
+                )
+                inverse_cn[key] = a
+            else:
+                self.cn_configs[inverse_cn[key]].alleles.add(a)
+        # Custom deletions (main gene only)
+        for a, items in custom_cn.items():
+            cn = [{r: int(r not in items) for r in self.regions[0]}]
+            if len(self.regions) > 1:
+                cn.append({r: 1 for r in self.regions[1]})
+            key = freezekey(cn)
+            if key not in inverse_cn:
+                self.cn_configs[a] = CNConfig(
+                    cn,
+                    CNConfigType.CUSTOM,
+                    {a},
+                    f"{self.name} deletion in {','.join(items)}",
                 )
                 inverse_cn[key] = a
             else:
