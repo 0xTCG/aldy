@@ -39,7 +39,7 @@ alleles:
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*1.006:
     pharmvar: https://www.pharmvar.org/haplotype/73
-    activity: uncertain function
+    activity: normal function
     label: CYP2C19*27
     evidence: D
     mutations:
@@ -593,12 +593,12 @@ alleles:
     - [17687, A>G, rs12769205, splice defect]
     - [85186, A>G, rs3758581, I331V]
   CYP2C19*36.001:
-    activity: unknown
+    activity: no function
     mutations:
     - [CYP2C19, deletion]
     ignored: true
   CYP2C19*37.001:
-    activity: unknown
+    activity: no function
     mutations:
     - [CYP2C19, "deletion:e2,i2,e3,i3,e4,i4,e5"]
   CYP2C19*38.001:

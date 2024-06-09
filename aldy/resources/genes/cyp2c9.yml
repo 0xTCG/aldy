@@ -696,13 +696,13 @@ alleles:
     - [55863, C>T, rs9332239, P489S]
   CYP2C9*72.001:
     pharmvar: https://www.pharmvar.org/haplotype/1737
-    activity: normal function
+    activity: function not assigned
     evidence: D
     mutations:
     - [9149, C>T, rs1289704600, A149V]
   CYP2C9*73.001:
     pharmvar: https://www.pharmvar.org/haplotype/1739
-    activity: normal function
+    activity: function not assigned
     evidence: D
     mutations:
     - [9151, C>T, rs17847037, R150C]
@@ -714,7 +714,7 @@ alleles:
     - [14782, G>T, rs370100007, Q214H]
   CYP2C9*75.001:
     pharmvar: https://www.pharmvar.org/haplotype/1743
-    activity: normal function
+    activity: function not assigned
     evidence: D
     mutations:
     - [52979, A>C, rs1254213342, N418T]

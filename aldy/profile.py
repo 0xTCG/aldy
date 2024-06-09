@@ -229,8 +229,11 @@ class Profile:
                     self.__dict__[n] = v
                 else:
                     try:
-                        typ = type(self.__dict__[n])
-                        self.__dict__[n] = typ(v)
+                        if isinstance(self.__dict__[n], bool):
+                            self.__dict__[n] = not (v in ['False', '0'])
+                        else:
+                            typ = type(self.__dict__[n])
+                            self.__dict__[n] = typ(v)
                     except (ValueError, TypeError):
                         raise AldyException(f"Invalid parameter {n}: {v}") from None
                 params[n] = self.__dict__[n]
