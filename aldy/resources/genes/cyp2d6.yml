@@ -1844,7 +1844,7 @@ alleles:
     - [9421, C>T, rs28371738]
   CYP2D6*10.1004:
     label: CYP2D6*10.ALDY
-    activity: unknown
+    activity: decreased function
     mutations:
     - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
@@ -2381,7 +2381,7 @@ alleles:
     - [9501, G>A, rs12169962]
   CYP2D6*32.001:
     pharmvar: https://www.pharmvar.org/haplotype/1726
-    activity: uncertain function
+    activity: decreased function
     label: CYP2D6*32
     evidence: D
     mutations:
@@ -3188,7 +3188,7 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*46.003:
     pharmvar: https://www.pharmvar.org/haplotype/680
-    activity: no function
+    activity: normal function
     evidence: D
     mutations:
     - [3477, G>A, rs76210340]
@@ -3273,7 +3273,7 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*52.001:
     pharmvar: https://www.pharmvar.org/haplotype/242
-    activity: uncertain function
+    activity: decreased function
     label: CYP2D6*52
     evidence: L
     mutations:
@@ -3288,7 +3288,7 @@ alleles:
     - [9421, C>T, rs28371738]
   CYP2D6*52.002:
     pharmvar: https://www.pharmvar.org/haplotype/649
-    activity: uncertain function
+    activity: decreased function
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
@@ -3424,8 +3424,8 @@ alleles:
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*57.1001:
-    activity: no function
     label: CYP2D6*57.ALDY
+    activity: no function
     evidence: L
     mutations:
     - [5119, C>T, rs1065852, P34S]
@@ -3965,7 +3965,7 @@ alleles:
     - [6713, A>G, rs569229126, K147R]
   CYP2D6*91.001:
     pharmvar: https://www.pharmvar.org/haplotype/173
-    activity: uncertain function
+    activity: decreased function
     label: CYP2D6*91
     evidence: L
     mutations:
@@ -4249,7 +4249,7 @@ alleles:
     - [8255, A>G, rs202102799, Y355C]
   CYP2D6*109.001:
     pharmvar: https://www.pharmvar.org/haplotype/209
-    activity: uncertain function
+    activity: decreased function
     label: CYP2D6*109
     evidence: D
     mutations:
@@ -4385,7 +4385,7 @@ alleles:
     - [7912, A>G, '-', T310A]
   CYP2D6*119.001:
     pharmvar: https://www.pharmvar.org/haplotype/382
-    activity: unknown function
+    activity: decreased function
     evidence: D
     mutations:
     - [3785, A>G, rs28735595]
@@ -4465,7 +4465,7 @@ alleles:
     - [9501, G>A, rs12169962]
   CYP2D6*124.001:
     pharmvar: https://www.pharmvar.org/haplotype/1375
-    activity: function not assigned
+    activity: no function
     evidence: D
     mutations:
     - [8829, delTC, rs757396767, L395fs]
@@ -4609,7 +4609,7 @@ alleles:
     - [7490, T>C, rs17002852]
   CYP2D6*132.001:
     pharmvar: https://www.pharmvar.org/haplotype/709
-    activity: unknown function
+    activity: decreased function
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
@@ -4859,7 +4859,7 @@ alleles:
     - [6645, T>G, rs766391487, Y124X]
   CYP2D6*144.001:
     pharmvar: https://www.pharmvar.org/haplotype/1441
-    activity: function not assigned
+    activity: no function
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
@@ -4929,7 +4929,7 @@ alleles:
     - [9421, C>T, rs28371738]
   CYP2D6*148.001:
     pharmvar: https://www.pharmvar.org/haplotype/1746
-    activity: normal function
+    activity: function not assigned
     evidence: D
     mutations:
     - [4201, C>G, rs930275829]
@@ -5044,7 +5044,7 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*156.001:
     pharmvar: https://www.pharmvar.org/haplotype/1945
-    activity: function not assigned
+    activity: no function
     evidence: D
     mutations:
     - [3426, T>C, rs1080984]
@@ -5164,7 +5164,7 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*161.001:
     pharmvar: https://www.pharmvar.org/haplotype/1965
-    activity: function not assigned
+    activity: no function
     evidence: D
     mutations:
     - [4280, C>T, rs28624811]

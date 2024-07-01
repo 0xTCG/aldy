@@ -88,10 +88,12 @@ alleles:
   DPYD*HapB3:
     pharmvar: https://www.pharmvar.org/haplotype/1077
     activity: decreased function
-    label: HapB3
     mutations:
     - [346167, C>G, rs75017182, intronic]
     - [352197, G>A, rs56038477, intronic]
+  DPYD*HapB3_Alt:
+    mutations:
+    - [346167, C>G, rs75017182, intronic]
   DPYD*rs2297595:
     pharmvar: https://www.pharmvar.org/haplotype/943
     activity: normal function

@@ -61,7 +61,7 @@ alleles:
     - [50686, C>A, rs11045819, P155T]
   SLCO1B1*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/1661
-    activity: function not assigned
+    activity: no function
     label: SLCO1B1*5
     evidence: D
     mutations:
@@ -90,7 +90,7 @@ alleles:
     - [79728, A>G, rs72559748, D462G]
   SLCO1B1*9.001:
     pharmvar: https://www.pharmvar.org/haplotype/1707
-    activity: function not assigned
+    activity: no function
     label: SLCO1B1*9
     evidence: D
     mutations:
@@ -156,7 +156,7 @@ alleles:
     - [52498, C>T, rs2291075]
   SLCO1B1*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/1704
-    activity: function not assigned
+    activity: no function
     label: SLCO1B1*15A, SLCO1B1*15B, SLCO1B1*17
     evidence: D
     mutations:
@@ -165,7 +165,7 @@ alleles:
     - [52498, C>T, rs2291075]
   SLCO1B1*15.002:
     pharmvar: https://www.pharmvar.org/haplotype/1687
-    activity: function not assigned
+    activity: no function
     label: SLCO1B1*15C
     evidence: D
     mutations:
@@ -198,7 +198,7 @@ alleles:
     - [112849, A>C, rs34671512, L643F]
   SLCO1B1*20.001:
     pharmvar: https://www.pharmvar.org/haplotype/1714
-    activity: function not assigned
+    activity: increased function
     label: SLCO1B1*20, SLCO1B1*21, SLCO1B1*35
     evidence: D
     mutations:
@@ -216,7 +216,7 @@ alleles:
     - [112849, A>C, rs34671512, L643F]
   SLCO1B1*23.001:
     pharmvar: https://www.pharmvar.org/haplotype/1715
-    activity: function not assigned
+    activity: no function
     label: SLCO1B1*23
     evidence: L
     mutations:
@@ -286,7 +286,7 @@ alleles:
     - [52764, A>G, rs79135870, I222V]
   SLCO1B1*31.001:
     pharmvar: https://www.pharmvar.org/haplotype/1665
-    activity: function not assigned
+    activity: no function
     label: SLCO1B1*31
     evidence: D
     mutations:
@@ -329,14 +329,14 @@ alleles:
     - [76360, T>G, rs1228465562, F400V]
   SLCO1B1*37.001:
     pharmvar: https://www.pharmvar.org/haplotype/1716
-    activity: function not assigned
+    activity: normal function
     label: SLCO1B1*1B, SLCO1B1*1F
     evidence: D
     mutations:
     - [50611, A>G, rs2306283, N130D]
   SLCO1B1*37.002:
     pharmvar: https://www.pharmvar.org/haplotype/1694
-    activity: function not assigned
+    activity: normal function
     label: SLCO1B1*1G, SLCO1B1*1H
     evidence: D
     mutations:
@@ -484,7 +484,7 @@ alleles:
     - [52498, C>T, rs2291075]
     - [74351, C>G, rs72559747, P336R]
   SLCO1B1*48.001:
-    activity: unknown
+    activity: no function
     mutations:
     - [SLCO1B1, deletion]
     ignored: true
