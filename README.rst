@@ -622,6 +622,14 @@ Gene Support
      - PharmVar 5.2.3
      - ✅
      -
+   * - *ABCG2*
+     - PharmGKB (Jun 2024)
+     - ⚠️
+     - Thorough testing on the real datasets pending
+   * - *CACNA1S*
+     - PharmGKB (Jun 2024)
+     - ⚠️
+     - Thorough testing on the real datasets pending
    * - *CFTR*
      - PharmGKB (Jun 2020) and Pharmacoscan R9
      - ✅
@@ -663,6 +671,10 @@ Gene Support
      - PharmVar 5.2.3
      - ✅
      -
+   * - *RYR1*
+     - PharmGKB (Jun 2024)
+     - ⚠️
+     - Thorough testing on the real datasets pending
    * - *SLCO1B1*
      - PharmVar 5.2.3
      - ✅
@@ -683,6 +695,7 @@ Gene Support
      - PharmGKB (Jan 2021) and Pharmacoscan R9
      - ⚠️
      - Thorough testing on the real datasets pending
+
 
 Change log
 ==========
