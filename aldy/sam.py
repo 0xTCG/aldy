@@ -104,6 +104,8 @@ class Sample:
                     raise AldyException(f"VCF {path} is not indexed")
             elif self.kind == "dump":
                 norm, muts = self._load_dump(path)
+            elif self.kind == "pscan":
+                norm, muts = self._load_pscan(path)
             else:
                 if self.profile and self.profile.sam_long_reads:
                     self.is_long_read = True
@@ -324,6 +326,68 @@ class Sample:
         self.phases = {f"r{i}": v for i, v in enumerate(phases)}
         norm = {p: [q for q, n in c.items() for _ in range(n)] for p, c in norm.items()}
         muts = {p: [q for q, n in c.items() for _ in range(n)] for p, c in muts.items()}
+        return norm, muts
+
+    def _load_pscan(self, path: str):
+        """Load Pharmacoscan probe data."""
+
+        log.debug("[pscan] path= {}", os.path.abspath(path))
+
+        norm = {
+            p: [(40, 40)] * 20
+            for p in range(
+                self.gene.get_wide_region().start - 500,
+                self.gene.get_wide_region().end + 1,
+            )
+        }
+        muts: dict = defaultdict(list)
+
+        def parse(start, ref, alt):
+            while ref and alt and ref[0] == alt[0]:
+                ref, alt, start = ref[1:], alt[1:], start + 1
+            return start, ref, alt
+
+        with open(path) as f:
+            self._prefix = ""  # no chr prefix assumed
+            self.name = os.path.splitext(os.path.basename(path))[0]
+            for l in f:
+                if l.startswith("#") or l.startswith("probeset_id\t"): continue
+                l = l.strip().split('\t')
+                _, genotype, _, chrom, start, stop, _, rsid, _, _, _, _, _, _, _, _, _, ref, alt, *_  = l
+                start, stop = int(start) - 1, int(stop)
+                if chrom != self.gene.chr:
+                    continue
+                if start not in self.gene:
+                    continue
+                genotype = genotype.split('/')
+                if len(genotype) != 2:
+                    continue
+                if ref != '-':
+                    assert self.gene[start:stop] == ref, (ref, self.gene[start:stop])
+                alt = alt.split('//')
+                if len(alt) > 1:
+                    for g in genotype:
+                        if g in alt:
+                            alt = g
+                            break
+                else:
+                    alt = alt[0]
+                start, ref, alt = parse(start, ref, alt)
+
+                r, m = 20, 0
+                mc = f'{ref}>{alt}'
+                if alt == '-':
+                    mc = f'del{ref}'
+                if ref == '-':
+                    mc = f'ins{alt}'
+                mut = (start, mc)
+                for g in genotype:
+                    if g in alt:
+                        m += 10
+                        r -= 10
+                if m:
+                    muts[mut] += [(40, 40)] * m
+                    norm[mut[0]] = norm[mut[0]][:r]
         return norm, muts
 
     def _dump_alignments(self, debug: str, norm, muts):
@@ -918,6 +982,10 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
                 if data:
                     genome = data.read().decode("utf-8").strip()
                     return "dump", genome
+            if sam_path.endswith(".txt") and os.path.exists(sam_path):
+                with open(sam_path) as f:
+                    if f.readline().startswith("##batch-folder"):
+                        return "pscan", None
     return "", None
 
 
