@@ -15,7 +15,6 @@ import tarfile
 import pickle
 import tempfile
 
-from .indelpost import Variant, VariantAlignment
 from .common import log, GRange, AldyException, script_path, Timing, chr_prefix
 from .gene import Gene, CNConfigType
 from .coverage import Coverage
@@ -350,6 +349,8 @@ class Sample:
         """Realign reads around database indels via indelpost module."""
 
         assert self.profile, "profile not loaded"
+
+        from .indelpost import Variant, VariantAlignment
 
         rname = f"{self._prefix}{self.gene.chr}"
         if not reference:
