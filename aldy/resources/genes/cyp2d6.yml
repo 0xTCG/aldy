@@ -1699,6 +1699,15 @@ alleles:
     - [6266, C>T, rs267608277]
     - [6727, delT, rs5030655, W152fs]
     - [6996, G>A, rs5030866, G212E]
+  CYP2D6*6.ALDY:
+    pharmvar: https://www.pharmvar.org/haplotype/712
+    activity: no function
+    label: CYP2D6*6
+    evidence: D
+    mutations:
+    - [6727, delT, rs5030655, W152fs]
+    - [6996, G>A, rs5030866, G212E]
+    - [8308, G>A, rs61737946, G373S]
   CYP2D6*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/155
     activity: no function
