@@ -209,7 +209,7 @@ class Sample:
                     read.query_qualities,
                 )
                 if self.reads is not None:
-                    self.reads.append((read.query_sequence, read.query_name, r))
+                    self.reads.append((read.query_sequence, read.query_name, *r))
                 if r and debug:
                     self._dump_reads.append(r)
         return norm, muts

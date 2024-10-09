@@ -19,6 +19,9 @@ from .solutions import CNSolution
 from .profile import Profile
 
 
+RESCALE = (1.0, 1.25)
+
+
 def estimate_cn(
     gene: Gene,
     profile: Profile,
@@ -64,8 +67,8 @@ def estimate_cn(
         )
         region_cov = {
             r: (
-                coverage.region_coverage(0, r),
-                coverage.region_coverage(1, r) if len(gene.regions) > 1 else 0.0,
+                coverage.region_coverage(0, r) * RESCALE[0],
+                coverage.region_coverage(1, r) * RESCALE[1] if len(gene.regions) > 1 else 0.0,
             )
             for r in gene.unique_regions
         }
@@ -84,7 +87,7 @@ def estimate_cn(
         _print_coverage(gene, coverage)
 
         fusion_support = None
-        if coverage.sam._fusion_counter:
+        if False and coverage.sam._fusion_counter:
             fusion_support = {
                 fn: (a / b) if b else 0.0
                 for fn, [a, b] in coverage.sam._fusion_counter.items()
@@ -171,7 +174,7 @@ def solve_cn_model(
                     r: v - 1 for r, v in structures[a, i].cn[g].items()
                 }
     # Add "fake" pseudogenes to handle pseudogene CN changes or CN noise
-    if len(gene.regions) > 1 and del_allele:
+    if False and len(gene.regions) > 1 and del_allele:
         for i in range(max_cn):
             structures["PSEUDO", i + 1] = CNConfig(
                 copy.deepcopy(structures[del_allele, 0].cn),
@@ -272,6 +275,9 @@ def solve_cn_model(
         sol_tuple = sorted_tuple(
             lookup[v] for v in sol if lookup[v] not in [del_allele, "PSEUDO"]
         )
+        # print(sol)
+        # for r, ve in VERR.items():
+        #     print(r, model.getValue(ve), model.getValue(DD[r]))
         if sol_tuple not in result:
             result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
             log.debug(
@@ -327,9 +333,9 @@ def _print_coverage(gene: Gene, coverage: Coverage) -> None:
         pname = pname_[1] if len(pname_) > 1 else gene.pseudogenes[0]
     log.debug(f"  {'':5} {gname:4} {pname:4}")
     for r in gene.regions[0]:
-        g = coverage.region_coverage(0, r)
+        g = coverage.region_coverage(0, r) * RESCALE[0]
         if pname:
-            p = coverage.region_coverage(1, r)
+            p = coverage.region_coverage(1, r) * RESCALE[1]
             if r in gene.unique_regions:
                 log.debug(f"  {r:5} {g:4.1f} {p:4.1f} = {g - p:4.1f}")
             else:
