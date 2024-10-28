@@ -31,6 +31,7 @@ class Sample:
         path: str,
         reference: Optional[str] = None,
         debug: Optional[str] = None,
+        store_reads: bool = False,
     ):
         """
         :param gene: Gene instance.
@@ -90,6 +91,8 @@ class Sample:
 
         self.is_long_read = False
         """Set if long-read data is used."""
+
+        self.reads = [] if store_reads else None
 
         with Timing("[sam] Read SAM"):
             self.kind, _ = detect_genome(path)
@@ -204,6 +207,8 @@ class Sample:
                     read.mapping_quality,
                     read.query_qualities,
                 )
+                if self.reads is not None:
+                    self.reads.append((read.query_sequence, read.query_name, r))
                 if r and debug:
                     self._dump_reads.append(r)
         return norm, muts
