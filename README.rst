@@ -241,7 +241,7 @@ The summary of the calls is shown at the end of the output::
 
 In this example, the *CYP2D6* genotype is \*1/\*4 in terms of major star-alleles.
 The minor star-alleles are given after each major star-allele call (here, \*1.016 and \*4.021).
-The minor alleles might also have additional or removed mutations.
+The minor alleles might also have additional or removed variants.
 The additions are marked with `+` in front (e.g., `+rs112568578`), while the losses carry `-` in front (e.g., `-rs28588594`).
 In some instances, even the major alleles might contain additions (e.g., `(*1 +rs1234)`).
 This indicates the presence of a novel star-allele that has not been cataloged yet.
@@ -271,24 +271,24 @@ The columns are:
 - the major star-allele call,
 - the minor star-allele call,
 - the allele copy identifier (0 for the first allele in the minor column, 1 for the second and so on)
-- the mutation location,
-- the mutation type (SNP or indel),
-- the mutation coverage,
-- the mutation functionality:
+- the variant location (**zero-based indexing**),
+- the variant type (SNP or indel),
+- the variant coverage,
+- the variant functionality:
 
-  - ``DISRUPTING`` for gene-disrupting (functional) mutations, and
-  - ``NEUTRAL`` for neutral (silent) mutations
+  - ``DISRUPTING`` for gene-disrupting (core, functional) variants, and
+  - ``NEUTRAL`` for neutral (silent) variants
 
 - the dbSNP ID (if available),
-- traditional Karolinska-style mutation code from the CYP allele database (if available); and
-- the mutation status, which indicates the status of the mutation in the decomposition:
+- traditional Karolinska-style variant code from the CYP allele database (if available); and
+- the variant status, which indicates the status of the variant in the decomposition:
 
-    + ``NORMAL``: mutation is associated with the star-allele in the database and is found in the sample
-    + ``NOVEL``: gene-disrupting mutation is **NOT** associated with the star-allele in the database,
+    + ``NORMAL``: variant is associated with the star-allele in the database and is found in the sample
+    + ``NOVEL``: gene-disrupting (core) variant is **NOT** associated with the star-allele in the database,
       but is found in the sample (this indicates that Aldy found a novel major star-allele)
-    + ``EXTRA``: neutral mutation is **NOT** associated with the star-allele in the database,
+    + ``EXTRA``: neutral variant is **NOT** associated with the star-allele in the database,
       but is found in the sample (this indicates that Aldy found a novel minor star-allele)
-    + ``MISSING``: neutral mutation is associated with the star-allele in the database,
+    + ``MISSING``: neutral variant is associated with the star-allele in the database,
       but is **NOT** found in the sample (this also indicates that Aldy found a novel minor star-allele)
 
 VCF support
@@ -300,6 +300,8 @@ Aldy will also output tags `MA` and `MI` for major and minor solutions.
 
   **Note:** VCF is not an optimal format for star-allele reporting. Unless you really need it,
   we recommend using Aldy's default format.
+
+  **Another note:** Aldy output uses zero-based variant indexing; VCF (and SAM) use one-based indexing.
 
 
 Problems & Debugging
@@ -313,7 +315,7 @@ This will produce `debuginfo.tar.gz` file that contains the sample and LP model 
 Please send us this file, and we will try to resolve the issue.
 
 This file contains no private information of any kind except for the phasing information
-and mutation counts at the target gene locus as well as the file name.
+and variant counts at the target gene locus as well as the file name.
 
 
 Sample datasets
@@ -508,7 +510,7 @@ Commands:
   - ``-d, --debug DEBUG``
 
     Create a `DEBUG.tar.gz`` file that can be shared with the authors for easier debugging.
-    Contains no private information except the file name and sample mutation counts in
+    Contains no private information except the file name and sample variant counts in
     the gene of interest.
 
   - ``--multiple-warn-level MULTIPLE_WARN_LEVEL``
