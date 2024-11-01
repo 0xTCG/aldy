@@ -368,7 +368,12 @@ class Sample:
                 if len(genotype) != 2:
                     continue
                 if ref != '-':
-                    assert self.gene[start:stop] == ref, (ref, self.gene[start:stop])
+                    if self.gene[start:stop] != ref and self.gene[start:stop] == alt:
+                        ref, alt = alt, ref
+                    if self.gene[start:stop] != ref:
+                        log.debug(f"Issue: REF {ref} (ALT {alt}) "
+                                  f"does not match {self.gene[start:stop]}")
+                        ref = self.gene[start:stop]  # only for PScan/TPMT
                 alt = alt.split('//')
                 if len(alt) > 1:
                     for g in genotype:
