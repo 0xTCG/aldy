@@ -649,10 +649,10 @@ alleles:
     activity: no function
     mutations:
       - [CYP2C19, 'deletion:e8,i8,e9']
-  CYP2C19*37.015:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e?']
+  # CYP2C19*37.015:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e?']
   CYP2C19*38.001:
     pharmvar: https://www.pharmvar.org/haplotype/81
     activity: normal function
