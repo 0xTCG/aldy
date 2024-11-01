@@ -22,13 +22,13 @@ alleles:
     - [16571, G>A, rs1050828, V68M]
     - [17296, A>G, rs1050829, N126D]
   G6PD*A-.002:
-    label: G6PD A- 680T_376G
+    label: A- 680T_376G
     activity: III/Deficient
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [18448, G>T, rs137852328, R227L]
   G6PD*A-.003:
-    label: G6PD A- 968C_376G
+    label: A- 968C_376G
     activity: III/Deficient
     mutations:
     - [17296, A>G, rs1050829, N126D]
@@ -605,7 +605,7 @@ alleles:
     mutations:
     - [20328, C>G, rs137852344, P467R]
   G6PD*nice:
-    label: G6PD-Nice
+    label: Nice
     activity: III/Deficient
     mutations:
     - [20308, G>C, '-', E460D]
