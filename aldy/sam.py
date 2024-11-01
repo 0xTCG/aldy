@@ -355,26 +355,50 @@ class Sample:
         with open(path) as f:
             self._prefix = ""  # no chr prefix assumed
             self.name = os.path.splitext(os.path.basename(path))[0]
-            for l in f:
-                if l.startswith("#") or l.startswith("probeset_id\t"): continue
-                l = l.strip().split('\t')
-                _, genotype, _, chrom, start, stop, _, rsid, _, _, _, _, _, _, _, _, _, ref, alt, *_  = l
+            for line in f:
+                if line.startswith("#") or line.startswith("probeset_id\t"):
+                    continue
+                line = line.strip().split("\t")
+                (
+                    _,
+                    genotype,
+                    _,
+                    chrom,
+                    start,
+                    stop,
+                    _,
+                    rsid,
+                    _,
+                    _,
+                    _,
+                    _,
+                    _,
+                    _,
+                    _,
+                    _,
+                    _,
+                    ref,
+                    alt,
+                    *_,
+                ) = line
                 start, stop = int(start) - 1, int(stop)
                 if chrom != self.gene.chr:
                     continue
                 if start not in self.gene:
                     continue
-                genotype = genotype.split('/')
+                genotype = genotype.split("/")
                 if len(genotype) != 2:
                     continue
-                if ref != '-':
+                if ref != "-":
                     if self.gene[start:stop] != ref and self.gene[start:stop] == alt:
                         ref, alt = alt, ref
                     if self.gene[start:stop] != ref:
-                        log.debug(f"Issue: REF {ref} (ALT {alt}) "
-                                  f"does not match {self.gene[start:stop]}")
+                        log.debug(
+                            f"Issue: REF {ref} (ALT {alt}) "
+                            f"does not match {self.gene[start:stop]}"
+                        )
                         ref = self.gene[start:stop]  # only for PScan/TPMT
-                alt = alt.split('//')
+                alt = alt.split("//")
                 if len(alt) > 1:
                     for g in genotype:
                         if g in alt:
@@ -385,11 +409,11 @@ class Sample:
                 start, ref, alt = parse(start, ref, alt)
 
                 r, m = 20, 0
-                mc = f'{ref}>{alt}'
-                if alt == '-':
-                    mc = f'del{ref}'
-                if ref == '-':
-                    mc = f'ins{alt}'
+                mc = f"{ref}>{alt}"
+                if alt == "-":
+                    mc = f"del{ref}"
+                if ref == "-":
+                    mc = f"ins{alt}"
                 mut = (start, mc)
                 for g in genotype:
                     if g in alt:

@@ -230,7 +230,7 @@ class Profile:
                 else:
                     try:
                         if isinstance(self.__dict__[n], bool):
-                            self.__dict__[n] = not (v in ['False', '0'])
+                            self.__dict__[n] = not (v in ["False", "0"])
                         else:
                             typ = type(self.__dict__[n])
                             self.__dict__[n] = typ(v)
