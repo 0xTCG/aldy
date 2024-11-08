@@ -434,8 +434,6 @@ def test_profile(monkeypatch, capsys):
     captured = capsys.readouterr()
     with open(script_path("aldy.tests.resources/NA10860.profile.hg38")) as f:
         expected = f.read()
-    with open("/Users/inumanag/Desktop/v1.profile", "w") as f:
-        f.write(captured.out)
     assert captured.out == expected
 
 
