@@ -704,7 +704,7 @@ Change log
 
 - Aldy v4.7 (Nov 7, 2024)
   - Support for _ABCG2_, _CACNA1S_ and _RYR1_
-  -
+  - Database updates (with major _UGT1A1_ update)
   - Various fixes
 
 - Aldy v4.6 (May 15, 2024)
