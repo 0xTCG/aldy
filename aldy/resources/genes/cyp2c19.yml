@@ -592,67 +592,63 @@ alleles:
       - [5124, C>T, rs17885098]
       - [17687, A>G, rs12769205, splice defect]
       - [85186, A>G, rs3758581, I331V]
-  CYP2C19*36.001:
-    activity: no function
-    mutations:
-      - [CYP2C19, deletion]
-    ignored: true
-  CYP2C19*37.001:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e1,i1,e2,i2,e3,i3,e4,i4,e5']
-  CYP2C19*37.002:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e1,i1,e2,i2,e3,i3,e4']
-  CYP2C19*37.003:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e1']
-  CYP2C19*37.004:
-    activity: no function
-    mutations:
-      - [CYP2C19, deletion:e1, i1, e2, i2, e3, i3, e4, i4, e5, i5, e6, i6, e7"]
-  CYP2C19*37.006:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e1,i1,e2,i2,e3']
-  CYP2C19*37.007:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e1,i1,e2,i2,e3,i3,e4,i4,e5,i5,e6']
-  CYP2C19*37.008:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e1,i1,e2,i2,e3,i3,e4,i4,e5,i5,e6,i6,e7,i7,e8']
-  CYP2C19*37.009:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e2,i2,e3,i3,e4,i4,e5']
-  CYP2C19*37.010:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e2,i2,e3,i3,e4,i4,e5,i5,e6']
-  CYP2C19*37.011:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e2,i2,e3,i3,e4,i4,e5,i5,e6,i6,e7,i7,e8,i8,e9']
-  CYP2C19*37.012:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e6']
-  CYP2C19*37.013:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e6,i6,e7']
-  CYP2C19*37.014:
-    activity: no function
-    mutations:
-      - [CYP2C19, 'deletion:e8,i8,e9']
-  # CYP2C19*37.015:
+  # CYP2C19*36.001:
   #   activity: no function
   #   mutations:
-  #     - [CYP2C19, 'deletion:e?']
+  #     - [CYP2C19, deletion]
+  #   ignored: true
+  # CYP2C19*37.001:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e1,i1,e2,i2,e3,i3,e4,i4,e5']
+  # CYP2C19*37.002:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e1,i1,e2,i2,e3,i3,e4']
+  # CYP2C19*37.003:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e1']
+  # CYP2C19*37.004:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, deletion:e1, i1, e2, i2, e3, i3, e4, i4, e5, i5, e6, i6, e7"]
+  # CYP2C19*37.006:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e1,i1,e2,i2,e3']
+  # CYP2C19*37.007:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e1,i1,e2,i2,e3,i3,e4,i4,e5,i5,e6']
+  # CYP2C19*37.008:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e1,i1,e2,i2,e3,i3,e4,i4,e5,i5,e6,i6,e7,i7,e8']
+  # CYP2C19*37.009:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e2,i2,e3,i3,e4,i4,e5']
+  # CYP2C19*37.010:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e2,i2,e3,i3,e4,i4,e5,i5,e6']
+  # CYP2C19*37.011:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e2,i2,e3,i3,e4,i4,e5,i5,e6,i6,e7,i7,e8,i8,e9']
+  # CYP2C19*37.012:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e6']
+  # CYP2C19*37.013:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e6,i6,e7']
+  # CYP2C19*37.014:
+  #   activity: no function
+  #   mutations:
+  #     - [CYP2C19, 'deletion:e8,i8,e9']
   CYP2C19*38.001:
     pharmvar: https://www.pharmvar.org/haplotype/81
     activity: normal function
