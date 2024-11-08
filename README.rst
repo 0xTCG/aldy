@@ -702,22 +702,27 @@ Gene Support
 Change log
 ==========
 
-- Aldy v4.6 (May 15th, 2024)
+- Aldy v4.7 (Nov 7, 2024)
+  - Support for _ABCG2_, _CACNA1S_ and _RYR1_
+  -
+  - Various fixes
+
+- Aldy v4.6 (May 15, 2024)
   - PharmVar 6.1.2 updates (including _NAT2_ PharmVar update)
   - Support for custom structural events (partial deletions)
   - Various bug fixes
 
-- Aldy v4.5 (Nov 15th, 2023)
+- Aldy v4.5 (Nov 15, 2023)
    - Add `min_avg_coverage` parameter
    - Add `vcf_sample_idx` parameter for selecting VCF sample in multi-sample VCF
    - Database cleanup
    - Various bug fixes
 
-- Aldy v4.2 (Sep 25th, 2022)
+- Aldy v4.2 (Sep 25, 2022)
    - Fix indelpost setup errors
    - Various small fixes
 
-- Aldy v4.1 (Aug 28th, 2022)
+- Aldy v4.1 (Aug 28, 2022)
    - Output allele's activity and/or impact when available
    - Updated and tested gene definitions
      - Major changes to *NAT1*, *NAT2*, *UGT1A1*, *CYP2E1* and *CYP2A6*
@@ -726,7 +731,7 @@ Change log
    - New debug format
    - Various small fixes
 
-- Aldy v4.0 (Aug 17th, 2022)
+- Aldy v4.0 (Aug 17, 2022)
    - Major model changes
    - Phasing support
    - Long-read sequencing support (PacBio HiFi, 10X Genomics)
@@ -737,7 +742,7 @@ Change log
    - New debug format
    - Various small fixes
 
-- Aldy v3.0 (Nov 30th, 2020)
+- Aldy v3.0 (Nov 30, 2020)
    - Support for hg38
    - Support for 15+ new pharmacogenes
    - New profile format (**⚠️ WARNING:** Please make sure to re-generate custom profiles if using Aldy v2 profiles.)
