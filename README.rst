@@ -703,14 +703,14 @@ Change log
 ==========
 
 - Aldy v4.7 (Nov 7, 2024)
-  - Support for _ABCG2_, _CACNA1S_ and _RYR1_
-  - Database updates (with major _UGT1A1_ update)
-  - Various fixes
+   - Support for _ABCG2_, _CACNA1S_ and _RYR1_
+   - Database updates (with major _UGT1A1_ update)
+   - Various fixes
 
 - Aldy v4.6 (May 15, 2024)
-  - PharmVar 6.1.2 updates (including _NAT2_ PharmVar update)
-  - Support for custom structural events (partial deletions)
-  - Various bug fixes
+   - PharmVar 6.1.2 updates (including _NAT2_ PharmVar update)
+   - Support for custom structural events (partial deletions)
+   - Various bug fixes
 
 - Aldy v4.5 (Nov 15, 2023)
    - Add `min_avg_coverage` parameter
