@@ -170,7 +170,7 @@ def genotype(
     elif profile_name == "pgrnseq-v3":
         profile_name = "pgx3"
 
-    if kind == "vcf":
+    if kind in ["vcf", "pscan"]:
         log.warn("WARNING: Using VCF file. Copy-number calling is not available.")
         profile = Profile("user_provided", cn_solution=["1", "1"], **params)
         sample = sam.Sample(gene, profile, sam_path, debug=debug)
@@ -203,7 +203,7 @@ def genotype(
             end="\t",
             file=output_file,
         )
-    if kind != "vcf":
+    if kind not in ["vcf", "pscan"]:
         avg_cov = sample.coverage.average_coverage()
         if profile.cn_region and avg_cov < profile.min_avg_coverage:
             if is_simple:

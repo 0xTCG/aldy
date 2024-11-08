@@ -241,7 +241,7 @@ The summary of the calls is shown at the end of the output::
 
 In this example, the *CYP2D6* genotype is \*1/\*4 in terms of major star-alleles.
 The minor star-alleles are given after each major star-allele call (here, \*1.016 and \*4.021).
-The minor alleles might also have additional or removed mutations.
+The minor alleles might also have additional or removed variants.
 The additions are marked with `+` in front (e.g., `+rs112568578`), while the losses carry `-` in front (e.g., `-rs28588594`).
 In some instances, even the major alleles might contain additions (e.g., `(*1 +rs1234)`).
 This indicates the presence of a novel star-allele that has not been cataloged yet.
@@ -271,24 +271,24 @@ The columns are:
 - the major star-allele call,
 - the minor star-allele call,
 - the allele copy identifier (0 for the first allele in the minor column, 1 for the second and so on)
-- the mutation location,
-- the mutation type (SNP or indel),
-- the mutation coverage,
-- the mutation functionality:
+- the variant location (**zero-based indexing**),
+- the variant type (SNP or indel),
+- the variant coverage,
+- the variant functionality:
 
-  - ``DISRUPTING`` for gene-disrupting (functional) mutations, and
-  - ``NEUTRAL`` for neutral (silent) mutations
+  - ``DISRUPTING`` for gene-disrupting (core, functional) variants, and
+  - ``NEUTRAL`` for neutral (silent) variants
 
 - the dbSNP ID (if available),
-- traditional Karolinska-style mutation code from the CYP allele database (if available); and
-- the mutation status, which indicates the status of the mutation in the decomposition:
+- traditional Karolinska-style variant code from the CYP allele database (if available); and
+- the variant status, which indicates the status of the variant in the decomposition:
 
-    + ``NORMAL``: mutation is associated with the star-allele in the database and is found in the sample
-    + ``NOVEL``: gene-disrupting mutation is **NOT** associated with the star-allele in the database,
+    + ``NORMAL``: variant is associated with the star-allele in the database and is found in the sample
+    + ``NOVEL``: gene-disrupting (core) variant is **NOT** associated with the star-allele in the database,
       but is found in the sample (this indicates that Aldy found a novel major star-allele)
-    + ``EXTRA``: neutral mutation is **NOT** associated with the star-allele in the database,
+    + ``EXTRA``: neutral variant is **NOT** associated with the star-allele in the database,
       but is found in the sample (this indicates that Aldy found a novel minor star-allele)
-    + ``MISSING``: neutral mutation is associated with the star-allele in the database,
+    + ``MISSING``: neutral variant is associated with the star-allele in the database,
       but is **NOT** found in the sample (this also indicates that Aldy found a novel minor star-allele)
 
 VCF support
@@ -300,6 +300,8 @@ Aldy will also output tags `MA` and `MI` for major and minor solutions.
 
   **Note:** VCF is not an optimal format for star-allele reporting. Unless you really need it,
   we recommend using Aldy's default format.
+
+  **Another note:** Aldy output uses zero-based variant indexing; VCF (and SAM) use one-based indexing.
 
 
 Problems & Debugging
@@ -313,7 +315,7 @@ This will produce `debuginfo.tar.gz` file that contains the sample and LP model 
 Please send us this file, and we will try to resolve the issue.
 
 This file contains no private information of any kind except for the phasing information
-and mutation counts at the target gene locus as well as the file name.
+and variant counts at the target gene locus as well as the file name.
 
 
 Sample datasets
@@ -321,11 +323,11 @@ Sample datasets
 
 Sample datasets are also available for download. They include:
 
-- `HG00463 <http://cb.csail.mit.edu/cb/aldy/data/HG00463.bam>`_ (PGRNseq v.2), containing *CYP2D6* configuration with multiple copies
-- `NA19790 <http://cb.csail.mit.edu/cb/aldy/data/NA19790.bam>`_ (PGRNseq v.2), containing a fusion between *CYP2D6* and *CYP2D7* deletion (\*78 allele)
-- `NA24027 <http://cb.csail.mit.edu/cb/aldy/data/NA24027.bam>`_ (PGRNseq v.1), containing novel *DPYD* allele and multiple copies of *CYP2D6*
-- `NA10856 <http://cb.csail.mit.edu/cb/aldy/data/NA10856.bam>`_ (PGRNseq v.1), containing *CYP2D6* deletion (\*5 allele)
-- `NA10860 <http://cb.csail.mit.edu/cb/aldy/data/NA10860.bam>`_ (Illumina WGS), containing three copies of *CYP2D6*. This sample contains only the *CYP2D6* region.
+- `HG00463 <https://cb.csail.mit.edu/cb/aldy/data/HG00463.bam>`_ (PGRNseq v.2), containing *CYP2D6* configuration with multiple copies
+- `NA19790 <https://cb.csail.mit.edu/cb/aldy/data/NA19790.bam>`_ (PGRNseq v.2), containing a fusion between *CYP2D6* and *CYP2D7* deletion (\*78 allele)
+- `NA24027 <https://cb.csail.mit.edu/cb/aldy/data/NA24027.bam>`_ (PGRNseq v.1), containing novel *DPYD* allele and multiple copies of *CYP2D6*
+- `NA10856 <https://cb.csail.mit.edu/cb/aldy/data/NA10856.bam>`_ (PGRNseq v.1), containing *CYP2D6* deletion (\*5 allele)
+- `NA10860 <https://cb.csail.mit.edu/cb/aldy/data/NA10860.bam>`_ (Illumina WGS), containing three copies of *CYP2D6*. This sample contains only the *CYP2D6* region.
 
 The expected results are:
 
@@ -508,7 +510,7 @@ Commands:
   - ``-d, --debug DEBUG``
 
     Create a `DEBUG.tar.gz`` file that can be shared with the authors for easier debugging.
-    Contains no private information except the file name and sample mutation counts in
+    Contains no private information except the file name and sample variant counts in
     the gene of interest.
 
   - ``--multiple-warn-level MULTIPLE_WARN_LEVEL``
@@ -622,6 +624,14 @@ Gene Support
      - PharmVar 5.2.3
      - ✅
      -
+   * - *ABCG2*
+     - PharmGKB (Jun 2024)
+     - ⚠️
+     - Thorough testing on the real datasets pending
+   * - *CACNA1S*
+     - PharmGKB (Jun 2024)
+     - ⚠️
+     - Thorough testing on the real datasets pending
    * - *CFTR*
      - PharmGKB (Jun 2020) and Pharmacoscan R9
      - ✅
@@ -663,6 +673,10 @@ Gene Support
      - PharmVar 5.2.3
      - ✅
      -
+   * - *RYR1*
+     - PharmGKB (Jun 2024)
+     - ⚠️
+     - Thorough testing on the real datasets pending
    * - *SLCO1B1*
      - PharmVar 5.2.3
      - ✅
@@ -684,25 +698,31 @@ Gene Support
      - ⚠️
      - Thorough testing on the real datasets pending
 
+
 Change log
 ==========
 
-- Aldy v4.6 (May 15th, 2024)
+- Aldy v4.7 (Nov 7, 2024)
+  - Support for _ABCG2_, _CACNA1S_ and _RYR1_
+  - Database updates (with major _UGT1A1_ update)
+  - Various fixes
+
+- Aldy v4.6 (May 15, 2024)
   - PharmVar 6.1.2 updates (including _NAT2_ PharmVar update)
   - Support for custom structural events (partial deletions)
   - Various bug fixes
 
-- Aldy v4.5 (Nov 15th, 2023)
+- Aldy v4.5 (Nov 15, 2023)
    - Add `min_avg_coverage` parameter
    - Add `vcf_sample_idx` parameter for selecting VCF sample in multi-sample VCF
    - Database cleanup
    - Various bug fixes
 
-- Aldy v4.2 (Sep 25th, 2022)
+- Aldy v4.2 (Sep 25, 2022)
    - Fix indelpost setup errors
    - Various small fixes
 
-- Aldy v4.1 (Aug 28th, 2022)
+- Aldy v4.1 (Aug 28, 2022)
    - Output allele's activity and/or impact when available
    - Updated and tested gene definitions
      - Major changes to *NAT1*, *NAT2*, *UGT1A1*, *CYP2E1* and *CYP2A6*
@@ -711,7 +731,7 @@ Change log
    - New debug format
    - Various small fixes
 
-- Aldy v4.0 (Aug 17th, 2022)
+- Aldy v4.0 (Aug 17, 2022)
    - Major model changes
    - Phasing support
    - Long-read sequencing support (PacBio HiFi, 10X Genomics)
@@ -722,7 +742,7 @@ Change log
    - New debug format
    - Various small fixes
 
-- Aldy v3.0 (Nov 30th, 2020)
+- Aldy v3.0 (Nov 30, 2020)
    - Support for hg38
    - Support for 15+ new pharmacogenes
    - New profile format (**⚠️ WARNING:** Please make sure to re-generate custom profiles if using Aldy v2 profiles.)

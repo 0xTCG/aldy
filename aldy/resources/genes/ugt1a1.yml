@@ -1,5 +1,5 @@
 name: UGT1A1
-version: pharmgkb+pharmacoscan-r9
+version: pharmgkb-apr2023
 generated: '2022-08-26'
 ensembl: ENSG00000241635
 alleles:
@@ -8,31 +8,11 @@ alleles:
   UGT1A1*6:
     mutations:
     - [175755, G>A, rs4148323, G71R]
-  UGT1A1*8:
-    mutations:
-    - [176169, C>T, rs72551343, R209W]
-  UGT1A1*12:
-    mutations:
-    - [176068, T>A, rs72551341, L175Q]
-  UGT1A1*14:
-    mutations:
-    - [176370, G>C, rs72551345, G276R]
-  UGT1A1*15:
-    mutations:
-    - [176073, T>C, rs72551342, C177R]
   UGT1A1*27:
     mutations:
     - [176230, C>A, rs35350960, P229Q]
-  UGT1A1*27_28_60_80:
+  UGT1A1*27_28_80:
     mutations:
-    - [172270, T>G, rs4124874, 5'UTR]
-    - [175181, C>T, rs887829, 5'UTR]
-    - [175491, insTA, rs3064744, Promoter]
-    - [176230, C>A, rs35350960, P229Q]
-  UGT1A1*27_28_60_80_93:
-    mutations:
-    - [172270, T>G, rs4124874, 5'UTR]
-    - [172393, G>A, rs10929302, 5'UTR]
     - [175181, C>T, rs887829, 5'UTR]
     - [175491, insTA, rs3064744, Promoter]
     - [176230, C>A, rs35350960, P229Q]
@@ -43,23 +23,8 @@ alleles:
     mutations:
     - [175181, C>T, rs887829, 5'UTR]
     - [175491, insTA, rs3064744, Promoter]
-  UGT1A1*28_60_80:
-    mutations:
-    - [172270, T>G, rs4124874, 5'UTR]
-    - [175181, C>T, rs887829, 5'UTR]
-    - [175491, insTA, rs3064744, Promoter]
-  UGT1A1*28_60_80_93:
-    mutations:
-    - [172270, T>G, rs4124874, 5'UTR]
-    - [172393, G>A, rs10929302, 5'UTR]
-    - [175181, C>T, rs887829, 5'UTR]
-    - [175491, insTA, rs3064744, Promoter]
   UGT1A1*36:
     mutations:
-    - [175492, delTA, rs3064744_del, Promoter]
-  UGT1A1*36_60:
-    mutations:
-    - [172270, T>G, rs4124874, 5'UTR]
     - [175492, delTA, rs3064744_del, Promoter]
   UGT1A1*37:
     mutations:
@@ -68,34 +33,9 @@ alleles:
     mutations:
     - [175181, C>T, rs887829, 5'UTR]
     - [175491, insTATA, rs3064744, Promoter]
-  UGT1A1*43:
-    mutations:
-    - [176242, T>G, rs72551344, L233R]
-  UGT1A1*45:
-    mutations:
-    - [175766, C>A, rs72551340, Y74X]
-  UGT1A1*60:
-    mutations:
-    - [172270, T>G, rs4124874, 5'UTR]
-  UGT1A1*60_80:
-    mutations:
-    - [172270, T>G, rs4124874, 5'UTR]
-    - [175181, C>T, rs887829, 5'UTR]
-  UGT1A1*62:
-    mutations:
-    - [175791, T>C, rs56059937, F83L]
   UGT1A1*80:
     mutations:
     - [175181, C>T, rs887829, 5'UTR]
-  UGT1A1*93:
-    mutations:
-    - [172393, G>A, rs10929302, 5'UTR]
-  UGT1A1*112:
-    mutations:
-    - [174193, A>C, rs3755319, 5'UTR]
-  UGT1A1*F83I:
-    mutations:
-    - [175791, T>A, rs56059937, F83I]
 structure:
   genes: [UGT1A1]
   regions:
