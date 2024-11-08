@@ -55,9 +55,8 @@ jobs:
       with:
         repository-url: https://test.pypi.org/legacy/
         skip-existing: true
+        attestations: false
     - name: Publish package
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.python-version == '3.7'
-      uses: pypa/gh-action-pypi-publish@release/v1.10.3
-      with:
-        verbose: true
+      uses: pypa/gh-action-pypi-publish@release/v1
 
