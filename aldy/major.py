@@ -95,6 +95,11 @@ def solve_major_model(
         for m in gene.mutations
         if gene.is_functional(m) and coverage[Mutation(*m)] > 0
     }
+    func_muts |= {
+        m
+        for m in gene.random_mutations
+        if gene.is_functional((m.pos, m.op)) and coverage[m] > 0
+    }
     _print_candidates(gene, allele_dict, coverage, cn_solution, func_muts)
 
     a: Any = 0
@@ -310,7 +315,7 @@ def _print_candidates(
             + f"{gene.get_refseq(m, from_atg=True):10} "
             + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
             + f"region={g[1] if g else '?'}; "
-            + f"impact={gene.get_functional(m)}; "
+            + f"impact={gene.get_functional(m)}"
             + ")"
         )
 
@@ -323,10 +328,13 @@ def _print_candidates(
             for a, al in gene.alleles.items()
             if m in al.func_muts and "#" not in a
         )
-        log.debug(
-            "    {}",
-            "\n    ".join(" ".join(als[i : i + 6]) for i in range(0, len(als), 6)),
-        )
+        if als:
+            log.debug(
+                "    {}",
+                "\n    ".join(" ".join(als[i : i + 6]) for i in range(0, len(als), 6)),
+            )
+        else:
+            log.debug("    <NOVEL>")
     log.debug("[major] candidate alleles=")
     muts = muts.copy()
     for a in natsorted(alleles):
@@ -340,33 +348,3 @@ def _print_candidates(
         for m in sorted(muts):
             a = (f"*{a}" for a, b in gene.alleles.items() if m in b.func_muts)
             log.debug("  {}, alleles={})", print_mut(m)[:-1], ", ".join(a))
-
-    if coverage.profile.debug_novel:
-        log.debug("[major] completely novel mutations=")
-        for pos, muts in coverage._coverage.items():
-            for op in muts:
-                if op == "_":
-                    continue
-                if (pos, op) in gene.mutations:
-                    continue
-                e = gene.get_functional((pos, op), infer=True)
-                if not e:
-                    continue
-
-                m = Mutation(pos, op)
-                copies = (
-                    coverage[m] / (coverage.total(m) / cn_solution.position_cn(m.pos))
-                    if cn_solution.position_cn(m.pos) and coverage.total(m)
-                    else 0
-                )
-                g = gene.region_at(m.pos)
-
-                op = gene._reverse_op(op) if gene.strand < 0 else op
-                log.warn(
-                    f"[novel]  {gene.name}: {str(m):15} "
-                    + f"{gene.chr_to_ref[pos]+1}:{op} "
-                    + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
-                    + f"region={g[1] if g else '?'}; "
-                    + f"impact={e}; "
-                    + ")"
-                )

@@ -22,7 +22,6 @@ def estimate_minor(
     major_sols: List[MajorSolution],
     solver: str,
     max_solutions: int = 1,
-    novel: bool = False,
 ) -> List[MinorSolution]:
     """
     Estimate the optimal minor star-allele.
@@ -33,8 +32,6 @@ def estimate_minor(
     :param solver: ILP solver (see :py:mod:`aldy.lpinterface` for supported solvers).
     :param max_solutions: Maximum number of solutions to report.
         Default: 1.
-    :param novel: Include non-database functional and silent mutations in the model.
-        Default: `False`.
     """
 
     # Get the list of potential alleles and mutations
@@ -51,7 +48,6 @@ def estimate_minor(
             for minor in gene.alleles[sa.major].minors.values():
                 mutations |= set(minor.neutral_muts)
         mutations |= set(major_sol.added)
-    mutations |= gene.random_mutations
 
     # Filter out low quality mutations
     def default_filter_fn(cov, mut):
@@ -72,19 +68,11 @@ def estimate_minor(
 
     cov = coverage.filtered(Coverage.quality_filter)
     cov = cov.filtered(default_filter_fn)
-
-    if novel:
-        for pos, c in cov._coverage.items():
-            for m in c:
-                if m != "_" and Mutation(pos, m) not in mutations:
-                    r = gene.region_at(pos)
-                    log.info(
-                        "[minor] novel {} ({}; coverage= {:.0f}; func= {})",
-                        r[1] if r else "-",
-                        cov.percentage(Mutation(pos, m)),
-                        gene.is_functional((pos, m)),
-                    )
-                    mutations.add(Mutation(pos, m))
+    mutations |= {
+        m
+        for m in gene.random_mutations
+        if cov[m] > 0
+    }
 
     # Group by CN solutions
     minor_sols: List[MinorSolution] = []
@@ -553,8 +541,8 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
         return (
             f"  {gene.get_rsid(m):12} {str(m):15} "
             + f"{gene.get_refseq(m, from_atg=True):10} "
-            + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
-            + (f"impact={impact})" if impact else "")
+            + f"(cov={coverage[m]:4}, cn= {copies:3.1f}"
+            + (f"; impact={impact})" if impact else ")")
         )
 
     log.debug("[minor] candidate mutations=")

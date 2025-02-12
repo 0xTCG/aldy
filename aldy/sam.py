@@ -16,7 +16,7 @@ import pickle
 import tempfile
 
 from .common import log, GRange, AldyException, script_path, Timing, chr_prefix
-from .gene import Gene, CNConfigType
+from .gene import Gene, CNConfigType, Mutation
 from .coverage import Coverage
 from .profile import Profile
 
@@ -133,6 +133,9 @@ class Sample:
                     self.coverage.diploid_avg_coverage()
                 )
             )
+
+        if self.profile.debug_novel:
+            self._load_novel_mutations()
 
     def _load_sam(self, sam_path: str, reference=None, debug=None):
         """
@@ -969,6 +972,26 @@ class Sample:
                 s_start += size
         return regs
 
+    def _load_novel_mutations(self):
+        ni = 0
+        for pos, muts in self.coverage._coverage.items():
+            for op in muts:
+                if op == "_":
+                    continue
+                if (pos, op) in self.gene.mutations:
+                    continue
+                e = self.gene.get_functional((pos, op), infer=True)
+                if not e:
+                    continue
+                if (len(muts[op])) > 3:
+                    log.debug(f"[sam] Found potential novel major mutation "
+                            f"{pos}.{op} ({e}): coverage = {len(muts[op])}")
+                self.gene.mutations.setdefault(
+                    (pos, op),
+                    (e, f"NOVEL:{pos+1}.{op}", pos, pos, op),
+                )
+                self.gene.random_mutations.add(Mutation(pos, op))
+                ni += 1
 
 def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
     """Detect file type and the reference genome."""
