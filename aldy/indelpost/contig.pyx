@@ -31,7 +31,13 @@ cdef class Contig:
 
                 self.splice_pattern = get_local_reference(self.target, consensus[2], 50, unspl_loc_ref, unspliced=False, splice_pattern_only=True)
 
-                self.__make_contig(consensus[0], consensus[1], basequalthresh)
+                rt_aln_consensus = False
+                rt_aligned_indel_seq = consensus[3]
+                if rt_aligned_indel_seq and len(rt_aligned_indel_seq) == len(consensus[2]):
+                    if len(set(rt_aligned_indel_seq)) == 1:
+                        rt_aln_consensus = rt_aligned_indel_seq[0]
+
+                self.__make_contig(consensus[0], consensus[1], rt_aln_consensus, basequalthresh)
 
                 self.failed = False
             else:
@@ -63,7 +69,7 @@ cdef class Contig:
         return targetpileup
 
 
-    def __make_contig(self, lt_consensus, rt_consensus, basequalthresh):
+    def __make_contig(self, lt_consensus, rt_consensus, rt_aln_consensus, basequalthresh):
         self.__index_by_genome_coord(lt_consensus[0], rt_consensus[0])
 
         self.lt_reference_seq = ""
@@ -110,7 +116,11 @@ cdef class Contig:
                 self.lt_consensus_scores.append(v[2])
                 self.lt_target_block_consensus_scores.extend([v[2]])
 
-                self.indel_seq = self.target.indel_seq
+                if rt_aln_consensus:
+                    self.indel_seq = rt_aln_consensus
+                else:
+                    self.indel_seq = self.target.indel_seq
+
             #elif k > self.target.pos:
             elif k > self.lt_end_pos:
                 self.rt_reference_seq += v[0]

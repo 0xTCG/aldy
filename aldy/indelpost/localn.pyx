@@ -2,10 +2,11 @@
 
 import re
 import numpy as np
-
 from .sswpy import SSW
+
 from .consensus import is_compatible
 from .utilities import get_mapped_subreads, get_end_pos, make_insertion_first, to_minimal_repeat_unit
+
 from .utilities cimport split, count_lowqual_non_ref_bases
 
 cigar_ptrn = re.compile(r"[0-9]+[MIDNSHPX=]")

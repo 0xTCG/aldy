@@ -27,9 +27,16 @@ def make_consensus(target, targetpileup, basequalthresh):
         len(target.indel_seq),
     )
 
-    lt_indexed, rt_indexed, contributing_reads = [], [], []
+    lt_indexed, rt_indexed, contributing_reads, rt_aln_indel_seq = [], [], [], []
     for read in targetpileup:
-        target_pos = target_pos if read.get("target_right_shifted", 0) else target_pos
+        
+        if read.get("target_right_shifted", 0):
+            target_pos = read["target_right_shifted"]
+            equivalents = target.generate_equivalents()
+            for eqi in equivalents:
+                if eqi.pos == target_pos:
+                    target = eqi
+                    rt_aln_indel_seq.append(target.indel_seq)
 
         try:
             lt = index_bases(
@@ -73,7 +80,7 @@ def make_consensus(target, targetpileup, basequalthresh):
         lt_consensus = consensus_data(lt_indexed, True, basequalthresh)
         rt_consensus = consensus_data(rt_indexed, False, basequalthresh)
 
-        return lt_consensus, rt_consensus, contributing_reads
+        return lt_consensus, rt_consensus, contributing_reads, rt_aln_indel_seq
 
 
 def index_bases(
@@ -188,6 +195,7 @@ def index_bases(
 
             if event in ("M", "S", "X", "="):
                 for i in range(event_len):
+
                     if ref and event != "S":
                         indexedbases[current_pos] = (ref[0], flank[0], qual[0])
                         ref = ref[1:]
@@ -236,10 +244,12 @@ def index_bases(
 
 
 def consensus_data(indexedbases_list, left, basequalthresh):
+
     consensus_index = OrderedDict()
 
     skip_loci = []
     for locus in locus_list(indexedbases_list, left):
+
         ref, consensus_base, consensus_score, coverage = get_consensus_base(
             indexedbases_list, locus, basequalthresh
         )
@@ -261,6 +271,7 @@ def consensus_data(indexedbases_list, left, basequalthresh):
     prev_locus = -1
     ref_end = -1
     for locus, data in consensus_index.items():
+
         ref, consensus_base, consensus_score, coverage = (
             data[0],
             data[1],
@@ -348,6 +359,7 @@ def get_consensus_base(indexedbases_list, locus, basequalthresh):
 
 
 def consensus_refseq(refseq_lst, left=False):
+
     if left:
         refseq_lst = [seq[::-1].upper() for seq in refseq_lst]
     else:
@@ -386,7 +398,7 @@ def is_compatible(query, subject, indel_type, partial_match=True):
 
     Args:
         query (dict): dictized read
-        subject (dict): indel template
+        subject (dict): indel template 
         indel_type (str): "I" for ins "D" for del
         patial_match (bool): True to allow partial match for longer insertions
     Returns:
@@ -477,7 +489,8 @@ def is_compatible(query, subject, indel_type, partial_match=True):
 
 
 def contains_repeat_end(indel_seq, query_flank, subject_flank):
-    """Check if repeat boundary is contained"""
+    """Check if repeat boundary is contained
+    """
     tmp = subject_flank.replace(indel_seq, "")
 
     if tmp:
@@ -509,14 +522,14 @@ def is_almost_same(
     mismatch_lim=2,
 ):
     """Check if query and subject sequences are same for high consensus bases
-
+    
     Args:
         query_seq (str): query flanking seq
         subject_seq (str): indel template flanking seq constructed by consensus
         consensus_score (list): consensus score for template flanking seq
         consensus_lim (float): threshold to define "high consensus"
         len_lim (int): seq shorter than len_lim may not contain any mismatch
-        mismatch_lim (int): allow (mismatch_lim)x mismatches for seq longer than len_lim
+        mismatch_lim (int): allow (mismatch_lim)x mismatches for seq longer than len_lim 
     Returns:
         True/False (bool): True if query and subject look same
     """

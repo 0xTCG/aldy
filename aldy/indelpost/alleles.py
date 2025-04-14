@@ -21,6 +21,7 @@ def phase_nearby_variants(
     hard,
     to_complex,
 ):
+
     # no indel reads or contig construction failure
     if contig.failed:
         return NullVariant(target.chrom, target.pos, target.reference)
@@ -31,22 +32,18 @@ def phase_nearby_variants(
     # no phasable variants
     variants_to_phase = contig.mismatches + contig.non_target_indels
     if not variants_to_phase:
-        return make_target_obj_from_contig(target, indexed_contig)
+        return  make_target_obj_from_contig(target, indexed_contig)
 
     # phase all phasables within the target exon (hard phasing)
     if hard:
         variants_list = []
-        cleaned, variant_list = precleaning(
-            indexed_contig, variants_list, target_pos_on_contig, pileup, target
-        )
+        cleaned, variant_list = precleaning(indexed_contig, variants_list, target_pos_on_contig, pileup, target)
         return greedy_phasing(target, cleaned)
     else:
-        indexed_contig, variants_to_phase = precleaning(
-            indexed_contig, variants_to_phase, target_pos_on_contig, pileup
-        )
+        indexed_contig, variants_to_phase = precleaning(indexed_contig, variants_to_phase, target_pos_on_contig, pileup)
 
     if not variants_to_phase:
-        return make_target_obj_from_contig(target, indexed_contig)
+        return  make_target_obj_from_contig(target, indexed_contig)
     else:
         variants_in_non_targets, mut_frac = variants_in_non_target_pileup(
             pileup, target, basequalthresh, to_complex
@@ -72,25 +69,13 @@ def phase_nearby_variants(
 
     remove_deletables(indexed_contig, lt_end, target_pos_on_contig, rt_end)
 
-    mismatches_to_phase = [
-        var
-        for var in variants_to_phase
-        if not var.is_indel and indexed_contig.get(var.pos, False)
-    ]
-    non_target_indels_to_phase = [
-        var
-        for var in variants_to_phase
-        if var.is_indel and indexed_contig.get(var.pos, False) and var != target
-    ]
+    mismatches_to_phase = [var for var in variants_to_phase if not var.is_indel and indexed_contig.get(var.pos, False)]
+    non_target_indels_to_phase = [var for var in variants_to_phase if var.is_indel and indexed_contig.get(var.pos, False) and var != target]
 
     if variants_to_phase:
         if not non_target_indels_to_phase:
             peak_locs = locate_mismatch_cluster_peaks(
-                indexed_contig,
-                mismatches_to_phase,
-                target,
-                snv_neighborhood,
-                to_complex,
+                indexed_contig, mismatches_to_phase, target, snv_neighborhood, to_complex
             )
 
             if peak_locs:
@@ -108,20 +93,10 @@ def phase_nearby_variants(
             if max(target_len, non_target_max_len) < 4:
                 indel_neighborhood = int(indel_neighborhood / 2) + 1
 
-            remove_common_substrings(
-                indexed_contig, target_pos_on_contig, indel_neighborhood
-            )
+            remove_common_substrings(indexed_contig, target_pos_on_contig, indel_neighborhood)
 
-            lt_end = end_point(
-                indexed_contig, mismatches_to_phase, target, snv_neighborhood, left=True
-            )
-            rt_end = end_point(
-                indexed_contig,
-                mismatches_to_phase,
-                target,
-                snv_neighborhood,
-                left=False,
-            )
+            lt_end = end_point(indexed_contig, mismatches_to_phase, target, snv_neighborhood, left=True)
+            rt_end = end_point(indexed_contig, mismatches_to_phase, target, snv_neighborhood, left=False)
 
             remove_deletables(indexed_contig, lt_end, target_pos_on_contig, rt_end)
 
@@ -136,14 +111,12 @@ def phase_nearby_variants(
 def make_target_obj_from_contig(target, indexed_contig):
     try:
         data = indexed_contig[target.pos]
-        return Variant(
-            target.chrom, target.pos, data[0], data[1], target.reference
-        ).normalize()
+        return Variant(target.chrom, target.pos, data[0], data[1], target.reference).normalize()
     except:
         return target.normalize()
 
-
 def greedy_phasing(target, indexed_contig):
+
     cpos = 0
     cref = ""
     calt = ""
@@ -158,6 +131,7 @@ def greedy_phasing(target, indexed_contig):
 
 
 def seq_complexity(contig, snv_neighborhood, indel_neighorhood):
+
     splits = contig.get_reference_seq(split=True)
     lt_flank, rt_flank = splits[0], splits[2]
     neighorbood = min(snv_neighborhood, indel_neighorhood, len(lt_flank), len(rt_flank))
@@ -168,9 +142,7 @@ def seq_complexity(contig, snv_neighborhood, indel_neighorhood):
     )
 
 
-def precleaning(
-    genome_indexed_contig, variants_list, target_pos, pileup, limit_to_target_exon=True
-):
+def precleaning(genome_indexed_contig, variants_list, target_pos, pileup, limit_to_target_exon=True):
     lt_loci, rt_loci = [], []
 
     # filter low qual loci
@@ -241,6 +213,7 @@ def score_thresh(ref, alt, cov):
 def locate_mismatch_cluster_peaks(
     indexed_contig, mismatches_to_phase, target, snv_neighborhood, to_complex
 ):
+
     lt_peak, lt_peak_pos = calc_peak(
         indexed_contig, mismatches_to_phase, target, snv_neighborhood, left=True
     )
@@ -261,10 +234,9 @@ def locate_mismatch_cluster_peaks(
     else:
         return None
 
+
     lt_peak_pos = target.pos if lt_peak_pos == -np.inf else lt_peak_pos
-    rt_peak_pos = (
-        target.pos + len(target.ref) - 1 if rt_peak_pos == np.inf else rt_peak_pos
-    )
+    rt_peak_pos = target.pos + len(target.ref) - 1 if rt_peak_pos == np.inf else rt_peak_pos
 
     return (lt_peak_pos - 1, rt_peak_pos + 1)
 
@@ -276,7 +248,7 @@ def calc_peak(indexed_contig, mismatches, target, snv_neighborhood, left):
         loci = [k for k, v in indexed_contig.items() if k <= target_pos][::-1]
         snv_loci = [var.pos for var in mismatches if var.pos < target_pos]
     else:
-        del_adjust = len(target.ref) - 1
+        del_adjust = len(target.ref) -1
         loci = [k for k, v in indexed_contig.items() if k > target_pos + del_adjust]
         snv_loci = [var.pos for var in mismatches if var.pos > target_pos]
 
@@ -289,6 +261,7 @@ def calc_peak(indexed_contig, mismatches, target, snv_neighborhood, left):
     indel_len = len(target.indel_seq)
     scores = []
     for i, locus in enumerate(loci):
+
         if locus in snv_loci:
             score += gain
         else:
@@ -346,7 +319,7 @@ def variants_in_non_target_pileup(pileup, target, basequalthresh, to_complex):
     nontarget_pileup = [
         findall_mismatches(read, end_trim=10)
         for read in pileup
-        if not read["is_target"] and read["is_covering"] and not read["is_dirty"]
+        if not read["is_target" ] and read["is_covering"] and not read["is_dirty"]
     ]
 
     if not nontarget_pileup:
@@ -367,32 +340,34 @@ def variants_in_non_target_pileup(pileup, target, basequalthresh, to_complex):
     indels = [
         indel
         for indel, cnt in Counter(indels).items()
-        if (cnt > 2 and cnt / len(nontarget_pileup) > 0.15) or cnt > 5
+        if (cnt > 2 and cnt/ len(nontarget_pileup) > 0.15)
+        or cnt > 5
     ]
 
     mismatches = [
         Variant(target.chrom, v[0], v[1], v[2], target.reference)
         for read in nontarget_pileup
-        for v in read["mismatches"]
-        if v[3] > basequalthresh
+        for v in read["mismatches"] if v[3] > basequalthresh
     ]
 
-    nontarget_pileup_vol = (
-        sum(max(0, len(read["ref_seq"]) - 20) for read in nontarget_pileup) + 1
-    )
+    nontarget_pileup_vol = sum(
+        max(0, len(read["ref_seq"]) - 20) for read in nontarget_pileup
+    ) + 1
 
     mutation_frac = (len(mismatches) + len(indels)) / nontarget_pileup_vol
 
     mismatches = [
         var
         for var, cnt in Counter(mismatches).items()
-        if (cnt > 2 and cnt / len(nontarget_pileup) > 0.15) or cnt > 5
+        if (cnt > 2 and cnt / len(nontarget_pileup) > 0.15)
+        or cnt > 5
     ]
 
     return set(indels + mismatches), mutation_frac
 
 
 def is_deletable(variant, deletable_variants, indel_repeat_thresh, to_complex):
+
     if to_complex:
         if variant in deletable_variants:
             return True
@@ -421,9 +396,9 @@ def get_freq(freqinfo):
 def remove_deletables(indexed_contig, lt_end, target_pos, rt_end):
     tmp = indexed_contig.copy()
 
-    # if lt_end == -np.inf:
+    #if lt_end == -np.inf:
     #    lt_end = target_pos - 1
-    # if rt_end == np.inf:
+    #if rt_end == np.inf:
     #    rt_end = target_pos + 1
 
     for k, v in tmp.items():
@@ -449,6 +424,7 @@ def remove_deletables(indexed_contig, lt_end, target_pos, rt_end):
 
 
 def remove_common_substrings(indexed_contig, target_pos, max_common_str_len):
+
     common_sub_strs = profile_common_substrings(indexed_contig)
 
     lt_commons = [sub_str for sub_str in common_sub_strs if sub_str[1] < target_pos]
@@ -466,10 +442,12 @@ def trim_common(indexed_contig, commons, max_common_str_len, left):
 
     deletable_commons = []
     for sub_str in commons:
+
         if sub_str[0] == sub_str[-1]:
             start = sub_str[0]
         else:
             start = search_nearest_lt_locus(indexed_contig, sub_str[0], left)
+
 
         end = sub_str[-1]
         start_event = indexed_contig[start]
@@ -520,6 +498,7 @@ def search_nearest_lt_locus(indexed_contig, pos, left=True):
 
 
 def profile_common_substrings(indexed_contig):
+
     commons = []
 
     items = list(indexed_contig.items())
@@ -566,6 +545,7 @@ def extend_sub_str(start, indexed_contig):
 
 
 def end_point(indexed_contig, mismatches, target, snv_neighborhood, left):
+
     tmp = indexed_contig.copy()
 
     if not left:
@@ -599,7 +579,9 @@ def end_point(indexed_contig, mismatches, target, snv_neighborhood, left):
             return peak_pos + 1
 
 
+
 def get_end_most_indel(indexed_contig, target):
     for k, v in indexed_contig.items():
         if len(v[0]) != len(v[1]):
             return Variant(target.chrom, k, v[0], v[1], target.reference)
+

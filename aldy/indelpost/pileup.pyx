@@ -650,6 +650,11 @@ def retarget(
     complex_flags = []
     candidates, candidate_reads, candidate_ref_seqs, candidate_ref_starts, candidate_aligners = [], [], [], [], []
     for read, aln, ref_seq, ref_start, aligner in zip(non_refs, ref_alns, ref_seqs, ref_starts, aligners):
+
+        #this could happen
+        if not aln.CIGAR:
+            continue
+
         genome_aln_pos = ref_start + aln.reference_start
 
         aligned_read_len = (aln.read_end - aln.read_start)

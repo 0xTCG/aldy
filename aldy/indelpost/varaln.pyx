@@ -1011,7 +1011,7 @@ def right_aligner(read, target):
     cigar_lst = read["cigar_list"]
 
     query_pos = 0
-    ref_pos = read["read_start"]
+    ref_pos = read["aln_start"]
     new_cigar = []
     prev_event = "A"
     skip_next = False
