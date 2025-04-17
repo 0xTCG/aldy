@@ -2405,9 +2405,9 @@ reference:
       none: 0.0
       decreased: 0.5
     conditions:
-      poor: "x <= 0.5"
-      intermediate: "0.5 < x <= 1.5"
-      normal: "1.5 < x"
+      poor: [0, 0.5]
+      intermediate: [0.51, 1.5]
+      normal: [1.51, 99999]
   seq: |-
     GTTTTTCATTGATGTTGCCATTTGCAGTAAATATATTTTTGTGTGATTATTTTGCAAATGTCCATCTCCCTAACTA
     ATCTGCAAAGCGCAGGAGAATAAGAGTTCACTTTTATTTTGCTCATCACGGTACCTCTAGTGTTTTCCACTGAACC

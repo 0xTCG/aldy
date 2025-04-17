@@ -1,6 +1,7 @@
 name: CYP2D6
 version: pharmvar-6.1.2
 generated: '2024-05-14'
+notes: CPIC
 pharmvar: 33529
 ensembl: ENSG00000100197
 alleles:
@@ -5311,9 +5312,10 @@ reference:
       decreased-50: 0.25
       decreased: 0.5
     conditions:
-      intermediate: "0 < x <= 1.25"
-      normal: "1.25 <= x <= 2.25"
-      ultrarapid: "2.25 < x"
+      poor: [0, 0]
+      intermediate: [0.001, 1.249]
+      normal: [1.25, 2.25]
+      ultrarapid: [2.251, 99999]
   seq: |-
     GTGTCTGCCAAGGGTGCCAGCACAGCCGCCCCACTCCAGGGGAAGAGGAGTGCCAGCCCTTACCCACCTGAGTGGG
     CACAGTGTAGCATTTATTCATTAGCCCCCACACTGGCCTGACCATCTCCCCTGTGGGCTGCATGACAAGGAGAGAG

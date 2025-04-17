@@ -58,13 +58,17 @@ class MinorAllele:
     name: str
     alt_name: Optional[str] = None
     neutral_muts: Set[Mutation] = field(default_factory=set)
-    activity: Optional[str] = None
+    _activity: Optional[str] = None
     evidence: Optional[str] = None
     pharmvar: Optional[str] = None
 
     def __str__(self):
         muts = ", ".join(map(str, self.neutral_muts))
         return f"Minor({self.name}; [{muts}])"
+
+    @property
+    def activity(self):
+        return self._activity or "unknown"
 
 
 @dataclass
@@ -396,6 +400,7 @@ class Gene:
         self.refseq = yml["reference"]["name"]
         self.pharmvar = yml.get("pharmvar", None)
         self.ensembl = yml.get("ensembl", None)
+        self.notes = yml.get("notes", "")
 
         self.seq = yml["reference"]["seq"].replace("\n", "")
         if "patches" in yml["reference"]:
@@ -439,6 +444,18 @@ class Gene:
 
         self.exons = sorted((s - 1, e - 1) for [s, e] in yml["reference"]["exons"])
         self.aminoacid = seq_to_amino("".join(self.seq[s:e] for [s, e] in self.exons))
+
+        self.cpic = {}
+        self.cpic_scores = None
+        cpic = yml["reference"].get("cpic", {})
+        if "scores" in cpic and "conditions" in cpic:
+            for fn, s in cpic["conditions"].items():
+                self.cpic[fn] = s
+            self.cpic_scores = cpic["scores"]
+        elif "table" in cpic:
+            for fn, ll in cpic["table"].items():
+                self.cpic[fn] = {tuple(sorted(i)) for i in ll}
+        print(self.cpic, self.cpic_scores)
 
     def _init_regions(self, yml) -> None:
         """
@@ -594,7 +611,7 @@ class Gene:
                 name,
                 alt_name,
                 mutations,
-                allele.get("activity", None),
+                allele.get("activity", "unknown"),
                 allele.get("evidence", None),
                 allele.get("pharmvar", None),
             )

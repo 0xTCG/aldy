@@ -306,3 +306,35 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     )
     solution.set_diplotype(diplotype)
     return diplotype
+
+def estimate_cpic(gene: Gene, solution: MinorSolution) -> str:
+    """Calculate the CPIC functionality for a minor solution.
+    :returns: CPIC functionality.
+    """
+
+    activities = []
+    for ai, a in enumerate(solution.solution):
+        if a.extra_functionality():
+            activities.append("unknown")
+        else:
+            activities.append(gene.alleles[a.major].minors[a.minor].activity)
+    if "unknown" not in activities:
+        if gene.cpic_scores:
+            score = 0.0
+            for a in activities:
+                if a not in gene.cpic_scores:
+                    break
+                score += gene.cpic_scores[a]
+            else:
+                for fn, [lo, hi] in gene.cpic.items():
+                    if lo <= score <= hi:
+                        return (score, fn)
+        else:
+            activities = tuple(sorted(activities))
+            i = [fn for fn, a in gene.cpic.items() if activities in a]
+            if len(i) == 1:
+                return (0, i[0])
+    return (0, "indeterminate")
+
+
+

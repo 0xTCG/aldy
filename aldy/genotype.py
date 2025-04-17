@@ -378,6 +378,12 @@ def genotype(
                 log.info(f"    Minor: {r.get_minor_diplotype()}")
                 log.info(f"    Legacy notation: {r.get_minor_diplotype(legacy=True)}")
                 reported.add(st)
+                if gene.cpic:
+                    cpic_score, cpic_fun = diplotype.estimate_cpic(gene, r)
+                    s = f"    CPIC functionality: {cpic_fun}"
+                    if gene.cpic_scores:
+                        s += f" (activity score = {cpic_score})"
+                    log.info(s)
                 # Output the activity
                 for m in r.solution:
                     mn = [
@@ -388,10 +394,12 @@ def genotype(
                     msg = f"Estimated activity for {m.major_repr()}"
                     if len(mn) == 1 and mn[0].activity:
                         msg = f"{msg}: {mn[0].activity}"
+                        if gene.cpic_scores and mn[0].activity in gene.cpic_scores:
+                            msg = f"{msg} (score: {gene.cpic_scores[mn[0].activity]})"
                         if mn[0].evidence:
-                            msg = f"{msg} (evidence: {mn[0].evidence})"
+                            msg = f"{msg}; evidence: {mn[0].evidence}"
                         if mn[0].pharmvar:
-                            msg = f"{msg}; see {mn[0].pharmvar} for details"
+                            msg = f"{msg} (see {mn[0].pharmvar} for details)"
                     else:
                         msg = f"{msg}: unknown"
                     log.info(f"    {msg}")
