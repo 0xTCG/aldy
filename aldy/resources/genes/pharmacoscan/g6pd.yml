@@ -25,7 +25,7 @@ alleles:
     - [19548, T>C, rs76723693, L323P]
   G6PD*Null:
     label: null
-    activity: IV/Normal
+    activity: normal
     mutations:
     - [G6PD, deletion]
   G6PD*Abeno:

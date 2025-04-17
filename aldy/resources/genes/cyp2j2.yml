@@ -6,60 +6,60 @@ ensembl: ENSG00000134716
 alleles:
   CYP2J2*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/299
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*1
     mutations: []
   CYP2J2*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/300
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*2
     mutations:
     - [19494, A>G, rs55753213, T143A]
   CYP2J2*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/301
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*3
     mutations:
     - [19539, C>T, rs56307989, R158C]
   CYP2J2*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/303
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*4
     mutations:
     - [20035, T>A, rs66515830, I192N]
   CYP2J2*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/304
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*5
     mutations:
     - [26714, G>A, rs56053398, D342N]
   CYP2J2*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/305
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*6
     mutations:
     - [30667, A>T, rs72547598, N404Y]
   CYP2J2*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/306
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*7
     mutations:
     - [4930, G>T, rs890293, upstream]
   CYP2J2*8.001:
     pharmvar: https://www.pharmvar.org/haplotype/307
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*8
     mutations:
     - [23897, G>A, rs150461093, G312R]
   CYP2J2*9.001:
     pharmvar: https://www.pharmvar.org/haplotype/308
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*9
     mutations:
     - [26742, C>T, rs148429756, P351L]
   CYP2J2*10.001:
     pharmvar: https://www.pharmvar.org/haplotype/302
-    activity: function not assigned
+    activity: unknown
     label: CYP2J2*10
     mutations:
     - [15785, C>T, rs1644461311, P115L]

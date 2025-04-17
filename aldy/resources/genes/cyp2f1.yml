@@ -6,11 +6,11 @@ ensembl: ENSG00000197446
 alleles:
   CYP2F1*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/370
-    activity: function not assigned
+    activity: unknown
     mutations: []
   CYP2F1*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/1587
-    activity: function not assigned
+    activity: unknown
     mutations:
     - [4701, G>A, rs35107873]
     - [4709, delC, rs34903717]
@@ -23,7 +23,7 @@ alleles:
     - [16063, C>A, rs305978]
   CYP2F1*2.002:
     pharmvar: https://www.pharmvar.org/haplotype/1588
-    activity: function not assigned
+    activity: unknown
     mutations:
     - [4701, G>A, rs35107873]
     - [4709, delC, rs34903717]
@@ -48,7 +48,7 @@ alleles:
     - [16063, C>A, rs305978]
   CYP2F1*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/373
-    activity: function not assigned
+    activity: unknown
     mutations:
     - [4399, A>G, rs1709114]
     - [4498, C>T, rs62117444]
@@ -63,7 +63,7 @@ alleles:
     - [18628, C>T, rs7246981, P490L]
   CYP2F1*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/368
-    activity: function not assigned
+    activity: unknown
     mutations:
     - [6837, G>A, rs305968]
     - [6853, T>C, rs58285195, S38P]
@@ -72,12 +72,12 @@ alleles:
     - [13325, T>G, rs305975]
   CYP2F1*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/367
-    activity: function not assigned
+    activity: unknown
     mutations:
     - [16065, T>C, rs144315434, L391P]
   CYP2F1*5.002:
     pharmvar: https://www.pharmvar.org/haplotype/369
-    activity: function not assigned
+    activity: unknown
     mutations:
     - [13334, C>T, rs960127696]
     - [13335, T>C, rs991361920]
@@ -85,7 +85,7 @@ alleles:
     - [16065, T>C, rs144315434, L391P]
   CYP2F1*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/374
-    activity: function not assigned
+    activity: unknown
     mutations:
     - [7129, G>C, rs57670668, R98P]
 structure:

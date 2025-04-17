@@ -76,7 +76,7 @@ class SolvedAllele:
     major: str
     """Major star-allele identifier."""
     minor: str = ""
-    """Minor star-allele identifier. Empty string when not assigned."""
+    """Minor star-allele identifier. Empty string when unknown."""
     added: List[Mutation] = field(default_factory=list)
     """Mutations that are added to the star-allele (from the allele database)."""
     missing: List[Mutation] = field(default_factory=list)

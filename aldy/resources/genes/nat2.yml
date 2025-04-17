@@ -6,47 +6,47 @@ ensembl: ENSG00000156006
 alleles:
   NAT2*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/2453
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12A
     evidence: D
     mutations: []
   NAT2*1.002:
     pharmvar: https://www.pharmvar.org/haplotype/2458
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12B
     evidence: D
     mutations:
     - [14041, C>T, rs1041983]
   NAT2*1.003:
     pharmvar: https://www.pharmvar.org/haplotype/2456
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12C
     evidence: L
     mutations:
     - [14240, C>T, rs1799929]
   NAT2*1.004:
     pharmvar: https://www.pharmvar.org/haplotype/2486
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12I
     evidence: L
     mutations:
     - [13987, C>T, rs72466459]
   NAT2*1.005:
     pharmvar: https://www.pharmvar.org/haplotype/2441
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [14893, C>T, rs56011639]
   NAT2*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/2437
-    activity: function not assigned
+    activity: unknown
     label: NAT2*4
     evidence: D
     mutations:
     - [14562, G>A, rs1208, R268K]
   NAT2*4.002:
     pharmvar: https://www.pharmvar.org/haplotype/2431
-    activity: function not assigned
+    activity: unknown
     label: NAT2*11A
     evidence: L
     mutations:
@@ -54,7 +54,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*4.003:
     pharmvar: https://www.pharmvar.org/haplotype/2432
-    activity: function not assigned
+    activity: unknown
     label: NAT2*13A
     evidence: D
     mutations:
@@ -62,7 +62,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*4.004:
     pharmvar: https://www.pharmvar.org/haplotype/2488
-    activity: function not assigned
+    activity: unknown
     label: NAT2*20
     evidence: L
     mutations:
@@ -70,35 +70,35 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*4.005:
     pharmvar: https://www.pharmvar.org/haplotype/2477
-    activity: function not assigned
+    activity: unknown
     evidence: M
     mutations:
     - [5042, T>C, rs574921384]
     - [14562, G>A, rs1208, R268K]
   NAT2*4.006:
     pharmvar: https://www.pharmvar.org/haplotype/2466
-    activity: function not assigned
+    activity: unknown
     evidence: M
     mutations:
     - [14562, G>A, rs1208, R268K]
     - [14789, A>G, rs528808128]
   NAT2*4.007:
     pharmvar: https://www.pharmvar.org/haplotype/2467
-    activity: function not assigned
+    activity: unknown
     evidence: M
     mutations:
     - [14562, G>A, rs1208, R268K]
     - [14961, A>T, rs142360798]
   NAT2*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/2482
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5C
     evidence: D
     mutations:
     - [14100, T>C, rs1801280, I114T]
   NAT2*5.002:
     pharmvar: https://www.pharmvar.org/haplotype/2491
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5B
     evidence: D
     mutations:
@@ -106,7 +106,7 @@ alleles:
     - [14240, C>T, rs1799929]
   NAT2*5.003:
     pharmvar: https://www.pharmvar.org/haplotype/2438
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5F
     evidence: L
     mutations:
@@ -115,7 +115,7 @@ alleles:
     - [14518, C>T, rs56011192]
   NAT2*5.004:
     pharmvar: https://www.pharmvar.org/haplotype/2484
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5W
     evidence: D
     mutations:
@@ -124,7 +124,7 @@ alleles:
     - [14240, C>T, rs1799929]
   NAT2*5.005:
     pharmvar: https://www.pharmvar.org/haplotype/2481
-    activity: function not assigned
+    activity: unknown
     evidence: M
     mutations:
     - [14100, T>C, rs1801280, I114T]
@@ -132,7 +132,7 @@ alleles:
     - [14476, C>T, rs556893422]
   NAT2*5.006:
     pharmvar: https://www.pharmvar.org/haplotype/2440
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [14100, T>C, rs1801280, I114T]
@@ -140,7 +140,7 @@ alleles:
     - [14722, G>A, rs539028538]
   NAT2*5.007:
     pharmvar: https://www.pharmvar.org/haplotype/2434
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [14100, T>C, rs1801280, I114T]
@@ -148,7 +148,7 @@ alleles:
     - [14780, T>C, rs2552]
   NAT2*5.008:
     pharmvar: https://www.pharmvar.org/haplotype/2473
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [14100, T>C, rs1801280, I114T]
@@ -157,7 +157,7 @@ alleles:
     - [14780, T>C, rs2552]
   NAT2*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/2455
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6B
     evidence: M
     mutations:
@@ -165,7 +165,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*6.002:
     pharmvar: https://www.pharmvar.org/haplotype/2439
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6A
     evidence: D
     mutations:
@@ -174,7 +174,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*6.003:
     pharmvar: https://www.pharmvar.org/haplotype/2474
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6D
     evidence: L
     mutations:
@@ -184,7 +184,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*6.004:
     pharmvar: https://www.pharmvar.org/haplotype/2463
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6E
     evidence: L
     mutations:
@@ -193,7 +193,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*6.005:
     pharmvar: https://www.pharmvar.org/haplotype/2468
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6L
     evidence: D
     mutations:
@@ -203,7 +203,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*6.006:
     pharmvar: https://www.pharmvar.org/haplotype/2459
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [14041, C>T, rs1041983]
@@ -212,7 +212,7 @@ alleles:
     - [14730, G>C, rs532595039]
   NAT2*6.007:
     pharmvar: https://www.pharmvar.org/haplotype/2479
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [14041, C>T, rs1041983]
@@ -221,7 +221,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/2460
-    activity: function not assigned
+    activity: unknown
     label: NAT2*7A
     evidence: M
     mutations:
@@ -229,7 +229,7 @@ alleles:
     - [14616, G>A, rs1799931, G286E]
   NAT2*7.002:
     pharmvar: https://www.pharmvar.org/haplotype/2487
-    activity: function not assigned
+    activity: unknown
     label: NAT2*7B
     evidence: D
     mutations:
@@ -238,7 +238,7 @@ alleles:
     - [14616, G>A, rs1799931, G286E]
   NAT2*7.003:
     pharmvar: https://www.pharmvar.org/haplotype/2457
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [5095, G>C, rs56320227]
@@ -247,7 +247,7 @@ alleles:
     - [14616, G>A, rs1799931, G286E]
   NAT2*10.001:
     pharmvar: https://www.pharmvar.org/haplotype/2429
-    activity: function not assigned
+    activity: unknown
     label: NAT2*10
     evidence: D
     mutations:
@@ -255,7 +255,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*14.001:
     pharmvar: https://www.pharmvar.org/haplotype/2447
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14A
     evidence: D
     mutations:
@@ -263,7 +263,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*14.002:
     pharmvar: https://www.pharmvar.org/haplotype/2435
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14B
     evidence: D
     mutations:
@@ -272,7 +272,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/2471
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14D
     evidence: L
     mutations:
@@ -282,7 +282,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*16.001:
     pharmvar: https://www.pharmvar.org/haplotype/2478
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5D
     evidence: L
     mutations:
@@ -290,7 +290,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*16.002:
     pharmvar: https://www.pharmvar.org/haplotype/2465
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5A
     evidence: D
     mutations:
@@ -299,7 +299,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/2443
-    activity: function not assigned
+    activity: unknown
     label: NAT2*19
     evidence: L
     mutations:
@@ -307,7 +307,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*21.001:
     pharmvar: https://www.pharmvar.org/haplotype/2450
-    activity: function not assigned
+    activity: unknown
     label: NAT2*21
     evidence: L
     mutations:
@@ -315,7 +315,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*27.001:
     pharmvar: https://www.pharmvar.org/haplotype/2444
-    activity: function not assigned
+    activity: unknown
     label: NAT2*27
     evidence: L
     mutations:
@@ -323,7 +323,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*29.001:
     pharmvar: https://www.pharmvar.org/haplotype/2480
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14F
     evidence: L
     mutations:
@@ -331,7 +331,7 @@ alleles:
     - [14100, T>C, rs1801280, I114T]
   NAT2*29.002:
     pharmvar: https://www.pharmvar.org/haplotype/2462
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14C
     evidence: L
     mutations:
@@ -340,7 +340,7 @@ alleles:
     - [14240, C>T, rs1799929]
   NAT2*30.001:
     pharmvar: https://www.pharmvar.org/haplotype/2445
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5E
     evidence: L
     mutations:
@@ -349,7 +349,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*31.001:
     pharmvar: https://www.pharmvar.org/haplotype/2430
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5L
     evidence: M
     mutations:
@@ -359,7 +359,7 @@ alleles:
     - [14860, C>G, rs45539742]
   NAT2*32.001:
     pharmvar: https://www.pharmvar.org/haplotype/2442
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5O
     evidence: L
     mutations:
@@ -368,7 +368,7 @@ alleles:
     - [14240, C>T, rs1799929]
   NAT2*33.001:
     pharmvar: https://www.pharmvar.org/haplotype/2483
-    activity: function not assigned
+    activity: unknown
     label: NAT2*5N
     evidence: D
     mutations:
@@ -377,7 +377,7 @@ alleles:
     - [14240, C>T, rs1799929]
   NAT2*34.001:
     pharmvar: https://www.pharmvar.org/haplotype/2476
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6C
     evidence: L
     mutations:
@@ -385,7 +385,7 @@ alleles:
     - [14349, G>A, rs1799930, R197Q]
   NAT2*35.001:
     pharmvar: https://www.pharmvar.org/haplotype/2448
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6M
     evidence: L
     mutations:
@@ -395,7 +395,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*36.001:
     pharmvar: https://www.pharmvar.org/haplotype/2492
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6P
     evidence: D
     mutations:
@@ -404,7 +404,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*37.001:
     pharmvar: https://www.pharmvar.org/haplotype/2436
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6K
     evidence: D
     mutations:
@@ -414,7 +414,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*38.001:
     pharmvar: https://www.pharmvar.org/haplotype/2464
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6H
     evidence: D
     mutations:
@@ -424,7 +424,7 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*39.001:
     pharmvar: https://www.pharmvar.org/haplotype/2433
-    activity: function not assigned
+    activity: unknown
     label: NAT2*6O
     evidence: D
     mutations:
@@ -434,7 +434,7 @@ alleles:
     - [14597, G>A, rs56393504, V280M]
   NAT2*40.001:
     pharmvar: https://www.pharmvar.org/haplotype/2451
-    activity: function not assigned
+    activity: unknown
     label: NAT2*7C
     evidence: L
     mutations:
@@ -442,7 +442,7 @@ alleles:
     - [14616, G>A, rs1799931, G286E]
   NAT2*41.001:
     pharmvar: https://www.pharmvar.org/haplotype/2489
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12E
     evidence: D
     mutations:
@@ -450,14 +450,14 @@ alleles:
     - [14337, C>T, rs79050330, T193M]
   NAT2*42.001:
     pharmvar: https://www.pharmvar.org/haplotype/2469
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12F
     evidence: L
     mutations:
     - [14381, T>C, rs56387565, Y208H]
   NAT2*43.001:
     pharmvar: https://www.pharmvar.org/haplotype/2454
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12G
     evidence: D
     mutations:
@@ -465,28 +465,28 @@ alleles:
     - [14368, G>T, rs45618543, E203D]
   NAT2*44.001:
     pharmvar: https://www.pharmvar.org/haplotype/2485
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12H
     evidence: D
     mutations:
     - [14162, C>G, rs12720065, L135V]
   NAT2*45.001:
     pharmvar: https://www.pharmvar.org/haplotype/2472
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12J
     evidence: D
     mutations:
     - [13788, T>C, rs72466456, I10T]
   NAT2*46.001:
     pharmvar: https://www.pharmvar.org/haplotype/2449
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14E
     evidence: L
     mutations:
     - [13950, G>A, rs1801279, R64Q]
   NAT2*46.002:
     pharmvar: https://www.pharmvar.org/haplotype/2470
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14G
     evidence: L
     mutations:
@@ -494,7 +494,7 @@ alleles:
     - [14041, C>T, rs1041983]
   NAT2*46.003:
     pharmvar: https://www.pharmvar.org/haplotype/2461
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14I
     evidence: L
     mutations:
@@ -502,7 +502,7 @@ alleles:
     - [14240, C>T, rs1799929]
   NAT2*47.001:
     pharmvar: https://www.pharmvar.org/haplotype/2446
-    activity: function not assigned
+    activity: unknown
     label: NAT2*14H
     evidence: D
     mutations:
@@ -512,14 +512,14 @@ alleles:
     - [14562, G>A, rs1208, R268K]
   NAT2*48.001:
     pharmvar: https://www.pharmvar.org/haplotype/2452
-    activity: function not assigned
+    activity: unknown
     label: NAT2*12D
     evidence: L
     mutations:
     - [14123, G>A, rs4986996, D122N]
   NAT2*49.001:
     pharmvar: https://www.pharmvar.org/haplotype/2490
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [14100, T>C, rs1801280, I114T]
@@ -527,7 +527,7 @@ alleles:
     - [14337, C>T, rs79050330, T193M]
   NAT2*50.001:
     pharmvar: https://www.pharmvar.org/haplotype/2475
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [13766, A>G, rs200893121, I3V]

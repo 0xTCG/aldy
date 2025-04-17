@@ -6,12 +6,12 @@ ensembl: ENSG00000186104
 alleles:
   CYP2R1*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/310
-    activity: function not assigned
+    activity: unknown
     label: CYP2R1*1
     mutations: []
   CYP2R1*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/309
-    activity: function not assigned
+    activity: unknown
     label: CYP2R1*2
     mutations:
     - [11359, T>C, rs61495246, L99P]

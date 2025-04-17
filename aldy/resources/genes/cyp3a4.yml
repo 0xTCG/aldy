@@ -6,20 +6,20 @@ ensembl: ENSG00000160868
 alleles:
   CYP3A4*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/1494
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*1B
     evidence: D
     mutations: []
   CYP3A4*1.002:
     pharmvar: https://www.pharmvar.org/haplotype/1515
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*1A
     evidence: D
     mutations:
     - [4713, G>A, rs2740574]
   CYP3A4*1.003:
     pharmvar: https://www.pharmvar.org/haplotype/1495
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*1E
     evidence: L
     mutations:
@@ -27,7 +27,7 @@ alleles:
     - [4736, T>A, rs72552802]
   CYP3A4*1.004:
     pharmvar: https://www.pharmvar.org/haplotype/1504
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*1M
     evidence: L
     mutations:
@@ -35,7 +35,7 @@ alleles:
     - [4949, C>A, rs59537101]
   CYP3A4*1.005:
     pharmvar: https://www.pharmvar.org/haplotype/1489
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*1T
     evidence: L
     mutations:
@@ -43,14 +43,14 @@ alleles:
     - [31126, T>C, rs72552794]
   CYP3A4*1.006:
     pharmvar: https://www.pharmvar.org/haplotype/1524
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [4804, T>C, rs35223458]
   CYP3A4*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/1500
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*2
     evidence: D
     mutations:
@@ -58,7 +58,7 @@ alleles:
     - [20826, T>C, rs55785340, S222P]
   CYP3A4*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/1523
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*3
     evidence: D
     mutations:
@@ -66,7 +66,7 @@ alleles:
     - [28285, T>C, rs4986910, M445T]
   CYP3A4*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/1496
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*4
     evidence: M
     mutations:
@@ -74,7 +74,7 @@ alleles:
     - [18984, A>G, rs55951658, I118V]
   CYP3A4*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/1509
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*5
     evidence: M
     mutations:
@@ -82,7 +82,7 @@ alleles:
     - [20815, C>G, rs55901263, P218R]
   CYP3A4*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/1513
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*6
     evidence: L
     mutations:
@@ -90,7 +90,7 @@ alleles:
     - [22774, insA, rs4646438, D277fs]
   CYP3A4*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/1526
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*7
     evidence: L
     mutations:
@@ -98,14 +98,14 @@ alleles:
     - [11107, G>A, rs56324128, G56D]
   CYP3A4*8.001:
     pharmvar: https://www.pharmvar.org/haplotype/1754
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*8
     evidence: L
     mutations:
     - [19021, G>A, rs72552799, R130Q]
   CYP3A4*9.001:
     pharmvar: https://www.pharmvar.org/haplotype/1756
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*9
     evidence: L
     mutations:
@@ -113,7 +113,7 @@ alleles:
     - [19405, G>A, rs72552798, V170I]
   CYP3A4*10.001:
     pharmvar: https://www.pharmvar.org/haplotype/1519
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*10
     evidence: D
     mutations:
@@ -121,28 +121,28 @@ alleles:
     - [19417, G>C, rs4986908, D174H]
   CYP3A4*11.001:
     pharmvar: https://www.pharmvar.org/haplotype/1508
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*11
     evidence: L
     mutations:
     - [26980, C>T, rs67784355, T363M]
   CYP3A4*12.001:
     pharmvar: https://www.pharmvar.org/haplotype/1758
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*12
     evidence: D
     mutations:
     - [27009, C>T, rs12721629, L373F]
   CYP3A4*13.001:
     pharmvar: https://www.pharmvar.org/haplotype/1514
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*13
     evidence: L
     mutations:
     - [27139, C>T, rs4986909, P416L]
   CYP3A4*14.001:
     pharmvar: https://www.pharmvar.org/haplotype/1512
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*14
     evidence: D
     mutations:
@@ -150,14 +150,14 @@ alleles:
     - [5148, T>C, rs12721634, L15P]
   CYP3A4*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/1760
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*15A, CYP3A4*15B
     evidence: D
     mutations:
     - [19382, G>A, rs4986907, R162Q]
   CYP3A4*16.001:
     pharmvar: https://www.pharmvar.org/haplotype/1762
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*16A, CYP3A4*16B
     evidence: D
     mutations:
@@ -165,14 +165,14 @@ alleles:
     - [20716, C>G, rs12721627, T185S]
   CYP3A4*17.001:
     pharmvar: https://www.pharmvar.org/haplotype/1522
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*17
     evidence: L
     mutations:
     - [20728, T>C, rs4987161, F189S]
   CYP3A4*18.001:
     pharmvar: https://www.pharmvar.org/haplotype/1764
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*18A, CYP3A4*18B
     evidence: M
     mutations:
@@ -180,7 +180,7 @@ alleles:
     - [25183, T>C, rs28371759, L293P]
   CYP3A4*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/1766
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*19
     evidence: L
     mutations:
@@ -188,7 +188,7 @@ alleles:
     - [28350, C>T, rs4986913, P467S]
   CYP3A4*20.001:
     pharmvar: https://www.pharmvar.org/haplotype/1505
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*20
     evidence: L
     mutations:
@@ -196,7 +196,7 @@ alleles:
     - [31002, insA, rs67666821, P488fs]
   CYP3A4*21.001:
     pharmvar: https://www.pharmvar.org/haplotype/1506
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*21
     evidence: M
     mutations:
@@ -204,7 +204,7 @@ alleles:
     - [25261, A>G, rs201821708, Y319C]
   CYP3A4*22.001:
     pharmvar: https://www.pharmvar.org/haplotype/1521
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*22
     evidence: D
     mutations:
@@ -212,21 +212,21 @@ alleles:
     - [20493, C>T, rs35599367, splice defect]
   CYP3A4*23.001:
     pharmvar: https://www.pharmvar.org/haplotype/1768
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*23
     evidence: M
     mutations:
     - [19381, C>T, rs57409622, R162W]
   CYP3A4*24.001:
     pharmvar: https://www.pharmvar.org/haplotype/1770
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*24
     evidence: M
     mutations:
     - [20762, A>T, rs113667357, Q200H]
   CYP3A4*26.001:
     pharmvar: https://www.pharmvar.org/haplotype/1501
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*26
     evidence: L
     mutations:
@@ -234,7 +234,7 @@ alleles:
     - [22746, C>T, rs138105638, R268X]
   CYP3A4*28.001:
     pharmvar: https://www.pharmvar.org/haplotype/1772
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*28
     evidence: L
     mutations:
@@ -242,7 +242,7 @@ alleles:
     - [5168, C>G, rs570051168, L22V]
   CYP3A4*29.001:
     pharmvar: https://www.pharmvar.org/haplotype/1510
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*29
     evidence: L
     mutations:
@@ -250,7 +250,7 @@ alleles:
     - [18969, T>A, rs1449865051, F113I]
   CYP3A4*30.001:
     pharmvar: https://www.pharmvar.org/haplotype/1517
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*30
     evidence: L
     mutations:
@@ -258,7 +258,7 @@ alleles:
     - [19020, C>T, rs778013004, R130X]
   CYP3A4*31.001:
     pharmvar: https://www.pharmvar.org/haplotype/1502
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*31
     evidence: L
     mutations:
@@ -266,7 +266,7 @@ alleles:
     - [25277, C>A, rs1303250043, H324Q]
   CYP3A4*32.001:
     pharmvar: https://www.pharmvar.org/haplotype/1491
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*32
     evidence: L
     mutations:
@@ -274,7 +274,7 @@ alleles:
     - [25309, T>C, rs368296206, I335T]
   CYP3A4*33.001:
     pharmvar: https://www.pharmvar.org/haplotype/1507
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*33
     evidence: L
     mutations:
@@ -282,7 +282,7 @@ alleles:
     - [27000, G>T, rs756833413, A370S]
   CYP3A4*34.001:
     pharmvar: https://www.pharmvar.org/haplotype/1503
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*34
     evidence: L
     mutations:
@@ -290,7 +290,7 @@ alleles:
     - [28230, A>G, rs774109750, I427V]
   CYP3A4*35.001:
     pharmvar: https://www.pharmvar.org/haplotype/1492
-    activity: function not assigned
+    activity: unknown
     label: CYP3A4*35
     evidence: D
     mutations:
@@ -298,7 +298,7 @@ alleles:
     - [5111, C>G, rs188389063, L3V]
   CYP3A4*37.001:
     pharmvar: https://www.pharmvar.org/haplotype/1802
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4713, G>A, rs2740574]

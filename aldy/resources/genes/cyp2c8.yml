@@ -6,40 +6,40 @@ ensembl: ENSG00000138115
 alleles:
   CYP2C8*1.001:
     pharmvar: https://www.pharmvar.org/haplotype/292
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*1A
     evidence: D
     mutations: []
   CYP2C8*1.002:
     pharmvar: https://www.pharmvar.org/haplotype/293
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*1B
     evidence: L
     mutations:
     - [4825, C>A, rs7909236]
   CYP2C8*1.003:
     pharmvar: https://www.pharmvar.org/haplotype/294
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*1C
     evidence: L
     mutations:
     - [4726, T>G, rs17110453]
   CYP2C8*1.004:
     pharmvar: https://www.pharmvar.org/haplotype/1576
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
   CYP2C8*1.005:
     pharmvar: https://www.pharmvar.org/haplotype/1567
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
     - [31518, C>T, rs11188150]
   CYP2C8*1.006:
     pharmvar: https://www.pharmvar.org/haplotype/1564
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -47,7 +47,7 @@ alleles:
     - [37394, C>T, rs1058932]
   CYP2C8*1.007:
     pharmvar: https://www.pharmvar.org/haplotype/1565
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -56,14 +56,14 @@ alleles:
     - [37394, C>T, rs1058932]
   CYP2C8*1.008:
     pharmvar: https://www.pharmvar.org/haplotype/1578
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
     - [7289, G>A, rs11572081]
   CYP2C8*1.009:
     pharmvar: https://www.pharmvar.org/haplotype/1580
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -71,21 +71,21 @@ alleles:
     - [28663, C>T, rs200154618]
   CYP2C8*1.010:
     pharmvar: https://www.pharmvar.org/haplotype/1568
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
     - [37394, C>T, rs1058932]
   CYP2C8*1.011:
     pharmvar: https://www.pharmvar.org/haplotype/1581
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
     - [37423, insT, rs761474363]
   CYP2C8*1.012:
     pharmvar: https://www.pharmvar.org/haplotype/1575
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -93,21 +93,21 @@ alleles:
     - [37459, C>T, rs28399518]
   CYP2C8*1.013:
     pharmvar: https://www.pharmvar.org/haplotype/1582
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
     - [4963, A>C, rs78041161]
   CYP2C8*1.014:
     pharmvar: https://www.pharmvar.org/haplotype/1579
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
     - [4848, insA, rs11572065]
   CYP2C8*1.015:
     pharmvar: https://www.pharmvar.org/haplotype/1586
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -115,20 +115,20 @@ alleles:
     - [37394, C>T, rs1058932]
   CYP2C8*1.016:
     pharmvar: https://www.pharmvar.org/haplotype/1570
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
     - [4825, C>A, rs7909236]
   CYP2C8*1.017:
     pharmvar: https://www.pharmvar.org/haplotype/1571
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4974, A>C, rs547978262]
   CYP2C8*1.018:
     pharmvar: https://www.pharmvar.org/haplotype/1569
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -136,7 +136,7 @@ alleles:
     - [7289, G>A, rs11572081]
   CYP2C8*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/854
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*2
     evidence: L
     mutations:
@@ -144,7 +144,7 @@ alleles:
     - [37394, C>T, rs1058932]
   CYP2C8*2.002:
     pharmvar: https://www.pharmvar.org/haplotype/1566
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -152,7 +152,7 @@ alleles:
     - [37394, C>T, rs1058932]
   CYP2C8*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/853
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*3
     evidence: L
     mutations:
@@ -161,7 +161,7 @@ alleles:
     - [37394, C>T, rs1058932]
   CYP2C8*3.002:
     pharmvar: https://www.pharmvar.org/haplotype/1577
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -169,14 +169,14 @@ alleles:
     - [35506, A>G, rs10509681, K399R]
   CYP2C8*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/291
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*4
     evidence: L
     mutations:
     - [16136, C>G, rs1058930, I264M]
   CYP2C8*4.002:
     pharmvar: https://www.pharmvar.org/haplotype/1563
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]
@@ -185,7 +185,7 @@ alleles:
     - [37394, C>T, rs1058932]
   CYP2C8*5.001:
     pharmvar: https://www.pharmvar.org/haplotype/1583
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*5
     evidence: D
     mutations:
@@ -193,7 +193,7 @@ alleles:
     - [7284, delA, rs72558196, T159fs]
   CYP2C8*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/1573
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*6
     evidence: D
     mutations:
@@ -201,14 +201,14 @@ alleles:
     - [9567, G>A, rs142886225, G171S]
   CYP2C8*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/287
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*7
     evidence: L
     mutations:
     - [9612, C>T, rs72558195, R186X]
   CYP2C8*8.001:
     pharmvar: https://www.pharmvar.org/haplotype/1585
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*8
     evidence: D
     mutations:
@@ -216,55 +216,55 @@ alleles:
     - [9612, C>G, rs72558195, R186G]
   CYP2C8*9.001:
     pharmvar: https://www.pharmvar.org/haplotype/283
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*9
     evidence: L
     mutations:
     - [16084, A>G, rs769460274, K247R]
   CYP2C8*10.001:
     pharmvar: https://www.pharmvar.org/haplotype/295
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*10
     evidence: L
     mutations:
     - [31608, G>T, '-', K383N]
   CYP2C8*11.001:
     pharmvar: https://www.pharmvar.org/haplotype/296
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*11
     evidence: L
     mutations:
     - [28547, G>T, rs78637571, E274X]
   CYP2C8*12.001:
     pharmvar: https://www.pharmvar.org/haplotype/297
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*12
     evidence: L
     mutations:
     - [37279, delTTG, rs3832694, 461delV]
   CYP2C8*13.001:
     pharmvar: https://www.pharmvar.org/haplotype/298
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*13
     evidence: L
     mutations:
     - [16013, T>G, '-', I223M]
   CYP2C8*14.001:
     pharmvar: https://www.pharmvar.org/haplotype/284
-    activity: function not assigned
+    activity: unknown
     label: CYP2C8*14
     evidence: L
     mutations:
     - [16056, G>C, rs188934928, A238P]
   CYP2C8*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/1584
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [9597, G>A, rs41286886, V181I]
   CYP2C8*16.001:
     pharmvar: https://www.pharmvar.org/haplotype/1562
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [5010, A>G, rs11572066]
@@ -272,14 +272,14 @@ alleles:
     - [31451, T>C, rs146806199, I331T]
   CYP2C8*17.001:
     pharmvar: https://www.pharmvar.org/haplotype/1572
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [7289, G>A, rs11572081]
     - [16074, A>G, rs11572102, I244V]
   CYP2C8*18.001:
     pharmvar: https://www.pharmvar.org/haplotype/1574
-    activity: function not assigned
+    activity: unknown
     evidence: D
     mutations:
     - [4685, C>T, rs7912549]

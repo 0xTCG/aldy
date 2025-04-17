@@ -4,35 +4,35 @@ generated: '2020-11-17'
 alleles:
    TOY*1.001:
       label: TOY*1
-      activity: normal function
+      activity: normal
       evidence: D
       mutations: []
    TOY*1.002:
       label: TOY*1B
-      mutations: 
+      mutations:
       - [115, T>A, rs28371732]
    TOY*1.003:
       label: TOY*1C
       pharmvar: https://www.pharmvar.org/haplotype/NA
-      mutations: 
+      mutations:
       - [105, T>A, -, functional]
    TOY*2.001:
       label: TOY*2
-      mutations: 
+      mutations:
       - [111, delAC, -, frameshift]
       - [119, insTT, -, frameshift]
    TOY*3.001:
       label: TOY*3
-      mutations: 
+      mutations:
       - [151, C>T, -, functional]
       - [148, insA, -]
    TOY*4.001:
       label: TOY*4
-      mutations: 
+      mutations:
       - [TOYP, i2-]
    TOY*5.001:
       label: TOY*5
-      mutations: 
+      mutations:
       - [TOYP, e2+]
       - [111, delAC, -, functional]
    TOY*6.001:

@@ -5,245 +5,245 @@ ensembl: ENSG00000160211
 alleles:
   G6PD*202:
     label: 202G>A_376A>G_1264C>G
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [16571, G>A, rs1050828, V68M]
     - [17296, A>G, rs1050829, N126D]
     - [19983, C>G, '-', L422V]
   G6PD*A:
     label: A
-    activity: IV/Normal
+    activity: normal
     mutations:
     - [17296, A>G, rs1050829, N126D]
   G6PD*A-.001:
     label: A- 202A_376G
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16571, G>A, rs1050828, V68M]
     - [17296, A>G, rs1050829, N126D]
   G6PD*A-.002:
     label: A- 680T_376G
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [18448, G>T, rs137852328, R227L]
   G6PD*A-.003:
     label: A- 968C_376G
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [19548, T>C, rs76723693, L323P]
   G6PD*B:
     label: B(wildtype; Hektoen)
-    activity: IV/Normal
+    activity: normal
     mutations: []
   G6PD*aachen:
     label: Aachen
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19808, C>G, rs137852329, N363K]
   G6PD*abeno:
     label: Abeno
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19939, A>C, '-', K407T]
   G6PD*acrokorinthos:
     label: Acrokorinthos
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [17383, C>G, '-', H155D]
   G6PD*alhambra:
     label: Alhambra
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19899, G>C, rs137852335, V394L]
   G6PD*amazonia:
     label: Amazonia
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [16554, C>A, '-', P62H]
   G6PD*amiens:
     label: Amiens
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20295, A>T, '-', D456V]
   G6PD*amsterdam:
     label: Amsterdam
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [16549, delTCT, '-', L61del]
   G6PD*anadia:
     label: Anadia
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19912, A>G, '-', E398G]
   G6PD*ananindeua:
     label: Ananindeua
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [19451, G>A, rs137852327, V291M]
   G6PD*andalus:
     label: Andalus
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20184, G>A, rs137852324, R454H]
   G6PD*arakawa:
     label: Arakawa
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20491, C>T, '-', P489L]
   G6PD*asahi:
     label: Asahi
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16571, G>A, rs1050828, V68M]
   G6PD*asahikawa:
     label: Asahikawa
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18463, G>A, '-', C232Y]
   G6PD*aures:
     label: Aures
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16417, T>C, rs76645461, I48T]
   G6PD*aveiro:
     label: Aveiro
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18939, G>A, rs137852346, C269Y]
   G6PD*bajo_maumere:
     label: Bajo Maumere
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [18977, G>T, rs137852318, D282H]
   G6PD*bangkok:
     label: Bangkok
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18958, G>C, '-', K275N]
   G6PD*bangkok_noi:
     label: Bangkok Noi
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20304, G>T, rs72554665, R459L]
     - [20527, T>G, '-', F501C]
   G6PD*bao_loc:
     label: Bao Loc
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17272, T>C, '-', Y118H]
   G6PD*bari:
     label: Bari
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19906, C>T, '-', P396L]
   G6PD*belem:
     label: Belem
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17329, C>T, '-', L137F]
   G6PD*beverly_hills:
     label: Beverly Hills, Genova, Iwate, Niigata, Yamaguchi
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19879, G>A, rs137852321, R387H]
   G6PD*brighton:
     label: Brighton
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20513, delGAA, '-', K497del]
   G6PD*buenos_aires:
     label: Buenos Aires
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20490, C>T, '-', P489S]
   G6PD*cairo:
     label: Cairo
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [17324, A>C, rs782322505, N135T]
   G6PD*calvo_mackenna:
     label: Calvo Mackenna
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19857, A>G, '-', I380V]
   G6PD*campinas:
     label: Campinas
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20488, G>T, '-', G488V]
   G6PD*canton:
     label: Canton, Taiwan-Hakka, Gifu-like, Agrigento-like
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20304, G>T, rs72554665, R459L]
   G6PD*cassano:
     label: Cassano
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20170, G>C, '-', Q449H]
   G6PD*chatham:
     label: Chatham
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19583, G>A, rs5030869, A335T]
   G6PD*chikugo:
     label: Chikugo
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18126, A>T, '-', S179C]
   G6PD*chinese.001:
     label: Chinese-1
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18968, A>T, '-', T279S]
   G6PD*chinese.005:
     label: Chinese-5
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [19604, C>T, rs137852342, L342F]
   G6PD*cincinnati:
     label: Cincinnati
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18228, G>T, rs137852326, V213L]
     - [19617, A>T, rs398123544, N346I]
   G6PD*cleveland_corum:
     label: Cleveland Corum
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18953, G>A, '-', E274K]
   G6PD*clinic:
     label: Clinic
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19934, G>A, '-', M405I]
   G6PD*coimbra_shunde:
     label: Coimbra Shunde
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18183, C>T, rs137852330, R198C]
   G6PD*cosenza:
     label: Cosenza
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20304, G>C, rs72554665, R459P]
   G6PD*costanzo:
     label: Costanzo
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [16548, T>C, '-', L60P]
   G6PD*covao_do_lobo:
     label: Covao do Lobo
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19924, C>A, '-', T402N]
   G6PD*crispim:
     label: Crispim
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17295, G>T, '-', M125I]
     - [17299, G>T, '-', A127S]
@@ -251,711 +251,711 @@ alleles:
     - [17304, C>T, '-', L128L]
   G6PD*dagua:
     label: Dagua
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [18186, A>G, rs781865768, I199V]
   G6PD*durham:
     label: Durham
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18481, A>G, '-', K238R]
   G6PD*farroupilha:
     label: Farroupilha
-    activity: II-III/Deficient
+    activity: deficient-ii-iii
     mutations:
     - [19557, C>A, '-', P326H]
   G6PD*figuera_da_foz:
     label: Figuera da Foz
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20294, G>C, '-', D456H]
   G6PD*flores:
     label: Flores
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20315, C>A, '-', R463S]
   G6PD*fukaya:
     label: Fukaya
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20487, G>A, '-', G488S]
   G6PD*fukushima:
     label: Tokyo, Fukushima
-    activity: I-II/Deficient with CNSHA-Deficient
+    activity: deficient-i-ii
     mutations:
     - [19965, G>A, '-', E416K]
   G6PD*fushan:
     label: Fushan
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19584, C>A, '-', A335D]
   G6PD*gaohe:
     label: Gaohe
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [6512, A>G, rs137852340, H32R]
   G6PD*georgia:
     label: Georgia
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20003, C>A, '-', Y428X]
   G6PD*gidra:
     label: Gidra
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [6527, T>C, '-', M37T]
   G6PD*gond:
     label: Gond
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [17397, G>C, rs370918918, M159I]
   G6PD*guadalajara:
     label: Guadalajara
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19878, C>T, rs137852334, R387C]
   G6PD*guangzhou:
     label: Guangzhou
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [17194, C>T, '-', P92S]
   G6PD*haikou:
     label: Haikou
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18968, A>G, '-', T279A]
   G6PD*hammersmith:
     label: Hammersmith
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [17243, T>A, '-', V108E]
   G6PD*harilaou:
     label: Harilaou
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18416, T>G, rs137852319, F216L]
   G6PD*harima:
     label: Harima
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20181, T>A, '-', V453E]
   G6PD*hartford:
     label: Hartford
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19881, A>G, '-', N388D]
   G6PD*hechi:
     label: Hechi
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [16571, G>A, rs1050828, V68M]
     - [19451, G>A, rs137852327, V291M]
   G6PD*hermoupolis:
     label: Hermoupolis
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20170, G>C, '-', Q449H]
     - [20183, C>T, rs398123546, R454C]
   G6PD*honiara:
     label: Honiara
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [6516, A>G, '-', I33M]
     - [20183, C>T, rs398123546, R454C]
   G6PD*ierapetra:
     label: Ierapetra
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19776, C>T, rs137852333, P353S]
   G6PD*ilesha:
     label: Ilesha
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [17386, G>A, rs137852313, E156K]
   G6PD*insuli:
     label: Insuli
-    activity: IV/Normal
+    activity: normal
     mutations:
     - [19569, G>A, '-', R330H]
   G6PD*iowa:
     label: Iowa, Walter Reed, Springfield
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19875, A>G, rs137852320, K386E]
   G6PD*iwatsuki:
     label: Iwatsuki
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19800, G>A, '-', A361T]
   G6PD*kaiping:
     label: Kaiping, Anant, Dhon, Sapporo-like, Wosera
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20316, G>A, rs72554664, R463H]
   G6PD*kambos:
     label: Kambos
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16422, C>T, '-', P50S]
   G6PD*kamiube:
     label: Kamiube, Keelung
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [20315, C>T, '-', R463C]
   G6PD*kamogawa:
     label: Kamogawa
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [16538, C>T, '-', R57W]
   G6PD*kawasaki:
     label: Kawasaki
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19948, G>C, rs137852336, G410A]
   G6PD*kerala:
     label: Kalyan-Kerala, Jamnaga, Rohini
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [19529, G>A, rs137852339, E317K]
   G6PD*kozukata:
     label: Kozukata
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [16528, G>C, '-', W53C]
   G6PD*krakow:
     label: Krakow
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19894, T>C, '-', I392T]
   G6PD*la_jolla:
     label: La Jolla
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18965, T>C, '-', S278P]
   G6PD*lages:
     label: Lages
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [6457, G>A, '-', G14R]
   G6PD*lagosanto:
     label: Lagosanto
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16611, G>A, rs782308266, R81H]
   G6PD*laibin:
     label: Laibin
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [20342, A>C, '-', I472L]
   G6PD*lille:
     label: Lille
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18954, A>T, '-', E274V]
   G6PD*liuzhou:
     label: Liuzhou
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17362, G>A, '-', E148K]
   G6PD*loma_linda:
     label: Loma Linda
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19808, C>A, rs137852329, N363K]
   G6PD*ludhiana:
     label: Ludhiana
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19509, G>A, '-', G310E]
   G6PD*lynwood:
     label: Lynwood
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19873, G>T, '-', C385F]
   G6PD*madrid:
     label: Madrid
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19874, C>G, '-', C385W]
   G6PD*maewo:
     label: Union,Maewo, Chinese-2, Kalo
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20183, C>T, rs398123546, R454C]
   G6PD*mahidol:
     label: Mahidol
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [18078, G>A, rs137852314, G163S]
   G6PD*malaga:
     label: Malaga
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [18133, A>T, rs5030872, D181V]
   G6PD*manhattan:
     label: Manhattan
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19542, G>A, '-', G321E]
   G6PD*mediterranean.001:
     label: Mediterranean Haplotype
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [18154, C>T, rs5030868, S188F]
     - [20134, C>T, rs2230037, Y437Y]
   G6PD*mediterranean.002:
     label: Mediterranean, Dallas, Panama / Sassari, Cagliari, Birmingham
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18154, C>T, rs5030868, S188F]
   G6PD*metaponto:
     label: Metaponto
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16541, G>A, rs137852315, D58N]
   G6PD*mexico_city:
     label: Mexico City
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [18448, G>A, rs137852328, R227Q]
   G6PD*miaoli:
     label: Miaoli
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18110, C>G, '-', F173L]
   G6PD*minnesota:
     label: Minnesota, Marion, Gastonia, LeJeune
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18228, G>T, rs137852326, V213L]
   G6PD*mira_daire:
     label: Mira d'Aire
-    activity: IV/Normal
+    activity: normal
     mutations:
     - [19628, G>C, rs34193178, D350H]
   G6PD*mizushima:
     label: Mizushima
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18981, A>G, '-', D283G]
   G6PD*montalbano:
     label: Montalbano
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [18987, G>A, rs74575103, R285H]
   G6PD*montpellier:
     label: Montpellier
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19851, G>A, rs371489738', G378S]
   G6PD*mt_sinai:
     label: Mt Sinai
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [19878, C>T, rs137852334, R387C]
   G6PD*munich:
     label: Munich
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19950, A>G, '-', M411V]
   G6PD*murcia_oristano:
     label: Murcia Oristano
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16578, A>G, rs782090947, Y70C]
   G6PD*musashino:
     label: Musashino
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16554, C>T, '-', P62L]
   G6PD*namouru:
     label: Namouru
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [16577, T>C, rs137852349, Y70H]
   G6PD*nankang:
     label: Nankang
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18108, T>C, rs137852343, F173L]
   G6PD*nanning:
     label: Nanning
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [18471, C>T, rs782757170, L235F]
   G6PD*naone:
     label: Naone
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18088, G>A, '-', R166H]
   G6PD*nara:
     label: Nara
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19535, delACCAAAGGGTACCTGGACGACCCC, '-', T319_P326del]
   G6PD*nashville:
     label: Nashville, Anaheim, Portici
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19897, G>A, rs137852316, R393H]
   G6PD*neapolis:
     label: Neapolis
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [20328, C>G, rs137852344, P467R]
   G6PD*nice:
     label: Nice
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [20308, G>C, '-', E460D]
   G6PD*nilgiri:
     label: Nilgiri
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18184, G>A, rs137852332, R198H]
   G6PD*noname:
     label: No name
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [6442, C>T, '-', R9W]
   G6PD*north_dallas:
     label: North Dallas
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18451, delACA, '-', N229del]
   G6PD*olomouc:
     label: Olomouc
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19860, T>C, '-', F381L]
   G6PD*omiya:
     label: Omiya
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19501, G>C, '-', Q307H]
   G6PD*orissa:
     label: Orissa
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16405, C>G, rs78478128, A44G]
   G6PD*osaka:
     label: Osaka
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18986, C>T, '-', R285C]
   G6PD*palestrina:
     label: Palestrina
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16539, G>A, '-', R57E]
   G6PD*papua:
     label: Papua
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [18982, C>A, '-', D283E]
   G6PD*partenope:
     label: Partenope
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19771, G>T, '-', G351V]
   G6PD*pawnee:
     label: Pawnee
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20139, G>C, rs137852337, Arg439Pro]
   G6PD*pedoplis_ckaro:
     label: Pedoplis-Ckaro
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18164, C>G, '-', F191L]
   G6PD*piotrkow:
     label: Piotrkow
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18984, T>C, '-', V284A]
   G6PD*plymouth:
     label: Plymouth
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18079, G>A, '-', G163D]
   G6PD*praha:
     label: Praha
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19885, A>G, '-', E389G]
   G6PD*puerto_limon:
     label: Puerto Limon
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19911, G>A, rs137852325, E398K]
   G6PD*quing_yan:
     label: Quing Yan
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [17312, G>T, '-', G131V]
   G6PD*radlowo:
     label: Radlowo
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18447, C>T, '-', R227W]
   G6PD*rehevot:
     label: Rehevot
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19544, T>C, rs137852347, Y322H]
   G6PD*rignano:
     label: Rignano
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16404, G>A, '-', A44T]
   G6PD*riley:
     label: Riley
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19858, T>C, '-', I380T]
   G6PD*riverside:
     label: Riverside
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19947, G>T, rs137852323, G410C]
   G6PD*roubaix:
     label: Roubaix
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18944, G>C, '-', V271L]
   G6PD*s_antioco:
     label: S. Antioco
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20165, A>G, '-', S448G]
   G6PD*salerno_pyrgos:
     label: Salerno Pyrgos
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [17303, T>G, rs78365220, L128R]
   G6PD*santa_maria:
     label: Santa Maria
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17296, A>G, rs1050829, N126D]
     - [18133, A>T, rs5030872, D181V]
   G6PD*santiago:
     label: Santiago
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18184, G>C, rs137852332, R198P]
   G6PD*santiago_de_cuba:
     label: Santiago de Cuba, Morioka
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20162, G>A, rs137852317, G447R]
   G6PD*sao_borja:
     label: Sao Borja
-    activity: IV/Normal
+    activity: normal
     mutations:
     - [17257, G>A, rs5030870, D113N]
   G6PD*seattle:
     label: Seattle, Lodi, Modena, Ferrara II, Athens-like
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [18977, G>C, rs137852318, D282Y]
   G6PD*seoul:
     label: Seoul
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19496, G>A, '-', G306S]
   G6PD*serres:
     label: Serres
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19801, C>T, rs137852345, A361V]
   G6PD*shenzen:
     label: Shenzen
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17393, G>A, rs782487723', C158Y]
   G6PD*shinagawa:
     label: Japan, Shinagawa
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19948, G>A, rs137852336, G410D]
   G6PD*shinshu:
     label: Shinshu
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18118, A>G, '-', D176G]
   G6PD*sibari:
     label: Sibari
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [18225, A>G, rs782754619, M212V]
   G6PD*sierra_leone:
     label: Sierra Leone
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [17231, G>A, rs181277621, R104H]
     - [17296, A>G, rs1050829, N126D]
   G6PD*sinnai:
     label: Sinnai
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [6451, G>T, '-', V12L]
   G6PD*songklanagarind:
     label: Songklanagarind
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [16565, T>A, '-', P66I]
   G6PD*split:
     label: Split
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [20370, C>G, rs137852348, P481R]
   G6PD*stonybrook:
     label: Stonybrook
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18492, delGGCACT, '-', G242_T243del]
   G6PD*sugao:
     label: Sugao
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18959, C>T, '-', P276S]
   G6PD*sumare:
     label: Sumare
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20115, T>G, '-', V431G]
   G6PD*sunderland:
     label: Sunderland
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [6520, delATC, rs137852338, I35del]
   G6PD*surabaya:
     label: Surabaya
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [20114, G>A, rs782098548, V431M]
   G6PD*suwalki:
     label: Suwalki
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19945, C>G, '-', P409R]
   G6PD*swansea:
     label: Swansea
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [16593, T>C, '-', L75P]
   G6PD*taipei:
     label: Taipei / Chinese-3
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18084, A>G, rs137852331, N165D]
   G6PD*telti:
     label: Telti/Kobe
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [20141, C>T, '-', L440F]
   G6PD*tenri:
     label: Tenri
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19815, A>G, '-', K366E]
   G6PD*toledo:
     label: Toledo
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [18087, C>T, '-', R166C]
   G6PD*tomah:
     label: Tomah
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19872, T>C, rs137852322, C385R]
   G6PD*tondela:
     label: Tondela
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19803, delCTGAACGAGCGCAAGGCC, '-', L362_A367del]
   G6PD*torun:
     label: Torun
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19586, A>G, '-', T336A]
   G6PD*tsukui:
     label: Tsukui
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18152, delCTC, '-', S188del]
   G6PD*ube_konan:
     label: Ube Konan
-    activity: III/Deficient
+    activity: deficient-iii
     mutations:
     - [16610, C>T, rs138687036, R81C]
   G6PD*urayasu:
     label: Urayasu
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [17201, delAGA, '-', K95del]
   G6PD*utrecht:
     label: Utrecht
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19944, C>T, '-', P409S]
   G6PD*valladolid:
     label: Valladolid
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17326, C>T, '-', R136C]
   G6PD*vancouver:
     label: Vancouver
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [17237, C>G, rs267606835, S106C]
     - [18135, C>T, rs267606836, R182W]
     - [18183, C>T, rs137852330, R198C]
   G6PD*vanua_lava:
     label: Vanua Lava
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [17303, T>C, rs78365220, L128P]
   G6PD*viangchan:
     label: Viangchan, Jammu
-    activity: II/Deficient
+    activity: deficient-ii
     mutations:
     - [19451, G>A, rs137852327, V291M]
   G6PD*villeurbanne:
     label: Villeurbanne
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19580, delACC, '-', T334del]
   G6PD*volendam:
     label: Volendam
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18105, C>T, '-', P172S]
   G6PD*wayne:
     label: Wayne
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18537, C>G, '-', R257G]
   G6PD*west_virginia:
     label: West Virginia
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19490, G>T, '-', V303F]
   G6PD*wexham:
     label: Wexham
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [18966, C>T, '-', S278F]
   G6PD*wisconsin:
     label: Wisconsin
-    activity: I/Deficient with CNSHA
+    activity: deficient-i
     mutations:
     - [19896, C>G, '-', R393G]
   G6PD*yunan:
     label: Yunan
-    activity: Not reported/Unknown
+    activity: unknown
     mutations:
     - [20309, G>A, rs782608284, A461T]
 structure:
