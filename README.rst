@@ -702,6 +702,12 @@ Gene Support
 Change log
 ==========
 
+- Aldy v4.8 (May 2025)
+   - New definitions
+   - CPIC functionality reporting
+   - indelPost version upgrade
+   - Support for calling non-database novel variants (`--param novel=True`)
+
 - Aldy v4.7 (Nov 7, 2024)
    - Support for _ABCG2_, _CACNA1S_ and _RYR1_
    - Database updates (with major _UGT1A1_ update)

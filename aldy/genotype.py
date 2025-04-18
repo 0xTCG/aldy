@@ -356,7 +356,13 @@ def genotype(
             minor_sol.get_minor_diplotype(legacy=True).replace(" ", ""),
         ]
         if is_aldy:
-            print(f"#Solution {i + 1}: {minor_sol._solution_nice()}", file=output_file)
+            cpic = ""
+            if gene.cpic:
+                cpic_score, cpic_fun = diplotype.estimate_cpic(gene, minor_sol)
+                cpic = f"; cpic={cpic_fun}"
+                if gene.cpic_scores and cpic_fun != "indeterminate":
+                    cpic += f"; cpic_score={cpic_score}"
+            print(f"#Solution {i + 1}: {minor_sol._solution_nice()}{cpic}", file=output_file)
             diplotype.write_decomposition(
                 sample.name, gene, sample.coverage, i + 1, minor_sol, output_file
             )
