@@ -455,7 +455,6 @@ class Gene:
         elif "table" in cpic:
             for fn, ll in cpic["table"].items():
                 self.cpic[fn] = {tuple(sorted(i)) for i in ll}
-        print(self.cpic, self.cpic_scores)
 
     def _init_regions(self, yml) -> None:
         """

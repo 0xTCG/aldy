@@ -381,7 +381,7 @@ def genotype(
                 if gene.cpic:
                     cpic_score, cpic_fun = diplotype.estimate_cpic(gene, r)
                     s = f"    CPIC functionality: {cpic_fun}"
-                    if gene.cpic_scores:
+                    if gene.cpic_scores and cpic_fun != "indeterminate":
                         s += f" (activity score = {cpic_score})"
                     log.info(s)
                 # Output the activity
