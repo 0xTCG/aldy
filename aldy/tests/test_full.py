@@ -90,15 +90,17 @@ CYP2D6 results:
   - *1 / *4 + *4.021.ALDY
     Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.001] + [*4.1021 -rs28371738]
     Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4A] + [*4.021.ALDY -rs28371738]
-    Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
-    Estimated activity for *4: no function (evidence: D); see https://www.pharmvar.org/haplotype/235 for details
-    Estimated activity for *4.021.ALDY: no function (evidence: D)
+    CPIC functionality: intermediate (activity score = 1.0)
+    Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
+    Estimated activity for *4: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/235 for details)
+    Estimated activity for *4.021.ALDY: none (score: 0.0); evidence: D
   - *1 / *4.021 + *4N.ALDY
     Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.1013 -rs28371738]
     Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4N.ALDY -rs28371738]
-    Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
-    Estimated activity for *4.021: no function (evidence: D); see https://www.pharmvar.org/haplotype/652 for details
-    Estimated activity for *4N.ALDY: no function (evidence: D)
+    CPIC functionality: intermediate (activity score = 1.0)
+    Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
+    Estimated activity for *4.021: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/652 for details)
+    Estimated activity for *4N.ALDY: none (score: 0.0); evidence: D
 """
 
 
@@ -184,15 +186,17 @@ def test_NA10860_gap(monkeypatch, solver):
     - *1 / *4 + *4.021.ALDY
         Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.001] + [*4.1021 -rs28371738]
         Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4A] + [*4.021.ALDY -rs28371738]
-        Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
-        Estimated activity for *4: no function (evidence: D); see https://www.pharmvar.org/haplotype/235 for details
-        Estimated activity for *4.021.ALDY: no function (evidence: D)
+        CPIC functionality: intermediate (activity score = 1.0)
+        Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
+        Estimated activity for *4: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/235 for details)
+        Estimated activity for *4.021.ALDY: none (score: 0.0); evidence: D
     - *1 / *4.021 + *4N.ALDY
         Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.1013 -rs28371738]
         Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4N.ALDY -rs28371738]
-        Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
-        Estimated activity for *4.021: no function (evidence: D); see https://www.pharmvar.org/haplotype/652 for details
-        Estimated activity for *4N.ALDY: no function (evidence: D)
+        CPIC functionality: intermediate (activity score = 1.0)
+        Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
+        Estimated activity for *4.021: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/652 for details)
+        Estimated activity for *4N.ALDY: none (score: 0.0); evidence: D
     """
     file = script_path("aldy.tests.resources/NA10860.bam")
     assert_file(monkeypatch, file, solver, expected, {"--param": "gap=0.3"})
@@ -215,8 +219,9 @@ def test_NA10860_cn(monkeypatch, solver):
     - *1 / *4.021
         Minor: [*1.018 +rs113889384 +rs28371713] / [*4.021]
         Legacy notation: [*1.018 +rs113889384 +rs28371713] / [*4.021]
-        Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/662 for details
-        Estimated activity for *4.021: no function (evidence: D); see https://www.pharmvar.org/haplotype/652 for details
+        CPIC functionality: intermediate (activity score = 1.0)
+        Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
+        Estimated activity for *4.021: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/652 for details)
     """
     file = script_path("aldy.tests.resources/NA10860.bam")
     assert_file(monkeypatch, file, solver, expected, {"--cn": "1,1"})
@@ -324,8 +329,9 @@ def test_NA07000_vcf_in(monkeypatch, solver):
     - *1 / *15
         Minor: [*1.003] / [*15.001]
         Legacy notation: [*1.003] / [*15A, SLCO1B1*15B, SLCO1B1*17]
-        Estimated activity for *1: normal function (evidence: D); see https://www.pharmvar.org/haplotype/1713 for details
-        Estimated activity for *15: no function (evidence: D); see https://www.pharmvar.org/haplotype/1704 for details
+        CPIC functionality: intermediate
+        Estimated activity for *1: normal; evidence: D (see https://www.pharmvar.org/haplotype/1713 for details)
+        Estimated activity for *15: none; evidence: D (see https://www.pharmvar.org/haplotype/1704 for details)
     """
     file = script_path("aldy.tests.resources/NA07000_SLCO1B1.vcf.gz")
     assert_file(
@@ -452,8 +458,9 @@ def test_pacbio(monkeypatch, solver):
     - *2 / *40
         Minor: [*2.023] / [*40.001]
         Legacy notation: [*2.023] / [*40]
-        Estimated activity for *2: normal function (evidence: D); see https://www.pharmvar.org/haplotype/1370 for details
-        Estimated activity for *40: no function (evidence: D); see https://www.pharmvar.org/haplotype/231 for details
+        CPIC functionality: intermediate (activity score = 1.0)
+        Estimated activity for *2: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/1370 for details)
+        Estimated activity for *40: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/231 for details)
     """
     file = script_path("aldy.tests.resources/HG03166.pb.bam")
     assert_file(

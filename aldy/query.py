@@ -118,7 +118,7 @@ def print_majors(gene: Gene, major: str):
     log.info(f"  Structure: {allele.cn_config}")
 
     activities = {m.activity for m in allele.minors.values() if m.activity}
-    if len(activities) == 1:
+    if len(activities) == 1 and "unknown" not in activities:
         log.info(f"  Activity: {activities.pop()}")
     elif len(activities) > 1:
         log.info(f"  Activity: {' or '.join(activities)} (please check minor alleles)")
@@ -150,7 +150,7 @@ def print_minors(gene: Gene, major: str, minor: str):
     log.info(f"  Structure: {allele.cn_config}")
     log.info(f"  Major star-allele: {gene.name}*{allele.name}")
     mn = allele.minors[minor]
-    if mn.activity:
+    if mn.activity and mn.activity != "unknown":
         log.info(f"  Activity: {mn.activity}")
     if mn.evidence:
         evidence = {"L": "limited", "D": "definitive"}.get(mn.evidence, mn.evidence)

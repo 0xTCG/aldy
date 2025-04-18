@@ -58,7 +58,7 @@ class MinorAllele:
     name: str
     alt_name: Optional[str] = None
     neutral_muts: Set[Mutation] = field(default_factory=set)
-    _activity: Optional[str] = None
+    _activity: Optional[str] = "unknown"
     evidence: Optional[str] = None
     pharmvar: Optional[str] = None
 
