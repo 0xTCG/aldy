@@ -1,5 +1,5 @@
 ##fileformat=VCFv4.2
-##source=aldy-v4.0
+##source=aldy-v4.0 (gene: CYP2D6-pharmvar-6.1.2 (2024-05-14))
 ##INFO=<ID=ANN,Number=1,Type=String,Description="Location within CYP2D6">
 ##INFO=<ID=TYPE,Number=1,Type=String,Description="Mutation kind">
 ##INFO=<ID=GENE,Number=1,Type=String,Description="Gene">

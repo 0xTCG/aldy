@@ -336,6 +336,8 @@ class Profile:
             for g in sorted(pkg_resources.resource_listdir("aldy.resources", "genes")):
                 if not g.endswith(".yml"):
                     continue
+                if 'rnr1' in g.lower():
+                    continue
                 log.debug("Loading {}...", g)
                 gg = Gene(script_path(f"aldy.resources.genes/{g}"), genome=genome)
                 for gi, gr in enumerate(gg.regions):

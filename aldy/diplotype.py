@@ -113,7 +113,7 @@ def write_vcf(
 
     header = f"""
     ##fileformat=VCFv4.2
-    ##source=aldy-v{version}
+    ##source=aldy-v{version} (gene: {gene.name}-{gene.version})
     ##INFO=<ID=ANN,Number=1,Type=String,Description="Location within {gene.name}">
     ##INFO=<ID=TYPE,Number=1,Type=String,Description="Mutation kind">
     ##INFO=<ID=GENE,Number=1,Type=String,Description="Gene">
