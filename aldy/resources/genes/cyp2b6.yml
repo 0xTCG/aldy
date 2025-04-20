@@ -591,12 +591,6 @@ reference:
   - [30347, 30529]
   cpic:
     table:
-      indeterminate:
-      - [increased, unknown]
-      - [normal, unknown]
-      - [decreased, unknown]
-      - [none, unknown]
-      - [unknown, unknown]
       intermediate:
       - [decreased, normal]
       - [none, normal]

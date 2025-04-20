@@ -830,11 +830,6 @@ reference:
   - [55689, 55871]
   cpic:
     table:
-      indeterminate:
-      - [normal, unknown]
-      - [decreased, unknown]
-      - [none, unknown]
-      - [unknown, unknown]
       intermediate:
       - [decreased, normal]
       - [none, normal]

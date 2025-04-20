@@ -198,11 +198,7 @@ reference:
   - [13093, 13233]
   cpic:
     table:
-      indeterminate:
-      - [normal, unknown]
-      - [unknown, unknown]
       intermediate:
-      - [none, unknown]
       - [none, normal]
       normal:
       - [normal, normal]

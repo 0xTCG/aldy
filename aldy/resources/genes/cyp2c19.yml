@@ -747,12 +747,6 @@ reference:
     - [95052, 95234]
   cpic:
     table:
-      indeterminate:
-      - [unknown, unknown]
-      - [increased, unknown]
-      - [normal, unknown]
-      - [decreased, unknown]
-      - [none, unknown]
       intermediate:
       - [decreased, normal]
       - [decreased, increased]

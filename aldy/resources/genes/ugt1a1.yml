@@ -4,11 +4,14 @@ generated: '2022-08-26'
 ensembl: ENSG00000241635
 alleles:
   UGT1A1*1:
+    activity: normal
     mutations: []
   UGT1A1*6:
+    activity: decreased
     mutations:
     - [175755, G>A, rs4148323, G71R]
   UGT1A1*27:
+    activity: decreased
     mutations:
     - [176230, C>A, rs35350960, P229Q]
   UGT1A1*27_28_80:
@@ -17,19 +20,24 @@ alleles:
     - [175491, insTA, rs3064744, Promoter]
     - [176230, C>A, rs35350960, P229Q]
   UGT1A1*28:
+    activity: decreased
     mutations:
     - [175491, insTA, rs3064744, Promoter]
   UGT1A1*28_80:
+    activity: decreased
     mutations:
     - [175181, C>T, rs887829, 5'UTR]
     - [175491, insTA, rs3064744, Promoter]
   UGT1A1*36:
+    activity: increased
     mutations:
     - [175492, delTA, rs3064744_del, Promoter]
   UGT1A1*37:
+    activity: decreased
     mutations:
     - [175491, insTATA, rs3064744, Promoter]
   UGT1A1*37_80:
+    activity: decreased
     mutations:
     - [175181, C>T, rs887829, 5'UTR]
     - [175491, insTATA, rs3064744, Promoter]
@@ -71,6 +79,17 @@ reference:
   - [183105, 183193]
   - [183476, 183696]
   - [187518, 187816]
+  cpic:
+    table:
+      poor:
+      - [decreased, decreased]
+      normal:
+      - [normal, normal]
+      - [increased, normal]
+      - [increased, increased]
+      intermediate:
+      - [decreased, increased]
+      - [decreased, normal]
   seq: |-
     TGAAACAAGGCACCAGACCGATGGGGTGAGCCCACAGCAGAGGCCTACAGCTCTGTTTAGAATGAGGAAGCAGAGC
     AGGCTGAGAGAGGCAGCTCAGCAGAGTGCTTAGGCAAGCATAGGGCCACGACTCCCCACTGCAGGCAACATATCTG

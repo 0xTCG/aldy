@@ -557,12 +557,7 @@ reference:
   - [112785, 112996]
   cpic:
     table:
-      indeterminate:
-      - [increased, unknown]
-      - [normal, unknown]
-      - [unknown, unknown]
       intermediate:
-      - [none, unknown]
       - [increased, none]
       - [none, normal]
       normal:

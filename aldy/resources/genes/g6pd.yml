@@ -1019,6 +1019,26 @@ reference:
   - [20110, 20187]
   - [20292, 20385]
   - [20482, 20573]
+  cpic:
+    table:
+      variable:
+      - [deficient-iii, normal]
+      - [deficient-ii, normal]
+      - [deficient-i, normal]
+      normal:
+      - [normal]
+      - [normal, normal]
+      deficient-cnsha:
+      - [deficient-i]
+      - [deficient-i, deficient-i]
+      deficient:
+      - [deficient-ii]
+      - [deficient-iii]
+      - [deficient-iii, deficient-iii]
+      - [deficient-ii, deficient-iii]
+      - [deficient-i, deficient-iii]
+      - [deficient-ii, deficient-ii]
+      - [deficient-i, deficient-ii]
   seq: |-
     TGCCCTGTCCCAGGATGGACAGCACTTCATGAGTGCTCAGTGCAGGGACACAGAGGCCTGGACATGTTGGTCCAAC
     CTGGAAGGTTCATTCCAGCTCCAGAGCTCCCTGTAAGATCCAGCAAGGCTGTCCTGGAGCCTACCCGGCAGCGTGC
