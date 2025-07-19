@@ -773,4 +773,5 @@ Contact & Bug Reports
 
 or open a `GitHub issue <https://github.com/inumanag/aldy/issues>`_.
 
-If you have an urgent problem, I suggest using e-mail.
+If you have an urgent problem, I suggest using e-mail. 
+GitHub issues are not constantly monitored.
