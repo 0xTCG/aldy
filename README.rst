@@ -749,6 +749,17 @@ Change log
    - Better genotype calling models
    - Major API changes
 
+
+Known issues and limitations
+============================
+
+- When using VCF or other data formats that do not provide read alignments, Aldy will assume that the reference genome contains the wildtype allele without any mutations (see https://github.com/0xTCG/aldy/issues/74 for details). However, in some cases, this assumption is incorrect: for example, hg19 contains *CYP2C19*\*1 and not *CYP2C19*\*38 (the wildtype allele---yes, the *CYP2C19* nomenclature is confusing). Now, if your VCF does not contain the information about \*1 allele (which it often does not as it is a match in hg19), Aldy will call \*38 instead of \*1. **I suggest using hg38 or SAM/BAMs for the best results.**
+
+    **Known problematic genes:** *CYP2C19* (\*1 vs. \*38), *CYP3A7* (\*1 vs. \*2)
+
+- Aldy might mistakenly call *CYP2D6*\*4 as *CYP2D6*\*139 due to the near-similarity of these alleles, especially when the coverage is low. I suggest double-checking any \*139 call. 
+  You can track this issue here: https://github.com/0xTCG/aldy/issues/50.
+
 Acknowledgments
 ===============
 
