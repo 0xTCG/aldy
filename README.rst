@@ -540,7 +540,7 @@ Gene Support
      - Status
      - Notes
    * - *CYP2D6*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      - - Copy number and structural variation supported
        - Alleles with the *CYP2D7* exon 9 retention such as \*36, \*57, \*83 and \*141
@@ -548,12 +548,12 @@ Gene Support
          (i.e., they cannot be called in WES mode)
        - Detection of the non-functional *CYP2D7* intron 1 retention is spotty
    * - *CYP2A6*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      - - Copy number and structural variation supported
        - Detection of the *CYP2A7* 3' UTR retention not yet supported
    * - *CYP2B6*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      - Some allele calls should be further validated (e.g., \*6/\*9)
    * - *CYP1A1*
@@ -565,19 +565,19 @@ Gene Support
      - ✅
      -
    * - *CYP2A13*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *CYP2C19*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *CYP2C8*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *CYP2C9*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *CYP2E1*
@@ -585,43 +585,43 @@ Gene Support
      - ⚠️
      - Thorough testing on the real datasets pending
    * - *CYP2F1*
-     - PharmVar 5.2.3
+     - PharmVar v5.2.3
      - ✅
      -
    * - *CYP2J2*
-     - PharmVar 5.2.3
+     - PharmVar v5.2.3
      - ✅
      -
    * - *CYP2R1*
-     - PharmVar 5.2.3
+     - PharmVar v5.2.3
      - ⚠️
      - Thorough testing on the real datasets pending
    * - *CYP2S1*
-     - PharmVar 5.2.3
+     - PharmVar v5.2.3
      - ✅
      -
    * - *CYP2W1*
-     - PharmVar 5.2.3
+     - PharmVar v5.2.3
      - ⚠️
      - Thorough testing on the real datasets pending
    * - *CYP3A43*
-     - PharmVar 5.2.3
+     - PharmVar v5.2.3
      - ✅
      -
    * - *CYP3A4*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *CYP3A5*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *CYP3A7*
-     - PharmVar 5.2.3
+     - PharmVar v5.2.3
      - ✅
      -
    * - *CYP4F2*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *ABCG2*
@@ -641,7 +641,7 @@ Gene Support
      - ✅
      -
    * - *DPYD*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *G6PD*
@@ -666,11 +666,11 @@ Gene Support
      - ✅
      -
    * - *NAT2*
-     - PharmGKB (Mar 2014) and Pharmacoscan R9
+     - PharmVar v6.2.14
      - ✅
      -
    * - *NUDT15*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *RYR1*
@@ -678,7 +678,7 @@ Gene Support
      - ⚠️
      - Thorough testing on the real datasets pending
    * - *SLCO1B1*
-     - PharmVar 5.2.3
+     - PharmVar v6.2.14
      - ✅
      -
    * - *TPMT*
@@ -702,33 +702,33 @@ Gene Support
 Change log
 ==========
 
-- Aldy v4.8 (May 2025)
-   - New definitions
+- Aldy v4.8 (Jul 2025)
+   - PharmVar v6.2.14 update and new definitions
    - CPIC functionality reporting
    - indelPost version upgrade
    - Support for calling non-database novel variants (`--param novel=True`)
 
-- Aldy v4.7 (Nov 7, 2024)
+- Aldy v4.7 (Nov 2024)
    - Support for _ABCG2_, _CACNA1S_ and _RYR1_
    - Database updates (with major _UGT1A1_ update)
    - Various fixes
 
-- Aldy v4.6 (May 15, 2024)
+- Aldy v4.6 (May 2024)
    - PharmVar 6.1.2 updates (including _NAT2_ PharmVar update)
    - Support for custom structural events (partial deletions)
    - Various bug fixes
 
-- Aldy v4.5 (Nov 15, 2023)
+- Aldy v4.5 (Nov 2023)
    - Add `min_avg_coverage` parameter
    - Add `vcf_sample_idx` parameter for selecting VCF sample in multi-sample VCF
    - Database cleanup
    - Various bug fixes
 
-- Aldy v4.2 (Sep 25, 2022)
+- Aldy v4.2 (Sep 2022)
    - Fix indelpost setup errors
    - Various small fixes
 
-- Aldy v4.1 (Aug 28, 2022)
+- Aldy v4.1 (Aug 2022)
    - Output allele's activity and/or impact when available
    - Updated and tested gene definitions
      - Major changes to *NAT1*, *NAT2*, *UGT1A1*, *CYP2E1* and *CYP2A6*
@@ -737,7 +737,7 @@ Change log
    - New debug format
    - Various small fixes
 
-- Aldy v4.0 (Aug 17, 2022)
+- Aldy v4.0 (Aug 2022)
    - Major model changes
    - Phasing support
    - Long-read sequencing support (PacBio HiFi, 10X Genomics)
@@ -748,12 +748,28 @@ Change log
    - New debug format
    - Various small fixes
 
-- Aldy v3.0 (Nov 30, 2020)
+- Aldy v3.0 (Nov 2020)
    - Support for hg38
    - Support for 15+ new pharmacogenes
    - New profile format (**⚠️ WARNING:** Please make sure to re-generate custom profiles if using Aldy v2 profiles.)
    - Better genotype calling models
    - Major API changes
+
+
+Known issues and limitations
+============================
+
+- When using VCF or other data formats that do not provide read alignments, Aldy will assume that the reference genome contains the wildtype allele without any mutations (see https://github.com/0xTCG/aldy/issues/74 for details). However, in some cases, this assumption is incorrect: for example, hg19 contains *CYP2C19*\*1 and not *CYP2C19*\*38 (the wildtype allele---yes, the *CYP2C19* nomenclature is confusing). Now, if your VCF does not contain the information about \*1 allele (which it often does not as it is a match in hg19), Aldy will call \*38 instead of \*1. **I suggest using hg38 or SAM/BAMs for the best results.**
+
+    **Known problematic genes:** *CYP2C19* (\*1 vs. \*38), *CYP3A7* (\*1 vs. \*2)
+
+- Aldy might mistakenly call *CYP2D6*\*4 as *CYP2D6*\*139 due to the near-similarity of these alleles, especially when the coverage is low. I suggest double-checking any \*139 call.
+  You can track this issue here: https://github.com/0xTCG/aldy/issues/50.
+
+- *CYP2A6*\*46 is disabled and will be detected as *CYP2A6*\*1 (its previous designation) because it is solely distinguished by the *CYP2A7* 3'UTR retention. Aldy is currently unable to detect this retention.
+
+- *CYP2D7* exon 9 retention is also tricky, and sometimes it might not be detected due to low or uneven coverage when calling *CYP2D6* alleles.
+
 
 Acknowledgments
 ===============
@@ -780,3 +796,4 @@ Contact & Bug Reports
 or open a `GitHub issue <https://github.com/inumanag/aldy/issues>`_.
 
 If you have an urgent problem, I suggest using e-mail.
+GitHub issues are not constantly monitored.
