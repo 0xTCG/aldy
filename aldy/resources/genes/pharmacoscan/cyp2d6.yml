@@ -86,15 +86,15 @@ alleles:
     - [6002, A>G, rs28371704, H94R]
     - [6866, G>A, rs3892097, SpliceDefect]
     - [9200, G>C, rs1135840, S486T]
-  CYP2D6*4.1013:
-    label: CYP2D6*4N.ALDY
+  CYP2D6*4.013X:
+    label: CYP2D6*4NX
     mutations:
     - [5119, C>T, rs1065852, P34S]
     - [5992, C>A, rs28371703, L91M]
     - [6002, A>G, rs28371704, H94R]
     - [6866, G>A, rs3892097, SpliceDefect]
     - [CYP2D7, e9+]
-  CYP2D6*4.1021:
+  CYP2D6*4.021X:
     mutations:
     - [5119, C>T, rs1065852, P34S]
     - [6866, G>A, rs3892097, SpliceDefect]
@@ -258,8 +258,8 @@ alleles:
     - [ignored, 9151, A>G, rs1135835, T470A]
     - [ignored, 9175, C>T, rs28371735, H478Y]
     ignored: true
-  CYP2D6*36.1001:
-    label: CYP2D6*36.ALDY
+  CYP2D6*36.001X:
+    label: CYP2D6*36X
     mutations:
     - [5119, C>T, rs1065852, P34S]
     - [CYP2D7, e9+]
@@ -381,8 +381,8 @@ alleles:
     - [ignored, 9151, A>G, rs1135835, T470A]
     - [ignored, 9175, C>T, rs28371735, H478Y]
     ignored: true
-  CYP2D6*57.1001:
-    label: CYP2D6*57.ALDY
+  CYP2D6*57.001X:
+    label: CYP2D6*57X
     mutations:
     - [5119, C>T, rs1065852, P34S]
     - [9200, G>C, rs1135840, S486T]
@@ -516,8 +516,8 @@ alleles:
     - [ignored, 9151, A>G, rs1135835, T470A]
     - [ignored, 9175, C>T, rs28371735, H478Y]
     ignored: true
-  CYP2D6*83.1001:
-    label: CYP2D6*83.ALDY
+  CYP2D6*83.001X:
+    label: CYP2D6*83X
     mutations:
     - [9200, G>C, rs1135840, S486T]
     - [CYP2D7, e9+]
@@ -819,8 +819,8 @@ alleles:
     - [ignored, 9175, C>T, rs28371735, H478Y]
     - [ignored, 8873, G>A, rs769157652, E410K]
     ignored: true
-  CYP2D6*141.1001:
-    label: CYP2D6*141.ALDY
+  CYP2D6*141.001X:
+    label: CYP2D6*141X
     mutations:
     - [6041, C>T, rs28371706, T107I]
     - [7870, C>T, rs16947, R296C]

@@ -230,7 +230,7 @@ The summary of the calls is shown at the end of the output::
     Potential major CYP2D6 star-alleles for NA07048:
       1: 1x*1, 1x*4.021 (confidence: 100%)
       2: 1x*4, 1x*139 (confidence: 100%)
-      3: 1x*4.021.ALDY_2, 1x*74 (confidence: 100%)
+      3: 1x*4.021X2, 1x*74 (confidence: 100%)
     Best CYP2D6 star-alleles for NA07048:
       1: *1 / *4.021 (confidence=100%)
           Minor alleles: *(1.016 +rs112568578 +rs113889384 +rs28371713 +rs28633410), *(4.021 +rs28371729 -rs28371702 -rs28588594)
@@ -290,6 +290,10 @@ The columns are:
       but is found in the sample (this indicates that Aldy found a novel minor star-allele)
     + ``MISSING``: neutral variant is associated with the star-allele in the database,
       but is **NOT** found in the sample (this also indicates that Aldy found a novel minor star-allele)
+
+**Note:** All alleles ending with "X" or "XN" (where N is a digit) suffix are minor modifications of the parent database
+alleles and were added by the Aldy authors. These alleles do not exist in the source databases.
+
 
 VCF support
 -----------
@@ -532,6 +536,10 @@ Commands:
 Gene Support
 ============
 
+**Note:** All alleles ending with "X" or "XN" (where N is a digit) suffix are minor modifications of the parent database
+alleles and were added by the Aldy authors. These alleles do not exist in the source databases.
+
+
 .. list-table::
    :header-rows: 1
 
@@ -704,6 +712,7 @@ Change log
 
 - Aldy v4.8 (Jul 2025)
    - PharmVar v6.2.14 update and new definitions
+   - "ALDY" alleles renamed to "X" alleles
    - CPIC functionality reporting
    - indelPost version upgrade
    - Support for calling non-database novel variants (`--param novel=True`)

@@ -1500,10 +1500,10 @@ alleles:
     - [9421, C>T, rs28371738]
     - [9175, CA>TC, rs28371735, H478Y]
     - [9187, GC>AG, rs74478221, A482S]
-  CYP2D6*4.013_aldy:
+  CYP2D6*4.013X:
     pharmvar: https://www.pharmvar.org/haplotype/2559
     activity: none
-    label: CYP2D6*4N_aldy
+    label: CYP2D6*4NX
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
@@ -1697,7 +1697,7 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
-  CYP2D6*4.021_aldy:
+  CYP2D6*4.021X:
     pharmvar: https://www.pharmvar.org/haplotype/2566
     activity: none
     evidence: D
@@ -1719,8 +1719,8 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9421, C>T, rs28371738]
     - [CYP2D7, e9+]
-    label: CYP2D6*4.021_aldy
-  CYP2D6*4.021_aldy.2:
+    label: CYP2D6*4.021X
+  CYP2D6*4.021X2:
     pharmvar: https://www.pharmvar.org/haplotype/2566
     activity: none
     evidence: D
@@ -1741,7 +1741,7 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
-    label: CYP2D6*4.021_aldy.2
+    label: CYP2D6*4.021X2
   CYP2D6*4.022:
     pharmvar: https://www.pharmvar.org/haplotype/2567
     activity: none
@@ -2085,16 +2085,6 @@ alleles:
     - [6266, C>T, rs267608277]
     - [6727, delT, rs5030655, W152fs]
     - [6996, G>A, rs5030866, G212E]
-  CYP2D6*6.005_aldy:
-    pharmvar: https://www.pharmvar.org/haplotype/383
-    activity: none
-    evidence: D
-    mutations:
-    - [6266, C>T, rs267608277]
-    - [6727, delT, rs5030655, W152fs]
-    - [6996, G>A, rs5030866, G212E]
-    - [6996, G>A, rs5030866, G212E]
-    label: CYP2D6*6.005_aldy
   CYP2D6*6.006:
     pharmvar: https://www.pharmvar.org/haplotype/1410
     activity: none
@@ -3167,10 +3157,10 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9175, CA>TC, rs28371735, H478Y]
     - [9187, GC>AG, rs74478221, A482S]
-  CYP2D6*36.001_aldy:
+  CYP2D6*36.001X:
     pharmvar: https://www.pharmvar.org/haplotype/2597
     activity: none
-    label: CYP2D6*36_aldy
+    label: CYP2D6*36X
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
@@ -4428,9 +4418,9 @@ alleles:
     - [9464, A>G, rs148648640]
     - [9175, CA>TC, rs28371735, H478Y]
     - [9187, GC>AG, rs74478221, A482S]
-  CYP2D6*83.003_aldy:
+  CYP2D6*83.003X:
     activity: unknown
-    label: CYP2D6*83_aldy
+    label: CYP2D6*83X
     evidence: D
     mutations:
     - [5861, T>G, rs28371702]
@@ -5396,7 +5386,7 @@ alleles:
     - [9414, delAG, rs202032066]
     - [9175, CA>TC, rs28371735, H478Y]
     - [9187, GC>AG, rs74478221, A482S]
-  CYP2D6*141.001_aldy:
+  CYP2D6*141.001X:
     pharmvar: https://www.pharmvar.org/haplotype/2390
     activity: unknown
     evidence: D
@@ -5422,7 +5412,7 @@ alleles:
     - [8873, G>A, rs769157652, E410K]
     - [9414, delAG, rs202032066]
     - [CYP2D7, e9+]
-    label: CYP2D6*141.001_aldy
+    label: CYP2D6*141.001X
   CYP2D6*142.001:
     pharmvar: https://www.pharmvar.org/haplotype/1439
     activity: unknown

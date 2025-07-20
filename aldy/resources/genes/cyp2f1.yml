@@ -35,8 +35,8 @@ alleles:
     - [13325, T>G, rs305975]
     - [16051, C>T, rs201789202]
     - [16063, C>A, rs305978]
-  CYP2F1*2.1003:
-    label: CYP2F1*2.ALDY
+  CYP2F1*2.003X:
+    label: CYP2F1*2X
     mutations:
     - [4701, G>A, rs35107873]
     - [4709, delC, rs34903717]
