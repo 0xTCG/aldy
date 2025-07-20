@@ -1,6 +1,6 @@
 name: DPYD
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 1409
 ensembl: ENSG00000188641
 alleles:
@@ -38,24 +38,24 @@ alleles:
     mutations:
     - [620696, G>A, rs1801160, V732I]
   DPYD*7:
-    pharmvar: https://www.pharmvar.org/haplotype/1589
+    pharmvar: https://www.pharmvar.org/haplotype/2265
     activity: none
     label: DPYD*7
     mutations:
-    - [185646, delTCAT, rs72549309, F100Sfs]
+    - [185646, delTCAT, rs72549309]
   DPYD*8:
     pharmvar: https://www.pharmvar.org/haplotype/911
     activity: none
     label: DPYD*8
     mutations:
     - [234284, C>T, rs1801266, R235W]
-  DPYD*9.001:
+  DPYD*9A:
     pharmvar: https://www.pharmvar.org/haplotype/910
     activity: normal
     label: DPYD*9A
     mutations:
     - [42731, T>C, rs1801265, C29R]
-  DPYD*9.002:
+  DPYD*9B:
     pharmvar: https://www.pharmvar.org/haplotype/912
     activity: normal
     label: DPYD*9B
@@ -88,12 +88,10 @@ alleles:
   DPYD*HapB3:
     pharmvar: https://www.pharmvar.org/haplotype/1077
     activity: decreased
+    label: HapB3
     mutations:
-    - [346167, C>G, rs75017182, intronic]
-    - [352197, G>A, rs56038477, intronic]
-  DPYD*HapB3_Alt:
-    mutations:
-    - [346167, C>G, rs75017182, intronic]
+    - [346167, C>G, rs75017182, splice defect]
+    - [352197, G>A, rs56038477]
   DPYD*rs2297595:
     pharmvar: https://www.pharmvar.org/haplotype/943
     activity: normal
@@ -101,12 +99,12 @@ alleles:
     - [226525, A>G, rs2297595, M166V]
   DPYD*rs3918289:
     pharmvar: https://www.pharmvar.org/haplotype/982
-    activity: unknown
+    activity: normal
     mutations:
     - [476001, C>G, rs3918289, N635K]
   DPYD*rs6670886:
     pharmvar: https://www.pharmvar.org/haplotype/1020
-    activity: unknown
+    activity: normal
     mutations:
     - [226554, G>A, rs6670886, S175S]
   DPYD*rs17376848:
@@ -116,12 +114,12 @@ alleles:
     - [475992, T>C, rs17376848, F632F]
   DPYD*rs45589337:
     pharmvar: https://www.pharmvar.org/haplotype/984
-    activity: unknown
+    activity: normal
     mutations:
     - [246890, A>G, rs45589337, K259E]
   DPYD*rs55674432:
     pharmvar: https://www.pharmvar.org/haplotype/996
-    activity: unknown
+    activity: none
     mutations:
     - [827444, G>T, rs55674432, G880V]
   DPYD*rs55886062.2:
@@ -131,32 +129,32 @@ alleles:
     - [410273, T>A, rs55886062, I560N]
   DPYD*rs55971861:
     pharmvar: https://www.pharmvar.org/haplotype/1003
-    activity: unknown
+    activity: normal
     mutations:
     - [543599, A>C, rs55971861, I636L]
   DPYD*rs56005131:
     pharmvar: https://www.pharmvar.org/haplotype/1004
-    activity: unknown
+    activity: normal
     mutations:
     - [691069, C>A, rs56005131, T768K]
   DPYD*rs57918000:
     pharmvar: https://www.pharmvar.org/haplotype/1014
-    activity: unknown
+    activity: normal
     mutations:
     - [376347, C>T, rs57918000, N457N]
   DPYD*rs59086055:
     pharmvar: https://www.pharmvar.org/haplotype/1015
-    activity: unknown
+    activity: none
     mutations:
     - [475870, C>T, rs59086055, R592W]
   DPYD*rs60139309:
     pharmvar: https://www.pharmvar.org/haplotype/1016
-    activity: unknown
+    activity: normal
     mutations:
     - [732951, A>G, rs60139309, K861R]
   DPYD*rs60511679:
     pharmvar: https://www.pharmvar.org/haplotype/1017
-    activity: unknown
+    activity: normal
     mutations:
     - [620697, T>G, rs60511679, V732G]
   DPYD*rs61622928:
@@ -176,22 +174,22 @@ alleles:
     - [843669, A>T, rs67376798, D949V]
   DPYD*rs72547601:
     pharmvar: https://www.pharmvar.org/haplotype/1032
-    activity: unknown
+    activity: none
     mutations:
     - [846939, A>G, rs72547601, H978R]
   DPYD*rs72547602:
     pharmvar: https://www.pharmvar.org/haplotype/1033
-    activity: unknown
+    activity: normal
     mutations:
     - [846927, A>T, rs72547602, D974V]
   DPYD*rs72549304:
     pharmvar: https://www.pharmvar.org/haplotype/1035
-    activity: unknown
+    activity: none
     mutations:
     - [376451, C>T, rs72549304, S492L]
   DPYD*rs72549305:
     pharmvar: https://www.pharmvar.org/haplotype/1036
-    activity: unknown
+    activity: normal
     mutations:
     - [332822, A>G, rs72549305, I370V]
   DPYD*rs72549306.2:
@@ -201,12 +199,12 @@ alleles:
     - [332717, G>A, rs72549306, V335M]
   DPYD*rs72549307:
     pharmvar: https://www.pharmvar.org/haplotype/1039
-    activity: unknown
+    activity: none
     mutations:
     - [226661, A>G, rs72549307, Y211C]
   DPYD*rs72549308:
     pharmvar: https://www.pharmvar.org/haplotype/1040
-    activity: unknown
+    activity: none
     mutations:
     - [226630, A>C, rs72549308, S201R]
   DPYD*rs72549310:
@@ -216,7 +214,7 @@ alleles:
     - [42707, C>T, rs72549310, R21X]
   DPYD*rs72975710.1:
     pharmvar: https://www.pharmvar.org/haplotype/1043
-    activity: unknown
+    activity: normal
     mutations:
     - [376325, C>T, rs72975710, A450V]
   DPYD*rs72975710.2:
@@ -231,12 +229,12 @@ alleles:
     - [42708, G>A, rs80081766, R21Q]
   DPYD*rs111858276:
     pharmvar: https://www.pharmvar.org/haplotype/857
-    activity: unknown
+    activity: none
     mutations:
     - [376460, A>G, rs111858276, D495G]
   DPYD*rs112766203.1:
     pharmvar: https://www.pharmvar.org/haplotype/858
-    activity: unknown
+    activity: decreased
     mutations:
     - [620781, C>T, rs112766203, T760I]
   DPYD*rs112766203.2:
@@ -246,7 +244,7 @@ alleles:
     - [620781, C>G, rs112766203, T760S]
   DPYD*rs114096998.1:
     pharmvar: https://www.pharmvar.org/haplotype/860
-    activity: unknown
+    activity: normal
     mutations:
     - [847073, C>A, rs114096998, P1023T]
   DPYD*rs114096998.2:
@@ -271,32 +269,32 @@ alleles:
     - [843629, G>T, rs137878450, G936C]
   DPYD*rs137999090:
     pharmvar: https://www.pharmvar.org/haplotype/866
-    activity: unknown
+    activity: none
     mutations:
     - [552462, G>A, rs137999090, G674D]
   DPYD*rs138391898:
     pharmvar: https://www.pharmvar.org/haplotype/867
-    activity: unknown
+    activity: normal
     mutations:
     - [376495, G>A, rs138391898, V507I]
   DPYD*rs138545885:
     pharmvar: https://www.pharmvar.org/haplotype/868
-    activity: unknown
+    activity: normal
     mutations:
     - [552431, G>T, rs138545885, A664S]
   DPYD*rs138616379:
     pharmvar: https://www.pharmvar.org/haplotype/869
-    activity: unknown
+    activity: none
     mutations:
     - [475871, G>A, rs138616379, R592Q]
   DPYD*rs139459586:
     pharmvar: https://www.pharmvar.org/haplotype/870
-    activity: unknown
+    activity: normal
     mutations:
     - [846984, T>G, rs139459586, L993R]
   DPYD*rs139834141:
     pharmvar: https://www.pharmvar.org/haplotype/871
-    activity: unknown
+    activity: normal
     mutations:
     - [226527, G>A, rs139834141, M166I]
   DPYD*rs140039091:
@@ -306,12 +304,12 @@ alleles:
     - [410239, G>C, rs140039091, A549P]
   DPYD*rs140114515:
     pharmvar: https://www.pharmvar.org/haplotype/873
-    activity: unknown
+    activity: normal
     mutations:
     - [847055, G>A, rs140114515, V1017I]
   DPYD*rs140602333:
     pharmvar: https://www.pharmvar.org/haplotype/874
-    activity: unknown
+    activity: normal
     mutations:
     - [352141, C>T, rs140602333, R394W]
   DPYD*rs140989814:
@@ -321,7 +319,7 @@ alleles:
     - [846987, G>C, rs140989814, S994T]
   DPYD*rs141044036:
     pharmvar: https://www.pharmvar.org/haplotype/876
-    activity: unknown
+    activity: none
     mutations:
     - [843695, A>G, rs141044036, K958E]
   DPYD*rs141439344:
@@ -331,7 +329,7 @@ alleles:
     - [376423, G>A, rs141439344, V483I]
   DPYD*rs141462178:
     pharmvar: https://www.pharmvar.org/haplotype/878
-    activity: unknown
+    activity: normal
     mutations:
     - [204410, A>G, rs141462178, M115V]
   DPYD*rs141726921:
@@ -341,22 +339,22 @@ alleles:
     - [246887, G>A, rs141726921, G258S]
   DPYD*rs142512579:
     pharmvar: https://www.pharmvar.org/haplotype/880
-    activity: unknown
+    activity: normal
     mutations:
     - [352255, G>A, rs142512579, D432N]
   DPYD*rs142619737:
     pharmvar: https://www.pharmvar.org/haplotype/881
-    activity: unknown
+    activity: normal
     mutations:
     - [410209, G>A, rs142619737, G539R]
   DPYD*rs143154602:
     pharmvar: https://www.pharmvar.org/haplotype/882
-    activity: unknown
+    activity: none
     mutations:
     - [332771, C>T, rs143154602, R353C]
   DPYD*rs143815742.1:
     pharmvar: https://www.pharmvar.org/haplotype/883
-    activity: unknown
+    activity: normal
     mutations:
     - [352142, G>T, rs143815742, R394L]
   DPYD*rs143815742.2:
@@ -381,7 +379,7 @@ alleles:
     - [185621, C>G, rs143986398, P92A]
   DPYD*rs144395748.1:
     pharmvar: https://www.pharmvar.org/haplotype/888
-    activity: unknown
+    activity: normal
     mutations:
     - [376334, C>G, rs144395748, P453R]
   DPYD*rs144395748.2:
@@ -396,62 +394,62 @@ alleles:
     - [352090, A>G, rs144935781, M377V]
   DPYD*rs145112791:
     pharmvar: https://www.pharmvar.org/haplotype/891
-    activity: unknown
+    activity: normal
     mutations:
     - [330977, C>T, rs145112791, L312F]
   DPYD*rs145529148:
     pharmvar: https://www.pharmvar.org/haplotype/892
-    activity: unknown
+    activity: normal
     mutations:
     - [846921, A>G, rs145529148, Q972R]
   DPYD*rs145548112:
     pharmvar: https://www.pharmvar.org/haplotype/893
-    activity: unknown
+    activity: normal
     mutations:
     - [619865, G>A, rs145548112, A721T]
   DPYD*rs145773863:
     pharmvar: https://www.pharmvar.org/haplotype/894
-    activity: unknown
+    activity: none
     mutations:
     - [475873, G>A, rs145773863, G593R]
   DPYD*rs146356975:
     pharmvar: https://www.pharmvar.org/haplotype/895
-    activity: unknown
+    activity: decreased
     mutations:
     - [330911, A>G, rs146356975, K290E]
   DPYD*rs146529561:
     pharmvar: https://www.pharmvar.org/haplotype/896
-    activity: unknown
+    activity: normal
     mutations:
     - [620688, C>T, rs146529561, A729V]
   DPYD*rs147545709:
     pharmvar: https://www.pharmvar.org/haplotype/897
-    activity: unknown
+    activity: normal
     mutations:
     - [827461, C>T, rs147545709, R886C]
   DPYD*rs147601618:
     pharmvar: https://www.pharmvar.org/haplotype/898
-    activity: unknown
+    activity: normal
     mutations:
     - [475892, T>C, rs147601618, M599T]
   DPYD*rs148799944:
     pharmvar: https://www.pharmvar.org/haplotype/899
-    activity: unknown
+    activity: normal
     mutations:
     - [847067, G>C, rs148799944, V1021L]
   DPYD*rs148994843:
     pharmvar: https://www.pharmvar.org/haplotype/900
-    activity: unknown
+    activity: normal
     mutations:
     - [410137, G>A, rs148994843, V515I]
   DPYD*rs150036960:
     pharmvar: https://www.pharmvar.org/haplotype/901
-    activity: unknown
+    activity: normal
     mutations:
     - [42692, C>G, rs150036960, L16V]
   DPYD*rs150385342.1:
     pharmvar: https://www.pharmvar.org/haplotype/902
-    activity: unknown
+    activity: normal
     mutations:
     - [185660, G>A, rs150385342, A105T]
   DPYD*rs150385342.2:
@@ -461,7 +459,7 @@ alleles:
     - [185660, G>T, rs150385342, A105S]
   DPYD*rs150437414:
     pharmvar: https://www.pharmvar.org/haplotype/904
-    activity: unknown
+    activity: normal
     mutations:
     - [330972, T>C, rs150437414, L310S]
   DPYD*rs151074666:
@@ -476,12 +474,12 @@ alleles:
     - [330953, T>C, rs183105782, Y304H]
   DPYD*rs183385770:
     pharmvar: https://www.pharmvar.org/haplotype/915
-    activity: unknown
+    activity: none
     mutations:
     - [332738, G>A, rs183385770, D342N]
   DPYD*rs186169810:
     pharmvar: https://www.pharmvar.org/haplotype/916
-    activity: unknown
+    activity: decreased
     mutations:
     - [352275, T>G, rs186169810, F438L]
   DPYD*rs187713395:
@@ -501,17 +499,17 @@ alleles:
     - [332768, C>G, rs190577302, L352V]
   DPYD*rs190951787:
     pharmvar: https://www.pharmvar.org/haplotype/920
-    activity: unknown
+    activity: normal
     mutations:
     - [410171, C>G, rs190951787, T526S]
   DPYD*rs199549923:
     pharmvar: https://www.pharmvar.org/haplotype/921
-    activity: unknown
+    activity: normal
     mutations:
     - [376379, C>A, rs199549923, T468N]
   DPYD*rs199634007:
     pharmvar: https://www.pharmvar.org/haplotype/922
-    activity: unknown
+    activity: normal
     mutations:
     - [691102, C>A, rs199634007, T779N]
   DPYD*rs199646142:
@@ -526,7 +524,7 @@ alleles:
     - [732854, G>A, rs199777072, D829N]
   DPYD*rs200064537:
     pharmvar: https://www.pharmvar.org/haplotype/925
-    activity: unknown
+    activity: normal
     mutations:
     - [352221, T>A, rs200064537, N420K]
   DPYD*rs200296941:
@@ -536,7 +534,7 @@ alleles:
     - [475997, A>G, rs200296941, D634G]
   DPYD*rs200562975:
     pharmvar: https://www.pharmvar.org/haplotype/927
-    activity: unknown
+    activity: normal
     mutations:
     - [204518, A>G, rs200562975, N151D]
   DPYD*rs200643089:
@@ -546,7 +544,7 @@ alleles:
     - [691090, T>G, rs200643089, L775W]
   DPYD*rs200687447.1:
     pharmvar: https://www.pharmvar.org/haplotype/929
-    activity: unknown
+    activity: normal
     mutations:
     - [732851, G>A, rs200687447, E828K]
   DPYD*rs200687447.2:
@@ -566,12 +564,12 @@ alleles:
     - [352298, A>C, rs200709381, K446T]
   DPYD*rs201018345:
     pharmvar: https://www.pharmvar.org/haplotype/933
-    activity: unknown
+    activity: normal
     mutations:
     - [332681, G>A, rs201018345, A323T]
   DPYD*rs201035051:
     pharmvar: https://www.pharmvar.org/haplotype/934
-    activity: unknown
+    activity: normal
     mutations:
     - [827428, A>C, rs201035051, K875Q]
   DPYD*rs201268750:
@@ -586,7 +584,7 @@ alleles:
     - [475961, G>A, rs201433243, C622Y]
   DPYD*rs201615754.1:
     pharmvar: https://www.pharmvar.org/haplotype/937
-    activity: unknown
+    activity: normal
     mutations:
     - [410276, G>T, rs201615754, R561L]
   DPYD*rs201615754.2:
@@ -606,7 +604,7 @@ alleles:
     - [332834, C>T, rs201785202, P374S]
   DPYD*rs202144771:
     pharmvar: https://www.pharmvar.org/haplotype/941
-    activity: unknown
+    activity: normal
     mutations:
     - [846983, C>T, rs202144771, L993F]
   DPYD*rs202212118:
@@ -919,8 +917,8 @@ alleles:
     activity: unknown
     mutations:
     - [352118, A>T, rs576409484, E386V]
-  DPYD*rs672601273:
-    pharmvar: https://www.pharmvar.org/haplotype/1021
+  DPYD*rs672601273.1:
+    pharmvar: https://www.pharmvar.org/haplotype/1022
     activity: unknown
     mutations:
     - [846993, G>T, rs672601273, C996F]
@@ -1651,7 +1649,7 @@ alleles:
     - [226618, C>A, rs764635955, P197T]
   DPYD*rs764666241:
     pharmvar: https://www.pharmvar.org/haplotype/1183
-    activity: unknown
+    activity: normal
     mutations:
     - [352239, G>T, rs764666241, M426I]
   DPYD*rs764679468:
@@ -1989,6 +1987,11 @@ alleles:
     activity: unknown
     mutations:
     - [619841, A>G, rs773407491, N713D]
+  DPYD*rs773499329:
+    pharmvar: https://www.pharmvar.org/haplotype/2494
+    activity: unknown
+    mutations:
+    - [552484, delCCTGGCCTGTGGGCAG, rs773499329, L682fs]
   DPYD*rs773584401:
     pharmvar: https://www.pharmvar.org/haplotype/1251
     activity: unknown
@@ -2400,10 +2403,7 @@ reference:
   - [843589, 843730]
   - [846913, 847084]
   cpic:
-    scores:
-      normal: 1.0
-      none: 0.0
-      decreased: 0.5
+    scores: {normal: 1.0, none: 0.0, decreased: 0.5}
     conditions:
       poor: [0, 0.5]
       intermediate: [0.51, 1.5]

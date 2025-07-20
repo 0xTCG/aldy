@@ -1,7 +1,6 @@
 name: CYP2D6
-version: pharmvar-6.1.2
-generated: '2024-05-14'
-notes: CPIC
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 33529
 ensembl: ENSG00000100197
 alleles:
@@ -132,12 +131,6 @@ alleles:
     evidence: D
     mutations:
     - [5289, C>T, rs29001678]
-  CYP2D6*1.019:
-    pharmvar: https://www.pharmvar.org/haplotype/660
-    activity: normal
-    evidence: D
-    mutations:
-    - [3926, insA, rs375413467]
   CYP2D6*1.020:
     pharmvar: https://www.pharmvar.org/haplotype/676
     activity: normal
@@ -282,11 +275,10 @@ alleles:
     - [6085, T>G, rs78854695]
     - [6105, C>T, rs770138443]
   CYP2D6*1.040:
-    pharmvar: https://www.pharmvar.org/haplotype/1369
+    pharmvar: https://www.pharmvar.org/haplotype/2535
     activity: normal
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5233, G>C, rs1080995]
     - [5240, C>A, rs1080996]
@@ -364,14 +356,138 @@ alleles:
     mutations:
     - [4976, insG, rs28371695]
     - [8655, C>T, rs530299539]
+  CYP2D6*1.050:
+    pharmvar: https://www.pharmvar.org/haplotype/2170
+    activity: normal
+    evidence: D
+    mutations:
+    - [7061, G>C, rs778008161]
+  CYP2D6*1.051:
+    pharmvar: https://www.pharmvar.org/haplotype/2171
+    activity: normal
+    evidence: D
+    mutations:
+    - [7238, G>C, '-']
+  CYP2D6*1.052:
+    pharmvar: https://www.pharmvar.org/haplotype/2172
+    activity: normal
+    evidence: D
+    mutations:
+    - [8376, G>A, rs376909251]
+  CYP2D6*1.053:
+    pharmvar: https://www.pharmvar.org/haplotype/2173
+    activity: normal
+    evidence: D
+    mutations:
+    - [8406, insAGCACC, '-']
+  CYP2D6*1.054:
+    pharmvar: https://www.pharmvar.org/haplotype/2174
+    activity: normal
+    evidence: D
+    mutations:
+    - [5764, C>G, rs28371701]
+    - [8404, A>C, rs1985842]
+  CYP2D6*1.055:
+    pharmvar: https://www.pharmvar.org/haplotype/2175
+    activity: normal
+    evidence: D
+    mutations:
+    - [7018, T>C, rs28371713]
+  CYP2D6*1.056:
+    pharmvar: https://www.pharmvar.org/haplotype/2182
+    activity: normal
+    evidence: D
+    mutations:
+    - [4976, insG, rs28371695]
+    - [5352, A>G, rs546029764]
+  CYP2D6*1.057:
+    pharmvar: https://www.pharmvar.org/haplotype/2183
+    activity: normal
+    evidence: D
+    mutations:
+    - [4976, insG, rs28371695]
+    - [5720, delTG, '-']
+  CYP2D6*1.058:
+    pharmvar: https://www.pharmvar.org/haplotype/2303
+    activity: normal
+    evidence: D
+    mutations:
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+  CYP2D6*1.059:
+    pharmvar: https://www.pharmvar.org/haplotype/2304
+    activity: normal
+    evidence: D
+    mutations:
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+    - [7651, C>T, rs77562994]
+  CYP2D6*1.060:
+    pharmvar: https://www.pharmvar.org/haplotype/2306
+    activity: normal
+    evidence: D
+    mutations:
+    - [4623, G>T, rs769811346]
+  CYP2D6*1.061:
+    pharmvar: https://www.pharmvar.org/haplotype/2307
+    activity: normal
+    evidence: D
+    mutations:
+    - [6188, G>A, rs1081004]
+    - [7018, T>C, rs28371713]
+  CYP2D6*1.062:
+    pharmvar: https://www.pharmvar.org/haplotype/2308
+    activity: normal
+    evidence: D
+    mutations:
+    - [4341, C>T, rs545334485]
+  CYP2D6*1.063:
+    pharmvar: https://www.pharmvar.org/haplotype/2309
+    activity: normal
+    evidence: D
+    mutations:
+    - [6089, delG, rs751396592]
+  CYP2D6*1.065:
+    pharmvar: https://www.pharmvar.org/haplotype/2521
+    activity: normal
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7162, delAAG, rs529375661]
+  CYP2D6*1.066:
+    pharmvar: https://www.pharmvar.org/haplotype/2829
+    activity: normal
+    evidence: D
+    mutations:
+    - [7162, delAAG, rs529375661]
+  CYP2D6*1.067:
+    pharmvar: https://www.pharmvar.org/haplotype/2830
+    activity: normal
+    evidence: D
+    mutations:
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+    - [6085, T>G, rs78854695]
+    - [8741, delGT, rs542160647]
   CYP2D6*2.001:
-    pharmvar: https://www.pharmvar.org/haplotype/129
+    pharmvar: https://www.pharmvar.org/haplotype/2536
     activity: normal
     label: CYP2D6*2A
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -420,13 +536,12 @@ alleles:
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*2.005:
-    pharmvar: https://www.pharmvar.org/haplotype/836
+    pharmvar: https://www.pharmvar.org/haplotype/2537
     activity: normal
     label: CYP2D6*2E
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4036, G>A, rs567431353]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
@@ -480,23 +595,39 @@ alleles:
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*2.009:
-    pharmvar: https://www.pharmvar.org/haplotype/143
+    pharmvar: https://www.pharmvar.org/haplotype/2838
     activity: normal
     label: CYP2D6*2K
-    evidence: L
+    evidence: D
     mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
     - [6681, G>C, rs1058164]
     - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
     - [9135, C>T, rs150445731]
     - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
   CYP2D6*2.010:
-    pharmvar: https://www.pharmvar.org/haplotype/145
+    pharmvar: https://www.pharmvar.org/haplotype/2538
     activity: normal
     label: CYP2D6*2L
-    evidence: L
+    evidence: D
     mutations:
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5329, G>T, rs28371699]
     - [5764, C>G, rs28371701]
@@ -510,12 +641,11 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*2.011:
-    pharmvar: https://www.pharmvar.org/haplotype/144
+    pharmvar: https://www.pharmvar.org/haplotype/2539
     activity: normal
     label: CYP2D6*2M
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4270, delGA, rs536645539]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
@@ -537,12 +667,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.012:
-    pharmvar: https://www.pharmvar.org/haplotype/390
+    pharmvar: https://www.pharmvar.org/haplotype/2540
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -564,12 +693,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.013:
-    pharmvar: https://www.pharmvar.org/haplotype/389
+    pharmvar: https://www.pharmvar.org/haplotype/2541
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -611,12 +739,11 @@ alleles:
     - [8968, T>C, rs968226569]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*2.015:
-    pharmvar: https://www.pharmvar.org/haplotype/641
+    pharmvar: https://www.pharmvar.org/haplotype/2542
     activity: normal
     evidence: D
     mutations:
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5329, G>T, rs28371699]
     - [5764, C>G, rs28371701]
@@ -628,12 +755,11 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*2.016:
-    pharmvar: https://www.pharmvar.org/haplotype/640
+    pharmvar: https://www.pharmvar.org/haplotype/2543
     activity: normal
     evidence: D
     mutations:
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5329, G>T, rs28371699]
     - [5764, C>G, rs28371701]
@@ -646,11 +772,10 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*2.017:
-    pharmvar: https://www.pharmvar.org/haplotype/835
+    pharmvar: https://www.pharmvar.org/haplotype/2544
     activity: normal
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -673,12 +798,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.018:
-    pharmvar: https://www.pharmvar.org/haplotype/834
+    pharmvar: https://www.pharmvar.org/haplotype/2545
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -700,11 +824,10 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.019:
-    pharmvar: https://www.pharmvar.org/haplotype/837
+    pharmvar: https://www.pharmvar.org/haplotype/2546
     activity: normal
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -725,12 +848,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.020:
-    pharmvar: https://www.pharmvar.org/haplotype/833
+    pharmvar: https://www.pharmvar.org/haplotype/2547
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [4697, T>C, rs572914357]
@@ -752,13 +874,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.021:
-    pharmvar: https://www.pharmvar.org/haplotype/832
+    pharmvar: https://www.pharmvar.org/haplotype/2529
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
-    - [3922, A>G, rs1332990859]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -776,12 +896,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.022:
-    pharmvar: https://www.pharmvar.org/haplotype/1366
+    pharmvar: https://www.pharmvar.org/haplotype/2548
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -804,11 +923,10 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.023:
-    pharmvar: https://www.pharmvar.org/haplotype/1370
+    pharmvar: https://www.pharmvar.org/haplotype/2549
     activity: normal
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5233, G>C, rs1080995]
     - [5240, C>A, rs1080996]
@@ -833,12 +951,11 @@ alleles:
     - [9048, C>A, rs548264542]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*2.024:
-    pharmvar: https://www.pharmvar.org/haplotype/1363
+    pharmvar: https://www.pharmvar.org/haplotype/2550
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -902,12 +1019,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.027:
-    pharmvar: https://www.pharmvar.org/haplotype/1392
+    pharmvar: https://www.pharmvar.org/haplotype/2551
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -929,11 +1045,10 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*2.028:
-    pharmvar: https://www.pharmvar.org/haplotype/1393
+    pharmvar: https://www.pharmvar.org/haplotype/2552
     activity: normal
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4325, delTGTG, rs534009571]
     - [5233, G>C, rs1080995]
@@ -954,12 +1069,29 @@ alleles:
     - [8604, G>A, rs28371730]
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
-  CYP2D6*2.030:
-    pharmvar: https://www.pharmvar.org/haplotype/1980
+  CYP2D6*2.029:
+    pharmvar: https://www.pharmvar.org/haplotype/2208
     activity: normal
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
+    - [3722, G>A, rs59099247]
+    - [4280, C>T, rs28624811]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7298, G>A, rs184517596]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9053, C>T, rs377590656]
+    - [9200, G>C, rs1135840, S486T]
+  CYP2D6*2.030:
+    pharmvar: https://www.pharmvar.org/haplotype/2553
+    activity: normal
+    evidence: D
+    mutations:
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -973,6 +1105,163 @@ alleles:
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
     - [6597, C>T, rs574423474]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*2.031:
+    pharmvar: https://www.pharmvar.org/haplotype/2554
+    activity: normal
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7298, G>A, rs184517596]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [8887, C>T, rs1037093492]
+    - [9200, G>C, rs1135840, S486T]
+  CYP2D6*2.032:
+    pharmvar: https://www.pharmvar.org/haplotype/2555
+    activity: normal
+    evidence: D
+    mutations:
+    - [3722, G>A, rs59099247]
+    - [4280, C>T, rs28624811]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7298, G>A, rs184517596]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8417, C>A, rs369465929]
+    - [8604, G>A, rs28371730]
+    - [8655, C>T, rs530299539]
+    - [8810, C>T, rs4987144]
+    - [9053, C>T, rs377590656]
+    - [9200, G>C, rs1135840, S486T]
+  CYP2D6*2.033:
+    pharmvar: https://www.pharmvar.org/haplotype/2305
+    activity: normal
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4882, A>G, rs267608272]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*2.034:
+    pharmvar: https://www.pharmvar.org/haplotype/2556
+    activity: normal
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6375, T>C, rs184086520]
+    - [6508, A>C, rs142302759]
+    - [6681, G>C, rs1058164]
+    - [7681, G>A, rs28371721]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9048, C>A, rs548264542]
+    - [9200, G>C, rs1135840, S486T]
+  CYP2D6*2.035:
+    pharmvar: https://www.pharmvar.org/haplotype/2885
+    activity: normal
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5421, C>T, rs542260394]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*2.036:
+    pharmvar: https://www.pharmvar.org/haplotype/2832
+    activity: normal
+    evidence: D
+    mutations:
+    - [3564, C>T, rs538851378]
+    - [3722, G>A, rs59099247]
+    - [4280, C>T, rs28624811]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+  CYP2D6*2.037:
+    pharmvar: https://www.pharmvar.org/haplotype/2886
+    activity: normal
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6533, C>T, rs67497403]
     - [6681, G>C, rs1058164]
     - [7870, C>T, rs16947, R296C]
     - [8404, A>C, rs1985842]
@@ -995,14 +1284,20 @@ alleles:
     mutations:
     - [6769, A>G, rs1135824, N166D]
     - [7569, delA, rs35742686, R259fs]
+  CYP2D6*3.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2310
+    activity: none
+    evidence: D
+    mutations:
+    - [5217, G>A, rs201475960]
+    - [7569, delA, rs35742686, R259fs]
   CYP2D6*4.001:
-    pharmvar: https://www.pharmvar.org/haplotype/235
+    pharmvar: https://www.pharmvar.org/haplotype/2557
     activity: none
     label: CYP2D6*4A
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1099,19 +1394,28 @@ alleles:
     - [7958, C>T, rs140513104, P325L]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*4.008:
-    pharmvar: https://www.pharmvar.org/haplotype/251
+    pharmvar: https://www.pharmvar.org/haplotype/2884
     activity: none
     label: CYP2D6*4H
-    evidence: L
+    evidence: D
     mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
     - [5992, C>A, rs28371703, L91M]
     - [6002, A>G, rs28371704, H94R]
     - [6015, C>G, rs28371705]
     - [6681, G>C, rs1058164]
     - [6866, G>A, rs3892097, splice defect]
+    - [7117, A>G, rs2267447]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
     - [8897, G>C, rs28371733]
     - [9200, G>C, rs1135840, S486T]
+    - [9421, C>T, rs28371738]
   CYP2D6*4.009:
     pharmvar: https://www.pharmvar.org/haplotype/253
     activity: none
@@ -1147,12 +1451,11 @@ alleles:
     - [6866, G>A, rs3892097, splice defect]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*4.012:
-    pharmvar: https://www.pharmvar.org/haplotype/247
+    pharmvar: https://www.pharmvar.org/haplotype/2558
     activity: none
     label: CYP2D6*4M
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
     - [5992, C>A, rs28371703, L91M]
@@ -1165,13 +1468,12 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9421, C>T, rs28371738]
   CYP2D6*4.013:
-    pharmvar: https://www.pharmvar.org/haplotype/250
+    pharmvar: https://www.pharmvar.org/haplotype/2559
     activity: none
     label: CYP2D6*4N
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1189,23 +1491,44 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
+  CYP2D6*4.013_aldy:
+    pharmvar: https://www.pharmvar.org/haplotype/2559
+    activity: none
+    label: CYP2D6*4N_aldy
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [5992, C>A, rs28371703, L91M]
+    - [6002, A>G, rs28371704, H94R]
+    - [6015, C>G, rs28371705]
+    - [6681, G>C, rs1058164]
+    - [6866, G>A, rs3892097, splice defect]
+    - [7117, A>G, rs2267447]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [9421, C>T, rs28371738]
+    - [CYP2D7, e9+]
   CYP2D6*4.014:
-    pharmvar: https://www.pharmvar.org/haplotype/243
+    pharmvar: https://www.pharmvar.org/haplotype/2560
     activity: none
     label: CYP2D6*4P
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1224,12 +1547,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.015:
-    pharmvar: https://www.pharmvar.org/haplotype/387
+    pharmvar: https://www.pharmvar.org/haplotype/2561
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1247,12 +1569,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.016:
-    pharmvar: https://www.pharmvar.org/haplotype/386
+    pharmvar: https://www.pharmvar.org/haplotype/2562
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1292,12 +1613,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.018:
-    pharmvar: https://www.pharmvar.org/haplotype/423
+    pharmvar: https://www.pharmvar.org/haplotype/2563
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1315,12 +1635,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.019:
-    pharmvar: https://www.pharmvar.org/haplotype/1800
+    pharmvar: https://www.pharmvar.org/haplotype/2564
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1335,12 +1654,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.020:
-    pharmvar: https://www.pharmvar.org/haplotype/655
+    pharmvar: https://www.pharmvar.org/haplotype/2565
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1358,12 +1676,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.021:
-    pharmvar: https://www.pharmvar.org/haplotype/652
+    pharmvar: https://www.pharmvar.org/haplotype/2566
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1380,13 +1697,57 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
-  CYP2D6*4.022:
-    pharmvar: https://www.pharmvar.org/haplotype/651
+  CYP2D6*4.021_aldy:
+    pharmvar: https://www.pharmvar.org/haplotype/2566
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
+    - [4020, G>A, rs1080989]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [5992, C>A, rs28371703, L91M]
+    - [6002, A>G, rs28371704, H94R]
+    - [6015, C>G, rs28371705]
+    - [6681, G>C, rs1058164]
+    - [6866, G>A, rs3892097, splice defect]
+    - [7117, A>G, rs2267447]
+    - [8285, G>A, rs1058172, R365H]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [9421, C>T, rs28371738]
+    - [CYP2D7, e9+]
+    label: CYP2D6*4.021_aldy
+  CYP2D6*4.021_aldy.2:
+    pharmvar: https://www.pharmvar.org/haplotype/2566
+    activity: none
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6002, A>G, rs28371704, H94R]
+    - [6015, C>G, rs28371705]
+    - [6681, G>C, rs1058164]
+    - [6866, G>A, rs3892097, splice defect]
+    - [7117, A>G, rs2267447]
+    - [8285, G>A, rs1058172, R365H]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [9200, G>C, rs1135840, S486T]
+    - [9421, C>T, rs28371738]
+    label: CYP2D6*4.021_aldy.2
+  CYP2D6*4.022:
+    pharmvar: https://www.pharmvar.org/haplotype/2567
+    activity: none
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1404,12 +1765,11 @@ alleles:
     - [9349, C>T, rs28371737]
     - [9421, C>T, rs28371738]
   CYP2D6*4.023:
-    pharmvar: https://www.pharmvar.org/haplotype/650
+    pharmvar: https://www.pharmvar.org/haplotype/2568
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1427,12 +1787,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.024:
-    pharmvar: https://www.pharmvar.org/haplotype/648
+    pharmvar: https://www.pharmvar.org/haplotype/2569
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1450,12 +1809,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.025:
-    pharmvar: https://www.pharmvar.org/haplotype/646
+    pharmvar: https://www.pharmvar.org/haplotype/2570
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1473,12 +1831,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.026:
-    pharmvar: https://www.pharmvar.org/haplotype/644
+    pharmvar: https://www.pharmvar.org/haplotype/2571
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1496,12 +1853,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.027:
-    pharmvar: https://www.pharmvar.org/haplotype/725
+    pharmvar: https://www.pharmvar.org/haplotype/2572
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1510,7 +1866,7 @@ alleles:
     - [6681, G>C, rs1058164]
     - [6866, G>A, rs3892097, splice defect]
     - [7117, A>G, rs2267447]
-    - [7600, G>A, rs565013903, R269Q]
+    - [7600, G>A, '-', R269Q]
   CYP2D6*4.028:
     pharmvar: https://www.pharmvar.org/haplotype/724
     activity: none
@@ -1531,12 +1887,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*4.029:
-    pharmvar: https://www.pharmvar.org/haplotype/839
+    pharmvar: https://www.pharmvar.org/haplotype/2573
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1578,14 +1933,72 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
-  CYP2D6*4.1013:
+  CYP2D6*4.031:
+    pharmvar: https://www.pharmvar.org/haplotype/2207
     activity: none
-    label: CYP2D6*4N.ALDY
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [5992, C>A, rs28371703, L91M]
+    - [6002, A>G, rs28371704, H94R]
+    - [6015, C>G, rs28371705]
+    - [6681, G>C, rs1058164]
+    - [6866, G>A, rs3892097, splice defect]
+    - [7117, A>G, rs2267447]
+    - [7405, T>G, rs867349751]
+    - [7412, G>A, rs879014378]
+    - [7431, G>A, rs77593160]
+    - [7444, C>G, rs79331140]
+    - [9144, G>C, rs1135832]
+    - [9148, C>G, rs1135833, P469A]
+    - [9151, A>G, rs1135835, T470A]
+    - [9153, T>C, rs1135836]
+    - [9178, G>C, rs1135837, G479R]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
+    - [9189, T>C, rs747998333]
+    - [9192, C>T, rs28371736]
+    - [9200, G>C, rs1135840, S486T]
+    - [9263, C>T, rs201759814]
+    - [9421, C>T, rs28371738]
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
+  CYP2D6*4.032:
+    pharmvar: https://www.pharmvar.org/haplotype/2574
+    activity: none
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
+    - [4818, G>A, rs372204775]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [5992, C>A, rs28371703, L91M]
+    - [6002, A>G, rs28371704, H94R]
+    - [6015, C>G, rs28371705]
+    - [6681, G>C, rs1058164]
+    - [6866, G>A, rs3892097, splice defect]
+    - [7058, A>C, rs564994275]
+    - [7117, A>G, rs2267447]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [9200, G>C, rs1135840, S486T]
+    - [9421, C>T, rs28371738]
+  CYP2D6*4.033:
+    pharmvar: https://www.pharmvar.org/haplotype/2575
+    activity: none
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
+    - [4818, G>A, rs372204775]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
     - [5764, C>G, rs28371701]
@@ -1598,49 +2011,30 @@ alleles:
     - [7117, A>G, rs2267447]
     - [8404, A>C, rs1985842]
     - [8602, A>G, rs2004511]
-    - [9421, C>T, rs28371738]
-    - [CYP2D7, e9+]
-  CYP2D6*4.1021:
+    - [9200, G>C, rs1135840, S486T]
+    - [9421, C>G, rs28371738]
+  CYP2D6*4.034:
+    pharmvar: https://www.pharmvar.org/haplotype/2504
     activity: none
-    label: CYP2D6*4.021.ALDY
     evidence: D
     mutations:
+    - [6866, G>A, rs3892097, splice defect]
+  CYP2D6*4.035:
+    pharmvar: https://www.pharmvar.org/haplotype/2527
+    activity: none
+    evidence: M
+    mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
+    - [4179, G>C, rs1602597082]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
-    - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
-    - [5992, C>A, rs28371703, L91M]
-    - [6002, A>G, rs28371704, H94R]
-    - [6015, C>G, rs28371705]
+    - [6057, C>T, rs1081003]
     - [6681, G>C, rs1058164]
     - [6866, G>A, rs3892097, splice defect]
     - [7117, A>G, rs2267447]
-    - [8285, G>A, rs1058172, R365H]
-    - [8404, A>C, rs1985842]
-    - [8602, A>G, rs2004511]
-    - [9421, C>T, rs28371738]
-    - [CYP2D7, e9+]
-  CYP2D6*4.2021:
-    activity: none
-    label: CYP2D6*4.021.ALDY_2
-    evidence: D
-    mutations:
-    - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
-    - [4020, G>A, rs1080989]
-    - [5119, C>T, rs1065852, P34S]
-    - [5329, G>T, rs28371699]
-    - [5764, C>G, rs28371701]
-    - [5861, T>G, rs28371702]
-    - [6002, A>G, rs28371704, H94R]
-    - [6015, C>G, rs28371705]
-    - [6681, G>C, rs1058164]
-    - [6866, G>A, rs3892097, splice defect]
-    - [7117, A>G, rs2267447]
-    - [8285, G>A, rs1058172, R365H]
+    - [8180, G>A, rs141009491, R330H]
     - [8404, A>C, rs1985842]
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
@@ -1691,6 +2085,16 @@ alleles:
     - [6266, C>T, rs267608277]
     - [6727, delT, rs5030655, W152fs]
     - [6996, G>A, rs5030866, G212E]
+  CYP2D6*6.005_aldy:
+    pharmvar: https://www.pharmvar.org/haplotype/383
+    activity: none
+    evidence: D
+    mutations:
+    - [6266, C>T, rs267608277]
+    - [6727, delT, rs5030655, W152fs]
+    - [6996, G>A, rs5030866, G212E]
+    - [6996, G>A, rs5030866, G212E]
+    label: CYP2D6*6.005_aldy
   CYP2D6*6.006:
     pharmvar: https://www.pharmvar.org/haplotype/1410
     activity: none
@@ -1700,15 +2104,6 @@ alleles:
     - [6266, C>T, rs267608277]
     - [6727, delT, rs5030655, W152fs]
     - [6996, G>A, rs5030866, G212E]
-  CYP2D6*6.1005:
-    label: CYP2D6*6.ALDY
-    activity: none
-    mutations:
-    - [5468, A>C, rs867984132]
-    - [6266, C>T, rs267608277]
-    - [6727, delT, rs5030655, W152fs]
-    - [6996, G>A, rs5030866, G212E]
-    - [8308, G>A, rs61737946, G373S]
   CYP2D6*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/155
     activity: none
@@ -1751,13 +2146,12 @@ alleles:
     - [6681, G>C, rs1058164]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*10.002:
-    pharmvar: https://www.pharmvar.org/haplotype/178
+    pharmvar: https://www.pharmvar.org/haplotype/2576
     activity: decreased
     label: CYP2D6*10B
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1770,22 +2164,29 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*10.003:
-    pharmvar: https://www.pharmvar.org/haplotype/177
+    pharmvar: https://www.pharmvar.org/haplotype/2577
     activity: decreased
     label: CYP2D6*10D
-    evidence: L
+    evidence: D
     mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
     - [6057, C>T, rs1081003]
     - [6681, G>C, rs1058164]
+    - [7117, A>G, rs2267447]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
+    - [9464, A>G, rs148648640]
   CYP2D6*10.004:
-    pharmvar: https://www.pharmvar.org/haplotype/664
+    pharmvar: https://www.pharmvar.org/haplotype/2578
     activity: decreased
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -1852,34 +2253,49 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
-  CYP2D6*10.1004:
-    label: CYP2D6*10.ALDY
+  CYP2D6*10.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2579
     activity: decreased
+    evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
+    - [3594, C>T, rs28588594]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
-    - [5233, G>C, rs1080995]
-    - [5240, C>A, rs1080996]
-    - [5242, C>G, rs1080997]
-    - [5246, T>C, rs1080998]
-    - [5251, G>C, rs29001518]
-    - [5252, A>C, rs28695233]
-    - [5264, A>G, rs1081000]
     - [5329, G>T, rs28371699]
     - [5861, T>G, rs28371702]
+    - [6057, C>T, rs1081003]
     - [6681, G>C, rs1058164]
+    - [7117, A>G, rs2267447]
     - [8404, A>C, rs1985842]
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
+    - [9414, delAG, rs202032066]
+    - [9464, A>G, rs148648640]
+  CYP2D6*10.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2834
+    activity: decreased
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+    - [6057, C>T, rs1081003]
+    - [6681, G>C, rs1058164]
+    - [7117, A>G, rs2267447]
+    - [7363, delGCAGG, rs1168525049]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [9200, G>C, rs1135840, S486T]
+    - [9421, C>T, rs28371738]
   CYP2D6*11.001:
-    pharmvar: https://www.pharmvar.org/haplotype/166
+    pharmvar: https://www.pharmvar.org/haplotype/2580
     activity: none
     label: CYP2D6*11
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -1911,13 +2327,10 @@ alleles:
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*12.002:
-    pharmvar: https://www.pharmvar.org/haplotype/400
+    pharmvar: https://www.pharmvar.org/haplotype/2530
     activity: none
     evidence: D
     mutations:
-    - [3419, G>T, rs545591749]
-    - [3420, A>T, rs576829306]
-    - [3926, insA, rs375413467]
     - [4009, T>C, rs59360719]
     - [5143, G>A, rs5030862, G42R]
     - [5329, G>T, rs28371699]
@@ -2054,11 +2467,10 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*17.003:
-    pharmvar: https://www.pharmvar.org/haplotype/636
+    pharmvar: https://www.pharmvar.org/haplotype/2581
     activity: decreased-50
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5233, G>C, rs1080995]
     - [5240, C>A, rs1080996]
@@ -2078,11 +2490,10 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*17.004:
-    pharmvar: https://www.pharmvar.org/haplotype/1388
+    pharmvar: https://www.pharmvar.org/haplotype/2582
     activity: decreased-50
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5233, G>C, rs1080995]
     - [5240, C>A, rs1080996]
@@ -2149,6 +2560,29 @@ alleles:
     - [8604, G>A, rs28371730]
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
+  CYP2D6*17.007:
+    pharmvar: https://www.pharmvar.org/haplotype/2583
+    activity: decreased-50
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+    - [6041, C>T, rs28371706, T107I]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8581, G>C, rs552754154]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
   CYP2D6*18.001:
     pharmvar: https://www.pharmvar.org/haplotype/1594
     activity: none
@@ -2157,7 +2591,7 @@ alleles:
     mutations:
     - [9154, insTGCCCACTG, rs765776661, 468_470dupVPT]
   CYP2D6*19.001:
-    pharmvar: https://www.pharmvar.org/haplotype/115
+    pharmvar: https://www.pharmvar.org/haplotype/2198
     activity: none
     label: CYP2D6*19
     evidence: L
@@ -2166,6 +2600,12 @@ alleles:
     - [7559, delAACT, rs72549353, T256fs]
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
+  CYP2D6*19.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2197
+    activity: none
+    evidence: D
+    mutations:
+    - [7559, delAACT, rs72549353, T256fs]
   CYP2D6*20.001:
     pharmvar: https://www.pharmvar.org/haplotype/123
     activity: none
@@ -2174,18 +2614,17 @@ alleles:
     mutations:
     - [6681, G>C, rs1058164]
     - [6996, insG, rs72549354, L213fs]
-    - [6998, CT>TC, rs199535154]  # Has issues with CYP2D7 remapping; functionality disabled for now
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
+    - [6998, CT>TC, rs199535154]
   CYP2D6*21.001:
-    pharmvar: https://www.pharmvar.org/haplotype/200
+    pharmvar: https://www.pharmvar.org/haplotype/2827
     activity: none
     label: CYP2D6*21A
     evidence: L
     mutations:
     - [3436, C>G, rs1080985]
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [4391, A>G, '-']
@@ -2200,13 +2639,12 @@ alleles:
     - [8604, G>A, rs28371730]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*21.002:
-    pharmvar: https://www.pharmvar.org/haplotype/199
+    pharmvar: https://www.pharmvar.org/haplotype/2828
     activity: none
     label: CYP2D6*21B
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -2227,6 +2665,12 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
+  CYP2D6*21.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2826
+    activity: none
+    evidence: D
+    mutations:
+    - [7599, insC, rs72549352, R269fs]
   CYP2D6*22.001:
     pharmvar: https://www.pharmvar.org/haplotype/135
     activity: unknown
@@ -2236,17 +2680,18 @@ alleles:
     - [5101, C>T, rs138100349, R28C]
     - [6188, G>A, rs1081004]
   CYP2D6*23.001:
-    pharmvar: https://www.pharmvar.org/haplotype/134
+    pharmvar: https://www.pharmvar.org/haplotype/2840
     activity: unknown
     label: CYP2D6*23
-    evidence: L
+    evidence: D
     mutations:
     - [5975, C>T, rs267608310, A85V]
+    - [6188, G>A, rs1081004]
   CYP2D6*24.001:
     pharmvar: https://www.pharmvar.org/haplotype/137
     activity: unknown
     label: CYP2D6*24
-    evidence: L
+    evidence: D
     mutations:
     - [7873, A>C, rs949717872, I297L]
   CYP2D6*25.001:
@@ -2262,22 +2707,37 @@ alleles:
     label: CYP2D6*26
     evidence: L
     mutations:
-    - [8297, T>C, '-', I369T]
+    - [8297, T>C, rs1555888899, I369T]
   CYP2D6*27.001:
     pharmvar: https://www.pharmvar.org/haplotype/130
     activity: normal
     label: CYP2D6*27
-    evidence: L
+    evidence: D
     mutations:
     - [8873, G>A, rs769157652, E410K]
+  CYP2D6*27.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2496
+    activity: normal
+    evidence: D
+    mutations:
+    - [4130, G>A, rs566307819]
+    - [5329, G>T, rs28371699]
+    - [8873, G>A, rs769157652, E410K]
+  CYP2D6*27.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2497
+    activity: normal
+    evidence: D
+    mutations:
+    - [8565, insA, rs1269631565]
+    - [8602, A>G, rs2004511]
+    - [8873, G>A, rs769157652, E410K]
   CYP2D6*28.001:
-    pharmvar: https://www.pharmvar.org/haplotype/133
+    pharmvar: https://www.pharmvar.org/haplotype/2586
     activity: unknown
     label: CYP2D6*28
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5038, G>A, rs72549358, V7M]
@@ -2300,12 +2760,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*28.002:
-    pharmvar: https://www.pharmvar.org/haplotype/666
+    pharmvar: https://www.pharmvar.org/haplotype/2587
     activity: unknown
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [4772, C>G, rs540805349]
@@ -2328,13 +2787,43 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
+  CYP2D6*28.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2311
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5038, G>A, rs72549358, V7M]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6121, G>A, rs1363367942]
+    - [6122, T>C, rs932123190]
+    - [6123, G>A, rs920804900]
+    - [6124, A>G, rs974225727]
+    - [6681, G>C, rs1058164]
+    - [6724, C>G, rs78482768, Q151E]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
   CYP2D6*29.001:
-    pharmvar: https://www.pharmvar.org/haplotype/132
+    pharmvar: https://www.pharmvar.org/haplotype/2350
     activity: decreased-50
     label: CYP2D6*29
     evidence: D
     mutations:
-    - [3426, T>C, rs1080984]
     - [3602, T>A, rs1080986]
     - [3612, G>A, rs1080987]
     - [4280, C>T, rs28624811]
@@ -2343,7 +2832,6 @@ alleles:
     - [5762, delC, rs267608275]
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
-    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
     - [7143, C>T, rs76327133]
     - [7235, A>G, rs80262685]
     - [7312, G>A, rs75203276]
@@ -2351,6 +2839,7 @@ alleles:
     - [8203, G>A, rs59421388, V338M]
     - [8404, A>C, rs1985842]
     - [9200, G>C, rs1135840, S486T]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
   CYP2D6*30.001:
     pharmvar: https://www.pharmvar.org/haplotype/139
     activity: unknown
@@ -2362,13 +2851,12 @@ alleles:
     - [7870, C>T, rs16947, R296C]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*31.001:
-    pharmvar: https://www.pharmvar.org/haplotype/142
+    pharmvar: https://www.pharmvar.org/haplotype/2588
     activity: none
     label: CYP2D6*31
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -2390,12 +2878,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*32.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1726
+    pharmvar: https://www.pharmvar.org/haplotype/2589
     activity: decreased
     label: CYP2D6*32
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -2431,6 +2918,13 @@ alleles:
     mutations:
     - [7009, G>T, '-']
     - [7503, G>T, rs28371717, A237S]
+  CYP2D6*33.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2839
+    activity: normal
+    evidence: D
+    mutations:
+    - [5061, C>G, rs375323434]
+    - [7503, G>T, rs28371717, A237S]
   CYP2D6*34.001:
     pharmvar: https://www.pharmvar.org/haplotype/226
     activity: normal
@@ -2439,13 +2933,12 @@ alleles:
     mutations:
     - [7870, C>T, rs16947, R296C]
   CYP2D6*35.001:
-    pharmvar: https://www.pharmvar.org/haplotype/184
+    pharmvar: https://www.pharmvar.org/haplotype/2590
     activity: normal
     label: CYP2D6*35A
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5050, G>A, rs769258, V11M]
@@ -2467,13 +2960,12 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*35.002:
-    pharmvar: https://www.pharmvar.org/haplotype/1981
+    pharmvar: https://www.pharmvar.org/haplotype/2591
     activity: normal
     label: CYP2D6*35B
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [4589, C>T, rs566383351]
@@ -2512,12 +3004,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*35.003:
-    pharmvar: https://www.pharmvar.org/haplotype/723
+    pharmvar: https://www.pharmvar.org/haplotype/2592
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5050, G>A, rs769258, V11M]
@@ -2531,7 +3022,7 @@ alleles:
     - [5329, G>T, rs28371699]
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
-    - [6349, delG, rs1172058948]
+    - [6349, delG, rs1405751650]
     - [6681, G>C, rs1058164]
     - [7870, C>T, rs16947, R296C]
     - [8404, A>C, rs1985842]
@@ -2540,12 +3031,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*35.004:
-    pharmvar: https://www.pharmvar.org/haplotype/663
+    pharmvar: https://www.pharmvar.org/haplotype/2593
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [4532, A>T, rs540076362]
@@ -2568,12 +3058,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*35.005:
-    pharmvar: https://www.pharmvar.org/haplotype/1412
+    pharmvar: https://www.pharmvar.org/haplotype/2594
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [4589, C>T, rs566383351]
@@ -2596,12 +3085,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*35.006:
-    pharmvar: https://www.pharmvar.org/haplotype/659
+    pharmvar: https://www.pharmvar.org/haplotype/2595
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5050, G>A, rs769258, V11M]
@@ -2624,13 +3112,12 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*35.007:
-    pharmvar: https://www.pharmvar.org/haplotype/1413
+    pharmvar: https://www.pharmvar.org/haplotype/2596
     activity: normal
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
     - [3694, C>T, rs78047908]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5050, G>A, rs769258, V11M]
@@ -2653,13 +3140,12 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*36.001:
-    pharmvar: https://www.pharmvar.org/haplotype/222
+    pharmvar: https://www.pharmvar.org/haplotype/2597
     activity: none
     label: CYP2D6*36
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -2673,21 +3159,37 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
+  CYP2D6*36.001_aldy:
+    pharmvar: https://www.pharmvar.org/haplotype/2597
+    activity: none
+    label: CYP2D6*36_aldy
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+    - [6057, C>T, rs1081003]
+    - [6681, G>C, rs1058164]
+    - [7117, A>G, rs2267447]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [CYP2D7, e9+]
   CYP2D6*36.002:
-    pharmvar: https://www.pharmvar.org/haplotype/705
+    pharmvar: https://www.pharmvar.org/haplotype/2598
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -2701,18 +3203,18 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
     - [9414, delAG, rs202032066]
     - [9464, A>G, rs148648640]
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
   CYP2D6*36.003:
-    pharmvar: https://www.pharmvar.org/haplotype/1364
+    pharmvar: https://www.pharmvar.org/haplotype/2382
     activity: none
     evidence: D
     mutations:
@@ -2730,17 +3232,17 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
   CYP2D6*36.004:
-    pharmvar: https://www.pharmvar.org/haplotype/1720
+    pharmvar: https://www.pharmvar.org/haplotype/2383
     activity: none
     evidence: D
     mutations:
@@ -2760,33 +3262,42 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
     - [9414, delAG, rs202032066]
     - [9464, A>G, rs148648640]
-  CYP2D6*36.1001:
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
+  CYP2D6*36.005:
+    pharmvar: https://www.pharmvar.org/haplotype/2384
     activity: none
-    label: CYP2D6*36.ALDY
-    evidence: D
+    label: CYP2D6*57
+    evidence: L
     mutations:
-    - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
-    - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
     - [5861, T>G, rs28371702]
+    - [5905, C>T, rs267608311, R62W]
     - [6057, C>T, rs1081003]
     - [6681, G>C, rs1058164]
-    - [7117, A>G, rs2267447]
     - [8404, A>C, rs1985842]
     - [8602, A>G, rs2004511]
-    - [CYP2D7, e9+]
+    - [9144, G>C, rs1135832]
+    - [9148, C>G, rs1135833, P469A]
+    - [9151, A>G, rs1135835, T470A]
+    - [9153, T>C, rs1135836]
+    - [9178, G>C, rs1135837, G479R]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
+    - [9189, T>C, rs747998333]
+    - [9192, C>T, rs28371736]
+    - [9200, G>C, rs1135840, S486T]
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
   CYP2D6*37.001:
     pharmvar: https://www.pharmvar.org/haplotype/224
     activity: unknown
@@ -2836,6 +3347,30 @@ alleles:
     evidence: D
     mutations:
     - [9200, G>C, rs1135840, S486T]
+  CYP2D6*39.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2835
+    activity: normal
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
   CYP2D6*40.001:
     pharmvar: https://www.pharmvar.org/haplotype/231
     activity: none
@@ -2860,13 +3395,34 @@ alleles:
     - [8604, G>A, rs28371730]
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
+  CYP2D6*40.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2534
+    activity: none
+    evidence: D
+    mutations:
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+    - [6041, C>T, rs28371706, T107I]
+    - [6681, G>C, rs1058164]
+    - [6883, insTTTCGCCCCTTTCGCCCC, rs72549356, 174_175insFRPx2]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
   CYP2D6*41.001:
-    pharmvar: https://www.pharmvar.org/haplotype/230
+    pharmvar: https://www.pharmvar.org/haplotype/2599
     activity: decreased
     label: CYP2D6*41
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -2888,11 +3444,10 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*41.002:
-    pharmvar: https://www.pharmvar.org/haplotype/398
+    pharmvar: https://www.pharmvar.org/haplotype/2600
     activity: decreased
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -2941,11 +3496,10 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*41.004:
-    pharmvar: https://www.pharmvar.org/haplotype/1415
+    pharmvar: https://www.pharmvar.org/haplotype/2601
     activity: decreased
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -2969,14 +3523,13 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*41.005:
-    pharmvar: https://www.pharmvar.org/haplotype/1416
+    pharmvar: https://www.pharmvar.org/haplotype/2602
     activity: decreased
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
-    - [4589, C>T, rs566383351]
+    - [4381, A>C, '-']
     - [5233, G>C, rs1080995]
     - [5240, C>A, rs1080996]
     - [5242, C>G, rs1080997]
@@ -2997,8 +3550,112 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
+  CYP2D6*41.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2603
+    activity: decreased
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6528, G>A, rs369508051]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8008, G>A, rs28371725, splice defect]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*41.007:
+    pharmvar: https://www.pharmvar.org/haplotype/2604
+    activity: decreased
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6528, G>A, rs369508051]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8008, G>A, rs28371725, splice defect]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9021, A>G, rs769045995]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*41.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2836
+    activity: decreased
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [6744, C>T, rs74962936]
+    - [7870, C>T, rs16947, R296C]
+    - [8008, G>A, rs28371725, splice defect]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*41.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2837
+    activity: decreased
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6057, C>T, rs1081003]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8008, G>A, rs28371725, splice defect]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
   CYP2D6*42.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1414
+    pharmvar: https://www.pharmvar.org/haplotype/2298
     activity: none
     label: CYP2D6*42
     evidence: D
@@ -3019,7 +3676,7 @@ alleles:
     - [6248, G>A, rs570742137]
     - [6681, G>C, rs1058164]
     - [7870, C>T, rs16947, R296C]
-    - [8280, insGT, rs72549346, Q364fs]
+    - [8280, insTG, rs72549346, Q364fs]
     - [8404, A>C, rs1985842]
     - [8604, G>A, rs28371730]
     - [8810, C>T, rs4987144]
@@ -3048,14 +3705,11 @@ alleles:
     - [5101, C>T, rs138100349, R28C]
     - [7970, G>C, rs72549349, splice defect]
   CYP2D6*45.001:
-    pharmvar: https://www.pharmvar.org/haplotype/203
+    pharmvar: https://www.pharmvar.org/haplotype/2531
     activity: normal
     label: CYP2D6*45A
     evidence: D
     mutations:
-    - [3419, G>T, rs545591749]
-    - [3420, A>T, rs576829306]
-    - [3926, insA, rs375413467]
     - [4009, T>C, rs59360719]
     - [5329, G>T, rs28371699]
     - [5764, C>G, rs28371701]
@@ -3072,15 +3726,13 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*45.002:
-    pharmvar: https://www.pharmvar.org/haplotype/201
+    pharmvar: https://www.pharmvar.org/haplotype/2532
     activity: normal
     label: CYP2D6*45B
     evidence: D
     mutations:
     - [3477, G>A, rs76210340]
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
-    - [3926, insA, rs375413467]
     - [4280, C>T, rs28624811]
     - [4325, delTGTG, rs534009571]
     - [5329, G>T, rs28371699]
@@ -3097,13 +3749,12 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*45.003:
-    pharmvar: https://www.pharmvar.org/haplotype/1389
+    pharmvar: https://www.pharmvar.org/haplotype/2605
     activity: normal
     evidence: D
     mutations:
     - [3477, G>A, rs76210340]
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4341, C>T, rs545334485]
     - [5329, G>T, rs28371699]
@@ -3122,13 +3773,12 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*45.004:
-    pharmvar: https://www.pharmvar.org/haplotype/1976
+    pharmvar: https://www.pharmvar.org/haplotype/2533
     activity: normal
     evidence: D
     mutations:
     - [3477, G>A, rs76210340]
     - [3722, G>A, rs59099247]
-    - [3926, insA, rs375413467]
     - [4280, C>T, rs28624811]
     - [4325, delTGTG, rs534009571]
     - [5329, G>T, rs28371699]
@@ -3146,14 +3796,13 @@ alleles:
     - [9046, C>T, '-']
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*46.001:
-    pharmvar: https://www.pharmvar.org/haplotype/204
+    pharmvar: https://www.pharmvar.org/haplotype/2606
     activity: normal
     label: CYP2D6*46A
     evidence: D
     mutations:
     - [3477, G>A, rs76210340]
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5096, G>A, rs28371696, R26H]
     - [5329, G>T, rs28371699]
@@ -3172,14 +3821,13 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*46.002:
-    pharmvar: https://www.pharmvar.org/haplotype/182
+    pharmvar: https://www.pharmvar.org/haplotype/2607
     activity: normal
     label: CYP2D6*46B
     evidence: D
     mutations:
     - [3477, G>A, rs76210340]
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5096, G>A, rs28371696, R26H]
     - [5329, G>T, rs28371699]
@@ -3219,13 +3867,12 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*47.001:
-    pharmvar: https://www.pharmvar.org/haplotype/241
+    pharmvar: https://www.pharmvar.org/haplotype/2608
     activity: none
     label: CYP2D6*47
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5092, C>T, rs267608313, R25W]
     - [5119, C>T, rs1065852, P34S]
@@ -3240,13 +3887,12 @@ alleles:
     mutations:
     - [5990, C>T, rs267608309, A90V]
   CYP2D6*49.001:
-    pharmvar: https://www.pharmvar.org/haplotype/238
+    pharmvar: https://www.pharmvar.org/haplotype/2609
     activity: decreased-50
     label: CYP2D6*49
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [6057, C>T, rs1081003]
@@ -3261,13 +3907,12 @@ alleles:
     mutations:
     - [6740, A>C, rs267608302, E156A]
   CYP2D6*51.001:
-    pharmvar: https://www.pharmvar.org/haplotype/244
+    pharmvar: https://www.pharmvar.org/haplotype/2610
     activity: none
     label: CYP2D6*51
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -3282,13 +3927,12 @@ alleles:
     - [8192, A>C, rs72549348, E334A]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*52.001:
-    pharmvar: https://www.pharmvar.org/haplotype/242
+    pharmvar: https://www.pharmvar.org/haplotype/2611
     activity: decreased
     label: CYP2D6*52
     evidence: L
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [6057, C>T, rs1081003]
@@ -3346,13 +3990,12 @@ alleles:
     - [8855, A>C, rs1931013246, K404Q]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*56.001:
-    pharmvar: https://www.pharmvar.org/haplotype/229
+    pharmvar: https://www.pharmvar.org/haplotype/2612
     activity: none
     label: CYP2D6*56A
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -3370,13 +4013,12 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*56.002:
-    pharmvar: https://www.pharmvar.org/haplotype/228
+    pharmvar: https://www.pharmvar.org/haplotype/2613
     activity: none
     label: CYP2D6*56B
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -3389,12 +4031,11 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*56.003:
-    pharmvar: https://www.pharmvar.org/haplotype/1390
+    pharmvar: https://www.pharmvar.org/haplotype/2614
     activity: none
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -3407,53 +4048,12 @@ alleles:
     - [8602, A>G, rs2004511]
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
-  CYP2D6*57.001:
-    pharmvar: https://www.pharmvar.org/haplotype/183
-    activity: none
-    label: CYP2D6*57
-    evidence: L
-    mutations:
-    - [5119, C>T, rs1065852, P34S]
-    - [5329, G>T, rs28371699]
-    - [5861, T>G, rs28371702]
-    - [5905, C>T, rs267608311, R62W]
-    - [6057, C>T, rs1081003]
-    - [6681, G>C, rs1058164]
-    - [8404, A>C, rs1985842]
-    - [8602, A>G, rs2004511]
-    - [9144, G>C, rs1135832]
-    - [9148, C>G, rs1135833, P469A]
-    - [9151, A>G, rs1135835, T470A]
-    - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
-    - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
-    - [9189, T>C, rs747998333]
-    - [9192, C>T, rs28371736]
-    - [9200, G>C, rs1135840, S486T]
-  CYP2D6*57.1001:
-    label: CYP2D6*57.ALDY
-    activity: none
-    evidence: L
-    mutations:
-    - [5119, C>T, rs1065852, P34S]
-    - [5329, G>T, rs28371699]
-    - [5861, T>G, rs28371702]
-    - [5905, C>T, rs267608311, R62W]
-    - [6057, C>T, rs1081003]
-    - [6681, G>C, rs1058164]
-    - [8404, A>C, rs1985842]
-    - [8602, A>G, rs2004511]
-    - [CYP2D7, e9+]
   CYP2D6*58.001:
-    pharmvar: https://www.pharmvar.org/haplotype/181
+    pharmvar: https://www.pharmvar.org/haplotype/2615
     activity: unknown
     label: CYP2D6*58
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5233, G>C, rs1080995]
     - [5240, C>A, rs1080996]
@@ -3473,13 +4073,12 @@ alleles:
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*59.001:
-    pharmvar: https://www.pharmvar.org/haplotype/176
+    pharmvar: https://www.pharmvar.org/haplotype/2616
     activity: decreased-50
     label: CYP2D6*59
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -3510,6 +4109,7 @@ alleles:
     - [6907, insTA, '-', S183X]
     - [7323, C>T, rs28371715]
   CYP2D6*61.001:
+    activity: unknown
     label: CYP2D6*61
     mutations:
     - [8404, A>C, rs1985842]
@@ -3522,10 +4122,10 @@ alleles:
     mutations:
     - [9064, C>T, rs730882251, R441C]
   CYP2D6*63.001:
+    activity: unknown
     label: CYP2D6*63
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -3545,13 +4145,12 @@ alleles:
     - [8810, C>T, rs4987144]
     - [CYP2D7, e8+]
   CYP2D6*64.001:
-    pharmvar: https://www.pharmvar.org/haplotype/188
+    pharmvar: https://www.pharmvar.org/haplotype/2617
     activity: unknown
     label: CYP2D6*64
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -3600,13 +4199,12 @@ alleles:
     mutations:
     - [CYP2D7, i1+]
   CYP2D6*69.001:
-    pharmvar: https://www.pharmvar.org/haplotype/202
+    pharmvar: https://www.pharmvar.org/haplotype/2618
     activity: none
     label: CYP2D6*69
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -3632,10 +4230,10 @@ alleles:
     - [5329, G>T, rs28371699]
     - [5861, T>G, rs28371702]
     - [6628, G>A, rs374616348, V119M]
-    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
     - [8203, G>A, rs59421388, V338M]
     - [8404, A>C, rs1985842]
     - [9200, G>C, rs1135840, S486T]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
   CYP2D6*71.001:
     pharmvar: https://www.pharmvar.org/haplotype/212
     activity: unknown
@@ -3659,13 +4257,12 @@ alleles:
     - [5144, G>A, rs118203758, G42E]
     - [6514, T>C, rs267608306]
   CYP2D6*72.001:
-    pharmvar: https://www.pharmvar.org/haplotype/210
+    pharmvar: https://www.pharmvar.org/haplotype/2619
     activity: unknown
     label: CYP2D6*72
     evidence: L
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -3768,11 +4365,11 @@ alleles:
     - [6002, A>G, rs28371704, H94R]
     - [6015, C>G, rs28371705]
     - [6032, T>C, rs76187628, V104A]
-    - [6040, AC>TA, rs74802369, T107Y]
     - [6046, A>G, rs78459009, I109V]
     - [6054, T>C, rs1135821]
+    - [6040, AC>TA, rs74802369, T107Y]
   CYP2D6*83.001:
-    pharmvar: https://www.pharmvar.org/haplotype/161
+    pharmvar: https://www.pharmvar.org/haplotype/2386
     activity: unknown
     label: CYP2D6*83
     evidence: D
@@ -3782,17 +4379,17 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
     - [9213, T>C, rs61731577]
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
   CYP2D6*83.002:
-    pharmvar: https://www.pharmvar.org/haplotype/658
+    pharmvar: https://www.pharmvar.org/haplotype/2387
     activity: unknown
     evidence: D
     mutations:
@@ -3800,17 +4397,17 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
     - [9213, T>C, rs61731577]
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
   CYP2D6*83.003:
-    pharmvar: https://www.pharmvar.org/haplotype/665
+    pharmvar: https://www.pharmvar.org/haplotype/2388
     activity: unknown
     evidence: D
     mutations:
@@ -3818,11 +4415,9 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
@@ -3831,20 +4426,21 @@ alleles:
     - [9330, C>A, rs574780348]
     - [9414, delAG, rs202032066]
     - [9464, A>G, rs148648640]
-  CYP2D6*83.1003:
-    label: CYP2D6*83.ALDY
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
+  CYP2D6*83.003_aldy:
     activity: unknown
+    label: CYP2D6*83_aldy
     evidence: D
     mutations:
     - [5861, T>G, rs28371702]
     - [CYP2D7, e9+]
   CYP2D6*84.001:
-    pharmvar: https://www.pharmvar.org/haplotype/157
+    pharmvar: https://www.pharmvar.org/haplotype/2620
     activity: unknown
     label: CYP2D6*84
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5037, G>A, rs148382141]
@@ -3894,13 +4490,12 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*85.001:
-    pharmvar: https://www.pharmvar.org/haplotype/156
+    pharmvar: https://www.pharmvar.org/haplotype/2621
     activity: unknown
     label: CYP2D6*85
     evidence: D
     mutations:
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5121, A>G, rs151226748]
     - [5329, G>T, rs28371699]
@@ -3962,7 +4557,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/163
     activity: unknown
     label: CYP2D6*89
-    evidence: L
+    evidence: D
     mutations:
     - [6698, T>C, rs375135093, L142S]
   CYP2D6*90.001:
@@ -3979,7 +4574,7 @@ alleles:
     label: CYP2D6*91
     evidence: L
     mutations:
-    - [6755, G>C, '-', C161S]
+    - [6755, G>C, rs774943042, C161S]
     - [7870, C>T, rs16947, R296C]
     - [8008, G>A, rs28371725, splice defect]
   CYP2D6*92.001:
@@ -4072,13 +4667,12 @@ alleles:
     - [9130, C>G, '-', H463D]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*99.001:
-    pharmvar: https://www.pharmvar.org/haplotype/122
+    pharmvar: https://www.pharmvar.org/haplotype/2622
     activity: none
     label: CYP2D6*99
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5299, G>A, rs267608273]
@@ -4093,14 +4687,12 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*100.001:
-    pharmvar: https://www.pharmvar.org/haplotype/219
+    pharmvar: https://www.pharmvar.org/haplotype/2528
     activity: none
     label: CYP2D6*100
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
-    - [3911, C>T, rs267608271]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -4114,13 +4706,12 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*101.001:
-    pharmvar: https://www.pharmvar.org/haplotype/218
+    pharmvar: https://www.pharmvar.org/haplotype/2623
     activity: none
     label: CYP2D6*101
     evidence: D
     mutations:
     - [3594, C>T, rs28588594]
-    - [3785, A>G, rs28735595]
     - [4020, G>A, rs1080989]
     - [5119, C>T, rs1065852, P34S]
     - [5329, G>T, rs28371699]
@@ -4192,7 +4783,7 @@ alleles:
     - [5329, G>T, rs28371699]
     - [5861, T>G, rs28371702]
     - [6681, G>C, rs1058164]
-    - [6740, A>T, '-', E156V]
+    - [6740, A>T, rs267608302, E156V]
     - [7870, C>T, rs16947, R296C]
     - [8404, A>C, rs1985842]
     - [8810, C>T, rs4987144]
@@ -4240,7 +4831,7 @@ alleles:
     activity: unknown
     evidence: D
     mutations:
-    - [4912, delAAGGG, '-']
+    - [4912, delAAGGG, rs2146945674]
     - [8897, G>A, rs28371733, E418K]
   CYP2D6*107.001:
     pharmvar: https://www.pharmvar.org/haplotype/213
@@ -4360,12 +4951,11 @@ alleles:
     mutations:
     - [8180, G>C, rs141009491, R330P]
   CYP2D6*117.001:
-    pharmvar: https://www.pharmvar.org/haplotype/402
+    pharmvar: https://www.pharmvar.org/haplotype/2624
     activity: unknown
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -4394,11 +4984,10 @@ alleles:
     - [6188, G>A, rs1081004]
     - [7912, A>G, '-', T310A]
   CYP2D6*119.001:
-    pharmvar: https://www.pharmvar.org/haplotype/382
+    pharmvar: https://www.pharmvar.org/haplotype/2625
     activity: decreased
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [5861, T>G, rs28371702]
     - [8008, G>A, rs28371725, splice defect]
     - [8404, A>C, rs1985842]
@@ -4410,12 +4999,11 @@ alleles:
     mutations:
     - [5083, delC, '-', L22X]
   CYP2D6*121.001:
-    pharmvar: https://www.pharmvar.org/haplotype/637
+    pharmvar: https://www.pharmvar.org/haplotype/2626
     activity: unknown
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -4447,11 +5035,10 @@ alleles:
     mutations:
     - [8299, G>A, rs61745683, V370I]
   CYP2D6*123.001:
-    pharmvar: https://www.pharmvar.org/haplotype/667
+    pharmvar: https://www.pharmvar.org/haplotype/2627
     activity: unknown
     evidence: D
     mutations:
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -4487,12 +5074,11 @@ alleles:
     - [6998, C>T, rs150163869]
     - [8829, delTC, rs757396767, L395fs]
   CYP2D6*125.001:
-    pharmvar: https://www.pharmvar.org/haplotype/703
+    pharmvar: https://www.pharmvar.org/haplotype/2628
     activity: unknown
     evidence: D
     mutations:
     - [3722, G>A, rs59099247]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [5329, G>T, rs28371699]
     - [5764, C>G, rs28371701]
@@ -4505,12 +5091,11 @@ alleles:
     - [9092, G>A, rs369177208, R450H]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*126.001:
-    pharmvar: https://www.pharmvar.org/haplotype/694
+    pharmvar: https://www.pharmvar.org/haplotype/2629
     activity: unknown
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -4547,12 +5132,11 @@ alleles:
     - [8572, C>T, rs879173025]
     - [8602, A>G, rs2004511]
   CYP2D6*128.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1417
+    pharmvar: https://www.pharmvar.org/haplotype/2630
     activity: unknown
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [4788, G>C, rs35023634]
@@ -4576,12 +5160,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*129.001:
-    pharmvar: https://www.pharmvar.org/haplotype/704
+    pharmvar: https://www.pharmvar.org/haplotype/2631
     activity: none
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -4608,8 +5191,8 @@ alleles:
     activity: unknown
     evidence: D
     mutations:
-    - [6932, TG>CT, '-', C191L]
     - [7323, C>T, rs28371715]
+    - [6932, TG>CT, rs2146937045+rs747884067, C191L]
   CYP2D6*131.001:
     pharmvar: https://www.pharmvar.org/haplotype/717
     activity: unknown
@@ -4637,12 +5220,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9421, C>T, rs28371738]
   CYP2D6*133.001:
-    pharmvar: https://www.pharmvar.org/haplotype/699
+    pharmvar: https://www.pharmvar.org/haplotype/2632
     activity: unknown
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -4658,7 +5240,7 @@ alleles:
     - [6681, G>C, rs1058164]
     - [6810, A>G, rs76326664]
     - [7870, C>T, rs16947, R296C]
-    - [8209, G>A, '-', G340R]
+    - [8209, G>A, rs566108360, G340R]
     - [8404, A>C, rs1985842]
     - [8604, G>A, rs28371730]
     - [8810, C>T, rs4987144]
@@ -4672,12 +5254,11 @@ alleles:
     - [7323, C>T, rs28371715]
     - [8222, G>A, rs76088846, R344Q]
   CYP2D6*135.001:
-    pharmvar: https://www.pharmvar.org/haplotype/715
+    pharmvar: https://www.pharmvar.org/haplotype/2633
     activity: unknown
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -4699,12 +5280,11 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*136.001:
-    pharmvar: https://www.pharmvar.org/haplotype/707
+    pharmvar: https://www.pharmvar.org/haplotype/2634
     activity: unknown
     evidence: D
     mutations:
     - [3436, C>G, rs1080985]
-    - [3785, A>G, rs28735595]
     - [4280, C>T, rs28624811]
     - [4342, G>A, rs28633410]
     - [5233, G>C, rs1080995]
@@ -4779,7 +5359,7 @@ alleles:
     mutations:
     - [7482, C>T, rs373813287, L230F]
   CYP2D6*141.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1365
+    pharmvar: https://www.pharmvar.org/haplotype/2390
     activity: unknown
     evidence: D
     mutations:
@@ -4806,18 +5386,18 @@ alleles:
     - [9148, C>G, rs1135833, P469A]
     - [9151, A>G, rs1135835, T470A]
     - [9153, T>C, rs1135836]
-    - [9175, CA>TC, rs28371735, H478Y]
     - [9178, G>C, rs1135837, G479R]
-    - [9184, T>G, rs1135838, F481V]
-    - [9186, T>C, rs1135839]
-    - [9187, GC>AG, rs74478221, A482S]
+    - [9184, T>G, '-', F481V]
+    - [9186, T>C, '-']
     - [9189, T>C, rs747998333]
     - [9192, C>T, rs28371736]
     - [9200, G>C, rs1135840, S486T]
     - [9213, T>C, rs61731577]
     - [9414, delAG, rs202032066]
-  CYP2D6*141.1001:
-    pharmvar: https://www.pharmvar.org/haplotype/1365
+    - [9175, CA>TC, rs28371735, H478Y]
+    - [9187, GC>AG, rs74478221, A482S]
+  CYP2D6*141.001_aldy:
+    pharmvar: https://www.pharmvar.org/haplotype/2390
     activity: unknown
     evidence: D
     mutations:
@@ -4840,7 +5420,9 @@ alleles:
     - [8572, C>T, rs879173025]
     - [8602, A>G, rs2004511]
     - [8873, G>A, rs769157652, E410K]
+    - [9414, delAG, rs202032066]
     - [CYP2D7, e9+]
+    label: CYP2D6*141.001_aldy
   CYP2D6*142.001:
     pharmvar: https://www.pharmvar.org/haplotype/1439
     activity: unknown
@@ -4919,6 +5501,32 @@ alleles:
     - [8565, insA, rs1269631565]
     - [8572, C>T, rs879173025]
     - [9200, G>C, rs1135840, S486T]
+  CYP2D6*146.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2206
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5096, G>A, rs28371696, R26H]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
   CYP2D6*147.001:
     pharmvar: https://www.pharmvar.org/haplotype/1806
     activity: unknown
@@ -4966,11 +5574,10 @@ alleles:
     - [9200, G>C, rs1135840, S486T]
     - [9501, G>A, rs12169962]
   CYP2D6*149.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1731
+    pharmvar: https://www.pharmvar.org/haplotype/2635
     activity: unknown
     evidence: D
     mutations:
-    - [3426, T>C, rs1080984]
     - [3602, T>A, rs1080986]
     - [3612, G>A, rs1080987]
     - [4280, C>T, rs28624811]
@@ -4980,7 +5587,6 @@ alleles:
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
     - [6012, C>G, rs76802407, D97E]
-    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
     - [7143, C>T, rs76327133]
     - [7235, A>G, rs80262685]
     - [7490, T>C, rs17002852]
@@ -4988,8 +5594,59 @@ alleles:
     - [8203, G>A, rs59421388, V338M]
     - [8404, A>C, rs1985842]
     - [9200, G>C, rs1135840, S486T]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
+  CYP2D6*150.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2525
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4280, C>T, rs28624811]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6992, insG, rs763609904, E211fs]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+    - [6998, CT>TC, rs199535154]
+  CYP2D6*150.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2639
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+    - [6057, C>T, rs1081003]
+    - [6681, G>C, rs1058164]
+    - [6992, insG, rs763609904, E211fs]
+    - [7117, A>G, rs2267447]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [9200, G>C, rs1135840, S486T]
+    - [9421, C>T, rs28371738]
+    - [6998, CT>TC, rs199535154]
+  CYP2D6*151.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2195
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4976, insG, rs28371695]
+    - [6885, A>G, rs1459127426, N175S]
   CYP2D6*152.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1929
+    pharmvar: https://www.pharmvar.org/haplotype/2156
     activity: unknown
     evidence: D
     mutations:
@@ -4998,7 +5655,7 @@ alleles:
     - [6085, T>G, rs78854695]
     - [7471, C>T, rs140900383, A226V]
   CYP2D6*153.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1933
+    pharmvar: https://www.pharmvar.org/haplotype/2158
     activity: unknown
     evidence: D
     mutations:
@@ -5030,11 +5687,10 @@ alleles:
     - [9065, G>A, rs532668079, R441H]
     - [9200, G>C, rs1135840, S486T]
   CYP2D6*155.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1941
+    pharmvar: https://www.pharmvar.org/haplotype/2353
     activity: unknown
     evidence: D
     mutations:
-    - [3426, T>C, rs1080984]
     - [3602, T>A, rs1080986]
     - [3612, G>A, rs1080987]
     - [4280, C>T, rs28624811]
@@ -5043,7 +5699,6 @@ alleles:
     - [5762, delC, rs267608275]
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
-    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
     - [7143, C>T, rs76327133]
     - [7235, A>G, rs80262685]
     - [7312, G>A, rs75203276]
@@ -5052,12 +5707,12 @@ alleles:
     - [8404, A>C, rs1985842]
     - [9096, G>A, rs760940331, M451I]
     - [9200, G>C, rs1135840, S486T]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
   CYP2D6*156.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1945
+    pharmvar: https://www.pharmvar.org/haplotype/2354
     activity: none
     evidence: D
     mutations:
-    - [3426, T>C, rs1080984]
     - [3602, T>A, rs1080986]
     - [3612, G>A, rs1080987]
     - [4280, C>T, rs28624811]
@@ -5067,7 +5722,6 @@ alleles:
     - [5762, delC, rs267608275]
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
-    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
     - [7143, C>T, rs76327133]
     - [7235, A>G, rs80262685]
     - [7312, G>A, rs75203276]
@@ -5075,12 +5729,12 @@ alleles:
     - [8203, G>A, rs59421388, V338M]
     - [8404, A>C, rs1985842]
     - [9200, G>C, rs1135840, S486T]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
   CYP2D6*157.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1949
+    pharmvar: https://www.pharmvar.org/haplotype/2355
     activity: unknown
     evidence: D
     mutations:
-    - [3426, T>C, rs1080984]
     - [3602, T>A, rs1080986]
     - [3612, G>A, rs1080987]
     - [4280, C>T, rs28624811]
@@ -5089,7 +5743,6 @@ alleles:
     - [5762, delC, rs267608275]
     - [5764, C>G, rs28371701]
     - [5861, T>G, rs28371702]
-    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
     - [6767, C>T, rs201006451, A165V]
     - [7143, C>T, rs76327133]
     - [7235, A>G, rs80262685]
@@ -5098,8 +5751,9 @@ alleles:
     - [8203, G>A, rs59421388, V338M]
     - [8404, A>C, rs1985842]
     - [9200, G>C, rs1135840, S486T]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
   CYP2D6*158.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1953
+    pharmvar: https://www.pharmvar.org/haplotype/2636
     activity: unknown
     evidence: D
     mutations:
@@ -5245,6 +5899,344 @@ alleles:
     - [8604, G>A, rs28371730]
     - [8810, C>T, rs4987144]
     - [9200, G>C, rs1135840, S486T]
+  CYP2D6*164.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2200
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [5329, G>T, rs28371699]
+    - [5762, delC, rs267608275]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6280, A>G, rs566954285]
+    - [7235, A>G, rs80262685]
+    - [7312, G>A, rs75203276]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [9200, G>C, rs1135840, S486T]
+    - [9421, C>T, rs28371738]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
+  CYP2D6*165.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2356
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3602, T>A, rs1080986]
+    - [3612, G>A, rs1080987]
+    - [4280, C>T, rs28624811]
+    - [4844, G>A, rs1080993]
+    - [5329, G>T, rs28371699]
+    - [5762, delC, rs267608275]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6879, G>A, rs556882139, R173H]
+    - [7143, C>T, rs76327133]
+    - [7235, A>G, rs80262685]
+    - [7312, G>A, rs75203276]
+    - [7870, C>T, rs16947, R296C]
+    - [8203, G>A, rs59421388, V338M]
+    - [8404, A>C, rs1985842]
+    - [9200, G>C, rs1135840, S486T]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
+  CYP2D6*166.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2204
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7484, delCCT, rs777691989, L231del]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*167.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2160
+    activity: unknown
+    evidence: D
+    mutations:
+    - [6071, A>G, '-', Q117R]
+  CYP2D6*168.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2162
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5144, G>A, rs118203758, G42E]
+    - [6514, T>C, rs267608306]
+    - [6947, G>A, rs755518310, E196K]
+  CYP2D6*169.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2164
+    activity: unknown
+    evidence: D
+    mutations:
+    - [8849, G>C, rs1602566413, V402L]
+  CYP2D6*170.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2166
+    activity: unknown
+    evidence: D
+    mutations:
+    - [8934, C>T, rs3021084, P430L]
+  CYP2D6*171.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2637
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3602, T>A, rs1080986]
+    - [3612, G>A, rs1080987]
+    - [4280, C>T, rs28624811]
+    - [4844, G>A, rs1080993]
+    - [5329, G>T, rs28371699]
+    - [5762, delC, rs267608275]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6628, G>A, rs374616348, V119M]
+    - [7143, C>T, rs76327133]
+    - [7235, A>G, rs80262685]
+    - [7312, G>A, rs75203276]
+    - [7870, C>T, rs16947, R296C]
+    - [8203, G>A, rs59421388, V338M]
+    - [8404, A>C, rs1985842]
+    - [9200, G>C, rs1135840, S486T]
+    - [6679, G.G>A.C, rs61736512+rs1058164, V136I]
+  CYP2D6*172.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2302
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5050, G>A, rs769258, V11M]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6058, G>C, rs563185985, G113R]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*173.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2499
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5912, G>A, rs1415188318, R64H]
+  CYP2D6*174.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2501
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5028, insA, rs1240247139, E4fs]
+    - [8180, G>C, rs141009491, R330P]
+  CYP2D6*175.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2638
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5050, G>A, rs769258, V11M]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8203, G>A, rs59421388, V338M]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*176.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2520
+    activity: unknown
+    evidence: D
+    mutations:
+    - [7630, T>A, rs1135828, M279K]
+    - [7651, C>A, rs77562994]
+  CYP2D6*177.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2523
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3594, C>T, rs28588594]
+    - [4020, G>A, rs1080989]
+    - [5119, C>T, rs1065852, P34S]
+    - [5329, G>T, rs28371699]
+    - [5861, T>G, rs28371702]
+    - [6057, C>T, rs1081003]
+    - [6681, G>C, rs1058164]
+    - [7117, A>G, rs2267447]
+    - [8177, G>T, rs3915951, R329L]
+    - [8404, A>C, rs1985842]
+    - [8602, A>G, rs2004511]
+    - [9200, G>C, rs1135840, S486T]
+    - [9421, C>T, rs28371738]
+  CYP2D6*178.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2810
+    activity: unknown
+    evidence: D
+    mutations:
+    - [6935, G>A, rs538707090, G192R]
+  CYP2D6*179.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2812
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6637, G>T, rs1135823, A122S]
+    - [6681, G>C, rs1058164]
+    - [6803, A>C, rs200002499]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*180.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2814
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5931, C>A, rs1477736084, S70R]
+    - [7635, delAAG, rs5030656, K281del]
+  CYP2D6*181.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2816
+    activity: unknown
+    evidence: D
+    mutations:
+    - [7479, G>A, rs993385303, V229I]
+  CYP2D6*182.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2818
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8218, C>T, rs267608295, R343W]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*183.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2820
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [7969, C>T, rs150216909, R329C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9200, G>C, rs1135840, S486T]
+    - [9501, G>A, rs12169962]
+  CYP2D6*184.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2822
+    activity: unknown
+    evidence: D
+    mutations:
+    - [3436, C>G, rs1080985]
+    - [4280, C>T, rs28624811]
+    - [4342, G>A, rs28633410]
+    - [5050, G>A, rs769258, V11M]
+    - [5233, G>C, rs1080995]
+    - [5240, C>A, rs1080996]
+    - [5242, C>G, rs1080997]
+    - [5246, T>C, rs1080998]
+    - [5251, G>C, rs29001518]
+    - [5252, A>C, rs28695233]
+    - [5264, A>G, rs1081000]
+    - [5329, G>T, rs28371699]
+    - [5764, C>G, rs28371701]
+    - [5861, T>G, rs28371702]
+    - [6681, G>C, rs1058164]
+    - [7870, C>T, rs16947, R296C]
+    - [8404, A>C, rs1985842]
+    - [8604, G>A, rs28371730]
+    - [8810, C>T, rs4987144]
+    - [9501, G>A, rs12169962]
+  CYP2D6*185.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2824
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5992, C>A, rs28371703, L91M]
+    - [6002, A>G, rs28371704, H94R]
+    - [6015, C>G, rs28371705]
+    - [7740, G>C, rs187203531]
 structure:
   genes: [CYP2D6, CYP2D7]
   regions:
@@ -5306,11 +6298,7 @@ reference:
   - [8818, 8960]
   - [9058, 9237]
   cpic:
-    scores:
-      normal: 1.0
-      none: 0.0
-      decreased-50: 0.25
-      decreased: 0.5
+    scores: {normal: 1.0, none: 0.0, decreased-50: 0.25, decreased: 0.5}
     conditions:
       poor: [0, 0]
       intermediate: [0.001, 1.249]

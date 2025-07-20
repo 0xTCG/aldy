@@ -1,6 +1,6 @@
 name: CYP2C8
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 18214
 ensembl: ENSG00000138115
 alleles:
@@ -227,7 +227,7 @@ alleles:
     label: CYP2C8*10
     evidence: L
     mutations:
-    - [31608, G>T, '-', K383N]
+    - [31608, G>T, rs2134410323, K383N]
   CYP2C8*11.001:
     pharmvar: https://www.pharmvar.org/haplotype/296
     activity: unknown
@@ -248,7 +248,7 @@ alleles:
     label: CYP2C8*13
     evidence: L
     mutations:
-    - [16013, T>G, '-', I223M]
+    - [16013, T>G, rs2134428602, I223M]
   CYP2C8*14.001:
     pharmvar: https://www.pharmvar.org/haplotype/284
     activity: unknown

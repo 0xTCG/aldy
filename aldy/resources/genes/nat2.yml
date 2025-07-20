@@ -1,6 +1,6 @@
 name: NAT2
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 14759
 ensembl: ENSG00000156006
 alleles:
@@ -37,6 +37,12 @@ alleles:
     evidence: D
     mutations:
     - [14893, C>T, rs56011639]
+  NAT2*1.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2801
+    activity: unknown
+    evidence: D
+    mutations:
+    - [14785, A>G, rs185257970]
   NAT2*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/2437
     activity: unknown
@@ -155,6 +161,15 @@ alleles:
     - [14240, C>T, rs1799929]
     - [14658, G>A, rs372479247]
     - [14780, T>C, rs2552]
+  NAT2*5.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2646
+    activity: unknown
+    label: '*5BB'
+    evidence: L
+    mutations:
+    - [14100, T>C, rs1801280, I114T]
+    - [14104, C>T, rs45532639]
+    - [14240, C>T, rs1799929]
   NAT2*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/2455
     activity: unknown
@@ -219,6 +234,24 @@ alleles:
     - [14146, C>T, rs144828000]
     - [14349, G>A, rs1799930, R197Q]
     - [14562, G>A, rs1208, R268K]
+  NAT2*6.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2802
+    activity: unknown
+    evidence: D
+    mutations:
+    - [14041, C>T, rs1041983]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14562, G>A, rs1208, R268K]
+    - [14670, C>G, rs574856610]
+  NAT2*6.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2803
+    activity: unknown
+    evidence: M
+    mutations:
+    - [14041, C>T, rs1041983]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14562, G>A, rs1208, R268K]
+    - [14838, A>G, rs548735633]
   NAT2*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/2460
     activity: unknown
@@ -379,7 +412,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/2476
     activity: unknown
     label: NAT2*6C
-    evidence: L
+    evidence: D
     mutations:
     - [14041, C>T, rs1041983]
     - [14349, G>A, rs1799930, R197Q]
@@ -452,7 +485,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/2469
     activity: unknown
     label: NAT2*12F
-    evidence: L
+    evidence: D
     mutations:
     - [14381, T>C, rs56387565, Y208H]
   NAT2*43.001:
@@ -533,6 +566,121 @@ alleles:
     - [13766, A>G, rs200893121, I3V]
     - [14041, C>T, rs1041983]
     - [14349, G>A, rs1799930, R197Q]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*51.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2641
+    activity: unknown
+    label: '*12N'
+    evidence: D
+    mutations:
+    - [13880, A>T, rs149283608, N41Y]
+  NAT2*52.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2643
+    activity: unknown
+    label: '*6G'
+    evidence: L
+    mutations:
+    - [14041, C>T, rs1041983]
+    - [14277, A>G, rs369500066, K173R]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*53.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2645
+    activity: unknown
+    evidence: D
+    mutations:
+    - [14007, G>C, rs561124342, G83A]
+    - [14041, C>T, rs1041983]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*54.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2772
+    activity: unknown
+    evidence: M
+    mutations:
+    - [13788, T>C, rs72466456, I10T]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*55.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2777
+    activity: unknown
+    evidence: M
+    mutations:
+    - [13810, C>G, rs201339185, N17K]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*56.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2784
+    activity: unknown
+    evidence: M
+    mutations:
+    - [13817, G>T, rs532310930, D20Y]
+    - [14041, C>T, rs1041983]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*57.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2786
+    activity: unknown
+    evidence: D
+    mutations:
+    - [14080, C>A, rs549917500, H107Q]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*58.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2788
+    activity: unknown
+    evidence: M
+    mutations:
+    - [14041, C>T, rs1041983]
+    - [14105, G>A, rs183409091, G116S]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*59.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2790
+    activity: unknown
+    evidence: M
+    mutations:
+    - [14234, T>A, rs537007806, W159R]
+    - [14562, G>A, rs1208, R268K]
+    - [14616, G>A, rs1799931, G286E]
+  NAT2*60.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2792
+    activity: unknown
+    evidence: M
+    mutations:
+    - [14250, T>C, rs139512288, I164T]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*61.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2794
+    activity: unknown
+    evidence: M
+    mutations:
+    - [14041, C>T, rs1041983]
+    - [14265, A>G, rs200585149, Y169C]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*62.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2796
+    activity: unknown
+    evidence: D
+    mutations:
+    - [14041, C>T, rs1041983]
+    - [14295, A>G, rs572750517, H179R]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*63.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2798
+    activity: unknown
+    evidence: M
+    mutations:
+    - [14041, C>T, rs1041983]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14409, T>A, rs568110818, F217Y]
+    - [14562, G>A, rs1208, R268K]
+  NAT2*64.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2800
+    activity: unknown
+    evidence: M
+    mutations:
+    - [14041, C>T, rs1041983]
+    - [14349, G>A, rs1799930, R197Q]
+    - [14555, G>A, rs539346244, V266M]
     - [14562, G>A, rs1208, R268K]
 structure:
   genes: [NAT2]

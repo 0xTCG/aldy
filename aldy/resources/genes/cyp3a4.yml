@@ -1,6 +1,6 @@
 name: CYP3A4
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 13729
 ensembl: ENSG00000160868
 alleles:
@@ -48,6 +48,67 @@ alleles:
     mutations:
     - [4713, G>A, rs2740574]
     - [4804, T>C, rs35223458]
+  CYP3A4*1.007:
+    pharmvar: https://www.pharmvar.org/haplotype/2260
+    activity: unknown
+    evidence: D
+    mutations:
+    - [20741, C>T, rs4987159]
+  CYP3A4*1.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2261
+    activity: unknown
+    evidence: M
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [4986, A>G, rs535078648]
+  CYP3A4*1.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2262
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [20762, A>G, rs113667357]
+  CYP3A4*1.010:
+    pharmvar: https://www.pharmvar.org/haplotype/2263
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [4883, T>G, rs1185315431]
+    - [4886, A>G, rs12721637]
+  CYP3A4*1.011:
+    pharmvar: https://www.pharmvar.org/haplotype/2924
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [31099, G>A, rs370438919]
+  CYP3A4*1.012:
+    pharmvar: https://www.pharmvar.org/haplotype/2925
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [5043, C>A, rs12721636]
+  CYP3A4*1.013:
+    pharmvar: https://www.pharmvar.org/haplotype/2926
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [31020, T>G, rs148317879]
+  CYP3A4*1.014:
+    pharmvar: https://www.pharmvar.org/haplotype/2927
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4890, T>A, rs144721069]
+  CYP3A4*1.015:
+    pharmvar: https://www.pharmvar.org/haplotype/2928
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4985, A>G, rs12721633]
   CYP3A4*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/1500
     activity: unknown
@@ -68,7 +129,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/1496
     activity: unknown
     label: CYP3A4*4
-    evidence: M
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [18984, A>G, rs55951658, I118V]
@@ -76,7 +137,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/1509
     activity: unknown
     label: CYP3A4*5
-    evidence: M
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [20815, C>G, rs55901263, P218R]
@@ -84,30 +145,30 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/1513
     activity: unknown
     label: CYP3A4*6
-    evidence: L
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [22774, insA, rs4646438, D277fs]
   CYP3A4*7.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1526
+    pharmvar: https://www.pharmvar.org/haplotype/2264
     activity: unknown
     label: CYP3A4*7
-    evidence: L
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [11107, G>A, rs56324128, G56D]
   CYP3A4*8.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1754
+    pharmvar: https://www.pharmvar.org/haplotype/2241
     activity: unknown
     label: CYP3A4*8
     evidence: L
     mutations:
     - [19021, G>A, rs72552799, R130Q]
   CYP3A4*9.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1756
+    pharmvar: https://www.pharmvar.org/haplotype/2239
     activity: unknown
     label: CYP3A4*9
-    evidence: L
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [19405, G>A, rs72552798, V170I]
@@ -123,11 +184,11 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/1508
     activity: unknown
     label: CYP3A4*11
-    evidence: L
+    evidence: D
     mutations:
     - [26980, C>T, rs67784355, T363M]
   CYP3A4*12.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1758
+    pharmvar: https://www.pharmvar.org/haplotype/2243
     activity: unknown
     label: CYP3A4*12
     evidence: D
@@ -149,14 +210,14 @@ alleles:
     - [4713, G>A, rs2740574]
     - [5148, T>C, rs12721634, L15P]
   CYP3A4*15.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1760
+    pharmvar: https://www.pharmvar.org/haplotype/2245
     activity: unknown
     label: CYP3A4*15A, CYP3A4*15B
     evidence: D
     mutations:
     - [19382, G>A, rs4986907, R162Q]
   CYP3A4*16.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1762
+    pharmvar: https://www.pharmvar.org/haplotype/2247
     activity: unknown
     label: CYP3A4*16A, CYP3A4*16B
     evidence: D
@@ -171,18 +232,18 @@ alleles:
     mutations:
     - [20728, T>C, rs4987161, F189S]
   CYP3A4*18.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1764
+    pharmvar: https://www.pharmvar.org/haplotype/2249
     activity: unknown
     label: CYP3A4*18A, CYP3A4*18B
-    evidence: M
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [25183, T>C, rs28371759, L293P]
   CYP3A4*19.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1766
+    pharmvar: https://www.pharmvar.org/haplotype/2251
     activity: unknown
     label: CYP3A4*19
-    evidence: L
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [28350, C>T, rs4986913, P467S]
@@ -190,7 +251,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/1505
     activity: unknown
     label: CYP3A4*20
-    evidence: L
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [31002, insA, rs67666821, P488fs]
@@ -198,7 +259,7 @@ alleles:
     pharmvar: https://www.pharmvar.org/haplotype/1506
     activity: unknown
     label: CYP3A4*21
-    evidence: M
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [25261, A>G, rs201821708, Y319C]
@@ -211,17 +272,17 @@ alleles:
     - [4713, G>A, rs2740574]
     - [20493, C>T, rs35599367, splice defect]
   CYP3A4*23.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1768
+    pharmvar: https://www.pharmvar.org/haplotype/2253
     activity: unknown
     label: CYP3A4*23
-    evidence: M
+    evidence: D
     mutations:
     - [19381, C>T, rs57409622, R162W]
   CYP3A4*24.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1770
+    pharmvar: https://www.pharmvar.org/haplotype/2255
     activity: unknown
     label: CYP3A4*24
-    evidence: M
+    evidence: D
     mutations:
     - [20762, A>T, rs113667357, Q200H]
   CYP3A4*26.001:
@@ -233,10 +294,10 @@ alleles:
     - [4713, G>A, rs2740574]
     - [22746, C>T, rs138105638, R268X]
   CYP3A4*28.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1772
+    pharmvar: https://www.pharmvar.org/haplotype/2257
     activity: unknown
     label: CYP3A4*28
-    evidence: L
+    evidence: D
     mutations:
     - [4713, G>A, rs2740574]
     - [5168, C>G, rs570051168, L22V]
@@ -304,6 +365,82 @@ alleles:
     - [4713, G>A, rs2740574]
     - [20493, C>T, rs35599367, splice defect]
     - [28285, T>C, rs4986910, M445T]
+  CYP3A4*38.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2259
+    activity: unknown
+    evidence: M
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [26980, C>T, rs67784355, T363M]
+    - [28285, T>C, rs4986910, M445T]
+  CYP3A4*39.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2360
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5108, G>A, rs1226205448, A2T]
+  CYP3A4*40.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2362
+    activity: unknown
+    evidence: D
+    mutations:
+    - [9150, C>T, rs2485908963, P41S]
+  CYP3A4*41.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2364
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [18990, A>G, rs2485889420, I120V]
+  CYP3A4*42.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2366
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [20739, A>G, rs3208361, I193V]
+  CYP3A4*43.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2368
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [22747, G>A, rs145582851, R267Q]
+  CYP3A4*44.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2370
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [22762, A>G, rs1429705359, Q273R]
+  CYP3A4*45.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2372
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [27132, T>A, '-', F414I]
+  CYP3A4*46.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2374
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [30958, A>T, rs1584538410, I473F]
+  CYP3A4*47.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2376
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [27117, A>C, '-', T409P]
+  CYP3A4*48.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2378
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4713, G>A, rs2740574]
+    - [26952, G>A, rs1318364992, E354K]
 structure:
   genes: [CYP3A4]
   regions:

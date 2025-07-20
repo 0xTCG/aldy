@@ -1,242 +1,637 @@
 name: CYP1A2
-version: pharmgkb-karolinska+pharmacoscan-r9
-generated: '2022-08-26'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
+pharmvar: 25588
 ensembl: ENSG00000140505
 alleles:
   CYP1A2*1.001:
-    label: CYP1A2*1B
+    pharmvar: https://www.pharmvar.org/haplotype/2759
+    activity: unknown
+    label: CYP1A2*1A
+    evidence: D
     mutations: []
   CYP1A2*1.002:
-    label: CYP1A2*1A
+    pharmvar: https://www.pharmvar.org/haplotype/2704
+    activity: unknown
+    label: CYP1A2*1B, CYP1A2*1S, CYP1A2*1T
+    evidence: D
     mutations:
     - [11241, T>C, rs2470890]
   CYP1A2*1.003:
-    label: CYP1A2*1C
-    mutations:
-    - [2035, G>A, rs2069514]
-  CYP1A2*1.004:
-    label: CYP1A2*1D
-    mutations:
-    - [3428, delT, rs35694136]
-  CYP1A2*1.005:
-    label: CYP1A2*1E
-    mutations:
-    - [5156, T>G, rs2069526]
-  CYP1A2*1.006:
-    label: CYP1A2*1F
-    mutations:
-    - [5732, C>A, rs762551]
-  CYP1A2*1.008:
-    label: CYP1A2*1H
-    mutations:
-    - [7919, A>C, '-']
-  CYP1A2*1.009:
-    label: CYP1A2*1J
-    mutations:
-    - [5156, T>G, rs2069526]
-    - [5732, C>A, rs762551]
-  CYP1A2*1.010:
-    label: CYP1A2*1K
-    mutations:
-    - [5156, T>G, rs2069526]
-    - [5166, C>T, rs12720461]
-    - [5732, C>A, rs762551]
-  CYP1A2*1.011:
-    label: CYP1A2*1L
-    mutations:
-    - [2035, G>A, rs2069514]
-    - [3428, delT, rs35694136]
-    - [5732, C>A, rs762551]
-  CYP1A2*1.012:
-    label: CYP1A2*1M
-    mutations:
-    - [5732, C>A, rs762551]
-    - [8053, G>A, rs2472304]
-  CYP1A2*1.013:
-    label: CYP1A2*1N
-    mutations:
-    - [2301, T>G, '-']
-    - [3428, delT, rs35694136]
-    - [5732, C>A, rs762551]
-    - [8215, G>C, '-']
-    - [11415, A>G, '-']
-  CYP1A2*1.014:
-    label: CYP1A2*1P
-    mutations:
-    - [2301, T>G, '-']
-    - [3428, delT, rs35694136]
-    - [5162, G>C, '-']
-    - [5732, C>A, rs762551]
-    - [8215, G>C, '-']
-    - [11415, A>G, '-']
-  CYP1A2*1.015:
-    label: CYP1A2*1Q
-    mutations:
-    - [3087, A>C, '-']
-    - [5732, C>A, rs762551]
-    - [8053, G>A, rs2472304]
-  CYP1A2*1.016:
-    label: CYP1A2*1R
-    mutations:
-    - [2301, T>G, '-']
-    - [3428, delT, rs35694136]
-    - [5528, C>T, '-']
-    - [5732, C>A, rs762551]
-    - [8215, G>C, '-']
-    - [11415, A>G, '-']
-  CYP1A2*1.017:
-    label: CYP1A2*1S
-    mutations:
-    - [2842, A>G, '-']
-  CYP1A2*1.018:
-    label: CYP1A2*1T
-    mutations:
-    - [3228, T>G, '-']
-  CYP1A2*1.019:
+    pharmvar: https://www.pharmvar.org/haplotype/2720
+    activity: unknown
     label: CYP1A2*1U
+    evidence: M
     mutations:
-    - [6572, C>T, '-']
-  CYP1A2*1.020:
-    label: CYP1A2*1V
+    - [6572, C>T, rs1596357673]
+    - [11241, T>C, rs2470890]
+  CYP1A2*1.004:
+    pharmvar: https://www.pharmvar.org/haplotype/2765
+    activity: unknown
+    evidence: D
     mutations:
-    - [3428, delT, rs35694136]
-    - [5732, C>A, rs762551]
-  CYP1A2*1.021:
-    label: CYP1A2*1W
+    - [5390, G>A, rs45607039]
+    - [11241, T>C, rs2470890]
+  CYP1A2*1.005:
+    pharmvar: https://www.pharmvar.org/haplotype/2745
+    activity: unknown
+    evidence: M
     mutations:
-    - [3428, delT, rs35694136]
-    - [5156, T>G, rs2069526]
-    - [5732, C>A, rs762551]
+    - [6305, G>A, rs551386466]
+    - [11241, T>C, rs2470890]
+  CYP1A2*1.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2730
+    activity: unknown
+    evidence: M
+    mutations:
+    - [6035, C>T, rs200749915]
+    - [11241, T>C, rs2470890]
+  CYP1A2*1.007:
+    pharmvar: https://www.pharmvar.org/haplotype/2714
+    activity: unknown
+    evidence: M
+    mutations:
+    - [6488, C>T, rs567343028]
+    - [11241, T>C, rs2470890]
+  CYP1A2*1.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2746
+    activity: unknown
+    evidence: D
+    mutations:
+    - [7374, G>A, rs531577033]
+    - [11241, T>C, rs2470890]
+  CYP1A2*1.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2753
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5337, C>T, rs190560674]
+    - [11241, T>C, rs2470890]
+  CYP1A2*1.010:
+    pharmvar: https://www.pharmvar.org/haplotype/2721
+    activity: unknown
+    evidence: D
+    mutations:
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*1.011:
+    pharmvar: https://www.pharmvar.org/haplotype/2737
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5116, T>C, rs138161886]
+    - [11241, T>C, rs2470890]
+  CYP1A2*1.012:
+    pharmvar: https://www.pharmvar.org/haplotype/2706
+    activity: unknown
+    evidence: M
+    mutations:
+    - [6509, C>T, rs17861155]
+    - [6611, C>T, rs572583823]
+    - [11241, T>C, rs2470890]
   CYP1A2*2.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2701
+    activity: unknown
     label: CYP1A2*2
+    evidence: L
     mutations:
     - [5957, C>G, rs56160784, F21L]
   CYP1A2*3.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2725
+    activity: unknown
     label: CYP1A2*3
+    evidence: L
     mutations:
     - [8010, G>A, rs56276455, D348N]
+    - [11241, T>C, rs2470890]
   CYP1A2*4.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2889
+    activity: unknown
     label: CYP1A2*4
+    evidence: L
     mutations:
     - [8393, A>T, rs72547516, I386F]
   CYP1A2*5.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2700
+    activity: unknown
     label: CYP1A2*5
+    evidence: L
     mutations:
     - [9390, G>A, rs55889066, C406Y]
   CYP1A2*6.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2698
+    activity: unknown
     label: CYP1A2*6
+    evidence: D
     mutations:
     - [10984, C>T, rs28399424, R431W]
+    - [11241, T>C, rs2470890]
   CYP1A2*7.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2702
+    activity: unknown
     label: CYP1A2*7
+    evidence: L
     mutations:
-    - [9427, G>A, rs56107638, Splicing defect]
+    - [9427, G>A, rs56107638, splice defect]
   CYP1A2*8.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2739
+    activity: unknown
     label: CYP1A2*8
+    evidence: M
     mutations:
     - [11060, G>A, rs72547517, R456H]
+    - [11241, T>C, rs2470890]
   CYP1A2*9.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2705
+    activity: unknown
     label: CYP1A2*9
+    evidence: L
     mutations:
+    - [5732, C>A, rs762551, expression]
     - [6142, C>T, rs138652540, T83M]
-  CYP1A2*9.002:
-    label: CYP1A2*9_1F
-    mutations:
-    - [5732, C>A, rs762551]
-    - [6142, C>T, rs138652540, T83M]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
   CYP1A2*10.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2764
+    activity: unknown
     label: CYP1A2*10
+    evidence: M
     mutations:
+    - [5732, C>A, rs762551, expression]
     - [6396, G>C, rs72547512, E168Q]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
   CYP1A2*11.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2893
+    activity: unknown
     label: CYP1A2*11
+    evidence: L
     mutations:
     - [6452, C>A, rs72547513, F186L]
   CYP1A2*12.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2747
+    activity: unknown
     label: CYP1A2*12
+    evidence: M
     mutations:
     - [6528, A>T, rs758748797, S212C]
+    - [11241, T>C, rs2470890]
   CYP1A2*13.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2760
+    activity: unknown
     label: CYP1A2*13
+    evidence: L
     mutations:
+    - [5732, C>A, rs762551, expression]
     - [7408, G>A, rs35796837, G299S]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
   CYP1A2*13.002:
-    label: CYP1A2*13_1F
+    pharmvar: https://www.pharmvar.org/haplotype/2751
+    activity: unknown
+    evidence: M
     mutations:
-    - [5732, C>A, rs762551]
+    - [5732, C>A, rs762551, expression]
     - [7408, G>A, rs35796837, G299S]
+    - [11241, T>C, rs2470890]
   CYP1A2*14.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2749
+    activity: unknown
     label: CYP1A2*14
+    evidence: L
     mutations:
+    - [5156, T>G, rs2069526]
+    - [5732, C>A, rs762551, expression]
     - [11006, C>T, rs45486893, T438I]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
   CYP1A2*15.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2727
+    activity: unknown
     label: CYP1A2*15
+    evidence: L
     mutations:
+    - [5732, C>A, rs762551, expression]
     - [6019, C>G, rs72547511, P42R]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
   CYP1A2*16.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2713
+    activity: unknown
     label: CYP1A2*16
+    evidence: L
     mutations:
     - [8367, G>A, rs72547515, R377Q]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
   CYP1A2*17.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2728
+    activity: unknown
     label: CYP1A2*17
+    evidence: L
     mutations:
-    - [5732, C>A, rs762551]
-    - [8053, G>A, rs2472304]
+    - [5732, C>A, rs762551, expression]
     - [9357, C>T, rs149928755, T395M]
-  CYP1A2*17.1001:
-    label: CYP1A2*17.ALDY
-    mutations:
-    - [8053, G>A, rs2472304]
-    - [9357, C>T, rs149928755, T395M]
+    - [11241, T>C, rs2470890]
   CYP1A2*18.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2755
+    activity: unknown
     label: CYP1A2*18
+    evidence: L
     mutations:
-    - [9362, A>C, '-', N397H]
+    - [9362, A>C, rs2505559894, D397H]
+    - [11241, T>C, rs2470890]
   CYP1A2*19.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2731
+    activity: unknown
     label: CYP1A2*19
+    evidence: L
     mutations:
     - [11222, G>A, rs374094758, R510Q]
+    - [11241, T>C, rs2470890]
   CYP1A2*20.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2697
+    activity: unknown
     label: CYP1A2*20
+    evidence: L
     mutations:
     - [10999, G>A, rs144148965, D436N]
+    - [11241, T>C, rs2470890]
   CYP1A2*21.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2707
+    activity: unknown
     label: CYP1A2*21
+    evidence: D
     mutations:
-    - [5732, C>A, rs762551]
+    - [5732, C>A, rs762551, expression]
     - [7407, C>A, rs17861157, S298R]
     - [11178, C>A, rs143193369, Y495X]
-  CYP1A2*21.002:
+    - [11241, T>C, rs2470890]
+  CYP1A2*22.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2710
+    activity: unknown
+    evidence: D
     mutations:
-    - [5732, C>A, rs762551]
-    - [11178, C>A, rs143193369, Y495X]
-  CYP1A2*21.003:
-    label: CYP1A2*21.ALDY
-    mutations:
+    - [5732, C>A, rs762551, expression]
     - [7407, C>A, rs17861157, S298R]
-    - [11178, C>A, rs143193369, Y495X]
-  CYP1A2*F432S:
+    - [11241, T>C, rs2470890]
+  CYP1A2*22.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2715
+    activity: unknown
+    evidence: D
     mutations:
-    - [ignored, 10988, T>C, rs201485133, F432S]
-    ignored: true
-  CYP1A2*I314V:
+    - [5732, C>A, rs762551, expression]
+    - [7407, C>A, rs17861157, S298R]
+    - [11241, T>C, rs2470890]
+    - [11276, G>A, rs555422666]
+  CYP1A2*23.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2752
+    activity: unknown
+    evidence: D
     mutations:
-    - [ignored, 7453, A>G, rs28399418, I314V]
-    ignored: true
+    - [5732, C>A, rs762551, expression]
+    - [5947, C>G, rs17861152, S18C]
+    - [7407, C>A, rs17861157, S298R]
+    - [11241, T>C, rs2470890]
+  CYP1A2*24.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2695
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6031, G>A, rs568839929, W46X]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*25.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2699
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6591, G>A, rs201537008, G233R]
+  CYP1A2*26.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2703
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6225, C>T, rs45442197, L111F]
+    - [11241, T>C, rs2470890]
+  CYP1A2*27.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2716
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5997, delG, rs758752876, V35fs]
+    - [11241, T>C, rs2470890]
+  CYP1A2*28.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2718
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5937, C>T, rs60086777, L15F]
+    - [11241, T>C, rs2470890]
+  CYP1A2*29.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2743
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [11152, G>A, rs571663822, V487M]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*30.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2757
+    activity: unknown
+    label: CYP1A2*1F, CYP1A2*1L, CYP1A2*1M, CYP1A2*1Q
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+  CYP1A2*30.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2762
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+  CYP1A2*30.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2758
+    activity: unknown
+    label: CYP1A2*1N
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*30.004:
+    pharmvar: https://www.pharmvar.org/haplotype/2717
+    activity: unknown
+    label: CYP1A2*1P
+    evidence: D
+    mutations:
+    - [5162, G>C, rs28399417]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*30.005:
+    pharmvar: https://www.pharmvar.org/haplotype/2754
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5156, T>G, rs2069526]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*30.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2769
+    activity: unknown
+    label: CYP1A2*1R
+    evidence: M
+    mutations:
+    - [5528, C>T, rs183165301]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*30.007:
+    pharmvar: https://www.pharmvar.org/haplotype/2712
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5141, G>A, rs551892521]
+    - [5156, T>G, rs2069526]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*30.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2719
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5717, G>A, rs17861150]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+  CYP1A2*30.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2740
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5552, G>A, rs572865715]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+  CYP1A2*30.010:
+    pharmvar: https://www.pharmvar.org/haplotype/2736
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5156, T>G, rs2069526]
+    - [5546, C>G, rs17861149]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+  CYP1A2*30.011:
+    pharmvar: https://www.pharmvar.org/haplotype/2770
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6200, C>T, rs17861154]
+  CYP1A2*30.012:
+    pharmvar: https://www.pharmvar.org/haplotype/2766
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5467, C>G, rs539136028]
+    - [5732, C>A, rs762551, expression]
+  CYP1A2*30.013:
+    pharmvar: https://www.pharmvar.org/haplotype/2732
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [5873, T>G, rs41279196]
+  CYP1A2*30.014:
+    pharmvar: https://www.pharmvar.org/haplotype/2734
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5416, C>A, rs368142304]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*30.015:
+    pharmvar: https://www.pharmvar.org/haplotype/2735
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5156, T>G, rs2069526]
+    - [5535, T>C, rs2063303101]
+    - [5732, C>A, rs762551, expression]
+    - [11241, T>C, rs2470890]
+    - [11289, C>G, rs79624223]
+    - [11415, A>G, rs11636419]
+  CYP1A2*30.016:
+    pharmvar: https://www.pharmvar.org/haplotype/2741
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5167, G>A, rs888083658]
+    - [5732, C>A, rs762551, expression]
+  CYP1A2*30.017:
+    pharmvar: https://www.pharmvar.org/haplotype/2738
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [11073, G>C, rs774412529]
+  CYP1A2*31.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2750
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [8303, C>T, rs147333000, R356W]
+    - [11241, T>C, rs2470890]
+  CYP1A2*32.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2694
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6342, G>A, rs192799115, A150T]
+    - [11241, T>C, rs2470890]
+  CYP1A2*33.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2708
+    activity: unknown
+    evidence: D
+    mutations:
+    - [6036, T>G, rs201763966]
+    - [11241, T>C, rs2470890]
+  CYP1A2*34.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2756
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [8300, C>T, rs148157092, R355W]
+  CYP1A2*35.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2726
+    activity: unknown
+    evidence: D
+    mutations:
+    - [7354, C>T, rs45468096, R281W]
+    - [11241, T>C, rs2470890]
+  CYP1A2*36.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2763
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6111, G>A, rs45565238, G73R]
+    - [7407, C>A, rs17861157, S298R]
+    - [11241, T>C, rs2470890]
+  CYP1A2*37.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2761
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6204, G>A, rs34067076, D104N]
+  CYP1A2*38.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2729
+    activity: unknown
+    evidence: D
+    mutations:
+    - [6117, G>A, rs150164960, V75I]
+    - [11241, T>C, rs2470890]
+  CYP1A2*39.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2767
+    activity: unknown
+    evidence: D
+    mutations:
+    - [6563, T>C, rs767386512]
+    - [6564, C>A, rs773105304, H224N]
+    - [11241, T>C, rs2470890]
+  CYP1A2*40.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2723
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5156, T>G, rs2069526]
+    - [5732, C>A, rs762551, expression]
+    - [11062, C>T, rs34151816, R457W]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*41.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2724
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6453, G>A, rs369511887, D187N]
+  CYP1A2*42.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2768
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [6523, C>T, rs202191520, P210L]
+    - [11241, T>C, rs2470890]
+  CYP1A2*43.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2722
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [11033, A>T, rs566851431, K447M]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*44.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2709
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [11077, G>C, rs199528490, V462L]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*45.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2748
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [11215, C>T, rs200075745, Q508X]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
+  CYP1A2*46.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2744
+    activity: unknown
+    evidence: D
+    mutations:
+    - [6163, G>A, rs201551575, R90H]
+    - [11241, T>C, rs2470890]
+  CYP1A2*47.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2742
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5056, delA, rs1288558234]
+    - [5057, C>G, rs913188841]
+    - [5717, G>A, rs17861150]
+    - [5732, C>A, rs762551, expression]
+    - [6507, T>G, rs45540640, F205V]
+    - [11241, T>C, rs2470890]
+  CYP1A2*49.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2891
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5732, C>A, rs762551, expression]
+    - [8393, A>G, rs72547516, I386V]
+    - [11241, T>C, rs2470890]
+    - [11415, A>G, rs11636419]
   CYP1A2*L65P:
     mutations:
     - [6088, T>C, rs71651689, L65P]
-  CYP1A2*P485R:
-    mutations:
-    - [ignored, 11147, C>G, '-', P485R]
-    ignored: true
-  CYP1A2*S18C:
-    mutations:
-    - [ignored, 5947, C>G, rs17861152, S18C]
-    ignored: true
-  CYP1A2*S298R:
-    mutations:
-    - [7407, C>A, rs17861157, S298R]
 structure:
   genes: [CYP1A2]
   regions:

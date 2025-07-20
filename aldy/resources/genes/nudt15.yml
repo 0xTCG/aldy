@@ -1,6 +1,6 @@
 name: NUDT15
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 22812
 ensembl: ENSG00000136159
 alleles:
@@ -52,6 +52,24 @@ alleles:
     evidence: D
     mutations:
     - [5130, G>A, rs113950881]
+  NUDT15*1.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2806
+    activity: normal
+    evidence: D
+    mutations:
+    - [5016, A>G, rs45493295]
+  NUDT15*1.010:
+    pharmvar: https://www.pharmvar.org/haplotype/2807
+    activity: normal
+    evidence: D
+    mutations:
+    - [13339, C>A, rs111793948]
+  NUDT15*1.011:
+    pharmvar: https://www.pharmvar.org/haplotype/2808
+    activity: normal
+    evidence: D
+    mutations:
+    - [8396, A>G, rs200519664]
   NUDT15*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/349
     activity: none
@@ -162,11 +180,17 @@ alleles:
     mutations:
     - [5183, G>C, '-', M1I]
   NUDT15*20.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1317
+    pharmvar: https://www.pharmvar.org/haplotype/1925
     activity: unknown
     evidence: D
     mutations:
     - [13124, C>G, rs768324690, P129R]
+  NUDT15*21.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2805
+    activity: unknown
+    evidence: D
+    mutations:
+    - [13148, G>C, rs1185228044, G137A]
 structure:
   genes: [NUDT15]
   regions:

@@ -1,6 +1,6 @@
 name: CYP2C9
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 18211
 ensembl: ENSG00000138109
 alleles:
@@ -87,6 +87,40 @@ alleles:
     evidence: D
     mutations:
     - [5093, T>C, '-']
+  CYP2C9*1.014:
+    pharmvar: https://www.pharmvar.org/haplotype/2935
+    activity: normal
+    evidence: D
+    mutations:
+    - [56091, A>G, rs9332244]
+  CYP2C9*1.015:
+    pharmvar: https://www.pharmvar.org/haplotype/2936
+    activity: normal
+    evidence: D
+    mutations:
+    - [4338, T>C, rs4918758]
+    - [16109, C>T, rs149158426]
+  CYP2C9*1.016:
+    pharmvar: https://www.pharmvar.org/haplotype/2937
+    activity: normal
+    evidence: D
+    mutations:
+    - [3929, T>C, rs9332095]
+    - [3961, C>T, rs9332096]
+    - [4338, T>C, rs4918758]
+  CYP2C9*1.017:
+    pharmvar: https://www.pharmvar.org/haplotype/2938
+    activity: normal
+    evidence: D
+    mutations:
+    - [4338, T>C, rs4918758]
+    - [4747, C>T, rs112053016]
+  CYP2C9*1.018:
+    pharmvar: https://www.pharmvar.org/haplotype/2939
+    activity: normal
+    evidence: D
+    mutations:
+    - [9132, C>T, rs142079687]
   CYP2C9*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/44
     activity: decreased
@@ -120,6 +154,31 @@ alleles:
     - [4906, G>T, rs9332100]
     - [9133, C>T, rs1799853, R144C]
     - [55979, C>G, rs9332242]
+  CYP2C9*2.005:
+    pharmvar: https://www.pharmvar.org/haplotype/2940
+    activity: decreased
+    evidence: D
+    mutations:
+    - [4338, T>C, rs4918758]
+    - [4430, A>G, rs4917636]
+    - [4906, G>T, rs9332100]
+    - [5041, T>A, rs9332101]
+    - [5042, C>A, rs9332102]
+    - [9133, C>T, rs1799853, R144C]
+    - [55979, C>G, rs9332242]
+  CYP2C9*2.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2941
+    activity: decreased
+    evidence: D
+    mutations:
+    - [4338, T>C, rs4918758]
+    - [4430, A>G, rs4917636]
+    - [4906, G>T, rs9332100]
+    - [5041, T>A, rs9332101]
+    - [5042, C>A, rs9332102]
+    - [5100, T>C, rs188901044]
+    - [9133, C>T, rs1799853, R144C]
+    - [55979, C>G, rs9332242]
   CYP2C9*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/1776
     activity: none
@@ -141,6 +200,17 @@ alleles:
     - [4545, G>A, rs9332098]
     - [48139, A>C, rs1057910, I359L]
     - [55823, A>T, rs1057911]
+  CYP2C9*3.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2942
+    activity: none
+    evidence: D
+    mutations:
+    - [3989, G>A, rs61604699]
+    - [4338, T>C, rs4918758]
+    - [4545, G>A, rs9332098]
+    - [5055, A>G, rs532912394]
+    - [48139, A>C, rs1057910, I359L]
+    - [55823, A>T, rs1057911]
   CYP2C9*4.001:
     pharmvar: https://www.pharmvar.org/haplotype/24
     activity: decreased
@@ -157,11 +227,12 @@ alleles:
     - [4338, T>C, rs4918758]
     - [48144, C>G, rs28371686, D360E]
   CYP2C9*6.001:
-    pharmvar: https://www.pharmvar.org/haplotype/27
+    pharmvar: https://www.pharmvar.org/haplotype/2943
     activity: none
     label: CYP2C9*6
-    evidence: L
+    evidence: D
     mutations:
+    - [4338, T>C, rs4918758]
     - [16126, delA, rs9332131, K273fs]
   CYP2C9*7.001:
     pharmvar: https://www.pharmvar.org/haplotype/28
@@ -287,7 +358,7 @@ alleles:
     label: CYP2C9*17
     evidence: M
     mutations:
-    - [48208, C>T, '-', P382S]
+    - [48208, C>T, rs2492650213, P382S]
   CYP2C9*18.001:
     pharmvar: https://www.pharmvar.org/haplotype/1778
     activity: unknown
@@ -336,7 +407,7 @@ alleles:
     label: CYP2C9*23
     evidence: L
     mutations:
-    - [8758, G>A, '-', V76M]
+    - [8758, G>A, rs1216169538, V76M]
   CYP2C9*24.001:
     pharmvar: https://www.pharmvar.org/haplotype/39
     activity: none
@@ -359,7 +430,7 @@ alleles:
     mutations:
     - [3961, C>T, rs9332096]
     - [4338, T>C, rs4918758]
-    - [9092, C>G, '-', T130R]
+    - [9092, C>G, rs200965026, T130R]
   CYP2C9*27.001:
     pharmvar: https://www.pharmvar.org/haplotype/1320
     activity: unknown
@@ -432,6 +503,14 @@ alleles:
     evidence: L
     mutations:
     - [5526, A>G, rs114071557, M1V]
+  CYP2C9*36.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2944
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4338, T>C, rs4918758]
+    - [5526, A>G, rs114071557, M1V]
+    - [48144, C>G, rs28371686, D360E]
   CYP2C9*37.001:
     pharmvar: https://www.pharmvar.org/haplotype/55
     activity: decreased
@@ -445,7 +524,7 @@ alleles:
     label: CYP2C9*38
     evidence: L
     mutations:
-    - [8819, G>C, '-', G96A]
+    - [8819, G>C, rs761033063, G96A]
   CYP2C9*39.001:
     pharmvar: https://www.pharmvar.org/haplotype/56
     activity: none
@@ -529,14 +608,14 @@ alleles:
     label: CYP2C9*50
     evidence: L
     mutations:
-    - [15987, C>T, '-', P227S]
+    - [15987, C>T, rs2492591692, P227S]
   CYP2C9*51.001:
     pharmvar: https://www.pharmvar.org/haplotype/6
     activity: unknown
     label: CYP2C9*51
     evidence: L
     mutations:
-    - [38977, A>G, '-', I284V]
+    - [38977, A>G, rs2492634549, I284V]
   CYP2C9*52.001:
     pharmvar: https://www.pharmvar.org/haplotype/5
     activity: none
@@ -592,7 +671,7 @@ alleles:
     label: CYP2C9*59
     evidence: L
     mutations:
-    - [55698, A>T, '-', I434F]
+    - [55698, A>T, rs2492662738, I434F]
   CYP2C9*60.001:
     pharmvar: https://www.pharmvar.org/haplotype/33
     activity: unknown
@@ -678,14 +757,14 @@ alleles:
     evidence: M
     mutations:
     - [4338, T>C, rs4918758]
-    - [14712, A>G, '-', D191G]
+    - [14712, A>G, rs2492587526, D191G]
   CYP2C9*70.001:
     pharmvar: https://www.pharmvar.org/haplotype/1432
     activity: unknown
     evidence: M
     mutations:
     - [4338, T>C, rs4918758]
-    - [55723, G>T, '-', G442V]
+    - [55723, G>T, rs2492662839, G442V]
   CYP2C9*71.001:
     pharmvar: https://www.pharmvar.org/haplotype/1453
     activity: unknown
@@ -730,7 +809,7 @@ alleles:
     evidence: D
     mutations:
     - [4338, T>C, rs4918758]
-    - [8818, G>A, '-', G96R]
+    - [8818, G>A, rs2493006942, G96R]
   CYP2C9*78.001:
     pharmvar: https://www.pharmvar.org/haplotype/1785
     activity: unknown
@@ -781,6 +860,25 @@ alleles:
     evidence: M
     mutations:
     - [16006, delT, '-', L233fs]
+  CYP2C9*86.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2930
+    activity: unknown
+    evidence: D
+    mutations:
+    - [16027, T>C, rs369745682, M240T]
+  CYP2C9*87.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2932
+    activity: unknown
+    evidence: D
+    mutations:
+    - [39037, A>C, rs546318684, T304P]
+  CYP2C9*88.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2934
+    activity: unknown
+    evidence: D
+    mutations:
+    - [9083, C>T, rs530507053, S127F]
+    - [55721, C>T, rs2017319]
 structure:
   genes: [CYP2C9]
   regions:

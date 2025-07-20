@@ -1,6 +1,6 @@
 name: CYP3A5
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 13724
 ensembl: ENSG00000106258
 alleles:
@@ -17,26 +17,40 @@ alleles:
     evidence: D
     mutations:
     - [36708, T>C, rs15524]
-  CYP3A5*1.003:
-    pharmvar: https://www.pharmvar.org/haplotype/1336
-    activity: normal
-    evidence: D
-    mutations:
-    - [4552, C>A, rs28365079]
-  CYP3A5*1.004:
-    pharmvar: https://www.pharmvar.org/haplotype/1334
-    activity: normal
-    evidence: D
-    mutations:
-    - [4394, T>C, rs28365073]
-    - [36708, T>C, rs15524]
   CYP3A5*1.005:
-    pharmvar: https://www.pharmvar.org/haplotype/1332
+    pharmvar: https://www.pharmvar.org/haplotype/2358
     activity: normal
     evidence: D
     mutations:
-    - [4394, T>C, rs28365073]
     - [19817, A>G, rs28383472]
+    - [36708, T>C, rs15524]
+  CYP3A5*1.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2916
+    activity: normal
+    evidence: D
+    mutations:
+    - [5088, A>C, rs28371765]
+    - [36708, T>C, rs15524]
+  CYP3A5*1.007:
+    pharmvar: https://www.pharmvar.org/haplotype/2917
+    activity: normal
+    evidence: D
+    mutations:
+    - [24359, C>T, rs144684833]
+    - [36708, T>C, rs15524]
+  CYP3A5*1.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2918
+    activity: normal
+    evidence: D
+    mutations:
+    - [5084, T>C, rs4646441]
+    - [36708, T>C, rs15524]
+  CYP3A5*1.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2919
+    activity: normal
+    evidence: D
+    mutations:
+    - [4810, C>T, rs2151471342]
     - [36708, T>C, rs15524]
   CYP3A5*3.001:
     pharmvar: https://www.pharmvar.org/haplotype/1340
@@ -74,7 +88,7 @@ alleles:
   CYP3A5*3.005:
     pharmvar: https://www.pharmvar.org/haplotype/1344
     activity: none
-    label: CYP3A5*3G(*5)
+    label: CYP3A5*3G, CYP3A5*5
     evidence: D
     mutations:
     - [12083, A>G, rs776746, splice defect]
@@ -86,11 +100,11 @@ alleles:
     evidence: L
     mutations:
     - [12083, A>G, rs776746, splice defect]
-    - [34879, A>G, '-', I465V]
+    - [34879, A>G, '-', I456V]
   CYP3A5*3.007:
     pharmvar: https://www.pharmvar.org/haplotype/1343
     activity: none
-    label: CYP3A5*3K(*10)
+    label: CYP3A5*3K, CYP3A5*10
     evidence: M
     mutations:
     - [12083, A>G, rs776746, splice defect]
@@ -98,7 +112,7 @@ alleles:
   CYP3A5*3.008:
     pharmvar: https://www.pharmvar.org/haplotype/1335
     activity: none
-    label: CYP3A5*3L(*11)
+    label: CYP3A5*3L, CYP3A5*11
     evidence: L
     mutations:
     - [8877, A>G, rs72552791, Y53C]
@@ -161,6 +175,34 @@ alleles:
     mutations:
     - [12083, A>G, rs776746, splice defect]
     - [19771, T>G, rs147489136, F203C]
+  CYP3A5*3.018:
+    pharmvar: https://www.pharmvar.org/haplotype/2923
+    activity: none
+    evidence: D
+    mutations:
+    - [12083, A>G, rs776746, splice defect]
+    - [36708, T>C, rs15524]
+  CYP3A5*3.019:
+    pharmvar: https://www.pharmvar.org/haplotype/2920
+    activity: none
+    evidence: D
+    mutations:
+    - [12083, A>G, rs776746, splice defect]
+    - [36758, A>G, rs41303967]
+  CYP3A5*3.020:
+    pharmvar: https://www.pharmvar.org/haplotype/2921
+    activity: none
+    evidence: D
+    mutations:
+    - [12083, A>G, rs776746, splice defect]
+    - [32257, A>G, rs149888520, Y355C]
+  CYP3A5*3.021:
+    pharmvar: https://www.pharmvar.org/haplotype/2922
+    activity: none
+    evidence: D
+    mutations:
+    - [12083, A>G, rs776746, splice defect]
+    - [34820, C>G, rs188908808, T436S]
   CYP3A5*6.001:
     pharmvar: https://www.pharmvar.org/haplotype/1337
     activity: none

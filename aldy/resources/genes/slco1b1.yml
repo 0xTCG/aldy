@@ -1,6 +1,6 @@
 name: SLCO1B1
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 21128
 ensembl: ENSG00000134538
 alleles:
@@ -37,6 +37,13 @@ alleles:
     evidence: D
     mutations:
     - [4692, T>C, rs11835045]
+  SLCO1B1*1.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2979
+    activity: normal
+    evidence: D
+    mutations:
+    - [4883, A>C, rs59710386]
+    - [52472, T>C, rs4149057]
   SLCO1B1*2.001:
     pharmvar: https://www.pharmvar.org/haplotype/1671
     activity: unknown
@@ -154,6 +161,15 @@ alleles:
     - [50611, A>G, rs2306283, N130D]
     - [50686, C>A, rs11045819, P155T]
     - [52498, C>T, rs2291075]
+  SLCO1B1*14.004:
+    pharmvar: https://www.pharmvar.org/haplotype/2980
+    activity: increased
+    evidence: D
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [50686, C>A, rs11045819, P155T]
+    - [52472, T>C, rs4149057]
+    - [52498, C>T, rs2291075]
   SLCO1B1*15.001:
     pharmvar: https://www.pharmvar.org/haplotype/1704
     activity: none
@@ -181,6 +197,13 @@ alleles:
     mutations:
     - [50675, A>G, rs2306282, N151S]
     - [52498, C>T, rs2291075]
+  SLCO1B1*16.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2981
+    activity: unknown
+    evidence: D
+    mutations:
+    - [50675, A>G, rs2306282, N151S]
+    - [52472, T>C, rs4149057]
   SLCO1B1*19.001:
     pharmvar: https://www.pharmvar.org/haplotype/1684
     activity: unknown
@@ -257,6 +280,16 @@ alleles:
     - [74430, C>T, rs57040246]
     - [76362, C>G, rs59113707, F400L]
     - [76410, G>A, rs11045859]
+  SLCO1B1*27.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2982
+    activity: unknown
+    evidence: D
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [52498, C>T, rs2291075]
+    - [74430, C>T, rs57040246]
+    - [76362, C>G, rs59113707, F400L]
+    - [76410, G>A, rs11045859]
   SLCO1B1*28.001:
     pharmvar: https://www.pharmvar.org/haplotype/1697
     activity: unknown
@@ -267,13 +300,15 @@ alleles:
     - [70758, A>G, rs11045852, I245V]
     - [70783, G>A, rs11045853, R253Q]
   SLCO1B1*29.001:
-    pharmvar: https://www.pharmvar.org/haplotype/1667
+    pharmvar: https://www.pharmvar.org/haplotype/2983
     activity: unknown
     label: SLCO1B1*29
-    evidence: L
+    evidence: D
     mutations:
     - [50611, A>G, rs2306283, N130D]
+    - [52498, C>T, rs2291075]
     - [112965, C>T, rs140790673, S682F]
+    - [113163, T>C, rs4149085]
   SLCO1B1*30.001:
     pharmvar: https://www.pharmvar.org/haplotype/1690
     activity: unknown
@@ -293,7 +328,24 @@ alleles:
     - [50611, A>G, rs2306283, N130D]
     - [52498, C>T, rs2291075]
     - [79806, G>C, rs59502379, G488A]
-    - [113197, G>C, '-']
+    - [113197, G>C, rs2121217938]
+  SLCO1B1*31.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2984
+    activity: none
+    evidence: D
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [52498, C>T, rs2291075]
+    - [79806, G>C, rs59502379, G488A]
+  SLCO1B1*31.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2985
+    activity: none
+    evidence: D
+    mutations:
+    - [4692, T>C, rs11835045]
+    - [50611, A>G, rs2306283, N130D]
+    - [52498, C>T, rs2291075]
+    - [79806, G>C, rs59502379, G488A]
   SLCO1B1*32.001:
     pharmvar: https://www.pharmvar.org/haplotype/1700
     activity: unknown
@@ -374,6 +426,30 @@ alleles:
     - [50611, A>G, rs2306283, N130D]
     - [52498, C>T, rs2291075]
     - [113078, C>T, rs72655363]
+  SLCO1B1*37.007:
+    pharmvar: https://www.pharmvar.org/haplotype/2986
+    activity: normal
+    evidence: D
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [113078, C>T, rs72655363]
+  SLCO1B1*37.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2987
+    activity: normal
+    evidence: D
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [52472, T>C, rs4149057]
+  SLCO1B1*37.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2990
+    activity: normal
+    evidence: D
+    mutations:
+    - [4692, T>C, rs11835045]
+    - [50611, A>G, rs2306283, N130D]
+    - [52498, C>T, rs2291075]
+    - [76410, G>A, rs11045859]
+    - [79795, C>T, rs74064211]
   SLCO1B1*38.001:
     pharmvar: https://www.pharmvar.org/haplotype/1688
     activity: unknown
@@ -404,6 +480,20 @@ alleles:
     activity: unknown
     evidence: D
     mutations:
+    - [50705, G>T, rs77271279, splice defect]
+  SLCO1B1*41.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2988
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4692, T>C, rs11835045]
+    - [50705, G>T, rs77271279, splice defect]
+  SLCO1B1*41.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2989
+    activity: unknown
+    evidence: D
+    mutations:
+    - [50697, G>A, rs140730264]
     - [50705, G>T, rs77271279, splice defect]
   SLCO1B1*42.001:
     pharmvar: https://www.pharmvar.org/haplotype/1683
@@ -484,15 +574,62 @@ alleles:
     - [52498, C>T, rs2291075]
     - [74351, C>G, rs72559747, P336R]
   SLCO1B1*48.001:
+    ignored: true
     activity: none
     mutations:
     - [SLCO1B1, deletion]
-    ignored: true
   SLCO1B1*49.001:
     ignored: true
     activity: none
     mutations:
     - [SLCO1B1, partial deletion]
+  SLCO1B1*50.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2970
+    activity: unknown
+    evidence: D
+    mutations:
+    - [52460, C>G, rs200331427, P187A]
+    - [52472, T>C, rs4149057]
+  SLCO1B1*51.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2972
+    activity: unknown
+    evidence: D
+    mutations:
+    - [52472, T>C, rs4149057]
+    - [98647, G>A, rs200994482, splice defect]
+  SLCO1B1*52.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2974
+    activity: unknown
+    evidence: D
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [52498, C>T, rs2291075]
+    - [74480, G>A, rs756393362, splice defect]
+    - [113163, T>C, rs4149085]
+  SLCO1B1*53.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2976
+    activity: unknown
+    evidence: D
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [50686, C>A, rs11045819, P155T]
+    - [52472, T>C, rs4149057]
+    - [52498, C>T, rs2291075]
+    - [74430, C>T, rs57040246]
+    - [76362, C>G, rs59113707, F400L]
+  SLCO1B1*54.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2978
+    activity: unknown
+    evidence: D
+    mutations:
+    - [50611, A>G, rs2306283, N130D]
+    - [52733, A>G, rs201722521, I211M]
+    - [70758, A>G, rs11045852, I245V]
+    - [70907, G>A, rs11045854]
+    - [76410, G>A, rs11045859]
+    - [79795, C>T, rs74064211]
+    - [98575, G>A, rs201556175]
+    - [112849, A>C, rs34671512, L643F]
 structure:
   genes: [SLCO1B1]
   regions:

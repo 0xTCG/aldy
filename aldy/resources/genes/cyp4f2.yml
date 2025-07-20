@@ -1,36 +1,349 @@
 name: CYP4F2
-version: pharmvar-6.1.2
-generated: '2024-05-14'
+version: pharmvar-6.2.14
+generated: '2025-07-20'
 pharmvar: 30114
 ensembl: ENSG00000186115
 alleles:
   CYP4F2*1.001:
-    pharmvar: https://www.pharmvar.org/haplotype/377
-    activity: normal
+    pharmvar: https://www.pharmvar.org/haplotype/2215
+    activity: unknown
     label: CYP4F2*1
+    evidence: D
     mutations: []
+  CYP4F2*1.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2229
+    activity: unknown
+    evidence: D
+    mutations:
+    - [24480, G>A, rs1126433]
+  CYP4F2*1.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2236
+    activity: unknown
+    evidence: D
+    mutations:
+    - [17065, C>T, rs2074900]
+    - [24480, G>A, rs1126433]
+  CYP4F2*1.004:
+    pharmvar: https://www.pharmvar.org/haplotype/2237
+    activity: unknown
+    evidence: D
+    mutations:
+    - [17065, C>T, rs2074900]
+    - [24431, T>C, rs3093201]
+    - [24480, G>A, rs1126433]
+  CYP4F2*1.005:
+    pharmvar: https://www.pharmvar.org/haplotype/2232
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5628, A>G, rs3093106]
+  CYP4F2*1.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2233
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5022, G>A, rs3093093]
+  CYP4F2*1.007:
+    pharmvar: https://www.pharmvar.org/haplotype/2393
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
+  CYP4F2*1.008:
+    pharmvar: https://www.pharmvar.org/haplotype/2957
+    activity: unknown
+    evidence: D
+    mutations:
+    - [24362, A>G, rs3952538]
+  CYP4F2*1.009:
+    pharmvar: https://www.pharmvar.org/haplotype/2958
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5562, T>C, rs139237854]
+    - [17065, C>T, rs2074900]
+    - [24480, G>A, rs1126433]
+  CYP4F2*1.010:
+    pharmvar: https://www.pharmvar.org/haplotype/2959
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
+    - [24480, G>A, rs1126433]
+  CYP4F2*1.011:
+    pharmvar: https://www.pharmvar.org/haplotype/2960
+    activity: unknown
+    evidence: D
+    mutations:
+    - [24211, C>T, rs150488576]
+  CYP4F2*1.012:
+    pharmvar: https://www.pharmvar.org/haplotype/2961
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5628, A>G, rs3093106]
+    - [23187, G>A, rs141338395]
   CYP4F2*2.001:
-    pharmvar: https://www.pharmvar.org/haplotype/375
+    pharmvar: https://www.pharmvar.org/haplotype/2216
     activity: unknown
     label: CYP4F2*2
+    evidence: D
     mutations:
     - [4758, C>A, rs3093092]
     - [5497, T>G, rs3093105, W12G]
     - [5628, A>G, rs3093106]
     - [7472, C>T, rs3093114]
+  CYP4F2*2.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2230
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5497, T>G, rs3093105, W12G]
+    - [5628, A>G, rs3093106]
+    - [7505, A>C, rs8100960]
+    - [7562, C>T, rs8110714]
+  CYP4F2*2.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2962
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5024, C>T, rs3093094]
+    - [5497, T>G, rs3093105, W12G]
+    - [5628, A>G, rs3093106]
+    - [7472, C>T, rs3093114]
+  CYP4F2*2.004:
+    pharmvar: https://www.pharmvar.org/haplotype/2963
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5497, T>G, rs3093105, W12G]
+    - [5628, A>G, rs3093106]
+    - [7505, A>C, rs8100960]
+    - [7562, C>T, rs8110714]
+    - [24480, G>A, rs1126433]
   CYP4F2*3.001:
-    pharmvar: https://www.pharmvar.org/haplotype/376
+    pharmvar: https://www.pharmvar.org/haplotype/2217
     activity: unknown
     label: CYP4F2*3
+    evidence: D
     mutations:
     - [4751, C>A, rs3093090]
     - [4752, C>T, rs3093091]
     - [23454, G>A, rs2108622, V433M]
-  CYP4F2*4.1001:
-    label: CYP4F2*4.ALDY
+  CYP4F2*3.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2231
+    activity: unknown
+    evidence: M
     mutations:
-    - [5497, T>G, rs3093105, W12G]
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
     - [23454, G>A, rs2108622, V433M]
+    - [24480, G>A, rs1126433]
+  CYP4F2*3.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2235
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
+    - [23454, G>A, rs2108622, V433M]
+    - [24376, C>A, rs4646502]
+  CYP4F2*3.004:
+    pharmvar: https://www.pharmvar.org/haplotype/2234
+    activity: unknown
+    evidence: M
+    mutations:
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
+    - [17113, A>G, rs563869029]
+    - [23454, G>A, rs2108622, V433M]
+  CYP4F2*3.005:
+    pharmvar: https://www.pharmvar.org/haplotype/2964
+    activity: unknown
+    evidence: D
+    mutations:
+    - [23454, G>A, rs2108622, V433M]
+  CYP4F2*3.006:
+    pharmvar: https://www.pharmvar.org/haplotype/2965
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
+    - [7439, G>A, rs143831754]
+    - [23454, G>A, rs2108622, V433M]
+  CYP4F2*4.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2222
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4758, C>A, rs3093092]
+    - [5497, T>G, rs3093105, W12G]
+    - [5628, A>G, rs3093106]
+    - [7472, C>T, rs3093114]
+    - [23454, G>A, rs2108622, V433M]
+  CYP4F2*4.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2966
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4758, C>A, rs3093092]
+    - [5497, T>G, rs3093105, W12G]
+    - [5628, A>G, rs3093106]
+    - [7472, C>T, rs3093114]
+    - [23454, G>A, rs2108622, V433M]
+    - [24480, G>A, rs1126433]
+  CYP4F2*4.003:
+    pharmvar: https://www.pharmvar.org/haplotype/2967
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4758, C>A, rs3093092]
+    - [5497, T>G, rs3093105, W12G]
+    - [5628, A>G, rs3093106]
+    - [7472, C>T, rs3093114]
+    - [7517, C>A, rs139580343]
+    - [23454, G>A, rs2108622, V433M]
+  CYP4F2*5.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2224
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
+    - [24296, C>A, rs3093200, L519M]
+  CYP4F2*6.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2226
+    activity: unknown
+    evidence: D
+    mutations:
+    - [12670, G>T, rs3093153, G185V]
+  CYP4F2*6.002:
+    pharmvar: https://www.pharmvar.org/haplotype/2968
+    activity: unknown
+    evidence: D
+    mutations:
+    - [12670, G>T, rs3093153, G185V]
+    - [24362, A>G, rs3952538]
+  CYP4F2*7.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2228
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5509, G>C, rs114099324, A16P]
+  CYP4F2*8.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2315
+    activity: unknown
+    evidence: D
+    mutations:
+    - [5602, C>T, rs115517770, R74C]
+    - [24480, G>A, rs1126433]
+  CYP4F2*9.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2317
+    activity: unknown
+    evidence: M
+    mutations:
+    - [5609, G>A, rs201380574, R49Q]
+    - [17065, C>T, rs2074900]
+    - [24480, G>A, rs1126433]
+  CYP4F2*10.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2319
+    activity: unknown
+    evidence: M
+    mutations:
+    - [7515, C>A, rs144455532, P97T]
+  CYP4F2*11.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2321
+    activity: unknown
+    evidence: M
+    mutations:
+    - [7548, C>T, rs114396708, R108W]
+    - [24480, G>A, rs1126433]
+  CYP4F2*12.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2323
+    activity: unknown
+    evidence: D
+    mutations:
+    - [10534, G>A, rs145875499, E129L]
+    - [24480, G>A, rs1126433]
+  CYP4F2*13.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2325
+    activity: unknown
+    evidence: D
+    mutations:
+    - [13404, G>T, rs144233412, A224S]
+    - [17065, C>T, rs2074900]
+    - [24431, T>C, rs3093201]
+    - [24480, G>A, rs1126433]
+  CYP4F2*14.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2327
+    activity: unknown
+    evidence: D
+    mutations:
+    - [17057, C>G, rs145174239, L341V]
+    - [24480, G>A, rs1126433]
+  CYP4F2*15.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2329
+    activity: unknown
+    evidence: D
+    mutations:
+    - [17065, C>T, rs2074900]
+    - [23663, G>A, rs138971789, R444H]
+    - [24480, G>A, rs1126433]
+  CYP4F2*17.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2392
+    activity: unknown
+    evidence: D
+    mutations:
+    - [17065, C>T, rs2074900]
+    - [24155, A>G, rs4020346, T472A]
+    - [24431, T>C, rs3093201]
+    - [24480, G>A, rs1126433]
+  CYP4F2*18.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2946
+    activity: unknown
+    evidence: D
+    mutations:
+    - [7549, G>A, rs148396222, R108Q]
+  CYP4F2*19.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2948
+    activity: unknown
+    evidence: D
+    mutations:
+    - [24189, C>G, rs3952537, A483G]
+  CYP4F2*20.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2950
+    activity: unknown
+    evidence: D
+    mutations:
+    - [10696, C>T, rs200629062, T152M]
+  CYP4F2*21.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2952
+    activity: unknown
+    evidence: D
+    mutations:
+    - [23662, C>T, rs142113670, R444C]
+    - [24480, G>A, rs1126433]
+  CYP4F2*22.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2954
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
+    - [7524, A>G, rs150579280, S100G]
+    - [23454, G>A, rs2108622, V433M]
+  CYP4F2*23.001:
+    pharmvar: https://www.pharmvar.org/haplotype/2956
+    activity: unknown
+    evidence: D
+    mutations:
+    - [4751, C>A, rs3093090]
+    - [4752, C>T, rs3093091]
+    - [10677, C>T, rs556151888, R146C]
+    - [24296, C>A, rs3093200, L519M]
 structure:
   genes: [CYP4F2]
   regions:
