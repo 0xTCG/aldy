@@ -702,6 +702,11 @@ Gene Support
 Change log
 ==========
 
+- Aldy v4.8 (Jul 20, 2025)
+   - PharmVar v6.2.14 update
+   - Database updates (with major _UGT1A1_ update)
+   - Various fixes
+
 - Aldy v4.7 (Nov 7, 2024)
    - Support for _ABCG2_, _CACNA1S_ and _RYR1_
    - Database updates (with major _UGT1A1_ update)
@@ -759,6 +764,11 @@ Known issues and limitations
 
 - Aldy might mistakenly call *CYP2D6*\*4 as *CYP2D6*\*139 due to the near-similarity of these alleles, especially when the coverage is low. I suggest double-checking any \*139 call. 
   You can track this issue here: https://github.com/0xTCG/aldy/issues/50.
+
+- *CYP2A6*\*46 is disabled and will be detected as *CYP2A6*\*1 (its previous designation) because it is solely distinguished by the *CYP2A7* 3'UTR retention. Aldy is currently unable to detect this retention.
+
+- *CYP2D7* exon 9 retention is also tricky, and sometimes it might not be detected due to low or uneven coverage when calling *CYP2D6* alleles.
+
 
 Acknowledgments
 ===============
