@@ -1,9 +1,13 @@
 # .readthedocs.yml
 
-build:
-  image: latest
+version: 2
 
-python:
-  version: 3.7
-  setup_py_install: true
-  pip_install: true
+
+build:
+  os: ubuntu-22.04
+  image: latest
+  tools:
+    python: "3.12"
+
+sphinx:
+  configuration: docs/conf.py
