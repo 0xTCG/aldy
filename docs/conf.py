@@ -22,13 +22,13 @@ sys.path.insert(0, os.path.abspath("../"))
 # -- Project information -----------------------------------------------------
 
 project = "Aldy"
-copyright = "2018, Ibrahim Numanagić"
+copyright = "2025, Ibrahim Numanagić"
 author = "Ibrahim Numanagić"
 
 # The short X.Y version
-version = "1.9"
+version = "4.8"
 # The full version, including alpha/beta/rc tags
-release = "1.9 beta"
+release = "4.8"
 
 
 # -- General configuration ---------------------------------------------------
@@ -47,6 +47,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
+    "sphinx_rtd_theme"
 ]
 
 napoleon_google_docstring = True
