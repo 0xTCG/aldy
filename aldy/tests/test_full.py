@@ -238,7 +238,7 @@ def test_NA10860_vcf_out(monkeypatch, solver):
             expected = f.read()
         with open(out.name) as f:
             produced = f.read()
-        assert produced == expected.replace("aldy-v4.0", f"aldy-v{__version__}")
+        assert produced == expected.replace("aldy-v4.8", f"aldy-v{__version__}")
 
 
 def test_fusion(monkeypatch, solver):
