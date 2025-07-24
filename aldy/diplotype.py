@@ -176,15 +176,19 @@ def write_vcf(
                     "GT": "|".join(str(all_mutations[m][mi][i]) for i in range(nall)),
                     "DP": str(coverage[m]),
                     "MA": ",".join(
-                        f"*{minor.solution[i].major}"
-                        if all_mutations[m][mi][i] > 0
-                        else "-"
+                        (
+                            f"*{minor.solution[i].major}"
+                            if all_mutations[m][mi][i] > 0
+                            else "-"
+                        )
                         for i in range(nall)
                     ),
                     "MI": ",".join(
-                        f"*{minor.solution[i].minor}"
-                        if all_mutations[m][mi][i] > 0
-                        else "-"
+                        (
+                            f"*{minor.solution[i].minor}"
+                            if all_mutations[m][mi][i] > 0
+                            else "-"
+                        )
                         for i in range(nall)
                     ),
                 }
@@ -307,6 +311,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     solution.set_diplotype(diplotype)
     return diplotype
 
+
 def estimate_cpic(gene: Gene, solution: MinorSolution) -> str:
     """Calculate the CPIC functionality for a minor solution.
     :returns: CPIC functionality.
@@ -335,6 +340,3 @@ def estimate_cpic(gene: Gene, solution: MinorSolution) -> str:
             if len(i) == 1:
                 return (0, i[0])
     return (0, "indeterminate")
-
-
-

@@ -984,14 +984,17 @@ class Sample:
                 if not e:
                     continue
                 if (len(muts[op])) > 3:
-                    log.debug(f"[sam] Found potential novel major mutation "
-                            f"{pos}.{op} ({e}): coverage = {len(muts[op])}")
+                    log.debug(
+                        f"[sam] Found potential novel major mutation "
+                        f"{pos}.{op} ({e}): coverage = {len(muts[op])}"
+                    )
                 self.gene.mutations.setdefault(
                     (pos, op),
                     (e, f"NOVEL:{pos+1}.{op}", pos, pos, op),
                 )
                 self.gene.random_mutations.add(Mutation(pos, op))
                 ni += 1
+
 
 def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
     """Detect file type and the reference genome."""

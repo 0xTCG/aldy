@@ -118,11 +118,12 @@ def test_gene_alleles(toy_gene):
         "1",
         cn_config="1",
         minors={
-            "1.001": MinorAllele(
-                "1.001", "1", _activity="normal", evidence="D"
-            ),
+            "1.001": MinorAllele("1.001", "1", _activity="normal", evidence="D"),
             "1.002": MinorAllele(
-                "1.002", "1B", _activity="unknown", neutral_muts=set([Mutation(100_000_114, "T>A")])
+                "1.002",
+                "1B",
+                _activity="unknown",
+                neutral_muts=set([Mutation(100_000_114, "T>A")]),
             ),
         },
     )

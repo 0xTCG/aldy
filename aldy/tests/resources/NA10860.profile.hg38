@@ -780,6 +780,10 @@ IFNL3:
   up: [0]
   utr3: [0]
   utr5: [0]
+MT-RNR1:
+  down: [0]
+  e1: [0]
+  up: [0]
 NAT1:
   down: [0]
   e1: [0]

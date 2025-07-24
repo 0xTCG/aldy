@@ -31,11 +31,15 @@ from .version import __version__
 def get_version():
     return "{} {}".format(
         platform.system() if platform.system() != "Darwin" else "macOS",
-        platform.platform()[6:]
-        if platform.system() == "Linux"
-        else platform.mac_ver()[0]
-        if platform.system() == "Darwin"
-        else platform.platform(),
+        (
+            platform.platform()[6:]
+            if platform.system() == "Linux"
+            else (
+                platform.mac_ver()[0]
+                if platform.system() == "Darwin"
+                else platform.platform()
+            )
+        ),
     )
 
 

@@ -1,5 +1,5 @@
 # 786
-#X source: test_cn_real.py
+# X source: test_cn_real.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
@@ -401,6 +401,7 @@ def test_profile(monkeypatch, capsys):
     Scanning 16:31099174-31112276...
     Scanning 19:15985833-41716444...
     Scanning 22:19923262-42549249...
+    Scanning MT:1-2700...
     Scanning X:153756605-153781787...
     """
     main(["profile", script_path("aldy.tests.resources/NA10860.bam")])
@@ -430,6 +431,7 @@ def test_profile(monkeypatch, capsys):
     Scanning 16:31087853-31100955...
     Scanning 19:15875023-41210539...
     Scanning 22:19935739-42153258...
+    Scanning MT:1-2700...
     Scanning X:154528390-154553572...
     """
     main(
@@ -468,3 +470,22 @@ def test_pacbio(monkeypatch, solver):
     assert_file(
         monkeypatch, file, solver, expected, {"--profile": "pacbio-hifi-targeted"}
     )
+
+
+def test_load_all_genes(monkeypatch, solver):
+    import importlib.resources
+    from aldy.gene import Gene
+    from aldy.profile import Profile
+    from aldy.common import AldyException
+
+    avail_genes = importlib.resources.files("aldy.resources.genes").iterdir()
+    for g in sorted(avail_genes):
+        if g.is_file() and g.suffix == ".yml":
+            print(g)
+            for genome in ["hg19", "hg38"]:
+                gx = Gene(g, genome=genome)
+                p = Profile.load(gx, "illumina")
+                for gene, gr in enumerate(gx.regions):
+                    for region in gr:
+                        assert region in p.data[gx.name]
+                        assert sum(p.data[gx.name][region]) > 0

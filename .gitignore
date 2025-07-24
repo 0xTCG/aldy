@@ -40,3 +40,4 @@ aldy_old/*
 scripts
 aldy/indelpost/*.c
 build/*
+/_*

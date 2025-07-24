@@ -93,9 +93,11 @@ class Gurobi:  # pragma: no cover
         self.objective = objective
         self.model.setObjective(
             self.objective,
-            self.gurobipy.GRB.MINIMIZE
-            if method == "min"
-            else self.gurobipy.GRB.MAXIMIZE,
+            (
+                self.gurobipy.GRB.MINIMIZE
+                if method == "min"
+                else self.gurobipy.GRB.MAXIMIZE
+            ),
         )
         self.update()
 

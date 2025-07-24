@@ -29,7 +29,7 @@ def make_consensus(target, targetpileup, basequalthresh):
 
     lt_indexed, rt_indexed, contributing_reads, rt_aln_indel_seq = [], [], [], []
     for read in targetpileup:
-        
+
         if read.get("target_right_shifted", 0):
             target_pos = read["target_right_shifted"]
             equivalents = target.generate_equivalents()
@@ -398,7 +398,7 @@ def is_compatible(query, subject, indel_type, partial_match=True):
 
     Args:
         query (dict): dictized read
-        subject (dict): indel template 
+        subject (dict): indel template
         indel_type (str): "I" for ins "D" for del
         patial_match (bool): True to allow partial match for longer insertions
     Returns:
@@ -489,8 +489,7 @@ def is_compatible(query, subject, indel_type, partial_match=True):
 
 
 def contains_repeat_end(indel_seq, query_flank, subject_flank):
-    """Check if repeat boundary is contained
-    """
+    """Check if repeat boundary is contained"""
     tmp = subject_flank.replace(indel_seq, "")
 
     if tmp:
@@ -522,14 +521,14 @@ def is_almost_same(
     mismatch_lim=2,
 ):
     """Check if query and subject sequences are same for high consensus bases
-    
+
     Args:
         query_seq (str): query flanking seq
         subject_seq (str): indel template flanking seq constructed by consensus
         consensus_score (list): consensus score for template flanking seq
         consensus_lim (float): threshold to define "high consensus"
         len_lim (int): seq shorter than len_lim may not contain any mismatch
-        mismatch_lim (int): allow (mismatch_lim)x mismatches for seq longer than len_lim 
+        mismatch_lim (int): allow (mismatch_lim)x mismatches for seq longer than len_lim
     Returns:
         True/False (bool): True if query and subject look same
     """

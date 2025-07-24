@@ -26,9 +26,9 @@ copyright = "2025, Ibrahim Numanagić"
 author = "Ibrahim Numanagić"
 
 # The short X.Y version
-version = "4.8"
+version = "4.8.1"
 # The full version, including alpha/beta/rc tags
-release = "4.8"
+release = "4.8.1"
 
 
 # -- General configuration ---------------------------------------------------

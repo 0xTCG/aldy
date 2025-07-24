@@ -5,7 +5,7 @@
 
 
 from typing import Iterable, Any, List
-import pkg_resources
+import importlib.resources
 import re
 import time
 import pprint
@@ -115,7 +115,7 @@ class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
         :param prefix: Chromosome prefix."""
 
         return "{}:{}-{}".format(
-            prefix + self.chr, self.start - pad_left, self.end + pad_right
+            prefix + self.chr, max(1, self.start - pad_left), self.end + pad_right
         )
 
     def __str__(self):
@@ -202,7 +202,7 @@ def script_path(key: str) -> str:
     components = key.split("/")
     if len(components) < 2:
         raise AldyException(f'"{key}"" is not valid resource name')
-    return pkg_resources.resource_filename(components[0], "/".join(components[1:]))
+    return str(importlib.resources.files(components[0]) / "/".join(components[1:]))
 
 
 def colorize(text: str, color: str = "green") -> str:

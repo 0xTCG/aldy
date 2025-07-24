@@ -330,19 +330,23 @@ class Profile:
         if not genome:
             genome = "hg19"
         if len(regions) == 0:
-            import pkg_resources
+            import importlib.resources
 
             gene_regions = {}
-            for g in sorted(pkg_resources.resource_listdir("aldy.resources", "genes")):
-                if not g.endswith(".yml"):
-                    continue
-                if 'rnr1' in g.lower():
+            for g in sorted(
+                importlib.resources.files("aldy.resources.genes").iterdir()
+            ):
+                if g.suffix != ".yml":
                     continue
                 log.debug("Loading {}...", g)
-                gg = Gene(script_path(f"aldy.resources.genes/{g}"), genome=genome)
-                for gi, gr in enumerate(gg.regions):
-                    for r, rng in gr.items():
-                        gene_regions[gg.name, r, gi] = rng
+                try:
+                    gg = Gene(script_path(f"aldy.resources.genes/{g}"), genome=genome)
+                    for gi, gr in enumerate(gg.regions):
+                        for r, rng in gr.items():
+                            gene_regions[gg.name, r, gi] = rng
+                except AldyException as e:
+                    log.warn(e)
+
         else:
             gene_regions = regions
 

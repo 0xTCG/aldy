@@ -97,8 +97,7 @@ class SolvedAllele:
     def major_repr(self):
         """Pretty-formats major star-allele name."""
         extra = "".join(
-            " +" + self.gene.get_rsid(m)
-            for m in self.extra_functionality()
+            " +" + self.gene.get_rsid(m) for m in self.extra_functionality()
         )
         s = f"{self.major}{extra}"
         return f"*({s})" if extra else f"*{s}"
@@ -116,7 +115,10 @@ class SolvedAllele:
         )
 
     def extra_functionality(self):
-        return [m for m in sorted(m for m in self.added if self.gene.is_functional(m, False))]
+        return [
+            m
+            for m in sorted(m for m in self.added if self.gene.is_functional(m, False))
+        ]
 
 
 @dataclass

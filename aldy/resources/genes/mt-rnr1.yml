@@ -82,14 +82,20 @@ alleles:
 structure:
   genes: [MT-RNR1]
   regions:
+    hg19:
+      up: [1, 647]
+      e1: [647, 1600]
+      down: [1600, 1701]
     hg38:
-      e1:
-      - [647, 1600]
+      up: [1, 647]
+      e1: [647, 1600]
+      down: [1600, 1701]
   cn_regions: [e1]
 reference:
   name: NC_012920.1
   mappings:
-    hg38: [MT, 647, 1600, +, M953]
+    hg19: [MT, 1, 1700, +, M1700]
+    hg38: [MT, 1, 1700, +, M1700]
   exons:
   - [647, 1600]
   cpic:

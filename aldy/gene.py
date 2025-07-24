@@ -280,9 +280,11 @@ class Gene:
             if self.seq[pos] != op[0]:
                 log.warn(f"Bad mutation: {op[0]} != {self.seq[pos]}")
             seq = "".join(
-                self.seq[s:pos] + op[2] + self.seq[pos + 1 : e]
-                if s <= pos < e
-                else self.seq[s:e]
+                (
+                    self.seq[s:pos] + op[2] + self.seq[pos + 1 : e]
+                    if s <= pos < e
+                    else self.seq[s:e]
+                )
                 for s, e in self.exons
             )
             amino = seq_to_amino(seq)
@@ -409,6 +411,8 @@ class Gene:
                 seq[pos - 1] = nuc
             self.seq = "".join(seq)
 
+        if self.genome not in yml["reference"]["mappings"]:
+            raise AldyException("Gene {self.name} not compatible with {self.genome}")
         self.chr, start, end, strand, cigar = yml["reference"]["mappings"][self.genome]
         self.chr_to_ref = {}
         self.ref_to_chr = {}
@@ -433,12 +437,14 @@ class Gene:
         self._lookup_range = (start - 1, end - 1)
         self._lookup_seq = "".join(
             (
-                rev_comp(self.seq[self.chr_to_ref[i]])
-                if self.strand < 0
-                else self.seq[self.chr_to_ref[i]]
+                (
+                    rev_comp(self.seq[self.chr_to_ref[i]])
+                    if self.strand < 0
+                    else self.seq[self.chr_to_ref[i]]
+                )
+                if i in self.chr_to_ref
+                else "N"
             )
-            if i in self.chr_to_ref
-            else "N"
             for i in range(*self._lookup_range)
         )
 
@@ -474,7 +480,7 @@ class Gene:
             for name, coord in yml["structure"]["regions"][self.genome].items():
                 if name[0] == "e" and name[1:].isdigit():  # this is exon
                     num_exons += 1
-                if not coord[i * 2] <= coord[i * 2 + 1]:
+                if i * 2 + 1 < len(coord) and not coord[i * 2] <= coord[i * 2 + 1]:
                     raise AldyException(
                         f"Malformed YML file {self.name} (structure:regions:{name})"
                     )

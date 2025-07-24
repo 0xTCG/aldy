@@ -7,7 +7,7 @@
 from typing import List, Optional, Any, Set, Dict
 import os
 import sys
-import pkg_resources
+import importlib.resources
 import datetime
 import time
 
@@ -98,7 +98,7 @@ def genotype(
 
     avail_genes = []
     if gene_db == "all":
-        avail_genes = pkg_resources.resource_listdir("aldy.resources", "genes")
+        avail_genes = importlib.resources.files("aldy.resources.genes").iterdir()
         avail_genes = [
             i[:-4]
             for i in avail_genes
@@ -106,9 +106,9 @@ def genotype(
         ]
         avail_genes = sorted(avail_genes)
     elif gene_db == "pharmacoscan":
-        avail_genes = pkg_resources.resource_listdir(
-            "aldy.resources.genes", "pharmacoscan"
-        )
+        avail_genes = importlib.resources.files(
+            "aldy.resources.genes.pharmacoscan"
+        ).iterdir()
         avail_genes = [
             f"pharmacoscan/{i[:-4]}" for i in avail_genes if i.endswith(".yml")
         ]
@@ -362,7 +362,10 @@ def genotype(
                 cpic += f"; cpic={cpic_fun}"
                 if gene.cpic_scores and cpic_fun != "indeterminate":
                     cpic += f"; cpic_score={cpic_score}"
-            print(f"#Solution {i + 1}: {minor_sol._solution_nice()}{cpic}", file=output_file)
+            print(
+                f"#Solution {i + 1}: {minor_sol._solution_nice()}{cpic}",
+                file=output_file,
+            )
             diplotype.write_decomposition(
                 sample.name, gene, sample.coverage, i + 1, minor_sol, output_file
             )

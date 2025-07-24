@@ -68,11 +68,7 @@ def estimate_minor(
 
     cov = coverage.filtered(Coverage.quality_filter)
     cov = cov.filtered(default_filter_fn)
-    mutations |= {
-        m
-        for m in gene.random_mutations
-        if cov[m] > 0
-    }
+    mutations |= {m for m in gene.random_mutations if cov[m] > 0}
 
     # Group by CN solutions
     minor_sols: List[MinorSolution] = []
