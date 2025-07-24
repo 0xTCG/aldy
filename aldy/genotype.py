@@ -7,7 +7,7 @@
 from typing import List, Optional, Any, Set, Dict
 import os
 import sys
-import importlib.resources
+import importlib_resources
 import datetime
 import time
 
@@ -98,7 +98,7 @@ def genotype(
 
     avail_genes = []
     if gene_db == "all":
-        avail_genes = importlib.resources.files("aldy.resources.genes").iterdir()
+        avail_genes = importlib_resources.files("aldy.resources.genes").iterdir()
         avail_genes = [
             i[:-4]
             for i in avail_genes
@@ -106,7 +106,7 @@ def genotype(
         ]
         avail_genes = sorted(avail_genes)
     elif gene_db == "pharmacoscan":
-        avail_genes = importlib.resources.files(
+        avail_genes = importlib_resources.files(
             "aldy.resources.genes.pharmacoscan"
         ).iterdir()
         avail_genes = [

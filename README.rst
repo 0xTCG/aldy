@@ -298,9 +298,9 @@ alleles and were added by the Aldy authors. These alleles do not exist in the so
 VCF support
 -----------
 
-The output will be a VCF file if the output file extension is `.vcf`.
+The output will be a VCF file if the output file extension is ``.vcf``.
 Aldy will report a VCF sample for each potential solution and the appropriate genotypes.
-Aldy will also output tags `MA` and `MI` for major and minor solutions.
+Aldy will also output tags ``MA`` and ``MI`` for major and minor solutions.
 
   **Note:** VCF is not an optimal format for star-allele reporting. Unless you really need it,
   we recommend using Aldy's default format.
@@ -315,7 +315,7 @@ If you encounter any issues with Aldy, please run Aldy with debug parameter:
 
    aldy genotype ... --debug debuginfo
 
-This will produce `debuginfo.tar.gz` file that contains the sample and LP model dumps.
+This will produce ``debuginfo.tar.gz`` file that contains the sample and LP model dumps.
 Please send us this file, and we will try to resolve the issue.
 
 This file contains no private information of any kind except for the phasing information
@@ -336,7 +336,7 @@ Sample datasets are also available for download. They include:
 The expected results are:
 
 ============= ===================== ================ ================= ============ ==============
-Gene (`-g`)   HG00463               NA19790          NA24027           NA10856      NA10860
+Gene (``g``)  HG00463               NA19790          NA24027           NA10856      NA10860
 ============= ===================== ================ ================= ============ ==============
 *CYP2D6*      \*36+\*10/\*36+\*10   \*1/\*78+\*2     \*6/\*2+\*2       \*1/\*5      \*1/\*4+\*4
 *CYP2A6*      \*1/\*1               \*1/\*1          \*1/\*35          \*1/\*1
@@ -442,12 +442,16 @@ Commands:
 
   You can specify a gene name (e.g. ``aldy query CYP2D6``) or an allele (e.g. ``aldy query 'CYP2D6*121'`` or ``aldy q 'CYP2D6*4C'``).
 
+  See below (``genotype`` section) for additional options.
+
 * ``profile [FILE]``
 
   Generate a copy-number profile for a custom sequencing panel and
   print it on the standard output.
   ``FILE`` is a SAM/BAM sample that is known to have two copies of the gene of interest
   (without any fusions or copy number alterations).
+
+  See below (``genotype`` section) for additional options.
 
 * ``genotype``
 
@@ -555,6 +559,7 @@ alleles and were added by the Aldy authors. These alleles do not exist in the so
          can be accurately called only when the copy number detection is enabled
          (i.e., they cannot be called in WES mode)
        - Detection of the non-functional *CYP2D7* intron 1 retention is spotty
+       - *CYP2D6*\*4 is sometimes miscalled as *CYP2D6*\*139 (see **Issues** below; track this issue here: #50).
    * - *CYP2A6*
      - PharmVar v6.2.14
      - ✅
@@ -579,7 +584,7 @@ alleles and were added by the Aldy authors. These alleles do not exist in the so
    * - *CYP2C19*
      - PharmVar v6.2.14
      - ✅
-     -
+     - \*1/\*38 are interchangeable in VCF mode with hg19.
    * - *CYP2C8*
      - PharmVar v6.2.14
      - ✅
@@ -627,7 +632,7 @@ alleles and were added by the Aldy authors. These alleles do not exist in the so
    * - *CYP3A7*
      - PharmVar v5.2.3
      - ✅
-     -
+     - \*1/\*2 are interchangeable in VCF mode with hg19.
    * - *CYP4F2*
      - PharmVar v6.2.14
      - ✅
@@ -715,21 +720,21 @@ Change log
    - "ALDY" alleles renamed to "X" alleles
    - CPIC functionality reporting
    - indelPost version upgrade
-   - Support for calling non-database novel variants (`--param novel=True`)
+   - Support for calling non-database novel variants (``--param novel=True``)
 
 - Aldy v4.7 (Nov 2024)
-   - Support for _ABCG2_, _CACNA1S_ and _RYR1_
-   - Database updates (with major _UGT1A1_ update)
+   - Support for *ABCG2*, *CACNA1S* and *RYR1*
+   - Database updates (with major *UGT1A1* update)
    - Various fixes
 
 - Aldy v4.6 (May 2024)
-   - PharmVar 6.1.2 updates (including _NAT2_ PharmVar update)
+   - PharmVar 6.1.2 updates (including *NAT2* PharmVar update)
    - Support for custom structural events (partial deletions)
    - Various bug fixes
 
 - Aldy v4.5 (Nov 2023)
-   - Add `min_avg_coverage` parameter
-   - Add `vcf_sample_idx` parameter for selecting VCF sample in multi-sample VCF
+   - Add ``min_avg_coverage`` parameter
+   - Add ``vcf_sample_idx`` parameter for selecting VCF sample in multi-sample VCF
    - Database cleanup
    - Various bug fixes
 

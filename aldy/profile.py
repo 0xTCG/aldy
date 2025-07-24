@@ -330,11 +330,11 @@ class Profile:
         if not genome:
             genome = "hg19"
         if len(regions) == 0:
-            import importlib.resources
+            import importlib_resources
 
             gene_regions = {}
             for g in sorted(
-                importlib.resources.files("aldy.resources.genes").iterdir()
+                importlib_resources.files("aldy.resources.genes").iterdir()
             ):
                 if g.suffix != ".yml":
                     continue

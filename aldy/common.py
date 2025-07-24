@@ -5,7 +5,7 @@
 
 
 from typing import Iterable, Any, List
-import importlib.resources
+import importlib_resources
 import re
 import time
 import pprint
@@ -202,7 +202,7 @@ def script_path(key: str) -> str:
     components = key.split("/")
     if len(components) < 2:
         raise AldyException(f'"{key}"" is not valid resource name')
-    return str(importlib.resources.files(components[0]) / "/".join(components[1:]))
+    return str(importlib_resources.files(components[0]) / "/".join(components[1:]))
 
 
 def colorize(text: str, color: str = "green") -> str:

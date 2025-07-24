@@ -473,12 +473,12 @@ def test_pacbio(monkeypatch, solver):
 
 
 def test_load_all_genes(monkeypatch, solver):
-    import importlib.resources
+    import importlib_resources
     from aldy.gene import Gene
     from aldy.profile import Profile
     from aldy.common import AldyException
 
-    avail_genes = importlib.resources.files("aldy.resources.genes").iterdir()
+    avail_genes = importlib_resources.files("aldy.resources.genes").iterdir()
     for g in sorted(avail_genes):
         if g.is_file() and g.suffix == ".yml":
             print(g)
