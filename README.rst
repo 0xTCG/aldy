@@ -357,7 +357,7 @@ License
 © 2016-2022 Aldy Authors, Indiana University Bloomington. All rights reserved.
 
 **Aldy is NOT free software.**
-A complete legal license is available in :ref:`aldy_license`.
+A complete legal license is available in `<LICENSE.rst>`_.
 
 For non-legal folks, here is a TL;DR version:
 
