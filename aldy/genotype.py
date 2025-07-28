@@ -100,9 +100,9 @@ def genotype(
     if gene_db == "all":
         avail_genes = importlib_resources.files("aldy.resources.genes").iterdir()
         avail_genes = [
-            i[:-4]
+            i.name[:-4]
             for i in avail_genes
-            if len(i) > 4 and i.endswith(".yml") and not i.startswith("pharma-")
+            if len(i.name) > 4 and i.name.endswith(".yml") and not i.name.startswith("pharma-")
         ]
         avail_genes = sorted(avail_genes)
     elif gene_db == "pharmacoscan":
@@ -110,7 +110,7 @@ def genotype(
             "aldy.resources.genes.pharmacoscan"
         ).iterdir()
         avail_genes = [
-            f"pharmacoscan/{i[:-4]}" for i in avail_genes if i.endswith(".yml")
+            f"pharmacoscan/{i.name[:-4]}" for i in avail_genes if i.name.endswith(".yml")
         ]
         avail_genes = sorted(avail_genes)
     else:
