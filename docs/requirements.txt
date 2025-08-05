@@ -1,1 +1,7 @@
 sphinx-rtd-theme
+natsort
+importlib_resources
+pyyaml
+logbook
+pysam
+ortools
