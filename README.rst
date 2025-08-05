@@ -715,6 +715,10 @@ alleles and were added by the Aldy authors. These alleles do not exist in the so
 Change log
 ==========
 
+- Aldy v4.8.2 (Aug 2025)
+  - Removal of obsolete Pharmacoscan definitions
+  - Bugfixes
+
 - Aldy v4.8 and v4.8.1 (Jul 2025)
    - PharmVar v6.2.14 update and new definitions
    - "ALDY" alleles renamed to "X" alleles

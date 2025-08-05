@@ -367,12 +367,13 @@ def test_fix_insertions(monkeypatch, solver):
         Estimated activity for *40: unknown
     """
     file = script_path("aldy.tests.resources/INS.dump.tar.gz")
+    gene = script_path("aldy.tests.resources/cyp2d6.test.yml")
     assert_file(
         monkeypatch,
         file,
         solver,
         expected,
-        {"--gene": "pharmacoscan/cyp2d6", "--param": "max-minor-solutions=1"},
+        {"--gene": gene, "--param": "max-minor-solutions=1"},
     )
 
 
