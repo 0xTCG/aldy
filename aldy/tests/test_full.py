@@ -280,7 +280,8 @@ def test_fusion(monkeypatch, solver):
         Estimated activity for *79#10: unknown
     """
     file = script_path("aldy.tests.resources/HARD.dump.tar.gz")
-    assert_file(monkeypatch, file, solver, expected, {"--gene": "pharmacoscan/cyp2d6"})
+    gene = script_path("aldy.tests.resources/cyp2d6.test.yml")
+    assert_file(monkeypatch, file, solver, expected, {"--gene": gene})
 
 
 def test_fusion_off(monkeypatch, solver):
@@ -303,12 +304,13 @@ def test_fusion_off(monkeypatch, solver):
         Estimated activity for *2: unknown
     """
     file = script_path("aldy.tests.resources/HARD.dump.tar.gz")
+    gene = script_path("aldy.tests.resources/cyp2d6.test.yml")
     assert_file(
         monkeypatch,
         file,
         solver,
         expected,
-        {"--param": "cn-fusion-left=10", "--gene": "pharmacoscan/cyp2d6"},
+        {"--param": "cn-fusion-left=10", "--gene": gene},
     )
 
 

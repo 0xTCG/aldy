@@ -1,7 +1,6 @@
 include *.rst
 include aldy/resources/*.rst
 include aldy/resources/genes/*.yml
-include aldy/resources/genes/pharmacoscan/*.yml
 include aldy/resources/profiles/*.yml
 include aldy/tests/resources/*.json
 include aldy/tests/resources/*.bam
