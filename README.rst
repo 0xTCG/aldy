@@ -716,8 +716,8 @@ Change log
 ==========
 
 - Aldy v4.8.2 (Aug 2025)
-  - Removal of obsolete Pharmacoscan definitions
-  - Bugfixes
+   - Removal of obsolete Pharmacoscan definitions
+   - Bugfixes
 
 - Aldy v4.8 and v4.8.1 (Jul 2025)
    - PharmVar v6.2.14 update and new definitions
