@@ -166,6 +166,8 @@ class Sample:
             self._prefix = chr_prefix(
                 self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
             )
+            if self.gene.chr == "MT" and self._prefix == "chr":
+                self.gene.chr = "M"  # UCSC fix
 
             with tempfile.TemporaryDirectory() as tmp:
                 self._realign_indels(tmp, sam, reference)
@@ -248,6 +250,8 @@ class Sample:
 
         with pysam.VariantFile(vcf_path) as vcf:  # type: ignore
             self._prefix = chr_prefix(self.gene.chr, list(vcf.header.contigs))
+            if self.gene.chr == "MT" and self._prefix == "chr":
+                self.gene.chr = "M"  # UCSC fix
 
             samples = list(vcf.header.samples)
             if sample_idx >= len(samples):
@@ -558,6 +562,8 @@ class Sample:
             self._prefix = chr_prefix(
                 self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
             )
+            if self.gene.chr == "MT" and self._prefix == "chr":
+                self.gene.chr = "M"  # UCSC fix
             # Set it to _fetched_ if a CN-neutral region is user-provided.
             # Then read the CN-neutral region.
             if has_index:
@@ -799,6 +805,8 @@ class Sample:
             self._prefix = chr_prefix(
                 self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
             )
+            if self.gene.chr == "MT" and self._prefix == "chr":
+                self.gene.chr = "M"  # UCSC fix
 
             with tempfile.TemporaryDirectory() as tmp:
                 self._realign_indels(tmp, sam, reference, True)
