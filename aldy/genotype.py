@@ -167,12 +167,14 @@ def genotype(
         profile = Profile("user_provided", cn_solution=["1", "1"], **params)
         sample = sam.Sample(gene, profile, sam_path, debug=debug)
     else:
-        if cn_solution:
+        if cn_solution and cn_solution != ['auto']:
             profile = Profile("user_provided", cn_solution=cn_solution, **params)
         elif kind != "dump":
             if not profile_name:
                 raise AldyException("Profile not provided")
             profile = Profile.load(gene, profile_name, cn_region, **params)
+            if cn_solution:
+                profile.cn_solution = cn_solution
         else:
             profile = None
         sample = sam.Sample(gene, profile, sam_path, reference, debug)

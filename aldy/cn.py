@@ -43,9 +43,10 @@ def estimate_cn(
 
     log.debug("\n" + "*" * 80)
 
-    if profile.cn_solution:
+    force_auto = profile.cn_solution and profile.cn_solution == ["auto"]
+    if profile.cn_solution and not force_auto:
         return [_parse_user_solution(gene, profile.cn_solution)]
-    elif not gene.do_copy_number:
+    elif not gene.do_copy_number and not force_auto:
         basic = [
             k for k, v in gene.cn_configs.items() if v.kind == CNConfigType.DEFAULT
         ]

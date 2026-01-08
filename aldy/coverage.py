@@ -108,7 +108,7 @@ class Coverage:
 
     def region_coverage(self, gene: int, region: str) -> float:
         """:returns: Average coverage of a gene region."""
-        return self._region_coverage[gene, region]
+        return self._region_coverage.get((gene, region), 0)
 
     def average_coverage(self) -> float:
         """:returns: Average coverage of the gene."""

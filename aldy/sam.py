@@ -133,7 +133,6 @@ class Sample:
                     self.coverage.diploid_avg_coverage()
                 )
             )
-
         if self.profile.debug_novel:
             self._load_novel_mutations()
 
@@ -163,11 +162,10 @@ class Sample:
             except ValueError:
                 raise AldyException(f"Cannot check index of {sam_path}")
 
-            self._prefix = chr_prefix(
-                self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
-            )
-            if self.gene.chr == "MT" and self._prefix == "chr":
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
+            self._prefix = chr_prefix(self.gene.chr, sam_chrs)
 
             with tempfile.TemporaryDirectory() as tmp:
                 self._realign_indels(tmp, sam, reference)
@@ -249,9 +247,10 @@ class Sample:
                 return pos, None
 
         with pysam.VariantFile(vcf_path) as vcf:  # type: ignore
-            self._prefix = chr_prefix(self.gene.chr, list(vcf.header.contigs))
-            if self.gene.chr == "MT" and self._prefix == "chr":
+            sam_chrs = list(vcf.header.contigs)
+            if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
+            self._prefix = chr_prefix(self.gene.chr, sam_chrs)
 
             samples = list(vcf.header.samples)
             if sample_idx >= len(samples):
@@ -559,11 +558,11 @@ class Sample:
                 has_index = False
             except ValueError:
                 raise AldyException(f"Cannot check index of {self.path}")
-            self._prefix = chr_prefix(
-                self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
-            )
-            if self.gene.chr == "MT" and self._prefix == "chr":
+
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
+            self._prefix = chr_prefix(self.gene.chr, sam_chrs)
             # Set it to _fetched_ if a CN-neutral region is user-provided.
             # Then read the CN-neutral region.
             if has_index:
@@ -802,11 +801,10 @@ class Sample:
             sam_path, reference_filename=reference
         ) as sam, Timing("[sam] Remap"):
             # Assumes SAM index exists
-            self._prefix = chr_prefix(
-                self.gene.chr, [x["SN"] for x in sam.header["SQ"]]
-            )
-            if self.gene.chr == "MT" and self._prefix == "chr":
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
+            self._prefix = chr_prefix(self.gene.chr, sam_chrs)
 
             with tempfile.TemporaryDirectory() as tmp:
                 self._realign_indels(tmp, sam, reference, True)
