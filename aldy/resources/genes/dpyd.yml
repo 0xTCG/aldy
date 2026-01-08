@@ -42,7 +42,7 @@ alleles:
     activity: none
     label: DPYD*7
     mutations:
-    - [185646, delTCAT, rs72549309]
+    - [185646, delTCAT, rs72549309, F100Sfs]
   DPYD*8:
     pharmvar: https://www.pharmvar.org/haplotype/911
     activity: none
