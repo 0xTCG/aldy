@@ -716,7 +716,7 @@ Change log
 ==========
 
 - Aldy v4.8.3 (Jan 2026)
-   - _DPYD\*7_ fix
+   - *DPYD*\*7 fix
    - Fix handling of `chrM`
 
 
