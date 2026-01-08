@@ -4,4 +4,4 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-__version__ = "4.8.2"
+__version__ = "4.8.3"
