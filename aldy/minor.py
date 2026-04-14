@@ -289,14 +289,13 @@ def solve_minor_model(
                     VKEEP[a][m][0] >= VA[a],
                     name=f"CFUNC_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
                 )
-    # 3) No allele can include a mutation with coverage 0
+    # 3) No allele can include a mutation with coverage 0 (severely penalize these cases)
+    impossible_coverage = 0
     for a in VKEEP:
         for m, v in VKEEP[a].items():
             if not gene.has_coverage(a[0].major, m.pos):
-                model.addConstr(
-                    v[0] <= 0,
-                    name=f"CZERO_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
-                )
+                impossible_coverage += v[0]
+
     # 4) Avoid extra mutations if there is an existing mutation at the corresponding
     #    locus (either from the definition or added via VNEW)
     for pos in set(m.pos for m in constraints):
@@ -424,6 +423,7 @@ def solve_minor_model(
     o_penal -= coverage.profile.minor_miss * model.quicksum(
         v[1] for a in VKEEP for _, v in VKEEP[a].items()
     )
+    o_penal += impossible_coverage * coverage.profile.major_novel * 2
     # ... and additions ...
     cnt = 0
     for a in VNEW:
