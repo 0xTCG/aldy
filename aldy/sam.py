@@ -222,13 +222,8 @@ class Sample:
 
         log.debug("[vcf] path= {}", os.path.abspath(vcf_path))
 
-        norm = {
-            p: [(40, 40)] * 20
-            for p in range(
-                self.gene.get_wide_region().start - 500,
-                self.gene.get_wide_region().end + 1,
-            )
-        }
+        region = self.gene.get_wide_region()
+        norm = {p: [(40, 40)] * 20 for p in range(region.start - 500, region.end + 1)}
         muts: dict = defaultdict(list)
 
         # VCF normally left-aligns repeat indels; the star-allele database may
@@ -283,15 +278,28 @@ class Sample:
             self._indel_sites = {}
 
             log.info("Using VCF sample {}", sample)
-            for read in vcf.fetch(
-                region=self.gene.get_wide_region().samtools(prefix=self._prefix)
-            ):
-                g = sorted(y for y in read.samples[sample]["GT"] if y is not None)
-                if len(g) != 2 or self.gene[read.pos - 1] == "N":
+            has_data = False
+            reads = (
+                vcf.fetch(region=region.samtools(prefix=self._prefix))
+                if self._prefix + self.gene.chr in sam_chrs
+                else ()
+            )
+            for read in reads:
+                genotype = read.samples[sample].get("GT")
+                if not genotype or len(genotype) != 2 or None in genotype:
                     continue  # ignore polyploid and incomplete cases
+                # Reference calls and gVCF blocks are evidence too. Exclude
+                # records that only overlap the padding used by the fetch.
+                if read.start < region.end and read.stop > region.start:
+                    has_data = True
+                if self.gene[read.pos - 1] == "N":
+                    continue
+                g = sorted(genotype)
                 dump_arr = {}
                 if len(read.ref) == 1 and read.ref.upper() != self.gene[read.pos - 1]:
-                    hgvs = [(read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref.upper()}")]
+                    hgvs = [
+                        (read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref.upper()}")
+                    ]
                 else:
                     hgvs = [(read.pos - 1, "_")]
                 hgvs += [get_mut(read.pos - 1, read.ref, a) for a in read.alleles[1:]]
@@ -301,7 +309,8 @@ class Sample:
                         continue
                     if op.startswith(("ins", "del")):
                         pos, op = indel_aliases.get(
-                            self.mutation_to_vcf(self.gene, Mutation(pos, op)), (pos, op)
+                            self.mutation_to_vcf(self.gene, Mutation(pos, op)),
+                            (pos, op),
                         )
                     muts[pos, op] += [(40, 40)] * 10
                     norm[pos] = norm[pos][:-10]
@@ -328,6 +337,13 @@ class Sample:
                                 if p:
                                     norm[pos + p] += [(40, 40)] * 10
                         muts[pos, op] += [(40, 40)] * 10
+            if not has_data:
+                log.warn(
+                    "WARNING: No usable VCF records found for {} in sample {}. "
+                    "A wild-type call cannot be confirmed.",
+                    self.gene.name,
+                    sample,
+                )
         return norm, muts
 
     def _load_dump(self, dump_path: str):

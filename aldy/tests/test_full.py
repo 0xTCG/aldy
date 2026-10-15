@@ -249,7 +249,9 @@ with open(script_path("aldy.tests.resources/vcf-input.vcf")) as f:
 
 
 @pytest.mark.parametrize("sample_idx,sample", enumerate(VCF_SAMPLES), ids=VCF_SAMPLES)
-def test_vcf_input_output(tmp_path, solver, sample_idx, sample):
+def test_vcf_input_output(monkeypatch, tmp_path, solver, sample_idx, sample):
+    warnings = []
+    monkeypatch.setattr(log, "warn", lambda *args: warnings.append(str.format(*args)))
     gene = sample.split("_", 1)[0]
     chrom = {
         "CYP2C9": "10",
@@ -303,6 +305,9 @@ def test_vcf_input_output(tmp_path, solver, sample_idx, sample):
     assert output_path.read_text() == "".join(expected).replace(
         "aldy-v4.8", f"aldy-v{__version__}"
     )
+    # Explicit reference genotypes count as data, including the reference-only
+    # sample; a lack of alternate alleles must not trigger this warning.
+    assert not any("No usable VCF records found" in warning for warning in warnings)
 
 
 def test_fusion(monkeypatch, solver):
@@ -410,6 +415,46 @@ def test_NA07000_vcf_in(monkeypatch, solver):
         {"--param": "max-minor-solutions=1", "--gene": "SLCO1B1"},
         warn=True,
     )
+
+
+@pytest.mark.parametrize(
+    "filename,sample",
+    [
+        ("NA07000_SLCO1B1.vcf.gz", "NA07000"),  # Chromosome present, gene absent.
+        ("vcf-input.vcf", "CYP2C9_heterozygous"),  # Chromosome absent too.
+    ],
+)
+def test_vcf_missing_gene(monkeypatch, tmp_path, solver, filename, sample):
+    warnings = []
+    monkeypatch.setattr(log, "warn", lambda *args: warnings.append(str.format(*args)))
+    input_path = script_path("aldy.tests.resources/" + filename)
+    if not filename.endswith(".gz"):
+        compressed = str(tmp_path / "input.vcf.gz")
+        pysam.tabix_compress(input_path, compressed)
+        pysam.tabix_index(compressed, preset="vcf")
+        input_path = compressed
+    main(
+        [
+            "genotype",
+            input_path,
+            "--gene",
+            "cftr",
+            "--profile",
+            "illumina",
+            "--genome",
+            "hg19",
+            "--solver",
+            solver,
+            "--output",
+            str(tmp_path / "output.vcf"),
+        ]
+    )
+    assert [
+        warning for warning in warnings if "No usable VCF records found" in warning
+    ] == [
+        f"WARNING: No usable VCF records found for CFTR in sample {sample}. "
+        "A wild-type call cannot be confirmed."
+    ]
 
 
 def test_fix_insertions(monkeypatch, solver):

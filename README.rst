@@ -313,6 +313,9 @@ copies in each candidate, including copies without the record's variant. For exa
 Insertions and deletions include the required reference padding base, and
 ``POS`` identifies the first base in ``REF``. Indels in repeats are left-aligned;
 VCF input maps equivalent indels back to their star-allele database coordinates.
+Aldy warns when the selected sample has no usable VCF calls or reference
+coverage overlapping the requested gene. In that case, a wild-type call cannot
+be confirmed from the VCF.
 
   **Note:** VCF is not an optimal format for star-allele reporting. Unless you really need it,
   we recommend using Aldy's default format.
