@@ -4,20 +4,21 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Tuple, Dict, List, Optional
-from collections import defaultdict, Counter
-from statistics import mean
-import pysam
+import gzip
 import os
 import os.path
-import gzip
-import tarfile
 import pickle
+import tarfile
 import tempfile
+from collections import Counter, defaultdict
+from statistics import mean
+from typing import Dict, List, Optional, Tuple
 
-from .common import log, GRange, AldyException, script_path, Timing, chr_prefix
-from .gene import Gene, CNConfigType, Mutation
+import pysam
+
+from .common import AldyException, GRange, Timing, chr_prefix, log, script_path
 from .coverage import Coverage
+from .gene import CNConfigType, Gene, Mutation
 from .profile import Profile
 
 
@@ -230,18 +231,38 @@ class Sample:
         }
         muts: dict = defaultdict(list)
 
+        # VCF normally left-aligns repeat indels; the star-allele database may
+        # place the same event elsewhere in the repeat (e.g. CYP2C9 rs9332131).
+        indel_aliases = {
+            self.mutation_to_vcf(self.gene, Mutation(pos, op)): (pos, op)
+            for pos, op in self.gene.mutations
+            if op.startswith(("ins", "del"))
+        }
+
         def get_mut(pos, ref, alt):
+            if not alt or any(b not in "ACGTN" for b in alt.upper()):
+                return pos, None  # symbolic, spanning-deletion and breakend alleles
+            ref, alt = ref.upper(), alt.upper()
             off = 0
             while off < len(ref) and off < len(alt) and ref[off] == alt[off]:
                 off += 1
-            if len(ref) - off == 1 and len(alt) - off == 1:
-                if alt[off] == self.gene[off + pos]:
-                    return off + pos, "_"
-                return off + pos, f"{self.gene[off + pos]}>{alt[off]}"
-            elif len(ref) > len(alt) and len(alt) - off == 0:
-                return off + pos, f"del{self.gene[off + pos : pos + len(ref)]}"
-            elif len(ref) < len(alt) and len(ref) - off == 0:
-                return off + pos, f"ins{alt[off:]}"
+            pos += off
+            ref, alt = ref[off:], alt[off:]
+            # VCF permits extra padding and requires right padding at contig start.
+            while ref and alt and ref[-1] == alt[-1]:
+                ref, alt = ref[:-1], alt[:-1]
+            if not ref and not alt:
+                return pos, "_"
+            elif len(ref) == len(alt) == 1:
+                if alt == self.gene[pos]:
+                    return pos, "_"
+                return pos, f"{self.gene[pos]}>{alt}"
+            elif ref and not alt:
+                return pos, f"del{self.gene[pos : pos + len(ref)]}"
+            elif alt and not ref:
+                return pos, f"ins{alt}"
+            elif len(ref) != len(alt):
+                return pos, f"del{self.gene[pos : pos + len(ref)]}ins{alt}"
             else:
                 log.trace(f"[sam] ignoring {pos}: {ref}->{alt}")
                 return pos, None
@@ -259,6 +280,7 @@ class Sample:
                     f"input VCF has {len(vcf.header.samples)} samples"
                 )
             self.name = sample = samples[sample_idx]
+            self._indel_sites = {}
 
             log.info("Using VCF sample {}", sample)
             for read in vcf.fetch(
@@ -268,18 +290,26 @@ class Sample:
                 if len(g) != 2 or self.gene[read.pos - 1] == "N":
                     continue  # ignore polyploid and incomplete cases
                 dump_arr = {}
-                if len(read.ref) == 1 and read.ref != self.gene[read.pos - 1]:
-                    hgvs = [(read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref}")]
+                if len(read.ref) == 1 and read.ref.upper() != self.gene[read.pos - 1]:
+                    hgvs = [(read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref.upper()}")]
                 else:
                     hgvs = [(read.pos - 1, "_")]
                 hgvs += [get_mut(read.pos - 1, read.ref, a) for a in read.alleles[1:]]
                 for gt in g:
                     pos, op = hgvs[gt]
-                    if op == "_":
+                    if op is None or op == "_":
                         continue
+                    if op.startswith(("ins", "del")):
+                        pos, op = indel_aliases.get(
+                            self.mutation_to_vcf(self.gene, Mutation(pos, op)), (pos, op)
+                        )
                     muts[pos, op] += [(40, 40)] * 10
                     norm[pos] = norm[pos][:-10]
                     dump_arr[pos] = op
+
+                    if op.startswith("ins") or op.startswith("del"):
+                        support = len(muts[pos, op])
+                        self._indel_sites[pos, op] = (20 - support, support)
 
                 # Handle multi-SNPs
                 for pos, op in self._multi_sites.items():
@@ -1000,6 +1030,42 @@ class Sample:
                 )
                 self.gene.random_mutations.add(Mutation(pos, op))
                 ni += 1
+
+    @staticmethod
+    def mutation_to_vcf(gene, mutation):
+        """Return left-aligned, one-based POS, REF and ALT for an Aldy mutation."""
+        pos, op = mutation
+        if ">" in op:
+            ref, alt = op.split(">")
+            ref = gene[pos : pos + len(ref)]
+            alt = "".join(r if a == "." else a for r, a in zip(ref, alt))
+        elif op.startswith("ins"):
+            ref, alt = "", op[3:]
+        elif op.startswith("del"):
+            deleted, _, alt = op[3:].partition("ins")
+            ref = gene[pos : pos + len(deleted)]
+        else:
+            raise ValueError(f"Unsupported VCF mutation: {mutation}")
+
+        # Remove redundant context before left-aligning insertions/deletions.
+        while ref and alt and ref[0] == alt[0]:
+            pos, ref, alt = pos + 1, ref[1:], alt[1:]
+        while ref and alt and ref[-1] == alt[-1]:
+            ref, alt = ref[:-1], alt[:-1]
+        if not ref or not alt:
+            while pos > 0 and (ref or alt)[-1:] == gene[pos - 1]:
+                anchor = gene[pos - 1]
+                ref = anchor + ref[:-1] if ref else ""
+                alt = anchor + alt[:-1] if alt else ""
+                pos -= 1
+            if pos > 0:
+                pos -= 1
+                ref, alt = gene[pos] + ref, gene[pos] + alt
+            else:
+                # VCF requires right padding when no preceding base exists.
+                anchor = gene[pos + len(ref)]
+                ref, alt = ref + anchor, alt + anchor
+        return pos + 1, ref, alt
 
 
 def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:

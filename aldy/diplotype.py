@@ -13,6 +13,7 @@ from .common import td
 from .gene import Gene, Mutation
 from .coverage import Coverage
 from .solutions import MinorSolution
+from .sam import Sample
 from .version import __version__ as version
 
 
@@ -106,32 +107,24 @@ def write_vcf(
 
     :param sample: Sample name.
     :param gene: Gene instance.
-    :param sol_id: Solution ID (each solution must have a different ID).
-    :param minor: Minor star-allele solution to be written.
+    :param minors: Candidate minor star-allele solutions for this sample.
     :param f: Output file.
     """
 
     header = f"""
     ##fileformat=VCFv4.2
     ##source=aldy-v{version} (gene: {gene.name}-{gene.version})
-    ##INFO=<ID=ANN,Number=1,Type=String,Description="Location within {gene.name}">
-    ##INFO=<ID=TYPE,Number=1,Type=String,Description="Mutation kind">
+    ##contig=<ID={gene.chr}>
+    ##INFO=<ID=EFFECT,Number=1,Type=String,Description="Mutation effect">
     ##INFO=<ID=GENE,Number=1,Type=String,Description="Gene">
-    ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+    ##FORMAT=<ID=GT,Number=1,Type=String,Description="Consensus unphased genotype">
     ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
-    ##FORMAT=<ID=MA,Number=1,Type=String,Description="Major genotype star-allele calls">
-    ##FORMAT=<ID=MI,Number=1,Type=String,Description="Minor genotype star-allele calls">
+    ##FORMAT=<ID=CGT,Number=.,Type=String,Description="Candidate copy genotypes (|)">
+    ##FORMAT=<ID=MA,Number=.,Type=String,Description="Candidate major calls (|)">
+    ##FORMAT=<ID=MI,Number=.,Type=String,Description="Candidate minor calls (|)">
     """
 
-    all_mutations: Dict[Mutation, List[dict]] = {
-        m: [collections.defaultdict(int)] * len(minors)
-        for minor in minors
-        for a in minor.solution
-        if a.minor
-        for m in set(gene.alleles[a.major].func_muts)
-        | set(gene.alleles[a.major].minors[a.minor].neutral_muts)
-        | set(a.added)
-    }
+    all_mutations: Dict[Mutation, List[dict]] = {}
     for mi, minor in enumerate(minors):
         for ai, a in enumerate(minor.solution):
             assert a.minor
@@ -139,28 +132,22 @@ def write_vcf(
                 gene.alleles[a.major].minors[a.minor].neutral_muts
             )
             mutations |= set(a.added)
+            mutations -= set(a.missing)
             for m in mutations:
+                if m not in all_mutations:
+                    all_mutations[m] = [collections.defaultdict(int) for _ in minors]
                 all_mutations[m][mi][ai] = 1
     print(
         td(header).strip()
         + "\n"
         + "\t".join(
             ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
-            + [
-                f"{sample}:{mi}:{m.get_major_diplotype().replace(' ', '')}"
-                for mi, m in enumerate(minors)
-            ]
+            + [sample]
         ),
         file=f,
     )
-    for m in sorted(all_mutations):
-        ref = m.op[0]  # TODO: should be genome nucleotide, not the RefSeq nucleotide?!
-        if m.op[1] == ">":
-            alt = m.op[2]
-        elif m.op[:3] == "ins":
-            alt = ref + m.op[3:]
-        else:
-            ref, alt = ".", f"{m.op[3:]}, ."  # TODO: this is wrong?!
+    records = [(m, Sample.mutation_to_vcf(gene, m)) for m in all_mutations]
+    for m, (pos, ref, alt) in sorted(records, key=lambda r: (r[1][0], r[0])):
 
         fm = gene.get_functional(m)
         fm = fm.replace(" ", "_").replace("\t", "_").replace(";", "_") if fm else "none"
@@ -174,25 +161,36 @@ def write_vcf(
             data.append(
                 {
                     "GT": "|".join(str(all_mutations[m][mi][i]) for i in range(nall)),
-                    "DP": str(coverage[m]),
-                    "MA": ",".join(
+                    "MA": "|".join(
                         (
                             f"*{minor.solution[i].major}"
-                            if all_mutations[m][mi][i] > 0
-                            else "-"
                         )
                         for i in range(nall)
                     ),
-                    "MI": ",".join(
+                    "MI": "|".join(
                         (
                             f"*{minor.solution[i].minor}"
-                            if all_mutations[m][mi][i] > 0
-                            else "-"
                         )
                         for i in range(nall)
                     ),
                 }
             )
+        # Candidate solutions describe the same individual. Do not concatenate
+        # their GTs: that would falsely increase the individual's ploidy.
+        genotypes = [tuple(sorted(d["GT"].split("|"))) for d in data]
+        ploidies = {len(minor.solution) for minor in minors}
+        if len(set(genotypes)) == 1 and ploidies != {0}:
+            gt = "/".join(genotypes[0])
+        else:
+            ploidy = next(iter(ploidies)) if len(ploidies) == 1 else 1
+            gt = "/".join(["."] * ploidy) or "."
+        sample_data = {
+            "GT": gt,
+            "DP": str(int(coverage.total(m))),
+            "CGT": ",".join(d["GT"] or "." for d in data),
+            "MA": ",".join(d["MA"] or "." for d in data),
+            "MI": ",".join(d["MI"] or "." for d in data),
+        }
         pattern = (
             "{chrom}\t{pos}\t{id}\t{ref}\t{alt}\t{qual}\t{filter}\t{info}\t"
             + "{format}\t{data}"
@@ -200,15 +198,19 @@ def write_vcf(
         print(
             pattern.format(
                 chrom=gene.chr,
-                pos=m.pos + 1,
-                id=gene.get_rsid(m, default=False),
+                pos=pos,
+                id=(
+                    gene.get_rsid(m, default=False)
+                    if gene.get_rsid(m, default=False) != "-"
+                    else "."
+                ),
                 ref=ref,
                 alt=alt,
                 qual=0,
                 filter="PASS",
                 info=";".join(info),
-                format=":".join(data[0].keys()),
-                data="\t".join(":".join(d.values()) for d in data),
+                format=":".join(sample_data.keys()),
+                data=":".join(sample_data.values()),
             ),
             file=f,
         )

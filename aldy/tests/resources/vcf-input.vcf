@@ -1,0 +1,38 @@
+##fileformat=VCFv4.2
+##reference=GRCh37
+##description=VCF input and output regression cases using existing Aldy genes
+##INFO=<ID=GENE,Number=1,Type=String,Description="Gene under test">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##contig=<ID=2>
+##contig=<ID=10>
+##contig=<ID=12>
+##contig=<ID=19>
+##contig=<ID=22>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	CYP2C9_heterozygous	CYP2C9_homozygous	CYP2C9_reference	CYP2C9_missing	CYP2C9_incomplete	CYP2C9_polyploid_input	CYP2C9_repeat_shifted	CYP2C9_right_padded	CYP2C9_both_padded	CYP2C9_lowercase	CYP2C9_symbolic	CYP2C9_spanning	CYP2C9_unsupported_mnv	CYP2C9_identical_alleles	CYP2C9_multi_base_deletion	UGT1A1_insertion	UGT1A1_homozygous_insertion	UGT1A1_both_padded	UGT1A1_lowercase_insertion	UGT1A1_multi_base_insertion	UGT1A1_repeat_deletion	UGT1A1_multiallelic	UGT1A1_ambiguous	CYP2D6_single_insertion	CYP2D6_multi_base_insertion	CYP2D6_shifted_insertion	CYP2D6_multi_base_deletion	CYP2A6_delins	CYP2A6_long_delins	SLCO1B1_ambiguous
+2	234668570	case1	C	T	.	PASS	GENE=UGT1A1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+2	234668879	case2	C	CTA	.	PASS	GENE=UGT1A1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	1/1	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+2	234668879	case3	C	CTA,CTATA	.	PASS	GENE=UGT1A1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	1/2	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+2	234668879	case4	C	CTATA	.	PASS	GENE=UGT1A1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+2	234668879	case5	CA	CTAA	.	PASS	GENE=UGT1A1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+2	234668879	case6	CAT	C	.	PASS	GENE=UGT1A1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+2	234668879	case7	c	cta	.	PASS	GENE=UGT1A1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96701962	case8	CAATGGAAAGA	C	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709038	case9	G	*	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709038	case10	G	<DEL>	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709038	case11	GA	G	.	PASS	GENE=CYP2C9	GT	0/1	1/1	0/0	./.	./1	0/1/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709038	case12	GA	GA	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709038	case13	GA	TC	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709038	case14	ga	g	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709039	case15	AA	A	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709039	case16	AAG	AG	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+10	96709040	case17	AG	G	.	PASS	GENE=CYP2C9	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0
+12	21329738	case18	A	G	.	PASS	GENE=SLCO1B1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1
+12	21331549	case19	T	C	.	PASS	GENE=SLCO1B1	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1
+19	41354171	case20	GC	T	.	PASS	GENE=CYP2A6	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0
+19	41354660	case21	A	G	.	PASS	GENE=CYP2A6	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0
+19	41356316	case22	T	G	.	PASS	GENE=CYP2A6	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0
+19	41356801	case23	GGGTTAAGGGTCTCAGGAAGGGG	CAGATTCCACATATGGATT	.	PASS	GENE=CYP2A6	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0
+22	42522657	case24	T	TCAGTGGGCA	.	PASS	GENE=CYP2D6	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0
+22	42522658	case25	C	CAGTGGGCAC	.	PASS	GENE=CYP2D6	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0
+22	42524175	case26	CCTT	C	.	PASS	GENE=CYP2D6	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0
+22	42526655	case27	G	GA	.	PASS	GENE=CYP2D6	GT	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/0	0/1	0/0	0/0	0/0	0/0	0/0	0/0
