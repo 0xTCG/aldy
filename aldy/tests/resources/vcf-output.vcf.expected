@@ -1,0 +1,34 @@
+##fileformat=VCFv4.2
+##source=aldy-v4.8 (gene: CYP2C9-pharmvar-6.2.14 (2025-07-20))
+##source=aldy-v4.8 (gene: UGT1A1-pharmgkb-apr2023 (2022-08-26))
+##source=aldy-v4.8 (gene: CYP2D6-pharmvar-6.2.14 (2025-07-20))
+##source=aldy-v4.8 (gene: CYP2A6-pharmvar-6.2.14 (2025-07-20))
+##source=aldy-v4.8 (gene: SLCO1B1-pharmvar-6.2.14 (2025-07-20))
+##contig=<ID=2>
+##contig=<ID=10>
+##contig=<ID=12>
+##contig=<ID=19>
+##contig=<ID=22>
+##INFO=<ID=EFFECT,Number=1,Type=String,Description="Mutation effect">
+##INFO=<ID=GENE,Number=1,Type=String,Description="Gene">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Consensus unphased genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+##FORMAT=<ID=CGT,Number=.,Type=String,Description="Candidate copy genotypes (|)">
+##FORMAT=<ID=MA,Number=.,Type=String,Description="Candidate major calls (|)">
+##FORMAT=<ID=MI,Number=.,Type=String,Description="Candidate minor calls (|)">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	CYP2C9_heterozygous	CYP2C9_homozygous	CYP2C9_reference	CYP2C9_missing	CYP2C9_incomplete	CYP2C9_polyploid_input	CYP2C9_repeat_shifted	CYP2C9_right_padded	CYP2C9_both_padded	CYP2C9_lowercase	CYP2C9_symbolic	CYP2C9_spanning	CYP2C9_unsupported_mnv	CYP2C9_identical_alleles	CYP2C9_multi_base_deletion	UGT1A1_insertion	UGT1A1_homozygous_insertion	UGT1A1_both_padded	UGT1A1_lowercase_insertion	UGT1A1_multi_base_insertion	UGT1A1_repeat_deletion	UGT1A1_multiallelic	UGT1A1_ambiguous	CYP2D6_single_insertion	CYP2D6_multi_base_insertion	CYP2D6_shifted_insertion	CYP2D6_multi_base_deletion	CYP2A6_delins	CYP2A6_long_delins	SLCO1B1_ambiguous
+2	234668570	rs887829	C	T	0	PASS	EFFECT=5'UTR;GENE=UGT1A1	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1,0|1:*1|*28_80,*28|*80:*1|*28_80,*28|*80	.	.	.	.	.	.	.
+2	234668879	rs3064744	C	CTA	0	PASS	EFFECT=Promoter;GENE=UGT1A1	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*28:*1|*28	1/1:20:1|1:*28|*28:*28|*28	0/1:20:0|1:*1|*28:*1|*28	0/1:20:0|1:*1|*28:*1|*28	.	.	0/1:20:1|0:*28|*37:*28|*37	0/1:20:0|1,1|0:*1|*28_80,*28|*80:*1|*28_80,*28|*80	.	.	.	.	.	.	.
+2	234668879	rs3064744	C	CTATA	0	PASS	EFFECT=Promoter;GENE=UGT1A1	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*37:*1|*37	.	0/1:20:0|1:*28|*37:*28|*37	.	.	.	.	.	.	.	.
+2	234668879	rs3064744_del	CAT	C	0	PASS	EFFECT=Promoter;GENE=UGT1A1	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*36:*1|*36	.	.	.	.	.	.	.	.	.
+10	96701962	rs1304490498	CAATGGAAAGA	C	0	PASS	EFFECT=K118fs;GENE=CYP2C9	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*25:*1.001|*25.001	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+10	96709038	rs9332131	GA	G	0	PASS	EFFECT=K273fs;GENE=CYP2C9	GT:DP:CGT:MA:MI	0/1:20:0|1:*1|*6:*1.001|*6.001	1/1:20:1|1:*6|*6:*6.001|*6.001	.	.	.	.	0/1:20:0|1:*1|*6:*1.001|*6.001	0/1:20:0|1:*1|*6:*1.001|*6.001	0/1:20:0|1:*1|*6:*1.001|*6.001	0/1:20:0|1:*1|*6:*1.001|*6.001	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+12	21329738	rs2306283	A	G	0	PASS	EFFECT=N130D;GENE=SLCO1B1	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:1|0,0|1:*37|*5,*1|*15:*37.001|*5.001,*1.001|*15.001
+12	21331549	rs4149056	T	C	0	PASS	EFFECT=V174A;GENE=SLCO1B1	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1,0|1:*37|*5,*1|*15:*37.001|*5.001,*1.001|*15.001
+19	41354171	rs1555782914	GC	T	0	PASS	EFFECT=R203fs;GENE=CYP2A6	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*27:*1.001|*27.001	.	.
+19	41354660	rs28399440	A	G	0	PASS	EFFECT=F118L;GENE=CYP2A6	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*27:*1.001|*27.001	.	.
+19	41356316	rs72549432	T	G	0	PASS	EFFECT=M6L;GENE=CYP2A6	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*31:*1.001|*31.001	.
+19	41356801	rs1555783362	GGGTTAAGGGTCTCAGGAAGGGG	CAGATTCCACATATGGATT	0	PASS	EFFECT=none;GENE=CYP2A6	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*31:*1.001|*31.001	.
+22	42522657	rs765776661	T	TCAGTGGGCA	0	PASS	EFFECT=468_470dupVPT;GENE=CYP2D6	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*18:*1.001|*18.001	0/1:20:0|1:*1|*18:*1.001|*18.001	.	.	.	.
+22	42524175	rs5030656	CCTT	C	0	PASS	EFFECT=K281del;GENE=CYP2D6	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*9:*1.001|*9.001	.	.	.
+22	42526655	rs774671100	G	GA	0	PASS	EFFECT=L47fs;GENE=CYP2D6	GT:DP:CGT:MA:MI	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	0/1:20:0|1:*1|*15:*1.001|*15.001	.	.	.	.	.	.

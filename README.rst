@@ -299,8 +299,23 @@ VCF support
 -----------
 
 The output will be a VCF file if the output file extension is ``.vcf``.
-Aldy will report a VCF sample for each potential solution and the appropriate genotypes.
-Aldy will also output tags ``MA`` and ``MI`` for major and minor solutions.
+Aldy reports one VCF sample column for the input sample. ``GT`` contains the
+unphased genotype shared by all potential solutions, or a missing genotype when
+the solutions disagree on allele dosage or copy number. A pipe in VCF ``GT``
+denotes phased allele copies, not alternative solutions.
+
+The FORMAT tags ``CGT``, ``MA`` and ``MI`` preserve candidate genotypes and major
+and minor star-allele calls, respectively. These are comma-separated lists in
+the same solution order. Within each candidate, pipes separate inferred gene
+copies; this copy order does not establish a phase. ``MA`` and ``MI`` report all
+copies in each candidate, including copies without the record's variant. For example,
+``CGT=0|1,1|1`` represents two candidate diploid solutions and has ``GT=./.``.
+Insertions and deletions include the required reference padding base, and
+``POS`` identifies the first base in ``REF``. Indels in repeats are left-aligned;
+VCF input maps equivalent indels back to their star-allele database coordinates.
+Aldy warns when the selected sample has no usable VCF calls or reference
+coverage overlapping the requested gene. In that case, a wild-type call cannot
+be confirmed from the VCF.
 
   **Note:** VCF is not an optimal format for star-allele reporting. Unless you really need it,
   we recommend using Aldy's default format.
