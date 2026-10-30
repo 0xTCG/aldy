@@ -4,18 +4,18 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Dict, Any
-from natsort import natsorted
 import collections
 import re
+from typing import Any
+
+from natsort import natsorted
 
 from .common import td
-from .gene import Gene, Mutation
 from .coverage import Coverage
-from .solutions import MinorSolution
+from .gene import Gene, Mutation
 from .sam import Sample
+from .solutions import MinorSolution
 from .version import __version__ as version
-
 
 OUTPUT_COLS = [
     "Sample",
@@ -100,7 +100,7 @@ def write_decomposition(
 
 
 def write_vcf(
-    sample: str, gene: Gene, coverage: Coverage, minors: List[MinorSolution], f
+    sample: str, gene: Gene, coverage: Coverage, minors: list[MinorSolution], f
 ):
     """
     Write an allelic decomposition in the VCF format to the given file.
@@ -124,7 +124,7 @@ def write_vcf(
     ##FORMAT=<ID=MI,Number=.,Type=String,Description="Candidate minor calls (|)">
     """
 
-    all_mutations: Dict[Mutation, List[dict]] = {}
+    all_mutations: dict[Mutation, list[dict]] = {}
     for mi, minor in enumerate(minors):
         for ai, a in enumerate(minor.solution):
             assert a.minor
@@ -230,7 +230,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     del_allele = gene.deletion_allele()
 
     # solution is the array of (major, minor) tuples
-    major_dict: Dict[str, List[int]] = collections.defaultdict(list)
+    major_dict: dict[str, list[int]] = collections.defaultdict(list)
     for ai, a in enumerate(solution.solution):
         n = str(a.major).split("#")[0]  # chop off fusion suffix
         components = re.split(r"(\d+)", n)
@@ -258,7 +258,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     # Handle duplicates (heuristics that groups duplicate alleles together,
     #                    e.g. 1, 1, 2 -> 1+1/2)
     # First check should we split them (e.g. 1, 1, 1, 1 -> 1+1/1+1)?
-    xlen = lambda d: sum(2 if isinstance(n, tuple) else 1 for n in d)  # noqa
+    xlen = lambda d: sum(2 if isinstance(n, tuple) else 1 for n in d)
 
     if len(major_dict) == 1:
         items = next(iter(major_dict.values()))
@@ -268,7 +268,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
             diplotype[dc % 2] += items[len(items) // 2 :]
             dc += 1
             major_dict.clear()
-    for _, items in major_dict.items():
+    for items in major_dict.values():
         if len(items) > 1:
             if xlen(diplotype[dc % 2]) > xlen(diplotype[(dc + 1) % 2]):
                 dc += 1
@@ -277,7 +277,7 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
             dc += 1
 
     # Handle the rest
-    for _, items in major_dict.items():
+    for items in major_dict.values():
         if items:
             if xlen(diplotype[dc % 2]) > xlen(diplotype[(dc + 1) % 2]):
                 dc += 1
@@ -314,13 +314,13 @@ def estimate_diplotype(gene: Gene, solution: MinorSolution) -> str:
     return diplotype
 
 
-def estimate_cpic(gene: Gene, solution: MinorSolution) -> str:
+def estimate_cpic(gene: Gene, solution: MinorSolution) -> tuple[float, str]:
     """Calculate the CPIC functionality for a minor solution.
     :returns: CPIC functionality.
     """
 
     activities = []
-    for ai, a in enumerate(solution.solution):
+    for a in solution.solution:
         if a.extra_functionality():
             activities.append("unknown")
         else:

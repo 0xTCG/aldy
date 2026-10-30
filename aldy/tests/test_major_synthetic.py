@@ -4,17 +4,16 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Any, List
-import pytest  # noqa
 import collections
+from typing import Any
 
+import pytest  # noqa
 
-from aldy.profile import Profile
-from aldy.major import estimate_major
-from aldy.solutions import CNSolution
-from aldy.coverage import Coverage
 from aldy.common import SOLUTION_PRECISION
-
+from aldy.coverage import Coverage
+from aldy.major import estimate_major
+from aldy.profile import Profile
+from aldy.solutions import CNSolution
 
 profile = Profile("test")
 
@@ -32,7 +31,7 @@ def assert_major(gene, solver, major):
         for s in sols:
             assert abs(major["score"] - s.score) < SOLUTION_PRECISION, "Score"
 
-    sols_parsed: List[Any] = [
+    sols_parsed: list[Any] = [
         dict(
             collections.Counter(
                 [i.major for i, v in s.solution.items() for _ in range(v)]

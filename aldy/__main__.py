@@ -5,25 +5,26 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Optional, Any
-import logbook
-import logbook.more
-import logbook.base
 import argparse
-import os
-import sys
-import platform
-import yaml
 import datetime
+import os
+import platform
+import sys
 import tempfile
 import traceback
+from typing import Any
+
+import logbook
+import logbook.base
+import logbook.more
 import pytest
+import yaml
 
 from . import common
-from .common import log, script_path, AldyException, td, parse_cn_region
+from .common import AldyException, log, parse_cn_region, script_path, td
 from .gene import Gene
-from .profile import Profile
 from .genotype import genotype
+from .profile import Profile
 from .query import query
 from .version import __version__
 
@@ -91,7 +92,7 @@ def main(argv):
                 gene, q = q, ""
             if args.gene:
                 gene = args.gene
-            db_file = script_path("aldy.resources.genes/{}.yml".format(gene.lower()))
+            db_file = script_path(f"aldy.resources.genes/{gene.lower()}.yml")
             if not os.path.exists(db_file):
                 db_file = gene
             with open(db_file):  # Check if file exists
@@ -128,7 +129,7 @@ def main(argv):
                 output.close()
         else:
             raise AldyException("Invalid sub-command " + args.subparser)
-    except IOError as ex:
+    except OSError as ex:
         if ex.filename is not None:
             log.critical("ERROR: {} cannot be accessed", ex.filename)
         else:
@@ -350,7 +351,7 @@ def _print_licence():
             print(ll.strip())
 
 
-def _genotype(gene: str, output: Optional[Any], args) -> None:
+def _genotype(gene: str, output: Any | None, args) -> None:
     """
     Genotype a file.
 

@@ -271,9 +271,9 @@ def test_deletion(real_gene, solver):  # HG00276/v1
 
 
 def test_comparison(real_gene, solver):  # NA10846/v1
-    from aldy.solutions import CNSolution, SolvedAllele, MajorSolution
     from aldy.coverage import Coverage
     from aldy.minor import estimate_minor
+    from aldy.solutions import CNSolution, MajorSolution, SolvedAllele
 
     data = {
         (42522391, "G>A"): 286,

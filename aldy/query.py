@@ -6,6 +6,7 @@
 
 import sys
 import textwrap
+
 from natsort import natsorted
 
 from .common import AldyException, log

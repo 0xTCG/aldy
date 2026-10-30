@@ -248,6 +248,9 @@ This indicates the presence of a novel star-allele that has not been cataloged y
 
 By default, Aldy only reports solutions with the maximum confidence.
 Use `--param gap=XY` (where `XY` is greater than 0) to report less likely solutions.
+The copy-number search has a separate ``cn_gap`` parameter, with the default value of
+``0.1``.
+Use ``--param cn_gap=0`` to restrict this search to optimal CN structures.
 
 Explicit decomposition is given in the ``file-[gene].aldy``
 (in the example above, it is ``NA19788_x.CYP2D6.aldy``).

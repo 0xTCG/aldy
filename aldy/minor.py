@@ -3,26 +3,26 @@
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
-from typing import List, Set, Tuple, Dict
-from natsort import natsorted
 import collections
 import os
 
+from natsort import natsorted
+
 from . import lpinterface
-from .common import log, json, Timing
-from .gene import Mutation, Gene
+from .common import Timing, json, log
 from .coverage import Coverage
-from .solutions import MajorSolution, SolvedAllele, MinorSolution
 from .diplotype import estimate_diplotype
+from .gene import Gene, Mutation
+from .solutions import MajorSolution, MinorSolution, SolvedAllele
 
 
 def estimate_minor(
     gene: Gene,
     coverage: Coverage,
-    major_sols: List[MajorSolution],
+    major_sols: list[MajorSolution],
     solver: str,
     max_solutions: int = 1,
-) -> List[MinorSolution]:
+) -> list[MinorSolution]:
     """
     Estimate the optimal minor star-allele.
 
@@ -35,10 +35,10 @@ def estimate_minor(
     """
 
     # Get the list of potential alleles and mutations
-    alleles: List[SolvedAllele] = list()
+    alleles: list[SolvedAllele] = []
     # Consider all major and minor mutations
     # *from all available major solutions* together
-    mutations: Set[Mutation] = set()
+    mutations: set[Mutation] = set()
     for major_sol in major_sols:
         for sa in major_sol.solution:
             alleles += [
@@ -71,7 +71,7 @@ def estimate_minor(
     mutations |= {m for m in gene.random_mutations if cov[m] > 0}
 
     # Group by CN solutions
-    minor_sols: List[MinorSolution] = []
+    minor_sols: list[MinorSolution] = []
     cn_sols = {m.cn_solution for m in major_sols}
     min_score = min(m.score for m in major_sols)
     for c in sorted(cn_sols, key=lambda x: x._solution_nice()):
@@ -98,11 +98,11 @@ def solve_minor_model(
     gene: Gene,
     coverage: Coverage,
     major_sol: MajorSolution,
-    alleles_list: List[SolvedAllele],
-    mutations: Set[Mutation],
+    alleles_list: list[SolvedAllele],
+    mutations: set[Mutation],
     solver: str,
     max_solutions: int = 1,
-) -> List[MinorSolution]:
+) -> list[MinorSolution]:
     """
     Solves the minor star-allele detection problem via integer linear programming.
 
@@ -127,7 +127,7 @@ def solve_minor_model(
     debug_info = json[gene.name]["minor"][len(json[gene.name]["minor"])]
 
     # Establish minor alleles and their mutations
-    alleles: Dict[Tuple[SolvedAllele, int], Set[Mutation]] = {
+    alleles: dict[tuple[SolvedAllele, int], set[Mutation]] = {
         (a, 0): set(gene.alleles[a.major].func_muts)
         | set(gene.alleles[a.major].minors[a.minor].neutral_muts)
         for a in alleles_list
@@ -375,7 +375,7 @@ def solve_minor_model(
                 mi = list(modes.items())
                 modes = dict(mi[i] for i in range(0, len(mi), int(skip)))
         with Timing("[minor] Model setup"):
-            addVar = lambda n: model.addVar(vtype="B", name=n, update=False)  # noqa
+            addVar = lambda n: model.addVar(vtype="B", name=n, update=False)
             vars = 0
             for ri, (rr, cnt) in enumerate(modes.items()):
                 r = dict(rr)
@@ -469,8 +469,8 @@ def solve_minor_model(
                         model, gene, mutations, modes, VPHASE, VKEEP, VNEW, allele, ai
                     )
 
-                added: List[Mutation] = []
-                missing: List[Mutation] = []
+                added: list[Mutation] = []
+                missing: list[Mutation] = []
                 for m, mv in VKEEP[allele].items():
                     if not model.getValue(mv[0]):
                         missing.append(m)
@@ -535,7 +535,7 @@ def _print_candidates(gene, alleles, cn_sol, coverage, muts):
         copies = coverage[m] / copies if copies > 0 else 0
         impact = gene.get_functional(m)
         return (
-            f"  {gene.get_rsid(m):12} {str(m):15} "
+            f"  {gene.get_rsid(m):12} {m!s:15} "
             + f"{gene.get_refseq(m, from_atg=True):10} "
             + f"(cov={coverage[m]:4}, cn= {copies:3.1f}"
             + (f"; impact={impact})" if impact else ")")

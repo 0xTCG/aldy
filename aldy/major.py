@@ -4,15 +4,16 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Dict, Tuple, Any, Optional
-from natsort import natsorted
 import collections
 import copy
+from typing import Any
+
+from natsort import natsorted
 
 from . import lpinterface
-from .common import log, json, sorted_tuple
-from .gene import MajorAllele, Mutation, Gene
+from .common import json, log, sorted_tuple
 from .coverage import Coverage
+from .gene import Gene, MajorAllele, Mutation
 from .solutions import CNSolution, MajorSolution, SolvedAllele
 
 
@@ -22,8 +23,8 @@ def estimate_major(
     cn_solution: CNSolution,
     solver: str,
     identifier: int = 0,
-    debug: Optional[str] = None,
-) -> List[MajorSolution]:
+    debug: str | None = None,
+) -> list[MajorSolution]:
     """
     Estimate optimal major star-alleles.
 
@@ -46,8 +47,8 @@ def estimate_major(
     coverage.dump(log.trace)
 
     # Check if some CN solution has no matching allele
-    if set(cn_solution.solution) - set(a.cn_config for a in alleles.values()):
-        results: List[MajorSolution] = []
+    if set(cn_solution.solution) - {a.cn_config for a in alleles.values()}:
+        results: list[MajorSolution] = []
     else:
         results = solve_major_model(
             gene, coverage, cn_solution, alleles, solver, identifier, debug
@@ -61,11 +62,11 @@ def solve_major_model(
     gene: Gene,
     coverage: Coverage,
     cn_solution: CNSolution,
-    allele_dict: Dict[str, MajorAllele],
+    allele_dict: dict[str, MajorAllele],
     solver: str,
     identifier: int = 0,
-    debug: Optional[str] = None,
-) -> List[MajorSolution]:
+    debug: str | None = None,
+) -> list[MajorSolution]:
     """
     Solves the major star-allele detection problem via integer linear programming.
 
@@ -105,7 +106,7 @@ def solve_major_model(
     a: Any = 0
 
     # Create a binary variable for every possible allele copy
-    alleles = {(a, int(0)): allele_dict[a] for a in allele_dict}
+    alleles = {(a, 0): allele_dict[a] for a in allele_dict}
     for (an, _), a in list(alleles.items()):
         max_cn = cn_solution.solution[a.cn_config]
         for i in range(1, max_cn):
@@ -113,7 +114,7 @@ def solve_major_model(
     VA = {a: model.addVar(vtype="B", name=f"A_{a[0]}_{a[1]}") for a in alleles}
 
     # Make sure that VA[i+1] <= VA[i] (to avoid equivalent solutions)
-    for a, ai in alleles.keys():
+    for a, ai in alleles:
         if ai > 0:
             model.addConstr(VA[a, ai] <= VA[a, ai - 1], name=f"CORD_{a}_{ai}")
 
@@ -130,24 +131,24 @@ def solve_major_model(
     VNEW = {m: model.addVar(vtype="B", name=f"N_{m}") for m in func_muts}
 
     # Populate the constraints
-    for a in alleles:
-        for m in alleles[a].func_muts:
-            constraints[m] += VA[a]
+    for an, a in alleles.items():
+        for m in a.func_muts:
+            constraints[m] += VA[an]
     for m, v in VNEW.items():
         constraints[m] += v
 
     # Populate constraints of non-variations (i.e. matches with the reference genome)
-    for pos in set(m.pos for m in constraints):
+    for pos in {m.pos for m in constraints}:
         ref_m = Mutation(pos, "_")  # type: ignore
         constraints[ref_m] = 0
         VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f"E_{pos}_REF")
-        for a in alleles:
-            if not gene.has_coverage(a[0], pos):
+        for an, a in alleles.items():
+            if not gene.has_coverage(an[0], pos):
                 continue
             # An insertion still contributes to the total coverage at this loci
-            if any(ma[0] == pos and ma[1][:3] != "ins" for ma in alleles[a].func_muts):
+            if any(ma[0] == pos and ma[1][:3] != "ins" for ma in a.func_muts):
                 continue
-            constraints[ref_m] += VA[a]
+            constraints[ref_m] += VA[an]
 
         # We ensure that only one additional mutation can be selected here (HACK)
         z = model.quicksum(
@@ -194,8 +195,8 @@ def solve_major_model(
     objective += model.abssum(e for e in VERR.values())
 
     z = model.addVar(vtype="B", name="NOVEL")
-    for m in VNEW:
-        model.addConstr(z >= VNEW[m], name=f"NOVEL_UB_{VNEW[m]}")
+    for vnew in VNEW.values():
+        model.addConstr(z >= vnew, name=f"NOVEL_UB_{vnew}")
     model.addConstr(z <= model.quicksum(VNEW[m] for m in VNEW), name="NOVEL_LB")
     objective += coverage.profile.major_novel * z
     objective += 0.1 * model.quicksum(VNEW[m] for m in VNEW)
@@ -208,7 +209,7 @@ def solve_major_model(
         **{model.varName(v): a for a, v in VA.items()},
         **{model.varName(v): m for m, v in VNEW.items()},
     }
-    result: Dict[Any, MajorSolution] = {}
+    result: dict[Any, MajorSolution] = {}
     debug_info["sol"] = []
     for status, opt, sol in model.solutions(coverage.profile.gap):
         solved_alleles = sorted_tuple(
@@ -242,7 +243,7 @@ def solve_major_model(
 
 def _filter_alleles(
     gene: Gene, coverage: Coverage, cn_solution: CNSolution
-) -> Tuple[Dict[str, MajorAllele], Coverage]:
+) -> tuple[dict[str, MajorAllele], Coverage]:
     """
     Filter out low-quality mutations and alleles that are not expressed.
 
@@ -283,7 +284,8 @@ def _filter_alleles(
     cov = cov.filtered(filter_fns)
 
     alleles = copy.deepcopy(gene.alleles)
-    for an, a in natsorted(gene.alleles.items()):
+    sorted_alleles: list[tuple[str, MajorAllele]] = natsorted(gene.alleles.items()) # type: ignore
+    for an, a in sorted_alleles:
         if a.cn_config not in cn_solution.solution:
             del alleles[an]
         elif any(cov[m] <= 0 for m in a.func_muts):
@@ -296,7 +298,7 @@ def _filter_alleles(
 
 def _print_candidates(
     gene,
-    alleles: Dict[str, Any],
+    alleles: dict[str, Any],
     coverage: Coverage,
     cn_solution: CNSolution,
     muts: set,
@@ -311,7 +313,7 @@ def _print_candidates(
         )
         g = gene.region_at(m.pos)
         return (
-            f"  {gene.get_rsid(m):12} {str(m):15} "
+            f"  {gene.get_rsid(m):12} {m!s:15} "
             + f"{gene.get_refseq(m, from_atg=True):10} "
             + f"(cov={coverage[m]:4}, cn= {copies:3.1f}; "
             + f"region={g[1] if g else '?'}; "
@@ -320,7 +322,7 @@ def _print_candidates(
         )
 
     log.debug("[major] candidate mutations=")
-    muts = set(m for a in alleles for m in alleles[a].func_muts) | set(muts)
+    muts = {m for a in alleles for m in alleles[a].func_muts} | set(muts)
     for m in sorted(muts):
         log.debug(print_mut(m))
         als = natsorted(

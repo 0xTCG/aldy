@@ -60,7 +60,10 @@ def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
         },
         **(params or {}),
     }
-    main(["genotype", file] + [i for k, v in args.items() for i in [k, v]])
+    argv = ["genotype", file]
+    for key, value in args.items():
+        argv += [key] + (value if isinstance(value, list) else [value])
+    main(argv)
     expected = "\n".join(e.strip() for e in expected.strip().split("\n"))
     lines = "\n".join(escape_ansi(l).strip() for l in lines).strip()
     assert lines == expected
@@ -202,7 +205,13 @@ def test_NA10860_gap(monkeypatch, solver):
         Estimated activity for *4NX: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2559 for details)
     """
     file = script_path("aldy.tests.resources/NA10860.bam")
-    assert_file(monkeypatch, file, solver, expected, {"--param": "gap=0.3"})
+    assert_file(
+        monkeypatch,
+        file,
+        solver,
+        expected,
+        {"--param": ["gap=0.3", "cn_gap=0.3"]},
+    )
 
 
 def test_NA10860_cn(monkeypatch, solver):
@@ -317,6 +326,7 @@ def test_fusion(monkeypatch, solver):
     Genotyping sample HARD.dump.tar.gz...
     Potential CYP2D6 gene structures for NA19785:
     1: 2x*1,1x*79 (confidence: 100%)
+    2: 2x*1,1x*80 (confidence: 98%)
     Potential major CYP2D6 star-alleles for NA19785:
     1: 1x*1, 1x*2, 1x*79#2 (confidence: 100%)
     2: 1x*2, 1x*34, 1x*79#10 (confidence: 100%)

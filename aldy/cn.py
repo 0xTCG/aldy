@@ -4,28 +4,28 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, List, Tuple, Optional
-from math import ceil
-from natsort import natsorted
-from functools import partial
 import copy
 import re
+from functools import partial
+from math import ceil
+
+from natsort import natsorted
 
 from . import lpinterface
-from .common import log, json, sorted_tuple, AldyException
-from .gene import CNConfig, CNConfigType, Gene
+from .common import AldyException, json, log, sorted_tuple
 from .coverage import Coverage
-from .solutions import CNSolution
+from .gene import CNConfig, CNConfigType, Gene
 from .profile import Profile
+from .solutions import CNSolution
 
 
 def estimate_cn(
     gene: Gene,
     profile: Profile,
-    coverage: Optional[Coverage],
+    coverage: Coverage | None,
     solver: str,
-    debug: Optional[str] = None,
-) -> List[CNSolution]:
+    debug: str | None = None,
+) -> list[CNSolution]:
     """
     Estimate the optimal copy number configuration for a sample given a gene and
     coverage information.
@@ -107,13 +107,13 @@ def estimate_cn(
 def solve_cn_model(
     gene: Gene,
     profile: Profile,
-    cn_configs: Dict[str, CNConfig],
+    cn_configs: dict[str, CNConfig],
     max_cn: int,
-    region_coverage: Dict[str, Tuple[float, float]],
+    region_coverage: dict[str, tuple[float, float]],
     solver: str,
-    debug: Optional[str] = None,
-    fusion_support: Optional[Dict[str, float]] = None,
-) -> List[CNSolution]:
+    debug: str | None = None,
+    fusion_support: dict[str, float] | None = None,
+) -> list[CNSolution]:
     """
     Solve the copy number estimation problem (instance of the closest vector problem).
 
@@ -124,8 +124,8 @@ def solve_cn_model(
     :param region_coverage: Observed copy number of the main gene and the pseudogene
         for each genic region.
     :param solver: ILP solver (see :py:mod:`aldy.lpinterface` for supported solvers).
-    :param gap: Optimality gap. Non-zero values enable non-optimal solutions.
-        Default: 0 (only optimal solutions).
+    :param profile: Model parameters. `cn_gap` controls the relative CN search gap
+        (default: 0.1, including structures within 10% of the best CN score).
     :param debug: When set, create a `{debug}.cn.lp` model description file for
         debug purposes.
         Default: `None` (no debug dumps).
@@ -152,7 +152,7 @@ def solve_cn_model(
     # When `number` > 0, the configuration describes only the main gene and not the
     # pseudogene (there can be many such configurations).
     # N.B. (3/2022) this step filters "weak" fusions without long-read support
-    structures: Dict[Tuple[str, int], CNConfig] = {
+    structures: dict[tuple[str, int], CNConfig] = {
         (name, 0): structure
         for name, structure in cn_configs.items()
         if not fusion_support
@@ -269,7 +269,7 @@ def solve_cn_model(
     # Solve the model
     lookup = {model.varName(v): a for (a, _), v in VCN.items()}
     result: dict = {}
-    for status, opt, sol in model.solutions(profile.gap):
+    for status, opt, sol in model.solutions(profile.cn_gap):
         sol_tuple = sorted_tuple(
             lookup[v] for v in sol if lookup[v] not in [del_allele, "PSEUDO"]
         )
@@ -290,7 +290,7 @@ def solve_cn_model(
     return list(result.values())
 
 
-def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
+def _filter_configs(gene: Gene, coverage: Coverage) -> dict[str, CNConfig]:
     """
     Filter out low-quality mutations and copy number configurations that are not
     supported by the remaining mutations.
@@ -300,7 +300,7 @@ def _filter_configs(gene: Gene, coverage: Coverage) -> Dict[str, CNConfig]:
         partial(
             Coverage.basic_filter,
             thres=coverage.profile.threshold / coverage.profile.cn_max,
-        )
+        ) # type: ignore
     )
     configs = copy.deepcopy(gene.cn_configs)
     for an in natsorted(gene.cn_configs):
@@ -339,7 +339,7 @@ def _print_coverage(gene: Gene, coverage: Coverage) -> None:
             log.debug(f"  {r:5}: {g:4.1f}")
 
 
-def _parse_user_solution(gene: Gene, sols: List[str]) -> CNSolution:
+def _parse_user_solution(gene: Gene, sols: list[str]) -> CNSolution:
     """
     Parse user-provided copy number solutions.
 

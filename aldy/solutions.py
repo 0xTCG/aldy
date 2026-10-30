@@ -4,10 +4,10 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Dict
-from dataclasses import dataclass, field
-from natsort import natsorted
 from collections import Counter, defaultdict
+from dataclasses import dataclass, field
+
+from natsort import natsorted
 
 from .gene import Gene, Mutation
 from .profile import Profile
@@ -21,15 +21,15 @@ class CNSolution:
     """Gene instance."""
     score: float
     """ILP model objective score (0 for user-provided solutions)."""
-    solution: Dict[str, int]
+    solution: dict[str, int]
     """
     Copy-number configurations mapped to the corresponding copy number
     (e.g. `{1: 2}` means that there are two copies of `*1` configuration).
     """
-    region_cn: List[Dict[str, int]]
+    region_cn: list[dict[str, int]]
     """Gene region copy numbers inferred by this solution."""
 
-    def __init__(self, gene: Gene, score: float, solution: List[str]):
+    def __init__(self, gene: Gene, score: float, solution: list[str]):
         self.region_cn = [
             {r: 0 for r in gene.regions[0]} for _ in gene.cn_configs["1"].cn
         ]
@@ -77,9 +77,9 @@ class SolvedAllele:
     """Major star-allele identifier."""
     minor: str = ""
     """Minor star-allele identifier. Empty string when unknown."""
-    added: List[Mutation] = field(default_factory=list)
+    added: list[Mutation] = field(default_factory=list)
     """Mutations that are added to the star-allele (from the allele database)."""
-    missing: List[Mutation] = field(default_factory=list)
+    missing: list[Mutation] = field(default_factory=list)
     """
     Mutations that are omitted from the star-allele (but present in the star-allele
     definition).
@@ -127,14 +127,14 @@ class MajorSolution:
 
     score: float
     """ILP model objective score."""
-    solution: Dict[SolvedAllele, int]
+    solution: dict[SolvedAllele, int]
     """
     Major star-alleles and the corresponding copy numbers
     (e.g. `{1: 2}` means that we have two copies of `*1`).
     """
     cn_solution: CNSolution
     """Copy-number solution that was used to assign major star-alleles."""
-    added: List[Mutation]
+    added: list[Mutation]
     """
     List of added mutations. Will be assigned to :py:class:`SolvedAllele` in the
     minor star-allele calling step if phasing is enabled.
@@ -165,14 +165,14 @@ class MinorSolution:
 
     score: float
     """ILP model objective score."""
-    solution: List[SolvedAllele]
+    solution: list[SolvedAllele]
     """
     List of solved minor star-alleles.
     Modifications to minor alleles are represented in :py:class:`SolvedAllele`.
     """
     major_solution: MajorSolution
     """Major star-allele solution used for calculating minor star-allele assignments."""
-    profile: Profile = None
+    profile: Profile | None = None
     """Profile."""
 
     def _solution_nice(self):

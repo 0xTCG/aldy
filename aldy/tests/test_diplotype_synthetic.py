@@ -5,11 +5,12 @@
 
 
 from collections import Counter
+
 import pytest  # noqa
 
-from aldy.solutions import SolvedAllele, MinorSolution, MajorSolution, CNSolution
 from aldy.diplotype import estimate_diplotype
 from aldy.gene import Mutation
+from aldy.solutions import CNSolution, MajorSolution, MinorSolution, SolvedAllele
 
 
 def assert_diplotype(gene, test, majors):

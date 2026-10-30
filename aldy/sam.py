@@ -12,7 +12,6 @@ import tarfile
 import tempfile
 from collections import Counter, defaultdict
 from statistics import mean
-from typing import Dict, List, Optional, Tuple
 
 import pysam
 
@@ -28,10 +27,10 @@ class Sample:
     def __init__(
         self,
         gene: Gene,
-        profile: Optional[Profile],
+        profile: Profile | None,
         path: str,
-        reference: Optional[str] = None,
-        debug: Optional[str] = None,
+        reference: str | None = None,
+        debug: str | None = None,
         store_reads: bool = False,
     ):
         """
@@ -62,7 +61,7 @@ class Sample:
         self._dump_cn = defaultdict(int)
         """dict[int, int]: Coverage of the copy-number neutral region"""
 
-        self._dump_reads: List[Tuple[Tuple, List]] = []
+        self._dump_reads: list[tuple[tuple, list]] = []
         """list[tuple[tuple, list]]: Read information."""
 
         self._indel_sites = {
@@ -84,10 +83,10 @@ class Sample:
         }
         """Locations that should be phased."""
 
-        self.phases: Dict[str, Dict[int, str]] = {}
+        self.phases: dict[str, dict[int, str]] = {}
         """Phasing information."""
 
-        self._fusion_counter: Dict = {}
+        self._fusion_counter: dict = {}
         """Fusion read coverage (for long reads)."""
 
         self.is_long_read = False
@@ -130,9 +129,7 @@ class Sample:
         log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
         if self.profile.cn_region and self.coverage.diploid_avg_coverage() < 2:
             raise AldyException(
-                "The average coverage of the sample is too low ({:.1f}).".format(
-                    self.coverage.diploid_avg_coverage()
-                )
+                f"The average coverage of the sample is too low ({self.coverage.diploid_avg_coverage():.1f})."
             )
         if self.profile.debug_novel:
             self._load_novel_mutations()
@@ -633,7 +630,7 @@ class Sample:
     def _make_coverage(self, norm, muts):
         """Populate coverage data."""
 
-        coverage: Dict[int, Dict[str, List]] = dict()
+        coverage: dict[int, dict[str, list]] = {}
         for pos, cov in norm.items():
             if len(cov) == 0:
                 continue
@@ -1084,7 +1081,7 @@ class Sample:
         return pos + 1, ref, alt
 
 
-def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
+def detect_genome(sam_path: str) -> tuple[str, str | None]:
     """Detect file type and the reference genome."""
 
     try:
@@ -1106,7 +1103,7 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
             hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
             chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
             is_hg19, is_hg38 = True, True
-            for c in "1 10 22".split():
+            for c in ["1", "10", "22"]:
                 if _prefix + c in chrs:
                     is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
                     is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
@@ -1122,14 +1119,14 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
                 return "vcf", None
         except (ValueError, OSError):
             if sam_path.endswith(".tar.gz"):
-                tar = tarfile.open(sam_path, "r:gz")
-                f = [i for i in tar.getnames() if i.endswith(".genome")]
-                if not f:
-                    raise AldyException("Invalid dump file")
-                data = tar.extractfile(f[0])
-                if data:
-                    genome = data.read().decode("utf-8").strip()
-                    return "dump", genome
+                with tarfile.open(sam_path, "r:gz") as tar:
+                    f = [i for i in tar.getnames() if i.endswith(".genome")]
+                    if not f:
+                        raise AldyException("Invalid dump file")
+                    data = tar.extractfile(f[0])
+                    if data:
+                        genome = data.read().decode("utf-8").strip()
+                        return "dump", genome
             if sam_path.endswith(".txt") and os.path.exists(sam_path):
                 with open(sam_path) as f:
                     if f.readline().startswith("##batch-folder"):
