@@ -119,9 +119,11 @@ def main(argv):
         elif args.subparser in ["genotype", "g"]:
             # Prepare the output file
             output = args.output
-            if output == "-":
+            if not output:
+                _genotype(args.gene, None, args)
+            elif output == "-":
                 _genotype(args.gene, sys.stdout, args)
-            elif output:
+            else:
                 with open(output, "w") as fo:
                     _genotype(args.gene, fo, args)
         else:

@@ -5,6 +5,7 @@
 
 
 import gzip
+import io
 import os
 import os.path
 import pickle
@@ -348,7 +349,6 @@ class Sample:
         """Load Aldy dump data."""
 
         log.debug("[dump] path= {}", os.path.abspath(dump_path))
-        data: tuple = (dump_path, "rb")
         if dump_path.endswith(".tar.gz"):
             with tarfile.open(dump_path, "r:gz") as tar:
                 f = [i for i in tar.getnames() if i.endswith(f".{self.gene.name}.dump")]
@@ -357,8 +357,11 @@ class Sample:
                 log.debug("Found {} in the archive", f[0])
                 stream = tar.extractfile(f[0])
                 assert stream, "Malformed dump file"
-                data = (stream, )
-        with gzip.open(*data) as fd:
+                data = stream.read()
+            fd = gzip.GzipFile(fileobj=io.BytesIO(data), mode="rb")
+        else:
+            fd = gzip.open(dump_path, "rb")  # noqa: SIM115
+        with fd:
             log.warn("Loading debug dump from {}", dump_path)
             (
                 self.name,
