@@ -8,9 +8,7 @@ import collections
 import re
 from typing import Any
 
-from natsort import natsorted
-
-from .common import td
+from .common import natsorted, td
 from .coverage import Coverage
 from .gene import Gene, Mutation
 from .sam import Sample

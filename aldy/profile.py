@@ -10,9 +10,8 @@ from collections import defaultdict
 
 import pysam
 import yaml
-from natsort import natsorted
 
-from .common import AldyException, GRange, chr_prefix, log, script_path
+from .common import AldyException, GRange, chr_prefix, log, natsorted, script_path
 from .gene import Gene
 
 
@@ -41,7 +40,7 @@ class Profile:
         Default: 0.1 (consider CN structures within 10% of the best CN score).
         """
 
-        self.cn_solution = None
+        self.cn_solution: list[str] | None = None
         """
         User-specified copy-number configuration.
         Default: `None` (uses CN solver in :py:mod:`aldy.cn` for detection)
@@ -313,10 +312,10 @@ class Profile:
     def get_sam_profile_data(
         sam_path: str,
         ref_path: str | None = None,
-        regions: dict[tuple[str, str, int], GRange] = dict(),
+        regions: dict[tuple[str, str, int], GRange] | None = None,
         cn_region: GRange | None = None,
         genome: str | None = "hg19",
-        params: dict = dict(),
+        params: dict | None = None,
     ) -> dict[str, dict[str, list[float]]]:
         """
         Load the profile information from a SAM/BAM/CRAM file.
@@ -335,6 +334,8 @@ class Profile:
                 3. Illumina: by definition contains all ones (uniform coverage).
         """
 
+        if regions is None:
+            regions = {}
         if not genome:
             genome = "hg19"
         if len(regions) == 0:
@@ -342,7 +343,7 @@ class Profile:
 
             gene_regions = {}
             for g in sorted(
-                importlib_resources.files("aldy.resources.genes").iterdir()
+                importlib_resources.files("aldy.resources.genes").iterdir() # type: ignore
             ):
                 if g.suffix != ".yml":
                     continue
@@ -383,7 +384,7 @@ class Profile:
                 region = GRange(c, s, e).samtools(
                     pad_left=1000,
                     pad_right=1000,
-                    prefix=chr_prefix(c, [x["SN"] for x in sam.header["SQ"]]),
+                    prefix=chr_prefix(c, [x["SN"] for x in sam.header["SQ"]]), # type: ignore
                 )
                 log.info("Scanning {}...", region)
                 try:

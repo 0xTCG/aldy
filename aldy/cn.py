@@ -9,10 +9,8 @@ import re
 from functools import partial
 from math import ceil
 
-from natsort import natsorted
-
 from . import lpinterface
-from .common import AldyException, json, log, sorted_tuple
+from .common import AldyException, json, log, natsorted, sorted_tuple
 from .coverage import Coverage
 from .gene import CNConfig, CNConfigType, Gene
 from .profile import Profile
@@ -80,7 +78,7 @@ def estimate_cn(
             )
 
         configs = _filter_configs(gene, coverage)
-        log.debug("[cn] candidates= {}", ", ".join(natsorted(configs)))
+        log.debug("[cn] candidates= {}", ", ".join(natsorted(configs))) # type: ignore
         log.debug("[cn] max_cn= {}", max_observed_cn)
         _print_coverage(gene, coverage)
 

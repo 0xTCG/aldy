@@ -6,10 +6,8 @@
 import collections
 import os
 
-from natsort import natsorted
-
 from . import lpinterface
-from .common import Timing, json, log
+from .common import Timing, json, log, natsorted
 from .coverage import Coverage
 from .diplotype import estimate_diplotype
 from .gene import Gene, Mutation
@@ -67,7 +65,7 @@ def estimate_minor(
         return cond
 
     cov = coverage.filtered(Coverage.quality_filter)
-    cov = cov.filtered(default_filter_fn)
+    cov = cov.filtered(default_filter_fn)  # type: ignore
     mutations |= {m for m in gene.random_mutations if cov[m] > 0}
 
     # Group by CN solutions
@@ -218,7 +216,7 @@ def solve_minor_model(
                 constraints[m] += model.prod(VNEW[a][m][1], [VA[a], VNEW[a][m][0]])
 
     # Fill the constraints for non-variations (i.e. reference genome matches)
-    for pos in set(m.pos for m in constraints):
+    for pos in {m.pos for m in constraints}:
         ref_m = Mutation(pos, "_")  # type: ignore
         VERR[ref_m] = model.addVar(lb=-model.INF, ub=model.INF, name=f"E_{pos}_REF")
         constraints[ref_m] = 0
@@ -299,7 +297,7 @@ def solve_minor_model(
                 )
     # 4) Avoid extra mutations if there is an existing mutation at the corresponding
     #    locus (either from the definition or added via VNEW)
-    for pos in set(m.pos for m in constraints):
+    for pos in {m.pos for m in constraints}:
         for a in alleles:
             mp = [VKEEP[a][m][1] for m in VKEEP[a] if m.pos == pos]
             ma = [VNEW[a][m][1] for m in VNEW[a] if m.pos == pos]
@@ -325,7 +323,7 @@ def solve_minor_model(
             # Ensure that at least one allele picks an existing non-filtered mutation
             model.addConstr(expr >= 1, name=f"CMINONE_{m.pos}_{m.op}")
     # 6) Do the same for non-mutations
-    for pos in set(m.pos for m in constraints):
+    for pos in {m.pos for m in constraints}:
         expr = 0
         max_mut = 0
         for a in alleles:
@@ -427,7 +425,7 @@ def solve_minor_model(
     # ... and additions ...
     cnt = 0
     for a in VNEW:
-        for _, v in VNEW[a].items():
+        for v in VNEW[a].values():
             # HACK:
             # Add cnt/10000 to select the smallest allele if there is a tie
             o_penal += coverage.profile.minor_add * (1 + cnt / 1000000) * v[0]

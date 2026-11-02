@@ -160,10 +160,10 @@ class Sample:
             except ValueError:
                 raise AldyException(f"Cannot check index of {sam_path}")
 
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]] # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
-            self._prefix = chr_prefix(self.gene.chr, sam_chrs)
+            self._prefix: str = chr_prefix(self.gene.chr, sam_chrs)
 
             with tempfile.TemporaryDirectory() as tmp:
                 self._realign_indels(tmp, sam, reference)
@@ -180,7 +180,7 @@ class Sample:
                     continue
                 if read.is_supplementary:  # avoid supplementary alignments
                     continue
-                if "H" in read.cigarstring:  # avoid hard-clipped reads
+                if read.cigarstring and "H" in read.cigarstring:  # avoid hard-clipped reads
                     continue
                 if not read.query_sequence:
                     continue
@@ -293,13 +293,14 @@ class Sample:
                     continue
                 g = sorted(genotype)
                 dump_arr = {}
-                if len(read.ref) == 1 and read.ref.upper() != self.gene[read.pos - 1]:
+                if read.ref and len(read.ref) == 1 and read.ref.upper() != self.gene[read.pos - 1]:
                     hgvs = [
                         (read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref.upper()}")
                     ]
                 else:
                     hgvs = [(read.pos - 1, "_")]
-                hgvs += [get_mut(read.pos - 1, read.ref, a) for a in read.alleles[1:]]
+                if read.alleles:
+                    hgvs += [get_mut(read.pos - 1, read.ref, a) for a in read.alleles[1:]]
                 for gt in g:
                     pos, op = hgvs[gt]
                     if op is None or op == "_":
@@ -313,7 +314,7 @@ class Sample:
                     norm[pos] = norm[pos][:-10]
                     dump_arr[pos] = op
 
-                    if op.startswith("ins") or op.startswith("del"):
+                    if op.startswith(("ins", "del")):
                         support = len(muts[pos, op])
                         self._indel_sites[pos, op] = (20 - support, support)
 
@@ -347,32 +348,30 @@ class Sample:
         """Load Aldy dump data."""
 
         log.debug("[dump] path= {}", os.path.abspath(dump_path))
+        data: tuple = (dump_path, "rb")
         if dump_path.endswith(".tar.gz"):
-            tar = tarfile.open(dump_path, "r:gz")
-
-            f = [i for i in tar.getnames() if i.endswith(f".{self.gene.name}.dump")]
-            if not f:
-                raise AldyException("Invalid dump file")
-            log.debug("Found {} in the archive", f[0])
-            data = tar.extractfile(f[0])
-            assert data, "Malformed dump file"
-            fd = gzip.open(data)
-        else:
-            fd = gzip.open(dump_path, "rb")
-
-        log.warn("Loading debug dump from {}", dump_path)
-        (
-            self.name,
-            self.profile,
-            self._dump_cn,
-            norm,
-            muts,
-            phases,
-            self._fusion_counter,
-            self._indel_sites,
-        ) = pickle.load(
-            fd
-        )  # type: ignore
+            with tarfile.open(dump_path, "r:gz") as tar:
+                f = [i for i in tar.getnames() if i.endswith(f".{self.gene.name}.dump")]
+                if not f:
+                    raise AldyException("Invalid dump file")
+                log.debug("Found {} in the archive", f[0])
+                stream = tar.extractfile(f[0])
+                assert stream, "Malformed dump file"
+                data = (stream, )
+        with gzip.open(*data) as fd:
+            log.warn("Loading debug dump from {}", dump_path)
+            (
+                self.name,
+                self.profile,
+                self._dump_cn,
+                norm,
+                muts,
+                phases,
+                self._fusion_counter,
+                self._indel_sites,
+            ) = pickle.load(
+                fd
+            )  # type: ignore
         self.profile.display_format = False
         self.profile.debug_probe = ""
         self.profile.debug_novel = False
@@ -405,7 +404,7 @@ class Sample:
             self._prefix = ""  # no chr prefix assumed
             self.name = os.path.splitext(os.path.basename(path))[0]
             for line in f:
-                if line.startswith("#") or line.startswith("probeset_id\t"):
+                if line.startswith(("#", "probeset_id\t")):
                     continue
                 line = line.strip().split("\t")
                 (
@@ -416,7 +415,7 @@ class Sample:
                     start,
                     stop,
                     _,
-                    rsid,
+                    _,
                     _,
                     _,
                     _,
@@ -602,7 +601,7 @@ class Sample:
             except ValueError:
                 raise AldyException(f"Cannot check index of {self.path}")
 
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]] # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
             self._prefix = chr_prefix(self.gene.chr, sam_chrs)
@@ -844,7 +843,7 @@ class Sample:
             sam_path, reference_filename=reference
         ) as sam, Timing("[sam] Remap"):
             # Assumes SAM index exists
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]] # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
             self._prefix = chr_prefix(self.gene.chr, sam_chrs)
@@ -862,7 +861,7 @@ class Sample:
             counter = 0
             iter = sam.fetch(region=rng.samtools(prefix=self._prefix))
             for read in iter:
-                if not read.cigartuples or "H" in read.cigarstring:
+                if not read.cigartuples or (read.cigarstring and "H" in read.cigarstring):
                     continue
                 if read.reference_start >= rng.end or read.reference_end < rng.start:
                     continue
@@ -1097,11 +1096,11 @@ def detect_genome(sam_path: str) -> tuple[str, str | None]:
                 )
 
             #: str: Check if we need to append 'chr' or not
-            _prefix = chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])
+            _prefix = chr_prefix("1", [x["SN"] for x in sam.header["SQ"]]) # type: ignore
             # Detect the genome
             hg19_lens = {"1": 249250621, "10": 135534747, "22": 51304566}
             hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
-            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
+            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]} # type: ignore
             is_hg19, is_hg38 = True, True
             for c in ["1", "10", "22"]:
                 if _prefix + c in chrs:

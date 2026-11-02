@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # 786
 # Aldy source: __main__.py
 #   This file is subject to the terms and conditions defined in
@@ -74,7 +73,7 @@ def main(argv):
     log.info(
         "   (c) 2016-{} Aldy Authors. All rights reserved.\n"
         + "   Free for non-commercial/academic use only.",
-        datetime.datetime.now().year,
+        datetime.datetime.now().astimezone().year,
     )
 
     try:
@@ -121,12 +120,10 @@ def main(argv):
             # Prepare the output file
             output = args.output
             if output == "-":
-                output = sys.stdout
+                _genotype(args.gene, sys.stdout, args)
             elif output:
-                output = open(output, "w")
-            _genotype(args.gene, output, args)
-            if output and output != sys.stdout:
-                output.close()
+                with open(output, "w") as fo:
+                    _genotype(args.gene, fo, args)
         else:
             raise AldyException("Invalid sub-command " + args.subparser)
     except OSError as ex:
@@ -136,24 +133,24 @@ def main(argv):
             log.critical("ERROR: {} cannot be accessed", str(ex))
         log.debug(ex)
         log.debug(traceback.format_exc())
-        exit(1)
+        sys.exit(1)
     except SystemExit as ex:
         log.debug(repr(ex))
         log.debug(traceback.format_exc())
-        exit(ex.code)
+        sys.exit(ex.code)
     except Exception as ex:
         gene = "" if "gene" not in args else f"gene= {args.gene}, "
         log.critical(f"ERROR: {gene}file= {args.file if 'file' in args else '-'}")
         log.critical(repr(ex))
         log.warn(traceback.format_exc())
-        exit(1)
+        sys.exit(1)
     except:  # noqa
         gene = "" if "gene" not in args else f"gene= {args.gene}, "
         exc = sys.exc_info()[0]
         log.critical(f"ERROR: {gene}file= {args.file if 'file' in args else '-'}")
         log.critical("Unrecoverable error: {}", repr(exc))
         log.warn(traceback.format_exc())
-        exit(1)
+        sys.exit(1)
 
 
 def _get_args(argv):
@@ -415,7 +412,10 @@ def _genotype(gene: str, output: Any | None, args) -> None:
 
     if args.log:
         fh = logbook.FileHandler(
-            args.log, mode="w", bubble=True, level="TRACE"  # type: ignore
+            args.log,
+            mode="w",
+            bubble=True,
+            level="TRACE",  # type: ignore
         )
         fh.formatter = lambda record, _: record.message  # type: ignore
         fh.push_application()
@@ -426,13 +426,15 @@ def _genotype(gene: str, output: Any | None, args) -> None:
                 prefix = f"{tmp}/{os.path.splitext(os.path.basename(args.file))[0]}"
                 log_output = f"{prefix}.log"
                 fh = logbook.FileHandler(
-                    log_output, mode="w", bubble=True, level="TRACE"  # type: ignore
+                    log_output,
+                    mode="w",
+                    bubble=True,
+                    level="TRACE",  # type: ignore
                 )
-                fh.formatter = lambda record, _: "[{}:{}/{}] {}".format(  # type: ignore
-                    record.level_name[0],
-                    os.path.splitext(os.path.basename(record.filename))[0],
-                    record.func_name,
-                    record.message,
+                fh.formatter = lambda record, _: ( # type: ignore
+                    f"[{record.level_name[0]}:"
+                    f"{os.path.splitext(os.path.basename(record.filename))[0]}/{record.func_name}] "
+                    f"{record.message}"
                 )
                 fh.push_application()
                 log.debug(f"Using {tmp} as temporary debug directory")

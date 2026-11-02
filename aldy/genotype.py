@@ -75,7 +75,7 @@ def genotype(
     """
 
     t1 = time.time()
-    log.debug("[genotype] gene={}; start={}", gene_db, datetime.datetime.now())
+    log.debug("[genotype] gene={}; start={}", gene_db, datetime.datetime.now().astimezone())
 
     # Test the existence of LP solver
     _ = lp_model("init", solver)
@@ -239,8 +239,6 @@ def genotype(
         conf = 100 * (min_cn_score + SLACK) / (cn_sol.score + SLACK)
         log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
-
-    # return []
 
     for i, cn_sol in enumerate(cn_sols):
         sols = major.estimate_major(

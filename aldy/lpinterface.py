@@ -179,7 +179,7 @@ class Gurobi:  # pragma: no cover
         if hasattr(var, "vtype") and var.vtype == self.gurobipy.GRB.BINARY:
             return round(var.x) > 0
         if hasattr(var, "vtype") and var.vtype == self.gurobipy.GRB.INTEGER:
-            return int(round(var.x))
+            return round(var.x)
         elif hasattr(var, "x"):
             return var.x
         else:
@@ -317,7 +317,7 @@ class CBC(Gurobi):
     def getValue(self, var):
         x = var.solution_value()
         if hasattr(var, "integer") and var.integer():
-            x = int(round(x))
+            x = round(x)
             if (
                 abs(var.lb()) < SOLUTION_PRECISION
                 and abs(1 - var.ub()) < SOLUTION_PRECISION

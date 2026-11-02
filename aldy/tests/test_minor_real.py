@@ -4,10 +4,10 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # noqa
 import collections
 
 from aldy.profile import Profile
+
 from .test_minor_synthetic import assert_minor
 
 
@@ -470,8 +470,8 @@ def test_comparison(real_gene, solver):  # NA10846/v1
         pall, pmiss, pnew = set(), set(), set()
         for i in sol.solution:
             pall.add(i.minor)
-            pmiss |= set((m.pos, m.op) for m in i.missing)
-            pnew |= set((m.pos, m.op) for m in i.added)
+            pmiss |= {(m.pos, m.op) for m in i.missing}
+            pnew |= {(m.pos, m.op) for m in i.added}
 
         assert eall == pall, "Alleles"
         assert emiss == pmiss, "Missing mutations"

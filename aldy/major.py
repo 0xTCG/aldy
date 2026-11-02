@@ -8,10 +8,8 @@ import collections
 import copy
 from typing import Any
 
-from natsort import natsorted
-
 from . import lpinterface
-from .common import json, log, sorted_tuple
+from .common import json, log, natsorted, sorted_tuple
 from .coverage import Coverage
 from .gene import Gene, MajorAllele, Mutation
 from .solutions import CNSolution, MajorSolution, SolvedAllele

@@ -1,2 +1,4 @@
 [build-system]
 requires = ["setuptools", "wheel", "cython", "pysam"]
+[tool.ruff.lint]
+ignore = ["BLE001", "PLC0206"]

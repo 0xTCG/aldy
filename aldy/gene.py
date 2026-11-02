@@ -11,7 +11,6 @@ from enum import Enum
 from typing import NamedTuple
 
 import yaml
-from natsort import natsorted
 
 from .common import (
     AldyException,
@@ -19,6 +18,7 @@ from .common import (
     allele_name,
     freezekey,
     log,
+    natsorted,
     rev_comp,
     seq_to_amino,
     sorted_tuple,
@@ -236,7 +236,7 @@ class Gene:
         if genome:
             self.genome = genome
         else:
-            self.genome = list(yml["reference"]["mappings"].keys())[0]  # type: ignore
+            self.genome = next(iter(yml["reference"]["mappings"].keys()))  # type: ignore
         self._init_basic(yml)
         self._init_regions(yml)
         self._init_alleles(yml)
@@ -313,7 +313,7 @@ class Gene:
     def get_allele(self, name):
         if name in self.removed:
             name = self.removed[name]
-        for an, a in self.alleles.items():
+        for a in self.alleles.values():
             if name in a.minors:
                 return (a, a.minors[name])
         return None
@@ -717,7 +717,7 @@ class Gene:
         )
 
         # Set CN of "empty" regions to zero (e.g. CYP2D6.pce)
-        for _, conf in self.cn_configs.items():
+        for conf in self.cn_configs.values():
             for g, r in enumerate(conf.cn):
                 for rg in r:
                     if self.regions[g][rg].end - self.regions[g][rg].start <= 0:

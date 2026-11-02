@@ -4,17 +4,15 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # noqa
 import collections
 
-from aldy.profile import Profile
-from aldy.sam import Sample
-from aldy.solutions import CNSolution, SolvedAllele, MajorSolution
+from aldy.common import SOLUTION_PRECISION, sorted_tuple
 from aldy.coverage import Coverage
 from aldy.gene import Mutation
 from aldy.minor import estimate_minor
-from aldy.common import SOLUTION_PRECISION, sorted_tuple
-
+from aldy.profile import Profile
+from aldy.sam import Sample
+from aldy.solutions import CNSolution, MajorSolution, SolvedAllele
 
 profile = Profile("test")
 
@@ -88,8 +86,8 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
         pall, pmiss, pnew = set(), set(), set()
         for i in sols[0].solution:
             pall.add(i.minor)
-            pmiss |= set((m.pos, m.op) for m in i.missing)
-            pnew |= set((m.pos, m.op) for m in i.added)
+            pmiss |= {(m.pos, m.op) for m in i.missing}
+            pnew |= {(m.pos, m.op) for m in i.added}
 
         assert eall == pall, "Alleles"
         assert emiss == pmiss, "Missing mutations"

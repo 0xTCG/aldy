@@ -7,8 +7,7 @@
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
-from natsort import natsorted
-
+from .common import natsorted
 from .gene import Gene, Mutation
 from .profile import Profile
 

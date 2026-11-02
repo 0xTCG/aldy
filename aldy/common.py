@@ -10,10 +10,11 @@ import re
 import textwrap
 import time
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, TypeVar
 
 import importlib_resources
 import logbook
+import natsort
 
 PROTEINS = {
     "TTT": "F",
@@ -101,7 +102,6 @@ precision are considered equal).
 
 class AldyException(Exception):
     """Aldy exception class."""
-
 
 
 class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
@@ -230,7 +230,7 @@ def parse_cn_region(cn_region):
     return None
 
 
-def chr_prefix(ch: str, chrs: list[str]) -> str:
+def chr_prefix(ch: str, chrs: list) -> str:
     """
     Check if a chromosome needs "chr" prefix given the available chromosomes.
     :returns: Chromosome prefix if the chromosome does not have it.
@@ -253,3 +253,10 @@ class JsonDict(dict):
 
 
 json: Any = JsonDict()
+
+
+T = TypeVar("T")
+
+
+def natsorted(what: Iterable[T], key=None) -> list[T]:
+    return natsort.natsorted(what, key=key) # type: ignore

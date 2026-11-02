@@ -4,10 +4,8 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # noqa
-
-from aldy.gene import Mutation, CNConfig, CNConfigType, MajorAllele, MinorAllele
 from aldy.common import GRange
+from aldy.gene import CNConfig, CNConfigType, MajorAllele, MinorAllele, Mutation
 
 
 def test_gene_basic(toy_gene):
@@ -78,25 +76,25 @@ def test_gene_alleles(toy_gene):
         "1": CNConfig(
             cnify("1,  1,1,  1,1,  1,1 | 1,  1,1,  1,1,  1,1"),
             kind=CNConfigType.DEFAULT,
-            alleles=set(["1", "1C", "2", "3"]),
+            alleles={"1", "1C", "2", "3"},
             description="Standard copy-number configuration",
         ),
         "4": CNConfig(
             cnify("0,  0,0,  0,1,  1,1 | 1,  1,1,  1,0,  0,0"),
             kind=CNConfigType.LEFT_FUSION,
-            alleles=set(["4#1", "4#3"]),
+            alleles={"4#1", "4#3"},
             description="TOYP fusion until i2",
         ),
         "5": CNConfig(
             cnify("1,  1,1,  0,0,  0,0 | 1,  1,1,  2,2,  2,2"),
             kind=CNConfigType.RIGHT_FUSION,
-            alleles=set(["5"]),
+            alleles={"5"},
             description="TOYP conservation after e2",
         ),
         "6": CNConfig(
             cnify("0,  0,0,  0,0,  0,0 | 1,  1,1,  1,1,  1,1"),
             kind=CNConfigType.DELETION,
-            alleles=set(["6"]),
+            alleles={"6"},
             description="TOY deletion",
         ),
     }, "CN configs"
@@ -123,14 +121,14 @@ def test_gene_alleles(toy_gene):
                 "1.002",
                 "1B",
                 _activity="unknown",
-                neutral_muts=set([Mutation(100_000_114, "T>A")]),
+                neutral_muts={Mutation(100_000_114, "T>A")},
             ),
         },
     )
     assert toy_gene.alleles["1C"] == MajorAllele(
         "1C",
         cn_config="1",
-        func_muts=set([Mutation(100_000_104, "T>A")]),
+        func_muts={Mutation(100_000_104, "T>A")},
         minors={
             "1.003": MinorAllele(
                 "1.003", "1C", pharmvar="https://www.pharmvar.org/haplotype/NA"
@@ -140,16 +138,16 @@ def test_gene_alleles(toy_gene):
     assert toy_gene.alleles["2"] == MajorAllele(
         "2",
         cn_config="1",
-        func_muts=set([Mutation(100_000_110, "delAC"), Mutation(100_000_118, "insTT")]),
+        func_muts={Mutation(100_000_110, "delAC"), Mutation(100_000_118, "insTT")},
         minors={"2.001": MinorAllele("2.001", "2")},
     )
     assert toy_gene.alleles["3"] == MajorAllele(
         "3",
         cn_config="1",
-        func_muts=set([Mutation(100_000_150, "C>T")]),
+        func_muts={Mutation(100_000_150, "C>T")},
         minors={
             "3.001": MinorAllele(
-                "3.001", "3", neutral_muts=set([Mutation(100_000_147, "insA")])
+                "3.001", "3", neutral_muts={Mutation(100_000_147, "insA")}
             )
         },
     )
@@ -161,17 +159,17 @@ def test_gene_alleles(toy_gene):
     assert toy_gene.alleles["4#3"] == MajorAllele(
         "4#3",
         cn_config="4",
-        func_muts=set([Mutation(100_000_150, "C>T")]),
+        func_muts={Mutation(100_000_150, "C>T")},
         minors={
             "4#3.001": MinorAllele(
-                "4#3.001", neutral_muts=set([Mutation(100_000_147, "insA")])
+                "4#3.001", neutral_muts={Mutation(100_000_147, "insA")}
             )
         },
     )
     assert toy_gene.alleles["5"] == MajorAllele(
         "5",
         cn_config="5",
-        func_muts=set([Mutation(100_000_110, "delAC")]),
+        func_muts={Mutation(100_000_110, "delAC")},
         minors={"5.001": MinorAllele("5.001", "5")},
     )
     assert toy_gene.alleles["6"] == MajorAllele(

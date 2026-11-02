@@ -7,9 +7,7 @@
 import sys
 import textwrap
 
-from natsort import natsorted
-
-from .common import AldyException, log
+from .common import AldyException, log, natsorted
 from .gene import Gene
 
 
