@@ -34,11 +34,7 @@ def get_version():
         (
             platform.platform()[6:]
             if platform.system() == "Linux"
-            else (
-                platform.mac_ver()[0]
-                if platform.system() == "Darwin"
-                else platform.platform()
-            )
+            else (platform.mac_ver()[0] if platform.system() == "Darwin" else platform.platform())
         ),
     )
 
@@ -53,15 +49,11 @@ def main(argv):
     # Set the logging verbosity
     level = (args.verbosity if "verbosity" in args else "I").lower()
     level = next(
-        v
-        for k, v in logbook.base._reverse_level_names.items()
-        if k.lower().startswith(level)
+        v for k, v in logbook.base._reverse_level_names.items() if k.lower().startswith(level)
     )
 
     # Set the command-line logging
-    sh = logbook.more.ColorizedStderrHandler(
-        format_string="{record.message}", level=level
-    )
+    sh = logbook.more.ColorizedStderrHandler(format_string="{record.message}", level=level)
     sh.push_application()
 
     log.info(
@@ -188,9 +180,7 @@ def _get_args(argv):
         help="Call the most likely genotype and diplotype within a sample.",
         parents=[base],
     )
-    genotype_parser.add_argument(
-        "file", nargs="?", help="Input file in SAM, BAM or CRAM format."
-    )
+    genotype_parser.add_argument("file", nargs="?", help="Input file in SAM, BAM or CRAM format.")
     genotype_parser.add_argument(
         "--gene",
         "-g",
@@ -256,8 +246,7 @@ def _get_args(argv):
     genotype_parser.add_argument(
         "--debug",
         default=None,
-        help="Create a directory that will contain the debug information "
-        + "and core dumps.",
+        help="Create a directory that will contain the debug information " + "and core dumps.",
     )
     genotype_parser.add_argument(
         "--cn",
@@ -334,9 +323,7 @@ def _get_args(argv):
     )
     profile_parser.add_argument("--param", action="append", nargs="+")
 
-    _ = subparsers.add_parser(
-        "help", parents=[base], help="Show program usage and exit."
-    )
+    _ = subparsers.add_parser("help", parents=[base], help="Show program usage and exit.")
 
     return parser, parser.parse_args(argv)
 
@@ -407,9 +394,7 @@ def _genotype(gene: str, output: Any | None, args) -> None:
                 **{k: v for k, v in params.items() if v is not None},
             )
         except AldyException as ex:
-            log.critical(
-                f"ERROR: gene= {gene}, profile= {args.profile}, file= {args.file}"
-            )
+            log.critical(f"ERROR: gene= {gene}, profile= {args.profile}, file= {args.file}")
             log.error(str(ex))
 
     if args.log:
@@ -433,7 +418,7 @@ def _genotype(gene: str, output: Any | None, args) -> None:
                     bubble=True,
                     level="TRACE",  # type: ignore
                 )
-                fh.formatter = lambda record, _: ( # type: ignore
+                fh.formatter = lambda record, _: (  # type: ignore
                     f"[{record.level_name[0]}:"
                     f"{os.path.splitext(os.path.basename(record.filename))[0]}/{record.func_name}] "
                     f"{record.message}"

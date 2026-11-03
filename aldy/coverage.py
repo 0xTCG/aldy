@@ -81,9 +81,7 @@ class Coverage:
             pos = m
         if pos not in self._coverage:
             return 0
-        return float(
-            sum(len(v) for p, v in self._coverage[pos].items() if p[:3] != "ins")
-        )
+        return float(sum(len(v) for p, v in self._coverage[pos].items() if p[:3] != "ins"))
 
     def percentage(self, m: Mutation) -> float:
         """:returns: Mutation coverage expressed as percentage (0-100%)."""
@@ -113,9 +111,7 @@ class Coverage:
 
     def average_coverage(self) -> float:
         """:returns: Average coverage of the gene."""
-        return sum(self.total(pos) for pos in self._coverage) / float(
-            len(self._coverage) + 0.1
-        )
+        return sum(self.total(pos) for pos in self._coverage) / float(len(self._coverage) + 0.1)
 
     def dump(self, out=None):
         """Pretty-print the coverage data."""
@@ -223,8 +219,5 @@ class Coverage:
         """Basic quality filter."""
         quals = self._coverage.get(mut.pos, {}).get(mut.op, [])
         return [
-            (m, q)
-            for m, q in quals
-            if q >= self.profile.min_quality
-            if m >= self.profile.min_mapq
+            (m, q) for m, q in quals if q >= self.profile.min_quality if m >= self.profile.min_mapq
         ]

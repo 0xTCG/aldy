@@ -1,4 +1,8 @@
 [build-system]
 requires = ["setuptools", "wheel", "cython", "pysam"]
+[tool.ruff]
+line-length = 100
 [tool.ruff.lint]
 ignore = ["BLE001", "PLC0206"]
+[tool.ruff.lint.pycodestyle]
+max-line-length = 100

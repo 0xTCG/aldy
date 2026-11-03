@@ -156,9 +156,7 @@ def test_NA10860_debug(monkeypatch, solver):
 
 def test_NA10860_hg38(monkeypatch, solver):
     file = script_path("aldy.tests.resources/NA10860_hg38.bam")
-    assert_file(
-        monkeypatch, file, solver, EXPECTED_NA10860.replace("NA10860", "NA10860_hg38")
-    )
+    assert_file(monkeypatch, file, solver, EXPECTED_NA10860.replace("NA10860", "NA10860_hg38"))
 
 
 def test_NA10860_gap(monkeypatch, solver):
@@ -252,9 +250,7 @@ def test_NA10860_vcf_out(monkeypatch, solver):
 
 
 with open(script_path("aldy.tests.resources/vcf-input.vcf")) as f:
-    VCF_SAMPLES = (
-        next(line for line in f if line.startswith("#CHROM")).strip().split("\t")[9:]
-    )
+    VCF_SAMPLES = next(line for line in f if line.startswith("#CHROM")).strip().split("\t")[9:]
 
 
 @pytest.mark.parametrize("sample_idx,sample", enumerate(VCF_SAMPLES), ids=VCF_SAMPLES)
@@ -298,10 +294,7 @@ def test_vcf_input_output(monkeypatch, tmp_path, solver, sample_idx, sample):
         for line in f:
             if line.startswith("##source=") and f"(gene: {gene}-" not in line:
                 continue
-            if (
-                line.startswith("##contig=")
-                and line.strip() != f"##contig=<ID={chrom}>"
-            ):
+            if line.startswith("##contig=") and line.strip() != f"##contig=<ID={chrom}>":
                 continue
             if line.startswith("##"):
                 expected.append(line)
@@ -311,9 +304,7 @@ def test_vcf_input_output(monkeypatch, tmp_path, solver, sample_idx, sample):
                     column = fields.index(sample)
                 if fields[0] == "#CHROM" or fields[column] != ".":
                     expected.append("\t".join(fields[:9] + [fields[column]]) + "\n")
-    assert output_path.read_text() == "".join(expected).replace(
-        "aldy-v4.8", f"aldy-v{__version__}"
-    )
+    assert output_path.read_text() == "".join(expected).replace("aldy-v4.8", f"aldy-v{__version__}")
     # Explicit reference genotypes count as data, including the reference-only
     # sample; a lack of alternate alleles must not trigger this warning.
     assert not any("No usable VCF records found" in warning for warning in warnings)
@@ -459,9 +450,7 @@ def test_vcf_missing_gene(monkeypatch, tmp_path, solver, filename, sample):
             str(tmp_path / "output.vcf"),
         ]
     )
-    assert [
-        warning for warning in warnings if "No usable VCF records found" in warning
-    ] == [
+    assert [warning for warning in warnings if "No usable VCF records found" in warning] == [
         f"WARNING: No usable VCF records found for CFTR in sample {sample}. "
         "A wild-type call cannot be confirmed."
     ]
@@ -556,9 +545,7 @@ def test_profile(monkeypatch, capsys):
     Scanning MT:1-2700...
     Scanning X:154528390-154553572...
     """
-    main(
-        ["profile", script_path("aldy.tests.resources/NA10860.bam"), "--genome", "hg38"]
-    )
+    main(["profile", script_path("aldy.tests.resources/NA10860.bam"), "--genome", "hg38"])
     lines = "\n".join(escape_ansi(l).strip() for l in lines).strip()
     expected = "\n".join(e.strip() for e in expected.strip().split("\n"))
     assert lines == expected
@@ -589,9 +576,7 @@ def test_pacbio(monkeypatch, solver):
         Estimated activity for *40: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/231 for details)
     """
     file = script_path("aldy.tests.resources/HG03166.pb.bam")
-    assert_file(
-        monkeypatch, file, solver, expected, {"--profile": "pacbio-hifi-targeted"}
-    )
+    assert_file(monkeypatch, file, solver, expected, {"--profile": "pacbio-hifi-targeted"})
 
 
 def test_load_all_genes(monkeypatch, solver):

@@ -444,9 +444,7 @@ def test_comparison(real_gene, solver):  # NA10846/v1
     majors = [
         MajorSolution(
             0,
-            collections.defaultdict(
-                int, {SolvedAllele(real_gene, m): c for m, c in major.items()}
-            ),
+            collections.defaultdict(int, {SolvedAllele(real_gene, m): c for m, c in major.items()}),
             cn_sol,
             [],
         )

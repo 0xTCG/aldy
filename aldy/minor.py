@@ -4,6 +4,7 @@
 #   file 'LICENSE', which is part of this source code package.
 
 import collections
+import functools
 import os
 
 from . import lpinterface
@@ -39,34 +40,26 @@ def estimate_minor(
     mutations: set[Mutation] = set()
     for major_sol in major_sols:
         for sa in major_sol.solution:
-            alleles += [
-                SolvedAllele(gene, sa.major, mi) for mi in gene.alleles[sa.major].minors
-            ]
+            alleles += [SolvedAllele(gene, sa.major, mi) for mi in gene.alleles[sa.major].minors]
             mutations |= set(gene.alleles[sa.major].func_muts)
             for minor in gene.alleles[sa.major].minors.values():
                 mutations |= set(minor.neutral_muts)
         mutations |= set(major_sol.added)
 
     # Filter out low quality mutations
-    def default_filter_fn(cov, mut):
+    def default_filter_fn(cov, mut, cn):
         # TODO: is this necessary?
         r = gene.region_at(mut.pos)
         if mut.op != "_" and not (
-            mut in mutations
-            or (r and r[1][0] == "e")
-            or (r and r[1] in ["utr3", "utr5", "up"])
+            mut in mutations or (r and r[1][0] == "e") or (r and r[1] in ["utr3", "utr5", "up"])
         ):
             return False
         cond = cov.basic_filter(mut, cn=coverage.profile.cn_max)
         if mut.op != "_":
-            cond = cond and cov.basic_filter(
-                mut, cn=major_sol.cn_solution.position_cn(mut.pos) + 0.5
-            )
+            cond = cond and cov.basic_filter(mut, cn=cn.position_cn(mut.pos) + 0.5)
         return cond
 
-    cov = coverage.filtered(Coverage.quality_filter)
-    cov = cov.filtered(default_filter_fn)  # type: ignore
-    mutations |= {m for m in gene.random_mutations if cov[m] > 0}
+    quality_cov = coverage.filtered(Coverage.quality_filter)
 
     # Group by CN solutions
     minor_sols: list[MinorSolution] = []
@@ -74,15 +67,17 @@ def estimate_minor(
     min_score = min(m.score for m in major_sols)
     for c in sorted(cn_sols, key=lambda x: x._solution_nice()):
         log.debug("*" * 80)
+        cov = quality_cov.filtered(functools.partial(default_filter_fn, cn=c))  # type: ignore
+        cn_muts = mutations | {m for m in gene.random_mutations if cov[m] > 0}
         majors = [m for m in major_sols if m.cn_solution == c]
-        _print_candidates(gene, alleles, c, cov, mutations)
+        _print_candidates(gene, alleles, c, cov, cn_muts)
         for major_sol in natsorted(majors, key=lambda s: str(s.solution)):
             sols = solve_minor_model(
                 gene,
                 cov,
                 major_sol,
                 alleles,
-                mutations,
+                cn_muts,
                 solver,
                 max_solutions,
             )
@@ -136,10 +131,7 @@ def solve_minor_model(
         for cnt in range(1, max_cn):
             alleles[a, cnt] = alleles[a, 0]
 
-    VA = {
-        a: model.addVar(vtype="B", name=f"A_{a[0].major}_{a[0].minor}_{a[1]}")
-        for a in alleles
-    }
+    VA = {a: model.addVar(vtype="B", name=f"A_{a[0].major}_{a[0].minor}_{a[1]}") for a in alleles}
     for a, cnt in alleles:
         if cnt > 0:
             model.addConstr(VA[a, cnt] <= VA[a, cnt - 1], name=f"CORD_{a.minor}_{cnt}")
@@ -167,9 +159,7 @@ def solve_minor_model(
     VKEEP: dict = {
         a: {
             m: (
-                model.addVar(
-                    vtype="B", name=f"K_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}"
-                ),
+                model.addVar(vtype="B", name=f"K_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}"),
                 model.addVar(
                     vtype="B",
                     name=f"MUL_K_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
@@ -187,9 +177,7 @@ def solve_minor_model(
     VNEW: dict = {
         a: {
             m: (
-                model.addVar(
-                    vtype="B", name=f"N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}"
-                ),
+                model.addVar(vtype="B", name=f"N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}"),
                 model.addVar(
                     vtype="B",
                     name=f"MUL_N_{m.pos}_{m.op}_{a[0].major}_{a[0].minor}_{a[1]}",
@@ -203,8 +191,7 @@ def solve_minor_model(
 
     # Add an error variable for each mutation, and populate error constraints
     VERR = {
-        m: model.addVar(lb=-model.INF, ub=model.INF, name=f"E_{m.pos}_{m.op}")
-        for m in mutations
+        m: model.addVar(lb=-model.INF, ub=model.INF, name=f"E_{m.pos}_{m.op}") for m in mutations
     }
     constraints = {m: 0 for m in mutations}
     for m in mutations:
@@ -342,8 +329,7 @@ def solve_minor_model(
             # allow the allele to select a non-existent non-mutation to prevent
             # infeasibility. Should not happen with "sane" datasets...
             model.addConstr(
-                expr
-                <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m], max_mut),
+                expr <= max(major_sol.cn_solution.position_cn(m.pos), coverage[m], max_mut),
                 name=f"CMAXCOV_{m.pos}_{m.op}",
             )
 
@@ -401,9 +387,7 @@ def solve_minor_model(
                             e += v_vp
                         VPHASEERR.append(cnt * e)
             for ri, _ in enumerate(modes):
-                v = [
-                    VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE
-                ]
+                v = [VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE]
                 if v:
                     e = model.quicksum(v)
                     model.addConstr(e <= 1, name=f"PHASE4_{ri}_1")
@@ -416,9 +400,7 @@ def solve_minor_model(
     o_error = model.abssum((v for v in VERR.values()), coeffs=score)
     objective += o_error
     # ... and penalize the misses ...
-    o_penal = coverage.profile.minor_miss * model.quicksum(
-        len(VKEEP[a]) * VA[a] for a in VKEEP
-    )
+    o_penal = coverage.profile.minor_miss * model.quicksum(len(VKEEP[a]) * VA[a] for a in VKEEP)
     o_penal -= coverage.profile.minor_miss * model.quicksum(
         v[1] for a in VKEEP for _, v in VKEEP[a].items()
     )
@@ -463,9 +445,7 @@ def solve_minor_model(
 
                 if coverage.profile.phase and coverage.sam:
                     ai = next(i for i, a in enumerate(alleles) if allele == a)
-                    _print_phase(
-                        model, gene, mutations, modes, VPHASE, VKEEP, VNEW, allele, ai
-                    )
+                    _print_phase(model, gene, mutations, modes, VPHASE, VKEEP, VNEW, allele, ai)
 
                 added: list[Mutation] = []
                 missing: list[Mutation] = []
@@ -597,7 +577,7 @@ def _print_phase(model, gene, mutations, modes, VPHASE, VKEEP, VNEW, allele, ai)
                 if ">" in c:
                     c = c[2]
                 elif c.startswith("del"):
-                    c = f"-{len(c)-3}"
+                    c = f"-{len(c) - 3}"
                 ph[c] += r[1]
         if len(ph):
             p = sorted(ph.items())

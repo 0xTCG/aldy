@@ -281,11 +281,7 @@ class Gene:
             if self.seq[pos] != op[0]:
                 log.warn(f"Bad mutation: {op[0]} != {self.seq[pos]}")
             seq = "".join(
-                (
-                    self.seq[s:pos] + op[2] + self.seq[pos + 1 : e]
-                    if s <= pos < e
-                    else self.seq[s:e]
-                )
+                (self.seq[s:pos] + op[2] + self.seq[pos + 1 : e] if s <= pos < e else self.seq[s:e])
                 for s, e in self.exons
             )
             amino = seq_to_amino(seq)
@@ -342,11 +338,7 @@ class Gene:
         """
 
         try:
-            return next(
-                a
-                for a, cn in self.cn_configs.items()
-                if cn.kind == CNConfigType.DELETION
-            )
+            return next(a for a, cn in self.cn_configs.items() if cn.kind == CNConfigType.DELETION)
         except StopIteration:
             return None
 
@@ -489,9 +481,7 @@ class Gene:
             for e in range(1, num_exons):  # fill introns
                 r = [regions[f"e{e}"], regions[f"e{e + 1}"]][:: self.strand]
                 regions[f"i{e}"] = GRange(self.chr, r[0][2], r[1][1])
-            self.regions.append(
-                dict(sorted(regions.items(), key=lambda x: x[1])[:: self.strand])
-            )
+            self.regions.append(dict(sorted(regions.items(), key=lambda x: x[1])[:: self.strand]))
 
         #: dict[int, (int, str)]:
         #: reverse lookup (gene, region) of gene regions given a location
@@ -511,9 +501,7 @@ class Gene:
         }
         for i in self.chr_to_ref:
             if i not in self._region_at:
-                raise AldyException(
-                    f"Position {i} not within a named region of {self.name}"
-                )
+                raise AldyException(f"Position {i} not within a named region of {self.name}")
         self.unique_regions = yml["structure"]["cn_regions"]
 
     def _init_alleles(self, yml) -> None:
@@ -705,9 +693,7 @@ class Gene:
         # Normal CN case
         used_alleles = {a for cn in self.cn_configs.values() for a in cn.alleles}
         has_pseudogenes = len(self.pseudogenes) > 0
-        default_cn = [
-            {r: 1 for r in self.regions[g]} for g in range(1 + has_pseudogenes)
-        ]
+        default_cn = [{r: 1 for r in self.regions[g]} for g in range(1 + has_pseudogenes)]
         self.cn_configs = {min(v.alleles): v for v in self.cn_configs.values()}
         self.cn_configs["1"] = CNConfig(
             default_cn,
@@ -726,9 +712,7 @@ class Gene:
         # Set up major and minor allele structures
         alleles_inverse: dict[tuple, set] = collections.defaultdict(set)
         for an, a in alleles.items():
-            cn_config = next(
-                cn for cn, conf in self.cn_configs.items() if an in conf.alleles
-            )
+            cn_config = next(cn for cn, conf in self.cn_configs.items() if an in conf.alleles)
             fn_muts = sorted(m for m in a.neutral_muts if self.is_functional(m))
             alleles_inverse[cn_config, tuple(fn_muts)].add(an)
 
@@ -854,10 +838,7 @@ class Gene:
                     for s in sa:
                         if s != min(sa) and "#" not in s:
                             self.removed[s] = min(sa)
-                            log.debug(
-                                f"Removing {self.name}*{s} as it is the same as"
-                                f" {min(sa)}"
-                            )
+                            log.debug(f"Removing {self.name}*{s} as it is the same as {min(sa)}")
             self.alleles[an] = MajorAllele(
                 self.alleles[an].name,
                 self.alleles[an].cn_config,

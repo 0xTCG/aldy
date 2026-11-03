@@ -31,7 +31,6 @@ class NoSolutionsError(Exception):
     """Raised if a model is infeasible."""
 
 
-
 class Gurobi:  # pragma: no cover
     """Wrapper around Gurobi's Python interface (:py:mod:`gurobipy`)."""
 
@@ -91,11 +90,7 @@ class Gurobi:  # pragma: no cover
         self.objective = objective
         self.model.setObjective(
             self.objective,
-            (
-                self.gurobipy.GRB.MINIMIZE
-                if method == "min"
-                else self.gurobipy.GRB.MAXIMIZE
-            ),
+            (self.gurobipy.GRB.MINIMIZE if method == "min" else self.gurobipy.GRB.MAXIMIZE),
         )
         self.update()
 
@@ -253,9 +248,7 @@ class CBC(Gurobi):
 
     def __init__(self, name):
         self.ortools = importlib.import_module("ortools.linear_solver.pywraplp")
-        self.model = self.ortools.Solver(
-            name, self.ortools.Solver.CBC_MIXED_INTEGER_PROGRAMMING
-        )
+        self.model = self.ortools.Solver(name, self.ortools.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
         self.INF = self.model.infinity()
         self.STATUS = collections.defaultdict(
             lambda: "UNKNOWN",
@@ -318,10 +311,7 @@ class CBC(Gurobi):
         x = var.solution_value()
         if hasattr(var, "integer") and var.integer():
             x = round(x)
-            if (
-                abs(var.lb()) < SOLUTION_PRECISION
-                and abs(1 - var.ub()) < SOLUTION_PRECISION
-            ):
+            if abs(var.lb()) < SOLUTION_PRECISION and abs(1 - var.ub()) < SOLUTION_PRECISION:
                 return x > 0
             else:
                 return x
@@ -384,9 +374,7 @@ def model(name: str, solver: str):
         if fname in locals():
             m = locals()[fname](name)
             if not m:
-                raise AldyException(
-                    f"ILP solver {solver} cannot be initialized"
-                )
+                raise AldyException(f"ILP solver {solver} cannot be initialized")
             return m
         else:
             raise AldyException(f"ILP solver {solver} is not supported")

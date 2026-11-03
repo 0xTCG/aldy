@@ -48,9 +48,7 @@ def estimate_major(
     if set(cn_solution.solution) - {a.cn_config for a in alleles.values()}:
         results: list[MajorSolution] = []
     else:
-        results = solve_major_model(
-            gene, coverage, cn_solution, alleles, solver, identifier, debug
-        )
+        results = solve_major_model(gene, coverage, cn_solution, alleles, solver, identifier, debug)
     # TODO: Check for novel functional mutations and do something with them
 
     return results
@@ -90,14 +88,10 @@ def solve_major_model(
     # Get the list of _all_ functional mutations present in the sample
     # and the database (intersection)
     func_muts = {
-        Mutation(*m)
-        for m in gene.mutations
-        if gene.is_functional(m) and coverage[Mutation(*m)] > 0
+        Mutation(*m) for m in gene.mutations if gene.is_functional(m) and coverage[Mutation(*m)] > 0
     }
     func_muts |= {
-        m
-        for m in gene.random_mutations
-        if gene.is_functional((m.pos, m.op)) and coverage[m] > 0
+        m for m in gene.random_mutations if gene.is_functional((m.pos, m.op)) and coverage[m] > 0
     }
     _print_candidates(gene, allele_dict, coverage, cn_solution, func_muts)
 
@@ -118,8 +112,7 @@ def solve_major_model(
 
     # Add an error variable for every mutation
     VERR = {
-        m: model.addVar(lb=-model.INF, ub=model.INF, name=f"E_{m.pos}_{m.op}")
-        for m in func_muts
+        m: model.addVar(lb=-model.INF, ub=model.INF, name=f"E_{m.pos}_{m.op}") for m in func_muts
     }
     constraints = {e: 0 for e in VERR}
 
@@ -149,9 +142,7 @@ def solve_major_model(
             constraints[ref_m] += VA[an]
 
         # We ensure that only one additional mutation can be selected here (HACK)
-        z = model.quicksum(
-            v for m, v in VNEW.items() if m[0] == pos and m[1][:3] != "ins"
-        )
+        z = model.quicksum(v for m, v in VNEW.items() if m[0] == pos and m[1][:3] != "ins")
         model.addConstr(z <= 1, name=f"CONE_{pos}")
 
     # Each allele must express all of its functional mutations
@@ -213,16 +204,10 @@ def solve_major_model(
         solved_alleles = sorted_tuple(
             [lookup[s][0] for s in sol if s in lookup and s.startswith("A_")]
         )
-        novel_muts = sorted_tuple(
-            [lookup[s] for s in sol if s in lookup and s.startswith("N_")]
-        )
+        novel_muts = sorted_tuple([lookup[s] for s in sol if s in lookup and s.startswith("N_")])
         if (solved_alleles, novel_muts) not in result:
-            solution = collections.Counter(
-                SolvedAllele(gene, major=a) for a in solved_alleles
-            )
-            debug_info["sol"].append(
-                dict(collections.Counter(a for a in solved_alleles))
-            )
+            solution = collections.Counter(SolvedAllele(gene, major=a) for a in solved_alleles)
+            debug_info["sol"].append(dict(collections.Counter(a for a in solved_alleles)))
             sol = MajorSolution(
                 score=opt,
                 solution=solution,
@@ -230,8 +215,7 @@ def solve_major_model(
                 added=list(novel_muts),
             )
             log.debug(
-                f"[major] status= {status}; opt= {opt:.2f}; "
-                + f"solution= {sol._solution_nice()}"
+                f"[major] status= {status}; opt= {opt:.2f}; " + f"solution= {sol._solution_nice()}"
             )
             result[solved_alleles, novel_muts] = sol
     if not result:
@@ -251,9 +235,7 @@ def _filter_alleles(
     def filter_fns(cov, mut):
         cond = cov.basic_filter(mut, cn=coverage.profile.cn_max)
         if mut.op != "_":
-            cond = cond and cov.basic_filter(
-                mut, cn=cn_solution.position_cn(mut.pos) + 0.5
-            )
+            cond = cond and cov.basic_filter(mut, cn=cn_solution.position_cn(mut.pos) + 0.5)
         return cond
 
     if coverage.profile.debug_probe:
@@ -268,8 +250,7 @@ def _filter_alleles(
 
         def pileup(pos):
             return "".join(
-                (a if a == "_" else a[2:]) * len(c)
-                for a, c in coverage._coverage[pos].items()
+                (a if a == "_" else a[2:]) * len(c) for a, c in coverage._coverage[pos].items()
             )
 
         for p in probes:
@@ -282,7 +263,7 @@ def _filter_alleles(
     cov = cov.filtered(filter_fns)
 
     alleles = copy.deepcopy(gene.alleles)
-    sorted_alleles: list[tuple[str, MajorAllele]] = natsorted(gene.alleles.items()) # type: ignore
+    sorted_alleles: list[tuple[str, MajorAllele]] = natsorted(gene.alleles.items())  # type: ignore
     for an, a in sorted_alleles:
         if a.cn_config not in cn_solution.solution:
             del alleles[an]
@@ -324,9 +305,7 @@ def _print_candidates(
     for m in sorted(muts):
         log.debug(print_mut(m))
         als = natsorted(
-            f"*{a:8}"
-            for a, al in gene.alleles.items()
-            if m in al.func_muts and "#" not in a
+            f"*{a:8}" for a, al in gene.alleles.items() if m in al.func_muts and "#" not in a
         )
         if als:
             log.debug(

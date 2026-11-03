@@ -23,9 +23,7 @@ def assert_diplotype(gene, test, majors):
         else:
             sols.append(SolvedAllele(gene, ma))
     cns = [c for m in cns for c, cc in gene.cn_configs.items() if m in cc.alleles]
-    minor = MinorSolution(
-        0, sols, MajorSolution(0, Counter(sols), CNSolution(gene, 0, cns), [])
-    )
+    minor = MinorSolution(0, sols, MajorSolution(0, Counter(sols), CNSolution(gene, 0, cns), []))
     estimate_diplotype(gene, minor)
     assert test == minor.get_major_diplotype(), "Diplotype not equal"
 
@@ -40,9 +38,7 @@ def test_tandem(toy_gene):
 
 def test_multi(toy_gene):
     assert_diplotype(toy_gene, "*1 + *4 / *3 + *3", ["4", "1", "3", "3"])
-    assert_diplotype(
-        toy_gene, "*1C + *4 / *3 + *3 + *3 + *3", ["4", "1C", "3", "3", "3", "3"]
-    )
+    assert_diplotype(toy_gene, "*1C + *4 / *3 + *3 + *3 + *3", ["4", "1C", "3", "3", "3", "3"])
 
 
 def test_combination(toy_gene):

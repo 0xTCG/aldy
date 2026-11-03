@@ -28,9 +28,7 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
     cov = Coverage(gene, profile, None, cov, None, {})
     if "phase" in data:
         cov.sam = Sample.__new__(Sample)
-        cov.sam.phases = {
-            r: {k: v for k, v in ph.items()} for r, ph in data["phase"].items()
-        }
+        cov.sam.phases = {r: {k: v for k, v in ph.items()} for r, ph in data["phase"].items()}
 
     if isinstance(data["major"], tuple):
         major = MajorSolution(
@@ -58,9 +56,7 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
 
     if not shallow:
         sols_expected = [
-            sorted_tuple(
-                (i[0], sorted_tuple(i[1]), sorted_tuple(i[2])) for i in data["sol"]
-            )
+            sorted_tuple((i[0], sorted_tuple(i[1]), sorted_tuple(i[2])) for i in data["sol"])
         ]
         sols_parsed = [
             sorted_tuple(

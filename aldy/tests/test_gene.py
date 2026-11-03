@@ -130,9 +130,7 @@ def test_gene_alleles(toy_gene):
         cn_config="1",
         func_muts={Mutation(100_000_104, "T>A")},
         minors={
-            "1.003": MinorAllele(
-                "1.003", "1C", pharmvar="https://www.pharmvar.org/haplotype/NA"
-            )
+            "1.003": MinorAllele("1.003", "1C", pharmvar="https://www.pharmvar.org/haplotype/NA")
         },
     )
     assert toy_gene.alleles["2"] == MajorAllele(
@@ -145,11 +143,7 @@ def test_gene_alleles(toy_gene):
         "3",
         cn_config="1",
         func_muts={Mutation(100_000_150, "C>T")},
-        minors={
-            "3.001": MinorAllele(
-                "3.001", "3", neutral_muts={Mutation(100_000_147, "insA")}
-            )
-        },
+        minors={"3.001": MinorAllele("3.001", "3", neutral_muts={Mutation(100_000_147, "insA")})},
     )
     assert toy_gene.alleles["4#1"] == MajorAllele(
         "4#1",
@@ -160,11 +154,7 @@ def test_gene_alleles(toy_gene):
         "4#3",
         cn_config="4",
         func_muts={Mutation(100_000_150, "C>T")},
-        minors={
-            "4#3.001": MinorAllele(
-                "4#3.001", neutral_muts={Mutation(100_000_147, "insA")}
-            )
-        },
+        minors={"4#3.001": MinorAllele("4#3.001", neutral_muts={Mutation(100_000_147, "insA")})},
     )
     assert toy_gene.alleles["5"] == MajorAllele(
         "5",

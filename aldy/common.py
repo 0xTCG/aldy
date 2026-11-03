@@ -136,9 +136,7 @@ def rev_comp(seq: str) -> str:
 def seq_to_amino(seq: str) -> str:
     """:returns: Protein sequence formed from the provided DNA sequence."""
 
-    return "".join(
-        PROTEINS[seq[i : i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3)
-    )
+    return "".join(PROTEINS[seq[i : i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3))
 
 
 def freezekey(x):
@@ -259,4 +257,4 @@ T = TypeVar("T")
 
 
 def natsorted(what: Iterable[T], key=None) -> list[T]:
-    return natsort.natsorted(what, key=key) # type: ignore
+    return natsort.natsorted(what, key=key)  # type: ignore

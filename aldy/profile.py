@@ -34,7 +34,7 @@ class Profile:
         Default: 0 (only optimal solutions)
         """
 
-        self.cn_gap = 0.1
+        self.cn_gap = 0.05
         """
         Copy-number solution gap. Non-zero values enable non-optimal solutions.
         Default: 0.1 (consider CN structures within 10% of the best CN score).
@@ -280,9 +280,7 @@ class Profile:
                 with open(profile) as f:
                     prof = yaml.safe_load(f)
         else:
-            profile_path = script_path(
-                f"aldy.resources.profiles/{profile.lower()}.yml"
-            )
+            profile_path = script_path(f"aldy.resources.profiles/{profile.lower()}.yml")
             with open(profile_path) as f:
                 prof = yaml.safe_load(f)
         if not prof:
@@ -343,7 +341,7 @@ class Profile:
 
             gene_regions = {}
             for g in sorted(
-                importlib_resources.files("aldy.resources.genes").iterdir() # type: ignore
+                importlib_resources.files("aldy.resources.genes").iterdir()  # type: ignore
             ):
                 if g.suffix != ".yml":
                     continue
@@ -384,7 +382,7 @@ class Profile:
                 region = GRange(c, s, e).samtools(
                     pad_left=1000,
                     pad_right=1000,
-                    prefix=chr_prefix(c, [x["SN"] for x in sam.header["SQ"]]), # type: ignore
+                    prefix=chr_prefix(c, [x["SN"] for x in sam.header["SQ"]]),  # type: ignore
                 )
                 log.info("Scanning {}...", region)
                 try:

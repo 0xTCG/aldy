@@ -32,11 +32,7 @@ def assert_major(gene, solver, major):
             assert abs(major["score"] - s.score) < SOLUTION_PRECISION, "Score"
 
     sols_parsed: list[Any] = [
-        dict(
-            collections.Counter(
-                [i.major for i, v in s.solution.items() for _ in range(v)]
-            )
-        )
+        dict(collections.Counter([i.major for i, v in s.solution.items() for _ in range(v)]))
         for s in sols
     ]
     for si, s in enumerate(sols):
@@ -53,9 +49,7 @@ def assert_major(gene, solver, major):
 
 def test_basic(toy_gene, solver):
     # Test two copies of *1
-    assert_major(
-        toy_gene, solver, {"cn": {"1": 2}, "data": {}, "sol": [{"1": 2}], "score": 0}
-    )
+    assert_major(toy_gene, solver, {"cn": {"1": 2}, "data": {}, "sol": [{"1": 2}], "score": 0})
 
 
 def test_deletion(toy_gene, solver):

@@ -101,9 +101,7 @@ class Sample:
 
             if self.kind == "vcf":
                 try:
-                    norm, muts = self._load_vcf(
-                        path, profile.vcf_sample_idx if profile else 0
-                    )
+                    norm, muts = self._load_vcf(path, profile.vcf_sample_idx if profile else 0)
                 except ValueError:
                     raise AldyException(f"VCF {path} is not indexed")
             elif self.kind == "dump":
@@ -117,9 +115,7 @@ class Sample:
                 else:
                     norm, muts = self._load_sam(path, reference, debug)
                 if self.profile and self.profile.cn_region:
-                    self._dump_cn = self._load_cn_region(
-                        path, reference, self.profile.cn_region
-                    )
+                    self._dump_cn = self._load_cn_region(path, reference, self.profile.cn_region)
             self._make_coverage(norm, muts)
             if self.kind == "sam" and debug:
                 self._dump_alignments(f"{debug}.{gene.name}", norm, muts)
@@ -161,7 +157,7 @@ class Sample:
             except ValueError:
                 raise AldyException(f"Cannot check index of {sam_path}")
 
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]] # type: ignore
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]  # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
             self._prefix: str = chr_prefix(self.gene.chr, sam_chrs)
@@ -169,9 +165,7 @@ class Sample:
             with tempfile.TemporaryDirectory() as tmp:
                 self._realign_indels(tmp, sam, reference)
             if has_index:
-                iter = sam.fetch(
-                    region=self.gene.get_wide_region().samtools(prefix=self._prefix)
-                )
+                iter = sam.fetch(region=self.gene.get_wide_region().samtools(prefix=self._prefix))
             else:
                 log.warn("SAM/BAM index not found. Reading will be slow.")
                 iter = sam.fetch()
@@ -295,9 +289,7 @@ class Sample:
                 g = sorted(genotype)
                 dump_arr = {}
                 if read.ref and len(read.ref) == 1 and read.ref.upper() != self.gene[read.pos - 1]:
-                    hgvs = [
-                        (read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref.upper()}")
-                    ]
+                    hgvs = [(read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref.upper()}")]
                 else:
                     hgvs = [(read.pos - 1, "_")]
                 if read.alleles:
@@ -372,9 +364,7 @@ class Sample:
                 phases,
                 self._fusion_counter,
                 self._indel_sites,
-            ) = pickle.load(
-                fd
-            )  # type: ignore
+            ) = pickle.load(fd)  # type: ignore
         self.profile.display_format = False
         self.profile.debug_probe = ""
         self.profile.debug_novel = False
@@ -445,8 +435,7 @@ class Sample:
                         ref, alt = alt, ref
                     if self.gene[start:stop] != ref:
                         log.debug(
-                            f"Issue: REF {ref} (ALT {alt}) "
-                            f"does not match {self.gene[start:stop]}"
+                            f"Issue: REF {ref} (ALT {alt}) does not match {self.gene[start:stop]}"
                         )
                         ref = self.gene[start:stop]  # only for PScan/TPMT
                 alt = alt.split("//")
@@ -573,9 +562,7 @@ class Sample:
                     x = len(on_target & prev_indel[2])
                     self._indel_sites[pos, op] = [off + x, on - x]
                 if self._indel_sites[pos, op][1]:
-                    log.debug(
-                        "[indel] {}:{} -> {}", pos + 1, op, self._indel_sites[pos, op]
-                    )
+                    log.debug("[indel] {}:{} -> {}", pos + 1, op, self._indel_sites[pos, op])
                     prev_indel = (pos, op, on_target)
             except (IndexError, ValueError):
                 log.error(
@@ -604,7 +591,7 @@ class Sample:
             except ValueError:
                 raise AldyException(f"Cannot check index of {self.path}")
 
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]] # type: ignore
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]  # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
             self._prefix = chr_prefix(self.gene.chr, sam_chrs)
@@ -737,10 +724,7 @@ class Sample:
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
                     q = qual[s_start + i] if qual else prev_q
-                    if (
-                        start + i in self.gene
-                        and self.gene[start + i] != seq[s_start + i]
-                    ):
+                    if start + i in self.gene and self.gene[start + i] != seq[s_start + i]:
                         mut = (start + i, f"{self.gene[start + i]}>{seq[s_start + i]}")
                         dump_arr.append(mut)
                         muts[mut].append((bin_quality(mq), bin_quality(q)))
@@ -759,11 +743,7 @@ class Sample:
             if pos not in dump_arr_pos:
                 continue
             l, r = op.split(">")
-            if all(
-                (pos + p, f"{l[p]}>{r[p]}") in dump_arr
-                for p in range(len(l))
-                if l[p] != "."
-            ):
+            if all((pos + p, f"{l[p]}>{r[p]}") in dump_arr for p in range(len(l)) if l[p] != "."):
                 items = []
                 for p in range(len(l)):
                     if l[p] != ".":
@@ -771,9 +751,7 @@ class Sample:
                         if p:  # no idea why...
                             norm[pos + p].append(items[-1])
                 # TODO: use sth else instead of mean?
-                muts[pos, op].append(
-                    (mean(mq for mq, _ in items), mean(q for _, q in items))
-                )
+                muts[pos, op].append((mean(mq for mq, _ in items), mean(q for _, q in items)))
 
         if self._indel_sites_eqs:  # long-read hack
             for pos, op in self._indel_sites:
@@ -834,19 +812,19 @@ class Sample:
                     (s, pos),
                 )
                 self._fusion_counter[n] = [0, 0]
-                if (
-                    sig[0][1] in self.gene.unique_regions
-                    or sig[1][1] in self.gene.unique_regions
-                ):
+                if sig[0][1] in self.gene.unique_regions or sig[1][1] in self.gene.unique_regions:
                     self._fusion_signatures[sig] = n
 
             log.debug("[sam] PacBio remapping enabled")
 
-        with pysam.AlignmentFile(  # type: ignore
-            sam_path, reference_filename=reference
-        ) as sam, Timing("[sam] Remap"):
+        with (
+            pysam.AlignmentFile(  # type: ignore
+                sam_path, reference_filename=reference
+            ) as sam,
+            Timing("[sam] Remap"),
+        ):
             # Assumes SAM index exists
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]] # type: ignore
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]  # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
             self._prefix = chr_prefix(self.gene.chr, sam_chrs)
@@ -884,19 +862,11 @@ class Sample:
                         s = seq[s_start:]
                         q = qual[s_start:]
                         h = self._map(self._index, s)
-                        if (
-                            h
-                            and h.r_st <= gene_bnd < h.r_en
-                            and gene_bnd - h.r_st > 100
-                        ):
+                        if h and h.r_st <= gene_bnd < h.r_en and gene_bnd - h.r_st > 100:
                             s = seq[s_start : s_start + (gene_bnd - h.r_st)]
                             q = qual[s_start : s_start + (gene_bnd - h.r_st)]
                             h = self._map(self._index, s)
-                        elif (
-                            h
-                            and h.r_st <= pseudo_bnd < h.r_en
-                            and pseudo_bnd - h.r_st > 100
-                        ):
+                        elif h and h.r_st <= pseudo_bnd < h.r_en and pseudo_bnd - h.r_st > 100:
                             s = seq[s_start : s_start + (pseudo_bnd - h.r_st)]
                             q = qual[s_start : s_start + (pseudo_bnd - h.r_st)]
                             h = self._map(self._index, s)
@@ -954,9 +924,7 @@ class Sample:
             """Reverse CIGAR tuples for pysam/mappy compatibility."""
             return [(op, size) for (size, op) in c]
 
-        regs = self._get_gene_regions(
-            hit.r_st + self._seq_range[0] - 1, _rev_cigar(hit.cigar)
-        )
+        regs = self._get_gene_regions(hit.r_st + self._seq_range[0] - 1, _rev_cigar(hit.cigar))
         if regs:
             splits = []
             for fs, fn in self._fusion_signatures.items():
@@ -1041,7 +1009,7 @@ class Sample:
                     )
                 self.gene.mutations.setdefault(
                     (pos, op),
-                    (e, f"NOVEL:{pos+1}.{op}", pos, pos, op),
+                    (e, f"NOVEL:{pos + 1}.{op}", pos, pos, op),
                 )
                 self.gene.random_mutations.add(Mutation(pos, op))
                 ni += 1
@@ -1094,16 +1062,14 @@ def detect_genome(sam_path: str) -> tuple[str, str | None]:
             except AttributeError:
                 pass  # SAM files do not have an index. BAMs might also lack it
             except ValueError:
-                raise AldyException(
-                    f"File {sam_path} has no index (it must be indexed)"
-                )
+                raise AldyException(f"File {sam_path} has no index (it must be indexed)")
 
             #: str: Check if we need to append 'chr' or not
-            _prefix = chr_prefix("1", [x["SN"] for x in sam.header["SQ"]]) # type: ignore
+            _prefix = chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])  # type: ignore
             # Detect the genome
             hg19_lens = {"1": 249250621, "10": 135534747, "22": 51304566}
             hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
-            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]} # type: ignore
+            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}  # type: ignore
             is_hg19, is_hg38 = True, True
             for c in ["1", "10", "22"]:
                 if _prefix + c in chrs:

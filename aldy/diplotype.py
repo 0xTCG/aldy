@@ -97,9 +97,7 @@ def write_decomposition(
             print("\t".join(str(i) for i in it), file=f)
 
 
-def write_vcf(
-    sample: str, gene: Gene, coverage: Coverage, minors: list[MinorSolution], f
-):
+def write_vcf(sample: str, gene: Gene, coverage: Coverage, minors: list[MinorSolution], f):
     """
     Write an allelic decomposition in the VCF format to the given file.
 
@@ -139,14 +137,12 @@ def write_vcf(
         td(header).strip()
         + "\n"
         + "\t".join(
-            ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
-            + [sample]
+            ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"] + [sample]
         ),
         file=f,
     )
     records = [(m, Sample.mutation_to_vcf(gene, m)) for m in all_mutations]
     for m, (pos, ref, alt) in sorted(records, key=lambda r: (r[1][0], r[0])):
-
         fm = gene.get_functional(m)
         fm = fm.replace(" ", "_").replace("\t", "_").replace(";", "_") if fm else "none"
         info = [
@@ -159,18 +155,8 @@ def write_vcf(
             data.append(
                 {
                     "GT": "|".join(str(all_mutations[m][mi][i]) for i in range(nall)),
-                    "MA": "|".join(
-                        (
-                            f"*{minor.solution[i].major}"
-                        )
-                        for i in range(nall)
-                    ),
-                    "MI": "|".join(
-                        (
-                            f"*{minor.solution[i].minor}"
-                        )
-                        for i in range(nall)
-                    ),
+                    "MA": "|".join((f"*{minor.solution[i].major}") for i in range(nall)),
+                    "MI": "|".join((f"*{minor.solution[i].minor}") for i in range(nall)),
                 }
             )
         # Candidate solutions describe the same individual. Do not concatenate
@@ -190,8 +176,7 @@ def write_vcf(
             "MI": ",".join(d["MI"] or "." for d in data),
         }
         pattern = (
-            "{chrom}\t{pos}\t{id}\t{ref}\t{alt}\t{qual}\t{filter}\t{info}\t"
-            + "{format}\t{data}"
+            "{chrom}\t{pos}\t{id}\t{ref}\t{alt}\t{qual}\t{filter}\t{info}\t" + "{format}\t{data}"
         )
         print(
             pattern.format(
