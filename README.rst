@@ -54,7 +54,7 @@ Finally, note that the allele databases are still a work in progress and that we
 Installation
 ============
 
-Aldy is written in Python and requires Python 3.7+ to run.
+Aldy is written in Python and requires Python 3.9+ to run.
 It is intended to be run on POSIX-based systems
 (so far, only Linux and macOS have been tested).
 
@@ -102,11 +102,11 @@ the installation by issuing the following command (this should take a few minute
 
 In case everything is set up properly, you should see something like this::
 
-    🐿  Aldy v4.0 (Python 3.7.5 on macOS 12.4)
+    🐿  Aldy v4.0 (Python 3.9 on macOS 12.4)
         (c) 2016-2022 Aldy Authors. All rights reserved.
         Free for non-commercial/academic use only.
     ================================ test session starts ================================
-    platform darwin -- Python 3.7.5, pytest-5.3.1, py-1.8.0, pluggy-0.13.1
+    platform darwin -- Python 3.9, pytest-5.3.1, py-1.8.0, pluggy-0.13.1
     rootdir: aldy, inifile: setup.cfg
     plugins: anyio-3.6.1, xdist-1.31.0, cov-2.10.1, forked-1.1.3
     collected 76 items
