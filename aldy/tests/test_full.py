@@ -181,6 +181,18 @@ def test_NA10860_gap(monkeypatch, solver):
     8: 1x*4.021X, 1x*4J, 1x*39 (confidence: 100%)
     9: 1x*4.021X, 1x*4M, 1x*10 (confidence: 100%)
     10: 1x*4.021X2, 1x*4NX, 1x*74 (confidence: 100%)
+    11: 1x*1, 1x*4, 1x*4.021 (confidence: 76%)
+    12: 1x*4, 1x*4.021X2, 1x*74 (confidence: 76%)
+    13: 1x*4.021, 1x*4C, 1x*185 (confidence: 76%)
+    14: 1x*4.021, 1x*4J, 1x*39 (confidence: 76%)
+    15: 1x*4.021, 1x*4M, 1x*10 (confidence: 76%)
+    16: 2x*4, 1x*139 (confidence: 76%)
+    17: 1x*4, 1x*4.021X, 1x*61 (confidence: 74%)
+    18: 1x*4, 1x*4.021X, 1x*83X (confidence: 74%)
+    19: 1x*4.021, 1x*4NX, 1x*61 (confidence: 74%)
+    20: 1x*4.021, 1x*4NX, 1x*83X (confidence: 74%)
+    21: 1x*4.021X, 1x*4NX, 1x*39 (confidence: 74%)
+    22: 1x*4.021, 2x*61 (confidence: 25%)
     Potential CYP2D6 star-alleles for NA10860:
     1: *1 / *4 + *4.021X (confidence=100%)
         Minor alleles: *(1.018 +rs28371713), *(4.001 +rs111564371 +rs112568578 +rs113889384), *(4.021X -rs28371738)
@@ -208,7 +220,7 @@ def test_NA10860_gap(monkeypatch, solver):
         file,
         solver,
         expected,
-        {"--param": ["gap=0.3", "cn_gap=0.3"]},
+        {"--param": ["gap=0.1", "cn_gap=0.3"]},
     )
 
 
@@ -320,8 +332,11 @@ def test_fusion(monkeypatch, solver):
     2: 2x*1,1x*80 (confidence: 98%)
     Potential major CYP2D6 star-alleles for NA19785:
     1: 1x*1, 1x*2, 1x*79#2 (confidence: 100%)
-    2: 1x*2, 1x*34, 1x*79#10 (confidence: 100%)
-    3: 2x*2, 1x*79#1 (confidence: 100%)
+    2: 1x*1, 1x*2, 1x*80#2 (confidence: 100%)
+    3: 1x*2, 1x*34, 1x*79#10 (confidence: 100%)
+    4: 1x*2, 1x*34, 1x*80#10 (confidence: 100%)
+    5: 2x*2, 1x*79#1 (confidence: 100%)
+    6: 2x*2, 1x*80#1 (confidence: 100%)
     Potential CYP2D6 star-alleles for NA19785:
     1: *1 / *79 + *2 (confidence=100%)
         Minor alleles: *1, *2, *79#11
