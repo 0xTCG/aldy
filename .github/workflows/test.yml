@@ -27,13 +27,11 @@ jobs:
       run: |
         sudo apt-get install libgfortran5 samtools
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest pytest-cov codecov black
+        python -m pip install ruff pytest pytest-cov codecov
         python -m pip install setuptools wheel twine numpy cython
         python -m pip install .
-    - name: Format with black
-      run: black aldy
-    - name: Lint with flake8
-      run: flake8 aldy
+    - name: Format with ruff
+      run: ruff format aldy --exclude=aldy/indelpost && ruff check aldy --exclude=aldy/indelpost
     - name: Run Aldy tests
       run: |
         mkdir -p tmp

@@ -2,6 +2,7 @@ pyyaml
 logbook
 pysam
 pytest
+pytest-cov
 ortools
 natsort
 mappy
