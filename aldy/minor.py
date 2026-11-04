@@ -48,7 +48,6 @@ def estimate_minor(
 
     # Filter out low quality mutations
     def default_filter_fn(cov, mut, cn):
-        # TODO: is this necessary?
         r = gene.region_at(mut.pos)
         if mut.op != "_" and not (
             mut in mutations or (r and r[1][0] == "e") or (r and r[1] in ["utr3", "utr5", "up"])
@@ -61,25 +60,43 @@ def estimate_minor(
 
     quality_cov = coverage.filtered(Coverage.quality_filter)
 
+    cn_sols = sorted({m.cn_solution for m in major_sols}, key=lambda c: c._solution_nice())
+    cn_coverages = {
+        c: quality_cov.filtered(functools.partial(default_filter_fn, cn=c))  # type: ignore
+        for c in cn_sols
+    }
+    shared_mutations = mutations | {
+        m for m in gene.random_mutations if any(cov[m] > 0 for cov in cn_coverages.values())
+    }
+
+    phase_modes = _prepare_phase_modes(
+        list(cn_coverages.values()),
+        shared_mutations,
+        max_alleles=max(
+            # Check each major allele for all candidates and select same number (max)
+            # to prevent biased sampling
+            sum(
+                max(
+                    1,
+                    major.solution.get(SolvedAllele(gene, a.major, "", a.added, a.missing), 0),
+                )
+                for a in set(alleles)
+            )
+            for major in major_sols
+        ),
+    )
+
     # Group by CN solutions
     minor_sols: list[MinorSolution] = []
-    cn_sols = {m.cn_solution for m in major_sols}
     min_score = min(m.score for m in major_sols)
-    for c in sorted(cn_sols, key=lambda x: x._solution_nice()):
+    for c in cn_sols:
         log.debug("*" * 80)
-        cov = quality_cov.filtered(functools.partial(default_filter_fn, cn=c))  # type: ignore
-        cn_muts = mutations | {m for m in gene.random_mutations if cov[m] > 0}
+        cov = cn_coverages[c]
         majors = [m for m in major_sols if m.cn_solution == c]
-        _print_candidates(gene, alleles, c, cov, cn_muts)
+        _print_candidates(gene, alleles, c, cov, shared_mutations)
         for major_sol in natsorted(majors, key=lambda s: str(s.solution)):
             sols = solve_minor_model(
-                gene,
-                cov,
-                major_sol,
-                alleles,
-                cn_muts,
-                solver,
-                max_solutions,
+                gene, cov, major_sol, alleles, shared_mutations, solver, max_solutions, phase_modes
             )
             for s in sols:
                 s.score += major_sol.score - min_score
@@ -95,6 +112,7 @@ def solve_minor_model(
     mutations: set[Mutation],
     solver: str,
     max_solutions: int = 1,
+    phase_modes=None,
 ) -> list[MinorSolution]:
     """
     Solves the minor star-allele detection problem via integer linear programming.
@@ -336,32 +354,11 @@ def solve_minor_model(
     # 7) Respect phasing
     VPHASEERR = []
     VPHASE = {}
-    modes = collections.defaultdict(int)
-    if coverage.profile.phase and coverage.sam:
-        mut_pos = {m.pos for m in mutations}
-        for rr, rv in coverage.sam.phases.items():
-            c = []
-            for k, v in rv.items():
-                if k in mut_pos:
-                    c.append((k, v))
-            c = sorted(c)
-            if len(c) > 1:
-                modes[tuple(c)] += 1
-        log.debug("[minor] number of phases= {}", len(modes))
-        log.debug("[minor] number of alleles= {}", len(alleles))
-        if len(modes) * len(alleles) > coverage.profile.minor_phase_vars:
-            max_sample = len(modes) * (
-                coverage.profile.minor_phase_vars / (len(modes) * len(alleles))
-            )
-            log.debug("[minor] downsampling to= {}", max_sample)
-            skip = len(modes) / max_sample
-            if max_sample < len(modes):
-                mi = list(modes.items())
-                modes = dict(mi[i] for i in range(0, len(mi), int(skip)))
+    if coverage.profile.phase and coverage.sam and phase_modes:
         with Timing("[minor] Model setup"):
             addVar = lambda n: model.addVar(vtype="B", name=n, update=False)
             vars = 0
-            for ri, (rr, cnt) in enumerate(modes.items()):
+            for ri, (rr, cnt) in enumerate(phase_modes.items()):
                 r = dict(rr)
                 for ai, a in enumerate(alleles):
                     pos, neg, e = [], [], 0
@@ -386,7 +383,7 @@ def solve_minor_model(
                             vars += 1
                             e += v_vp
                         VPHASEERR.append(cnt * e)
-            for ri, _ in enumerate(modes):
+            for ri, _ in enumerate(phase_modes):
                 v = [VPHASE[ai, ri] for ai, _ in enumerate(alleles) if (ai, ri) in VPHASE]
                 if v:
                     e = model.quicksum(v)
@@ -445,7 +442,9 @@ def solve_minor_model(
 
                 if coverage.profile.phase and coverage.sam:
                     ai = next(i for i, a in enumerate(alleles) if allele == a)
-                    _print_phase(model, gene, mutations, modes, VPHASE, VKEEP, VNEW, allele, ai)
+                    _print_phase(
+                        model, gene, mutations, phase_modes, VPHASE, VKEEP, VNEW, allele, ai
+                    )
 
                 added: list[Mutation] = []
                 missing: list[Mutation] = []
@@ -586,3 +585,67 @@ def _print_phase(model, gene, mutations, modes, VPHASE, VKEEP, VNEW, allele, ai)
                 sm,
                 "; ".join(f"{o} ({n})" for o, n in p),
             )
+
+        # mut_pos = {m.pos for m in mutations}
+        # for rr, rv in coverage.sam.phases.items():
+        #     c = []
+        #     for k, v in rv.items():
+        #         if k in mut_pos:
+        #             c.append((k, v))
+        #     c = sorted(c)
+        #     if len(c) > 1:
+        #         modes[tuple(c)] += 1
+        # log.debug("[minor] number of phases= {}", len(modes))
+        # log.debug("[minor] number of alleles= {}", len(alleles))
+        # if len(modes) * len(alleles) > coverage.profile.minor_phase_vars:
+        #     max_sample = len(modes) * (
+        #         coverage.profile.minor_phase_vars / (len(modes) * len(alleles))
+        #     )
+        #     log.debug("[minor] downsampling to= {}", max_sample)
+        #     skip = len(modes) / max_sample
+        #     if max_sample < len(modes):
+        #         mi = list(modes.items())
+        #         modes = dict(mi[i] for i in range(0, len(mi), int(skip)))
+
+
+def _prepare_phase_modes(coverages, mutations, max_alleles):
+    """Prepare one shared set of supported phase patterns."""
+    import hashlib
+
+    coverage = coverages[0]
+    if not coverage.profile.phase or not coverage.sam:
+        return {}
+
+    positions = {m.pos for m in mutations}
+    counts = collections.Counter()
+    for fragment in coverage.sam.phases.values():
+        calls = []
+        for pos, op in fragment.items():
+            if pos not in positions:
+                continue
+            mut = Mutation(pos, op)
+            if op != "_" and mut not in mutations:
+                continue
+            if any(cov[mut] <= 0 for cov in coverages):
+                continue
+            calls.append((pos, op))
+        if len(pattern := sorted(calls)) > 1:
+            counts[tuple(pattern)] += 1
+
+    var_budget = coverage.profile.minor_phase_vars
+    log.debug("[minor] number of phases= {}", len(counts))
+    log.debug("[minor] maximum number of alleles= {}", max_alleles)
+    if len(counts) * max_alleles <= var_budget:
+        return dict(sorted(counts.items()))
+
+    # Sample once for all candidates, retaining at least one pattern
+    limit = max(1, var_budget // max_alleles)
+    log.debug("[minor] downsampling to= {}", limit)
+
+    # Stable selection independent of dictionary order and Python's hash()
+    def sampling_key(pattern):
+        digest = hashlib.blake2b(repr(pattern).encode("ascii"), digest_size=16).digest()
+        return digest, pattern
+
+    selected = sorted(counts, key=sampling_key)[:limit]
+    return {pattern: counts[pattern] for pattern in selected}
