@@ -145,9 +145,7 @@ def test_NA10860_debug(monkeypatch, solver):
             # Check logs
             with open(out_log.name) as f:
                 log = f.read()
-            s = "    rs1058172    42523528.C>T    3267G>A    "
-            s += "(cov=  17, cn= 0.8; region=e7; impact=R365H; )\n"
-            s = "[major] status= optimal; opt= 1.47; solution= 1x*1, 1x*4, 1x*4.021"
+            s = "[major] status= optimal; opt= 1.47; solution= 1x*1, 1x*4, 1x*4.021X\n"
             assert s in log
         out = subprocess.check_output(f"tar tzf {tmp.name}", shell=True).decode("utf-8")
         out = "\n".join(i.strip() for i in sorted(out.strip().split("\n")))
@@ -194,25 +192,25 @@ def test_NA10860_gap(monkeypatch, solver):
     21: 1x*4.021X, 1x*4NX, 1x*39 (confidence: 74%)
     22: 1x*4.021, 2x*61 (confidence: 25%)
     Potential CYP2D6 star-alleles for NA10860:
-    1: *1 / *4 + *4.021X (confidence=100%)
-        Minor alleles: *(1.018 +rs28371713), *(4.001 +rs111564371 +rs112568578 +rs113889384), *(4.021X -rs28371738)
-    2: *1 / *4.021 + *4NX (confidence=100%)
-        Minor alleles: *(1.018 +rs28371713), *(4.013X -rs28371738), *(4.021 +rs111564371 +rs112568578 +rs113889384)
+    1: *1 / *4.021 + *4NX (confidence=100%)
+        Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713), *(4.013X -rs28371738), *4.021
+    2: *1 / *4 + *4.021X (confidence=100%)
+        Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713), *4.001, *(4.021X -rs28371738)
     CYP2D6 results:
-    - *1 / *4 + *4.021X
-        Minor: [*1.018 +rs28371713] / [*4.001 +rs111564371 +rs112568578 +rs113889384] + [*4.021X -rs28371738]
-        Legacy notation: [*1.018 +rs28371713] / [*4A +rs111564371 +rs112568578 +rs113889384] + [*4.021X -rs28371738]
-        CPIC functionality: intermediate (activity score = 1.0)
-        Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
-        Estimated activity for *4: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2557 for details)
-        Estimated activity for *4.021X: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2566 for details)
     - *1 / *4.021 + *4NX
-        Minor: [*1.018 +rs28371713] / [*4.021 +rs111564371 +rs112568578 +rs113889384] + [*4.013X -rs28371738]
-        Legacy notation: [*1.018 +rs28371713] / [*4.021 +rs111564371 +rs112568578 +rs113889384] + [*4NX -rs28371738]
+        Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.013X -rs28371738]
+        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4NX -rs28371738]
         CPIC functionality: intermediate (activity score = 1.0)
         Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
         Estimated activity for *4.021: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2566 for details)
         Estimated activity for *4NX: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2559 for details)
+    - *1 / *4 + *4.021X
+        Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.001] + [*4.021X -rs28371738]
+        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4A] + [*4.021X -rs28371738]
+    CPIC functionality: intermediate (activity score = 1.0)
+    Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
+    Estimated activity for *4: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2557 for details)
+    Estimated activity for *4.021X: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2566 for details)
     """
     file = script_path("aldy.tests.resources/NA10860.bam")
     assert_file(

@@ -642,10 +642,21 @@ def _prepare_phase_modes(coverages, mutations, max_alleles):
     limit = max(1, var_budget // max_alleles)
     log.debug("[minor] downsampling to= {}", limit)
 
-    # Stable selection independent of dictionary order and Python's hash()
+    # Select by RefSeq coordinates so that different genome versions hash to same thing.
+    gene = coverage.gene
     def sampling_key(pattern):
-        digest = hashlib.blake2b(repr(pattern).encode("ascii"), digest_size=16).digest()
-        return digest, pattern
+        canonical = []
+        for pos, op in pattern:
+            mutation = gene.mutations.get((pos, op))
+            if mutation is not None:
+                # original_refseq_pos, original_refseq_op
+                canonical.append(mutation[3:5])
+            else:
+                ref_op = gene._reverse_op(op) if gene.strand < 0 else op
+                canonical.append((gene.chr_to_ref[pos], ref_op))
+        canonical = tuple(sorted(canonical))
+        digest = hashlib.blake2b(repr(canonical).encode("ascii"), digest_size=16).digest()
+        return digest, canonical
 
     selected = sorted(counts, key=sampling_key)[:limit]
     return {pattern: counts[pattern] for pattern in selected}
