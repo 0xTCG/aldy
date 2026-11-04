@@ -4,17 +4,15 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # noqa
 import collections
 
-from aldy.profile import Profile
-from aldy.sam import Sample
-from aldy.solutions import CNSolution, SolvedAllele, MajorSolution
+from aldy.common import SOLUTION_PRECISION, sorted_tuple
 from aldy.coverage import Coverage
 from aldy.gene import Mutation
 from aldy.minor import estimate_minor
-from aldy.common import SOLUTION_PRECISION, sorted_tuple
-
+from aldy.profile import Profile
+from aldy.sam import Sample
+from aldy.solutions import CNSolution, MajorSolution, SolvedAllele
 
 profile = Profile("test")
 
@@ -30,9 +28,7 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
     cov = Coverage(gene, profile, None, cov, None, {})
     if "phase" in data:
         cov.sam = Sample.__new__(Sample)
-        cov.sam.phases = {
-            r: {k: v for k, v in ph.items()} for r, ph in data["phase"].items()
-        }
+        cov.sam.phases = {r: {k: v for k, v in ph.items()} for r, ph in data["phase"].items()}
 
     if isinstance(data["major"], tuple):
         major = MajorSolution(
@@ -60,9 +56,7 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
 
     if not shallow:
         sols_expected = [
-            sorted_tuple(
-                (i[0], sorted_tuple(i[1]), sorted_tuple(i[2])) for i in data["sol"]
-            )
+            sorted_tuple((i[0], sorted_tuple(i[1]), sorted_tuple(i[2])) for i in data["sol"])
         ]
         sols_parsed = [
             sorted_tuple(
@@ -88,8 +82,8 @@ def assert_minor(gene, solver, data, shallow=False, skip_check=False):
         pall, pmiss, pnew = set(), set(), set()
         for i in sols[0].solution:
             pall.add(i.minor)
-            pmiss |= set((m.pos, m.op) for m in i.missing)
-            pnew |= set((m.pos, m.op) for m in i.added)
+            pmiss |= {(m.pos, m.op) for m in i.missing}
+            pnew |= {(m.pos, m.op) for m in i.added}
 
         assert eall == pall, "Alleles"
         assert emiss == pmiss, "Missing mutations"

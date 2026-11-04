@@ -4,15 +4,14 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, List, Tuple, Optional
-import pysam
 import os
 import os.path
+from collections import defaultdict
+
+import pysam
 import yaml
 
-from collections import defaultdict
-from natsort import natsorted
-from .common import log, GRange, AldyException, script_path, chr_prefix
+from .common import AldyException, GRange, chr_prefix, log, natsorted, script_path
 from .gene import Gene
 
 
@@ -31,11 +30,17 @@ class Profile:
 
         self.gap = 0.0
         """
-        Optimality gap. Non-zero values enable non-optimal solutions.
+        Major/minor solution gap. Non-zero values enable non-optimal solutions.
         Default: 0 (only optimal solutions)
         """
 
-        self.cn_solution = None
+        self.cn_gap = 0.05
+        """
+        Copy-number solution gap. Non-zero values enable non-optimal solutions.
+        Default: 0.1 (consider CN structures within 10% of the best CN score).
+        """
+
+        self.cn_solution: list[str] | None = None
         """
         User-specified copy-number configuration.
         Default: `None` (uses CN solver in :py:mod:`aldy.cn` for detection)
@@ -138,7 +143,7 @@ class Profile:
 
         self.major_novel = 21.0
         """
-        Penalty for novel functional mutation (0 for no penalty).
+        Penalty per distinct novel functional mutation (0 for no such penalty).
         Should be large enough to avoid calling novel mutations unless really necessary.
         Default: 21.0 (i.e., `max_cn + 1`)
         """
@@ -222,6 +227,8 @@ class Profile:
         self.update(kwargs)
 
     def update(self, kwargs):
+        # Support older profile files without this parameter
+        self.__dict__.setdefault("cn_gap", 0.1)
         params = {}
         for n, v in kwargs.items():
             if v is not None and n in self.__dict__:
@@ -273,9 +280,7 @@ class Profile:
                 with open(profile) as f:
                     prof = yaml.safe_load(f)
         else:
-            profile_path = script_path(
-                "aldy.resources.profiles/{}.yml".format(profile.lower())
-            )
+            profile_path = script_path(f"aldy.resources.profiles/{profile.lower()}.yml")
             with open(profile_path) as f:
                 prof = yaml.safe_load(f)
         if not prof:
@@ -304,12 +309,12 @@ class Profile:
     @staticmethod
     def get_sam_profile_data(
         sam_path: str,
-        ref_path: Optional[str] = None,
-        regions: Dict[Tuple[str, str, int], GRange] = dict(),
-        cn_region: Optional[GRange] = None,
-        genome: Optional[str] = "hg19",
-        params: Dict = dict(),
-    ) -> Dict[str, Dict[str, List[float]]]:
+        ref_path: str | None = None,
+        regions: dict[tuple[str, str, int], GRange] | None = None,
+        cn_region: GRange | None = None,
+        genome: str | None = "hg19",
+        params: dict | None = None,
+    ) -> dict[str, dict[str, list[float]]]:
         """
         Load the profile information from a SAM/BAM/CRAM file.
 
@@ -327,6 +332,8 @@ class Profile:
                 3. Illumina: by definition contains all ones (uniform coverage).
         """
 
+        if regions is None:
+            regions = {}
         if not genome:
             genome = "hg19"
         if len(regions) == 0:
@@ -334,7 +341,7 @@ class Profile:
 
             gene_regions = {}
             for g in sorted(
-                importlib_resources.files("aldy.resources.genes").iterdir()
+                importlib_resources.files("aldy.resources.genes").iterdir()  # type: ignore
             ):
                 if g.suffix != ".yml":
                     continue
@@ -358,7 +365,7 @@ class Profile:
             cn_region if cn_region else default_cn_neutral_region[genome]
         )
 
-        chr_regions: Dict[str, Tuple[int, int]] = {}
+        chr_regions: dict[str, tuple[int, int]] = {}
         for c, s, e in gene_regions.values():
             if c not in chr_regions:
                 chr_regions[c] = (s, e)
@@ -375,7 +382,7 @@ class Profile:
                 region = GRange(c, s, e).samtools(
                     pad_left=1000,
                     pad_right=1000,
-                    prefix=chr_prefix(c, [x["SN"] for x in sam.header["SQ"]]),
+                    prefix=chr_prefix(c, [x["SN"] for x in sam.header["SQ"]]),  # type: ignore
                 )
                 log.info("Scanning {}...", region)
                 try:
@@ -389,9 +396,7 @@ class Profile:
                                 for i in range(size):
                                     cov[c][start + i] += 1
                                 start += size
-                            elif op == 1:
-                                s_start += size
-                            elif op == 4:
+                            elif op == 1 or op == 4:
                                 s_start += size
                             elif op in [0, 7, 8]:
                                 for i in range(size):
@@ -401,7 +406,7 @@ class Profile:
                 except ValueError:
                     log.warn("Cannot fetch {}", region)
 
-        d: Dict = {}
+        d: dict = {}
         for (g, r, ri), (c, s, e) in gene_regions.items():
             if g not in d:
                 d[g] = {}

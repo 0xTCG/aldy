@@ -4,10 +4,10 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-import pytest  # noqa
 import collections
 
 from aldy.profile import Profile
+
 from .test_minor_synthetic import assert_minor
 
 
@@ -271,9 +271,9 @@ def test_deletion(real_gene, solver):  # HG00276/v1
 
 
 def test_comparison(real_gene, solver):  # NA10846/v1
-    from aldy.solutions import CNSolution, SolvedAllele, MajorSolution
     from aldy.coverage import Coverage
     from aldy.minor import estimate_minor
+    from aldy.solutions import CNSolution, MajorSolution, SolvedAllele
 
     data = {
         (42522391, "G>A"): 286,
@@ -444,9 +444,7 @@ def test_comparison(real_gene, solver):  # NA10846/v1
     majors = [
         MajorSolution(
             0,
-            collections.defaultdict(
-                int, {SolvedAllele(real_gene, m): c for m, c in major.items()}
-            ),
+            collections.defaultdict(int, {SolvedAllele(real_gene, m): c for m, c in major.items()}),
             cn_sol,
             [],
         )
@@ -470,8 +468,8 @@ def test_comparison(real_gene, solver):  # NA10846/v1
         pall, pmiss, pnew = set(), set(), set()
         for i in sol.solution:
             pall.add(i.minor)
-            pmiss |= set((m.pos, m.op) for m in i.missing)
-            pnew |= set((m.pos, m.op) for m in i.added)
+            pmiss |= {(m.pos, m.op) for m in i.missing}
+            pnew |= {(m.pos, m.op) for m in i.added}
 
         assert eall == pall, "Alleles"
         assert emiss == pmiss, "Missing mutations"

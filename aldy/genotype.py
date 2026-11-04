@@ -4,49 +4,45 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Optional, Any, Set, Dict
+import datetime
 import os
 import sys
-import importlib_resources
-import datetime
 import time
+from typing import Any
 
-from . import sam
-from . import cn
-from . import major
-from . import minor
-from . import diplotype
-from . import solutions
+import importlib_resources
+
+from . import cn, diplotype, major, minor, sam, solutions
 from .common import (
+    SOLUTION_PRECISION,
+    AldyException,
     colorize,
+    json,
     log,
     script_path,
-    json,
-    AldyException,
-    SOLUTION_PRECISION,
 )
-from .profile import Profile
-from .gene import Gene, GRange
 from .diplotype import OUTPUT_COLS
+from .gene import Gene, GRange
 from .lpinterface import model as lp_model
+from .profile import Profile
 
 
 def genotype(
     gene_db: str,
     sam_path: str,
-    profile_name: Optional[str],
-    output_file: Optional[Any] = sys.stdout,
-    cn_region: Optional[GRange] = None,
-    cn_solution: Optional[List[str]] = None,
+    profile_name: str | None,
+    output_file: Any | None = sys.stdout,
+    cn_region: GRange | None = None,
+    cn_solution: list[str] | None = None,
     solver: str = "any",
-    reference: Optional[str] = None,
-    debug: Optional[str] = None,
+    reference: str | None = None,
+    debug: str | None = None,
     multiple_warn_level: int = 1,
     report: bool = False,
     genome=None,
     is_simple: bool = False,
     **params,
-) -> Dict[str, List[solutions.MinorSolution]]:
+) -> dict[str, list[solutions.MinorSolution]]:
     """Genotype a sample.
 
     :param gene_db: Gene name (if it is shipped with Aldy)
@@ -79,7 +75,7 @@ def genotype(
     """
 
     t1 = time.time()
-    log.debug("[genotype] gene={}; start={}", gene_db, datetime.datetime.now())
+    log.debug("[genotype] gene={}; start={}", gene_db, datetime.datetime.now().astimezone())
 
     # Test the existence of LP solver
     _ = lp_model("init", solver)
@@ -108,7 +104,7 @@ def genotype(
     else:
         avail_genes = gene_db.lower().split(",")
     if len(avail_genes) != 1:
-        res: Dict = {}
+        res = {}
         for a in avail_genes:
             log.warn("=" * 50)
             log.warn("Gene {}", a.upper())
@@ -134,13 +130,11 @@ def genotype(
                 }
             except AldyException as ex:
                 log.error(f"Failed gene {a.upper()}")
-                log.error(f"Message: {str(ex)}")
+                log.error(f"Message: {ex!s}")
             log.warn("")
         return res
     else:
-        db_file = script_path(
-            "aldy.resources.genes/{}.yml".format(avail_genes[0].lower())
-        )
+        db_file = script_path(f"aldy.resources.genes/{avail_genes[0].lower()}.yml")
 
     # Load the gene specification
     if os.path.exists(db_file):
@@ -167,7 +161,7 @@ def genotype(
         profile = Profile("user_provided", cn_solution=["1", "1"], **params)
         sample = sam.Sample(gene, profile, sam_path, debug=debug)
     else:
-        if cn_solution and cn_solution != ['auto']:
+        if cn_solution and cn_solution != ["auto"]:
             profile = Profile("user_provided", cn_solution=cn_solution, **params)
         elif kind != "dump":
             if not profile_name:
@@ -185,9 +179,7 @@ def genotype(
 
     json[gene.name].update({"sample": sample.name})
     is_vcf = output_file and output_file.name.endswith(".vcf")
-    is_simple = is_simple or (
-        output_file is not None and output_file.name.endswith(".simple")
-    )
+    is_simple = is_simple or (output_file is not None and output_file.name.endswith(".simple"))
     is_aldy = output_file and not (is_vcf or is_simple)
     if is_simple:
         print(
@@ -244,8 +236,6 @@ def genotype(
         log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
 
-    # return []
-
     for i, cn_sol in enumerate(cn_sols):
         sols = major.estimate_major(
             gene,
@@ -255,8 +245,6 @@ def genotype(
             identifier=i,
             debug=debug,
         )
-        for s in sols:
-            s.score += cn_sol.score - min_cn_score
         major_sols += sols
     if len(major_sols) == 0:
         if is_simple:
@@ -265,7 +253,7 @@ def genotype(
 
     major_sols = [
         solutions.MajorSolution(
-            m.score,  # * ((m.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
+            m.score,
             m.solution,
             m.cn_solution,
             m.added,
@@ -274,11 +262,7 @@ def genotype(
     ]
     min_major_score = min(major_sols, key=lambda m: m.score).score
     major_sols = sorted(
-        [
-            m
-            for m in major_sols
-            if m.score - min_major_score - profile.gap < SOLUTION_PRECISION
-        ],
+        major_sols,
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )
 
@@ -298,9 +282,14 @@ def genotype(
         solver,
         max_solutions=profile.max_minor_solutions,
     ):
+        score = m.score
+        score += 100 * max(0, m.major_solution.cn_solution.score - min_cn_score)
+        if novel_count := len(m.major_solution.added):
+            # Port novelty score from major solution to the final solution
+            score += (profile.major_novel if novel_count else 0.0) + 0.1 * novel_count
+
         n = solutions.MinorSolution(
-            m.score
-            * ((m.major_solution.cn_solution.score + SLACK) / (min_cn_score + SLACK)),
+            score,
             m.solution,
             m.major_solution,
             profile=profile,
@@ -323,7 +312,7 @@ def genotype(
         [
             m
             for m in minor_sols
-            if m.score - min_minor_score - profile.gap < SOLUTION_PRECISION
+            if m.score - min_minor_score * (profile.gap + 1.0) < SOLUTION_PRECISION
         ],
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )
@@ -340,10 +329,7 @@ def genotype(
     simple = [sample.name, gene.name]
     for i, minor_sol in enumerate(minor_sols):
         conf = 100 * (min_minor_score + SLACK) / (minor_sol.score + SLACK)
-        log.info(
-            f"  {i + 1:2}: {minor_sol.get_major_diplotype()}"
-            + f" (confidence={conf:.0f}%)"
-        )
+        log.info(f"  {i + 1:2}: {minor_sol.get_major_diplotype()} (confidence={conf:.0f}%)")
         log.info(f"      Minor alleles: {minor_sol._solution_nice()}")
         simple += [
             minor_sol.get_major_diplotype().replace(" ", ""),
@@ -373,7 +359,7 @@ def genotype(
 
     if report:
         log.info(colorize(f"{gene.name} results:"))
-        reported: Set[str] = set()
+        reported: set[str] = set()
         for r in minor_sols:
             st = f"  - {r.get_major_diplotype()}"
             if st not in reported:
@@ -390,9 +376,7 @@ def genotype(
                 # Output the activity
                 for m in r.solution:
                     mn = [
-                        ma.minors[m.minor]
-                        for ma in gene.alleles.values()
-                        if m.minor in ma.minors
+                        ma.minors[m.minor] for ma in gene.alleles.values() if m.minor in ma.minors
                     ]
                     msg = f"Estimated activity for {m.major_repr()}"
                     if len(mn) == 1 and mn[0].activity:
@@ -418,13 +402,8 @@ def genotype(
                                 sc,
                             )
 
-    if (
-        any(len(m.major_solution.added) > 0 for m in minor_sols)
-        and not sample.is_long_read
-    ):
-        novels = {
-            gene.get_rsid(mm) for m in minor_sols for mm in m.major_solution.added
-        }
+    if any(len(m.major_solution.added) > 0 for m in minor_sols) and not sample.is_long_read:
+        novels = {gene.get_rsid(mm) for m in minor_sols for mm in m.major_solution.added}
         log.warn(
             "WARNING: mutations {} suggest presence of a novel major star-allele.\n"
             "However, exact allele contents cannot be determined without the "

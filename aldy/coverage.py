@@ -4,12 +4,13 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Dict, Tuple, Callable, List, Any, Optional
 import copy
+from collections.abc import Callable
+from typing import Any
 
+from .common import AldyException, log
+from .gene import Gene, Mutation
 from .profile import Profile
-from .common import log, AldyException
-from .gene import Mutation, Gene
 from .solutions import CNSolution
 
 
@@ -21,9 +22,9 @@ class Coverage:
         gene: Gene,
         profile: Profile,
         sam,
-        coverage: Dict[int, Dict[str, List]],
-        indel_coverage: Optional[Dict],
-        cnv_coverage: Dict[int, int],
+        coverage: dict[int, dict[str, list]],
+        indel_coverage: dict | None,
+        cnv_coverage: dict[int, int],
     ) -> None:
         """
         :param gene: Gene instance.
@@ -54,7 +55,7 @@ class Coverage:
         else:
             self._indels = None
         self._cnv_coverage = cnv_coverage
-        self._region_coverage: Dict[Tuple[int, str], float] = {}
+        self._region_coverage: dict[tuple[int, str], float] = {}
 
     def __getitem__(self, mut: Mutation) -> float:
         """:returns: Mutation coverage."""
@@ -80,9 +81,7 @@ class Coverage:
             pos = m
         if pos not in self._coverage:
             return 0
-        return float(
-            sum(len(v) for p, v in self._coverage[pos].items() if p[:3] != "ins")
-        )
+        return float(sum(len(v) for p, v in self._coverage[pos].items() if p[:3] != "ins"))
 
     def percentage(self, m: Mutation) -> float:
         """:returns: Mutation coverage expressed as percentage (0-100%)."""
@@ -112,9 +111,7 @@ class Coverage:
 
     def average_coverage(self) -> float:
         """:returns: Average coverage of the gene."""
-        return sum(self.total(pos) for pos in self._coverage) / float(
-            len(self._coverage) + 0.1
-        )
+        return sum(self.total(pos) for pos in self._coverage) / float(len(self._coverage) + 0.1)
 
     def dump(self, out=None):
         """Pretty-print the coverage data."""
@@ -140,7 +137,7 @@ class Coverage:
                         f"{self.gene.chr_to_ref.get(pos, -1) + 1}\t{op}\t{p:.1f}\t{t}"
                     )
 
-    def filtered(self, filter_fn: Callable[[Any, Mutation], List]):
+    def filtered(self, filter_fn: Callable[[Any, Mutation], list]):
         """
         :param filter_fn: Function that performs mutation filtering with the following
             arguments:
@@ -218,12 +215,9 @@ class Coverage:
         sz = self.coverage(mut)
         return sz >= min_cov
 
-    def quality_filter(self, mut: Mutation) -> List:
+    def quality_filter(self, mut: Mutation) -> list:
         """Basic quality filter."""
         quals = self._coverage.get(mut.pos, {}).get(mut.op, [])
         return [
-            (m, q)
-            for m, q in quals
-            if q >= self.profile.min_quality
-            if m >= self.profile.min_mapq
+            (m, q) for m, q in quals if q >= self.profile.min_quality if m >= self.profile.min_mapq
         ]

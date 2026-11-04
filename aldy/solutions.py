@@ -4,11 +4,10 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import List, Dict
-from dataclasses import dataclass, field
-from natsort import natsorted
 from collections import Counter, defaultdict
+from dataclasses import dataclass, field
 
+from .common import natsorted
 from .gene import Gene, Mutation
 from .profile import Profile
 
@@ -21,18 +20,16 @@ class CNSolution:
     """Gene instance."""
     score: float
     """ILP model objective score (0 for user-provided solutions)."""
-    solution: Dict[str, int]
+    solution: dict[str, int]
     """
     Copy-number configurations mapped to the corresponding copy number
     (e.g. `{1: 2}` means that there are two copies of `*1` configuration).
     """
-    region_cn: List[Dict[str, int]]
+    region_cn: list[dict[str, int]]
     """Gene region copy numbers inferred by this solution."""
 
-    def __init__(self, gene: Gene, score: float, solution: List[str]):
-        self.region_cn = [
-            {r: 0 for r in gene.regions[0]} for _ in gene.cn_configs["1"].cn
-        ]
+    def __init__(self, gene: Gene, score: float, solution: list[str]):
+        self.region_cn = [{r: 0 for r in gene.regions[0]} for _ in gene.cn_configs["1"].cn]
         for conf in solution:
             for gi, g in enumerate(gene.cn_configs[conf].cn):
                 for r in g:
@@ -77,9 +74,9 @@ class SolvedAllele:
     """Major star-allele identifier."""
     minor: str = ""
     """Minor star-allele identifier. Empty string when unknown."""
-    added: List[Mutation] = field(default_factory=list)
+    added: list[Mutation] = field(default_factory=list)
     """Mutations that are added to the star-allele (from the allele database)."""
-    missing: List[Mutation] = field(default_factory=list)
+    missing: list[Mutation] = field(default_factory=list)
     """
     Mutations that are omitted from the star-allele (but present in the star-allele
     definition).
@@ -96,9 +93,7 @@ class SolvedAllele:
 
     def major_repr(self):
         """Pretty-formats major star-allele name."""
-        extra = "".join(
-            " +" + self.gene.get_rsid(m) for m in self.extra_functionality()
-        )
+        extra = "".join(" +" + self.gene.get_rsid(m) for m in self.extra_functionality())
         s = f"{self.major}{extra}"
         return f"*({s})" if extra else f"*{s}"
 
@@ -110,15 +105,10 @@ class SolvedAllele:
         return f"*({s})" if extra or miss else f"*{s}"
 
     def __hash__(self):
-        return hash(
-            (self.gene.name, self.major, self.minor, *self.added, *self.missing)
-        )
+        return hash((self.gene.name, self.major, self.minor, *self.added, *self.missing))
 
     def extra_functionality(self):
-        return [
-            m
-            for m in sorted(m for m in self.added if self.gene.is_functional(m, False))
-        ]
+        return [m for m in sorted(m for m in self.added if self.gene.is_functional(m, False))]
 
 
 @dataclass
@@ -127,14 +117,14 @@ class MajorSolution:
 
     score: float
     """ILP model objective score."""
-    solution: Dict[SolvedAllele, int]
+    solution: dict[SolvedAllele, int]
     """
     Major star-alleles and the corresponding copy numbers
     (e.g. `{1: 2}` means that we have two copies of `*1`).
     """
     cn_solution: CNSolution
     """Copy-number solution that was used to assign major star-alleles."""
-    added: List[Mutation]
+    added: list[Mutation]
     """
     List of added mutations. Will be assigned to :py:class:`SolvedAllele` in the
     minor star-allele calling step if phasing is enabled.
@@ -142,8 +132,7 @@ class MajorSolution:
 
     def _solution_nice(self):
         x = ", ".join(
-            f"{v}x{s}"
-            for s, v in natsorted(self.solution.items(), key=lambda x: x[0].major)
+            f"{v}x{s}" for s, v in natsorted(self.solution.items(), key=lambda x: x[0].major)
         )
         y = ", ".join(self.cn_solution.gene.get_rsid(m) for m in sorted(self.added))
         return " & ".join([x, y] if y else [x])
@@ -165,20 +154,18 @@ class MinorSolution:
 
     score: float
     """ILP model objective score."""
-    solution: List[SolvedAllele]
+    solution: list[SolvedAllele]
     """
     List of solved minor star-alleles.
     Modifications to minor alleles are represented in :py:class:`SolvedAllele`.
     """
     major_solution: MajorSolution
     """Major star-allele solution used for calculating minor star-allele assignments."""
-    profile: Profile = None
+    profile: Profile | None = None
     """Profile."""
 
     def _solution_nice(self):
-        return ", ".join(
-            str(s) for s in natsorted(self.solution, key=lambda x: x.minor)
-        )
+        return ", ".join(str(s) for s in natsorted(self.solution, key=lambda x: x.minor))
 
     def __str__(self):
         return (
@@ -209,9 +196,7 @@ class MinorSolution:
                 return rsid
             effect = gene.mutations[m][0]
             al = [
-                an
-                for an, a in gene.alleles.items()
-                if m in a.func_muts and len(a.func_muts) == 1
+                an for an, a in gene.alleles.items() if m in a.func_muts and len(a.func_muts) == 1
             ]
             if al:
                 return f"{al[0]}.{rsid}"
@@ -246,9 +231,7 @@ class MinorSolution:
 
     def get_major_diplotype(self):
         return " / ".join(
-            " + ".join(f"*{self.get_major_name(i)}" for i in d)
-            for d in self.diplotype
-            if d
+            " + ".join(f"*{self.get_major_name(i)}" for i in d) for d in self.diplotype if d
         )
 
     def get_minor_diplotype(self, legacy=False):

@@ -8,7 +8,7 @@
    <img src="https://github.com/0xTCG/aldy/workflows/aldy-test/badge.svg" alt="CI Status"/>
    <a href="https://aldy.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/aldy/badge/?version=latest" alt="ReadTheDocs"/></a>
    <a href="https://codecov.io/github/0xTCG/aldy"><img src="https://codecov.io/github/0xTCG/aldy/coverage.svg?branch=master" alt="Code Coverage"/></a>
-   <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black"/></a>
+   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff" style="max-width:100%;"></a>
    <br/>
    <a href="https://www.nature.com/articles/s41467-018-03273-1"><img src="https://img.shields.io/badge/Published%20in-Nature%20Communications-red.svg" alt="Published in Nature Communications" /></a>
    <a href="https://genome.cshlp.org/content/33/1/61.full"><img src="https://img.shields.io/badge/Published%20in-Genome%20Research-purple.svg" alt="Published in Genome Research" /></a>
@@ -54,7 +54,7 @@ Finally, note that the allele databases are still a work in progress and that we
 Installation
 ============
 
-Aldy is written in Python and requires Python 3.7+ to run.
+Aldy is written in Python and requires Python 3.10+ to run.
 It is intended to be run on POSIX-based systems
 (so far, only Linux and macOS have been tested).
 
@@ -102,11 +102,11 @@ the installation by issuing the following command (this should take a few minute
 
 In case everything is set up properly, you should see something like this::
 
-    🐿  Aldy v4.0 (Python 3.7.5 on macOS 12.4)
+    🐿  Aldy v4.0 (Python 3.10 on macOS 12.4)
         (c) 2016-2022 Aldy Authors. All rights reserved.
         Free for non-commercial/academic use only.
     ================================ test session starts ================================
-    platform darwin -- Python 3.7.5, pytest-5.3.1, py-1.8.0, pluggy-0.13.1
+    platform darwin -- Python 3.10, pytest-5.3.1, py-1.8.0, pluggy-0.13.1
     rootdir: aldy, inifile: setup.cfg
     plugins: anyio-3.6.1, xdist-1.31.0, cov-2.10.1, forked-1.1.3
     collected 76 items
@@ -248,6 +248,9 @@ This indicates the presence of a novel star-allele that has not been cataloged y
 
 By default, Aldy only reports solutions with the maximum confidence.
 Use `--param gap=XY` (where `XY` is greater than 0) to report less likely solutions.
+The copy-number search has a separate ``cn_gap`` parameter, with the default value of
+``0.1``.
+Use ``--param cn_gap=0`` to restrict this search to optimal CN structures.
 
 Explicit decomposition is given in the ``file-[gene].aldy``
 (in the example above, it is ``NA19788_x.CYP2D6.aldy``).
@@ -299,8 +302,23 @@ VCF support
 -----------
 
 The output will be a VCF file if the output file extension is ``.vcf``.
-Aldy will report a VCF sample for each potential solution and the appropriate genotypes.
-Aldy will also output tags ``MA`` and ``MI`` for major and minor solutions.
+Aldy reports one VCF sample column for the input sample. ``GT`` contains the
+unphased genotype shared by all potential solutions, or a missing genotype when
+the solutions disagree on allele dosage or copy number. A pipe in VCF ``GT``
+denotes phased allele copies, not alternative solutions.
+
+The FORMAT tags ``CGT``, ``MA`` and ``MI`` preserve candidate genotypes and major
+and minor star-allele calls, respectively. These are comma-separated lists in
+the same solution order. Within each candidate, pipes separate inferred gene
+copies; this copy order does not establish a phase. ``MA`` and ``MI`` report all
+copies in each candidate, including copies without the record's variant. For example,
+``CGT=0|1,1|1`` represents two candidate diploid solutions and has ``GT=./.``.
+Insertions and deletions include the required reference padding base, and
+``POS`` identifies the first base in ``REF``. Indels in repeats are left-aligned;
+VCF input maps equivalent indels back to their star-allele database coordinates.
+Aldy warns when the selected sample has no usable VCF calls or reference
+coverage overlapping the requested gene. In that case, a wild-type call cannot
+be confirmed from the VCF.
 
   **Note:** VCF is not an optimal format for star-allele reporting. Unless you really need it,
   we recommend using Aldy's default format.
