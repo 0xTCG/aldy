@@ -11,6 +11,7 @@ import time
 from typing import Any
 
 import importlib_resources
+import logbook
 
 from . import cn, diplotype, major, minor, sam, solutions
 from .common import (
@@ -173,6 +174,9 @@ def genotype(
             profile = None
         sample = sam.Sample(gene, profile, sam_path, reference, debug)
     profile = sample.profile  # if loaded for a dump
+    if kind == "dump" and cn_solution:
+        assert profile
+        profile.cn_solution = cn_solution
     assert profile, "Profile not set"
     if kind == "dump":
         profile.update(params)
@@ -206,6 +210,7 @@ def genotype(
             )
 
     # Get copy-number solutions
+    profile.cn_gap = max(profile.gap, profile.cn_gap)
     cn_sols = cn.estimate_cn(
         gene,
         profile,
@@ -225,15 +230,25 @@ def genotype(
         log.warn("WARNING: multiple gene structures found!")
     log.info(f"Potential {gene.name} gene structures for {sample.name}:")
     major_sols: list = []
-    cn_sols = sorted(cn_sols, key=lambda m: (int(1000 * m.score), m._solution_nice()))
     if len(cn_sols) == 0:
         if is_simple:
             print(file=output_file)
         raise AldyException("No solutions found!")
     min_cn_score = min(cn_sols, key=lambda m: m.score).score
+    cn_sols = sorted(
+        [m for m in cn_sols
+         if (m.score - min_cn_score) / min_cn_score <= profile.cn_gap + SOLUTION_PRECISION
+         ],
+        key=lambda m: (int(1000 * m.score), m._solution_nice()),
+    )
     for i, cn_sol in enumerate(cn_sols):
         conf = 100 * (min_cn_score + SLACK) / (cn_sol.score + SLACK)
-        log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
+        if log.level <= logbook.DEBUG:
+            log.info(
+                f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}% = {cn_sol.score:.2f})"
+            )
+        else:
+            log.info(f"  {i + 1:2}: {cn_sol._solution_nice()} (confidence: {conf:.0f}%)")
     log.debug("*" * 80)
 
     for i, cn_sol in enumerate(cn_sols):
@@ -262,7 +277,9 @@ def genotype(
     ]
     min_major_score = min(major_sols, key=lambda m: m.score).score
     major_sols = sorted(
-        major_sols,
+        [m for m in major_sols
+         if (m.score - min_major_score) / min_major_score <= profile.gap + SOLUTION_PRECISION
+         ],
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )
 
@@ -271,7 +288,13 @@ def genotype(
     log.info(f"Potential major {gene.name} star-alleles for {sample.name}:")
     for i, major_sol in enumerate(major_sols):
         conf = 100 * (min_major_score + SLACK) / (major_sol.score + SLACK)
-        log.info(f"  {i + 1:2}: {major_sol._solution_nice()} (confidence: {conf:.0f}%)")
+        if log.level <= logbook.DEBUG:
+            log.info(
+                f"  {i + 1:2}: {major_sol._solution_nice()} (confidence: {conf:.0f}% = {major_sol.score:.2f})"
+                f" / {major_sol.cn_solution._solution_nice()}"
+            )
+        else:
+            log.info(f"  {i + 1:2}: {major_sol._solution_nice()} (confidence: {conf:.0f}%")
     log.debug("*" * 80)
 
     minor_sols = []
@@ -312,7 +335,7 @@ def genotype(
         [
             m
             for m in minor_sols
-            if m.score - min_minor_score * (profile.gap + 1.0) < SOLUTION_PRECISION
+            if (m.score - min_minor_score) / min_minor_score <= profile.gap + SOLUTION_PRECISION
         ],
         key=lambda m: (int(1000 * m.score), m._solution_nice()),
     )

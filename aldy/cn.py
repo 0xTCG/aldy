@@ -226,18 +226,30 @@ def solve_cn_model(
 
     # Objective component 3: minimize the total number of present alleles
     #                        (maximum parsimony)
-    PARSIMONY_PENALTY = 10.0 / len(gene.unique_regions)
-    PARSIMONY_PENALTY *= 0.75
-    penalty = {s: PARSIMONY_PENALTY for s, _ in VCN}
+    PARSIMONY_PENALTY = 7.5 / len(gene.unique_regions)
+    penalty = {s: 0.0 for s, _ in VCN}
+    ref_weight = sum(
+        sum(i for n, i in g.items() if n in gene.unique_regions) for g in gene.cn_configs["1"].cn
+    )
     # Also penalize the left fusions as they are less likely
     for n, sv in gene.cn_configs.items():
-        if n in penalty and sv.kind == CNConfigType.RIGHT_FUSION:
-            penalty[n] += PARSIMONY_PENALTY * profile.cn_fusion_right
-        if n in penalty and sv.kind == CNConfigType.LEFT_FUSION:
-            penalty[n] += PARSIMONY_PENALTY * profile.cn_fusion_left
-    o_pars = profile.cn_parsimony * model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
+        if sv.kind in (CNConfigType.RIGHT_FUSION, CNConfigType.LEFT_FUSION):
+            if n not in penalty:
+                continue
+            # How many region does this CN covers?
+            cn_weight = (
+                sum(sum(i for n, i in g.items() if n in gene.unique_regions) for g in sv.cn)
+                / ref_weight
+            )
+            if sv.kind == CNConfigType.RIGHT_FUSION:
+                cn_weight = profile.cn_fusion_right * cn_weight
+            else:
+                cn_weight = profile.cn_fusion_left * cn_weight
+            penalty[n] = PARSIMONY_PENALTY * cn_weight
+    o_pars = profile.cn_parsimony * model.quicksum(PARSIMONY_PENALTY * v for _, v in VCN.items())
+    o_extrapars = profile.cn_parsimony * model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
 
-    model.setObjective(o_diff + o_fit + o_pars)
+    model.setObjective(o_diff + o_fit + o_pars + o_extrapars)
     if debug:
         model.dump(f"{debug}.{gene.name}.cn.lp")
 
@@ -247,14 +259,15 @@ def solve_cn_model(
     for status, opt, sol in model.solutions(profile.cn_gap):
         sol_tuple = sorted_tuple(lookup[v] for v in sol if lookup[v] not in [del_allele, "PSEUDO"])
         if sol_tuple not in result:
-            result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
+            pars = model.getValue(o_pars)
+            result[sol_tuple] = CNSolution(gene, opt - pars, list(sol_tuple))
             log.debug(
                 f"[cn] status= {status}; opt= {opt:.2f} "
                 + "(diff= {:.2f}, fit= {:.2f}, pars= {:.2f}) "
                 + f"solution= {result[sol_tuple]}",
                 model.getValue(o_diff),
                 model.getValue(o_fit),
-                model.getValue(o_pars),
+                model.getValue(o_extrapars) + pars,
             )
     if not result:
         log.debug("[cn] solution= []")

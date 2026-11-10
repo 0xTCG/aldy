@@ -138,6 +138,8 @@ def main(argv):
         log.critical(repr(ex))
         log.warn(traceback.format_exc())
         sys.exit(1)
+    except KeyboardInterrupt:
+        pass
     except:  # noqa
         gene = "" if "gene" not in args else f"gene= {args.gene}, "
         exc = sys.exc_info()[0]

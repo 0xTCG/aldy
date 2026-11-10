@@ -34,7 +34,7 @@ class Profile:
         Default: 0 (only optimal solutions)
         """
 
-        self.cn_gap = 0.05
+        self.cn_gap = 0.1
         """
         Copy-number solution gap. Non-zero values enable non-optimal solutions.
         Default: 0.1 (consider CN structures within 10% of the best CN score).
