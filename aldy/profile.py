@@ -129,6 +129,12 @@ class Profile:
         Default: 0.5
         """
 
+        self.clash_penalty = 0.5
+        """
+        Penalty for complementary fusion structures that clash.
+        Default: 0.5
+        """
+
         self.cn_fusion_left = 0.5
         """
         Extra penalty for the left fusions.
@@ -229,6 +235,7 @@ class Profile:
     def update(self, kwargs):
         # Support older profile files without this parameter
         self.__dict__.setdefault("cn_gap", 0.1)
+        self.__dict__.setdefault("clash_penalty", 0.5)
         params = {}
         for n, v in kwargs.items():
             if v is not None and n in self.__dict__:

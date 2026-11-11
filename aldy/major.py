@@ -121,6 +121,31 @@ def solve_major_model(
     #   VNEW[m] = 0 <=> sum(VA[a] if m in a) >= 1
     VNEW = {m: model.addVar(vtype="B", name=f"N_{m}") for m in func_muts}
 
+    # Allow one observed functional mutation to be off by one copy. This captures
+    # a single on/off copy ambiguity while leaving the catalog alleles intact.
+    def dosage_is_ambiguous(mutation: Mutation) -> bool:
+        cn = cn_solution.position_cn(mutation.pos)
+        single_copy = coverage.single_copy(mutation, cn_solution)
+        if cn < 2 or single_copy == 0 or coverage[mutation] == 0:
+            return False
+        fraction = (coverage[mutation] / single_copy) % 1
+        return 0.3 <= fraction <= 0.7
+
+    VADJ = {
+        m: (
+            model.addVar(vtype="B", name=f"COPY_PLUS_{m.pos}_{m.op}"),
+            model.addVar(vtype="B", name=f"COPY_MINUS_{m.pos}_{m.op}"),
+        )
+        for m in func_muts
+        if dosage_is_ambiguous(m)
+    }
+    for m, (plus, minus) in VADJ.items():
+        model.addConstr(plus + minus <= 1, name=f"COPY_SIGN_{m.pos}_{m.op}")
+    model.addConstr(
+        model.quicksum(v for pair in VADJ.values() for v in pair) <= 1,
+        name="COPY_ADJUST_ONE",
+    )
+
     # Populate the constraints
     for an, a in alleles.items():
         for m in a.func_muts:
@@ -140,10 +165,20 @@ def solve_major_model(
             if any(ma[0] == pos and ma[1][:3] != "ins" for ma in a.func_muts):
                 continue
             constraints[ref_m] += VA[an]
+        for m, (plus, minus) in VADJ.items():
+            if m.pos == pos and m.op[:3] != "ins":
+                constraints[ref_m] -= plus - minus
 
         # We ensure that only one additional mutation can be selected here (HACK)
         z = model.quicksum(v for m, v in VNEW.items() if m[0] == pos and m[1][:3] != "ins")
         model.addConstr(z <= 1, name=f"CONE_{pos}")
+
+    for m, (plus, minus) in VADJ.items():
+        model.addConstr(minus <= constraints[m], name=f"COPY_MINUS_BOUND_{m.pos}_{m.op}")
+        model.addConstr(
+            constraints[m] + plus <= cn_solution.position_cn(m.pos),
+            name=f"COPY_PLUS_BOUND_{m.pos}_{m.op}",
+        )
 
     # Each allele must express all of its functional mutations
     debug_info["id"] = identifier
@@ -154,8 +189,10 @@ def solve_major_model(
             cov = 0.0
         else:
             cov = coverage[m] / coverage.single_copy(m, cn_solution)
-        model.addConstr(expr + VERR[m] <= cov, name=f"CFUNC_{m.pos}_{m.op}")
-        model.addConstr(expr + VERR[m] >= cov, name=f"CFUNC_{m.pos}_{m.op}")
+        adjustment = VADJ.get(m, (0, 0))
+        adjusted_expr = expr + adjustment[0] - adjustment[1]
+        model.addConstr(adjusted_expr + VERR[m] <= cov, name=f"CFUNC_{m.pos}_{m.op}")
+        model.addConstr(adjusted_expr + VERR[m] >= cov, name=f"CFUNC_{m.pos}_{m.op}")
         debug_info["data"].append((m[0], m[1], cov))
 
     # Each CN configuration must be satisfied by corresponding alleles
@@ -189,6 +226,7 @@ def solve_major_model(
     model.addConstr(z <= model.quicksum(VNEW[m] for m in VNEW), name="NOVEL_LB")
     objective += coverage.profile.major_novel * z
     objective += 0.1 * model.quicksum(VNEW[m] for m in VNEW)
+    # objective += 0.1 * model.quicksum(v for pair in VADJ.values() for v in pair)
     model.setObjective(objective)
     if debug:
         model.dump(f"{debug}.{gene.name}.major{identifier}.lp")

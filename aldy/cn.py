@@ -93,6 +93,40 @@ def estimate_cn(
         return sol
 
 
+def complementary_fusions(gene):
+    regions = gene.unique_regions
+    normal = gene.cn_configs["1"].cn
+    fusions = [
+        (name, config)
+        for name, config in gene.cn_configs.items()
+        if config.kind in (CNConfigType.LEFT_FUSION, CNConfigType.RIGHT_FUSION)
+    ]
+    for left_name, left_config in gene.cn_configs.items():
+        if left_config.kind not in (CNConfigType.LEFT_FUSION, CNConfigType.RIGHT_FUSION):
+            continue
+        for right_name, right_config in gene.cn_configs.items():
+            if (
+                right_config.kind not in (CNConfigType.LEFT_FUSION, CNConfigType.RIGHT_FUSION)
+                or right_config.kind == left_config.kind
+            ):
+                continue
+            main_diff = sum(
+                left_config.cn[0].get(region, 0)
+                + right_config.cn[0].get(region, 0)
+                - normal[0].get(region, 0)
+                for region in regions
+            )
+            pseudo_diff = sum(
+                left_config.cn[1].get(region, 0)
+                + right_config.cn[1].get(region, 0)
+                - normal[1].get(region, 0)
+                - 1
+                for region in regions
+            )
+            if main_diff + pseudo_diff == 0:
+                yield left_name, right_name
+
+
 def solve_cn_model(
     gene: Gene,
     profile: Profile,
@@ -249,7 +283,19 @@ def solve_cn_model(
     o_pars = profile.cn_parsimony * model.quicksum(PARSIMONY_PENALTY * v for _, v in VCN.items())
     o_extrapars = profile.cn_parsimony * model.quicksum(penalty[s] * v for (s, _), v in VCN.items())
 
-    model.setObjective(o_diff + o_fit + o_pars + o_extrapars)
+    # Penalize complementary fusions
+    clash = []
+    for l, r in complementary_fusions(gene):
+        for n, ni in VCN:
+            if n == l and (r, ni) in VCN:
+                z = model.addVar(vtype="B", name="CLASH_{l}_{r}_{ni}")
+                model.addConstr(z <= VCN[l, ni])
+                model.addConstr(z <= VCN[r, ni])
+                model.addConstr(z >= VCN[l, ni] + VCN[r, ni] - 1)
+                clash.append(z)
+    o_clash = profile.clash_penalty * model.quicksum(clash)
+
+    model.setObjective(o_diff + o_fit + o_pars + o_extrapars + o_clash)
     if debug:
         model.dump(f"{debug}.{gene.name}.cn.lp")
 
@@ -260,14 +306,16 @@ def solve_cn_model(
         sol_tuple = sorted_tuple(lookup[v] for v in sol if lookup[v] not in [del_allele, "PSEUDO"])
         if sol_tuple not in result:
             pars = model.getValue(o_pars)
-            result[sol_tuple] = CNSolution(gene, opt - pars, list(sol_tuple))
+            result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
             log.debug(
                 f"[cn] status= {status}; opt= {opt:.2f} "
-                + "(diff= {:.2f}, fit= {:.2f}, pars= {:.2f}) "
+                + "(diff= {:.2f}, fit= {:.2f}, pars= {:.2f}, penal= {:.2f}, clash= {:.2f}) "
                 + f"solution= {result[sol_tuple]}",
                 model.getValue(o_diff),
                 model.getValue(o_fit),
-                model.getValue(o_extrapars) + pars,
+                pars,
+                model.getValue(o_extrapars),
+                model.getValue(o_clash),
             )
     if not result:
         log.debug("[cn] solution= []")
