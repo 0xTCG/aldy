@@ -230,12 +230,19 @@ class Profile:
         Default: True
         """
 
+        self.major_close_hits = False
+        """
+        Include solutions differing by a single-variant in major stage during the final stage.
+        Default: False
+        """
+
         self.update(kwargs)
 
     def update(self, kwargs):
         # Support older profile files without this parameter
         self.__dict__.setdefault("cn_gap", 0.1)
         self.__dict__.setdefault("clash_penalty", 0.5)
+        self.__dict__.setdefault("major_close_hits", False)
         params = {}
         for n, v in kwargs.items():
             if v is not None and n in self.__dict__:

@@ -131,20 +131,22 @@ def solve_major_model(
         fraction = (coverage[mutation] / single_copy) % 1
         return 0.3 <= fraction <= 0.7
 
-    VADJ = {
-        m: (
-            model.addVar(vtype="B", name=f"COPY_PLUS_{m.pos}_{m.op}"),
-            model.addVar(vtype="B", name=f"COPY_MINUS_{m.pos}_{m.op}"),
+    VADJ = {}
+    if coverage.profile.major_close_hits:
+        VADJ = {
+            m: (
+                model.addVar(vtype="B", name=f"COPY_PLUS_{m.pos}_{m.op}"),
+                model.addVar(vtype="B", name=f"COPY_MINUS_{m.pos}_{m.op}"),
+            )
+            for m in func_muts
+            if dosage_is_ambiguous(m)
+        }
+        for m, (plus, minus) in VADJ.items():
+            model.addConstr(plus + minus <= 1, name=f"COPY_SIGN_{m.pos}_{m.op}")
+        model.addConstr(
+            model.quicksum(v for pair in VADJ.values() for v in pair) <= 1,
+            name="COPY_ADJUST_ONE",
         )
-        for m in func_muts
-        if dosage_is_ambiguous(m)
-    }
-    for m, (plus, minus) in VADJ.items():
-        model.addConstr(plus + minus <= 1, name=f"COPY_SIGN_{m.pos}_{m.op}")
-    model.addConstr(
-        model.quicksum(v for pair in VADJ.values() for v in pair) <= 1,
-        name="COPY_ADJUST_ONE",
-    )
 
     # Populate the constraints
     for an, a in alleles.items():
