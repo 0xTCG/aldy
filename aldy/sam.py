@@ -4,20 +4,21 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Tuple, Dict, List, Optional
-from collections import defaultdict, Counter
-from statistics import mean
-import pysam
+import gzip
+import io
 import os
 import os.path
-import gzip
-import tarfile
 import pickle
+import tarfile
 import tempfile
+from collections import Counter, defaultdict
+from statistics import mean
 
-from .common import log, GRange, AldyException, script_path, Timing, chr_prefix
-from .gene import Gene, CNConfigType, Mutation
+import pysam
+
+from .common import AldyException, GRange, Timing, chr_prefix, log, script_path
 from .coverage import Coverage
+from .gene import CNConfigType, Gene, Mutation
 from .profile import Profile
 
 
@@ -27,10 +28,10 @@ class Sample:
     def __init__(
         self,
         gene: Gene,
-        profile: Optional[Profile],
+        profile: Profile | None,
         path: str,
-        reference: Optional[str] = None,
-        debug: Optional[str] = None,
+        reference: str | None = None,
+        debug: str | None = None,
         store_reads: bool = False,
     ):
         """
@@ -61,7 +62,7 @@ class Sample:
         self._dump_cn = defaultdict(int)
         """dict[int, int]: Coverage of the copy-number neutral region"""
 
-        self._dump_reads: List[Tuple[Tuple, List]] = []
+        self._dump_reads: list[tuple[tuple, list]] = []
         """list[tuple[tuple, list]]: Read information."""
 
         self._indel_sites = {
@@ -83,10 +84,10 @@ class Sample:
         }
         """Locations that should be phased."""
 
-        self.phases: Dict[str, Dict[int, str]] = {}
+        self.phases: dict[str, dict[int, str]] = {}
         """Phasing information."""
 
-        self._fusion_counter: Dict = {}
+        self._fusion_counter: dict = {}
         """Fusion read coverage (for long reads)."""
 
         self.is_long_read = False
@@ -100,9 +101,7 @@ class Sample:
 
             if self.kind == "vcf":
                 try:
-                    norm, muts = self._load_vcf(
-                        path, profile.vcf_sample_idx if profile else 0
-                    )
+                    norm, muts = self._load_vcf(path, profile.vcf_sample_idx if profile else 0)
                 except ValueError:
                     raise AldyException(f"VCF {path} is not indexed")
             elif self.kind == "dump":
@@ -116,9 +115,7 @@ class Sample:
                 else:
                     norm, muts = self._load_sam(path, reference, debug)
                 if self.profile and self.profile.cn_region:
-                    self._dump_cn = self._load_cn_region(
-                        path, reference, self.profile.cn_region
-                    )
+                    self._dump_cn = self._load_cn_region(path, reference, self.profile.cn_region)
             self._make_coverage(norm, muts)
             if self.kind == "sam" and debug:
                 self._dump_alignments(f"{debug}.{gene.name}", norm, muts)
@@ -129,9 +126,7 @@ class Sample:
         log.debug("[sam] avg_coverage= {:.1f}x", self.coverage.average_coverage())
         if self.profile.cn_region and self.coverage.diploid_avg_coverage() < 2:
             raise AldyException(
-                "The average coverage of the sample is too low ({:.1f}).".format(
-                    self.coverage.diploid_avg_coverage()
-                )
+                f"The average coverage of the sample is too low ({self.coverage.diploid_avg_coverage():.1f})."
             )
         if self.profile.debug_novel:
             self._load_novel_mutations()
@@ -162,17 +157,15 @@ class Sample:
             except ValueError:
                 raise AldyException(f"Cannot check index of {sam_path}")
 
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]  # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
-            self._prefix = chr_prefix(self.gene.chr, sam_chrs)
+            self._prefix: str = chr_prefix(self.gene.chr, sam_chrs)
 
             with tempfile.TemporaryDirectory() as tmp:
                 self._realign_indels(tmp, sam, reference)
             if has_index:
-                iter = sam.fetch(
-                    region=self.gene.get_wide_region().samtools(prefix=self._prefix)
-                )
+                iter = sam.fetch(region=self.gene.get_wide_region().samtools(prefix=self._prefix))
             else:
                 log.warn("SAM/BAM index not found. Reading will be slow.")
                 iter = sam.fetch()
@@ -182,7 +175,7 @@ class Sample:
                     continue
                 if read.is_supplementary:  # avoid supplementary alignments
                     continue
-                if "H" in read.cigarstring:  # avoid hard-clipped reads
+                if read.cigarstring and "H" in read.cigarstring:  # avoid hard-clipped reads
                     continue
                 if not read.query_sequence:
                     continue
@@ -221,27 +214,42 @@ class Sample:
 
         log.debug("[vcf] path= {}", os.path.abspath(vcf_path))
 
-        norm = {
-            p: [(40, 40)] * 20
-            for p in range(
-                self.gene.get_wide_region().start - 500,
-                self.gene.get_wide_region().end + 1,
-            )
-        }
+        region = self.gene.get_wide_region()
+        norm = {p: [(40, 40)] * 20 for p in range(region.start - 500, region.end + 1)}
         muts: dict = defaultdict(list)
 
+        # VCF normally left-aligns repeat indels; the star-allele database may
+        # place the same event elsewhere in the repeat (e.g. CYP2C9 rs9332131).
+        indel_aliases = {
+            self.mutation_to_vcf(self.gene, Mutation(pos, op)): (pos, op)
+            for pos, op in self.gene.mutations
+            if op.startswith(("ins", "del"))
+        }
+
         def get_mut(pos, ref, alt):
+            if not alt or any(b not in "ACGTN" for b in alt.upper()):
+                return pos, None  # symbolic, spanning-deletion and breakend alleles
+            ref, alt = ref.upper(), alt.upper()
             off = 0
             while off < len(ref) and off < len(alt) and ref[off] == alt[off]:
                 off += 1
-            if len(ref) - off == 1 and len(alt) - off == 1:
-                if alt[off] == self.gene[off + pos]:
-                    return off + pos, "_"
-                return off + pos, f"{self.gene[off + pos]}>{alt[off]}"
-            elif len(ref) > len(alt) and len(alt) - off == 0:
-                return off + pos, f"del{self.gene[off + pos : pos + len(ref)]}"
-            elif len(ref) < len(alt) and len(ref) - off == 0:
-                return off + pos, f"ins{alt[off:]}"
+            pos += off
+            ref, alt = ref[off:], alt[off:]
+            # VCF permits extra padding and requires right padding at contig start.
+            while ref and alt and ref[-1] == alt[-1]:
+                ref, alt = ref[:-1], alt[:-1]
+            if not ref and not alt:
+                return pos, "_"
+            elif len(ref) == len(alt) == 1:
+                if alt == self.gene[pos]:
+                    return pos, "_"
+                return pos, f"{self.gene[pos]}>{alt}"
+            elif ref and not alt:
+                return pos, f"del{self.gene[pos : pos + len(ref)]}"
+            elif alt and not ref:
+                return pos, f"ins{alt}"
+            elif len(ref) != len(alt):
+                return pos, f"del{self.gene[pos : pos + len(ref)]}ins{alt}"
             else:
                 log.trace(f"[sam] ignoring {pos}: {ref}->{alt}")
                 return pos, None
@@ -259,27 +267,49 @@ class Sample:
                     f"input VCF has {len(vcf.header.samples)} samples"
                 )
             self.name = sample = samples[sample_idx]
+            self._indel_sites = {}
 
             log.info("Using VCF sample {}", sample)
-            for read in vcf.fetch(
-                region=self.gene.get_wide_region().samtools(prefix=self._prefix)
-            ):
-                g = sorted(y for y in read.samples[sample]["GT"] if y is not None)
-                if len(g) != 2 or self.gene[read.pos - 1] == "N":
+            has_data = False
+            reads = (
+                vcf.fetch(region=region.samtools(prefix=self._prefix))
+                if self._prefix + self.gene.chr in sam_chrs
+                else ()
+            )
+            for read in reads:
+                genotype = read.samples[sample].get("GT")
+                if not genotype or len(genotype) != 2 or None in genotype:
                     continue  # ignore polyploid and incomplete cases
+                # Reference calls and gVCF blocks are evidence too. Exclude
+                # records that only overlap the padding used by the fetch.
+                if read.start < region.end and read.stop > region.start:
+                    has_data = True
+                if self.gene[read.pos - 1] == "N":
+                    continue
+                g = sorted(genotype)
                 dump_arr = {}
-                if len(read.ref) == 1 and read.ref != self.gene[read.pos - 1]:
-                    hgvs = [(read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref}")]
+                if read.ref and len(read.ref) == 1 and read.ref.upper() != self.gene[read.pos - 1]:
+                    hgvs = [(read.pos - 1, f"{self.gene[read.pos - 1]}>{read.ref.upper()}")]
                 else:
                     hgvs = [(read.pos - 1, "_")]
-                hgvs += [get_mut(read.pos - 1, read.ref, a) for a in read.alleles[1:]]
+                if read.alleles:
+                    hgvs += [get_mut(read.pos - 1, read.ref, a) for a in read.alleles[1:]]
                 for gt in g:
                     pos, op = hgvs[gt]
-                    if op == "_":
+                    if op is None or op == "_":
                         continue
+                    if op.startswith(("ins", "del")):
+                        pos, op = indel_aliases.get(
+                            self.mutation_to_vcf(self.gene, Mutation(pos, op)),
+                            (pos, op),
+                        )
                     muts[pos, op] += [(40, 40)] * 10
                     norm[pos] = norm[pos][:-10]
                     dump_arr[pos] = op
+
+                    if op.startswith(("ins", "del")):
+                        support = len(muts[pos, op])
+                        self._indel_sites[pos, op] = (20 - support, support)
 
                 # Handle multi-SNPs
                 for pos, op in self._multi_sites.items():
@@ -298,6 +328,13 @@ class Sample:
                                 if p:
                                     norm[pos + p] += [(40, 40)] * 10
                         muts[pos, op] += [(40, 40)] * 10
+            if not has_data:
+                log.warn(
+                    "WARNING: No usable VCF records found for {} in sample {}. "
+                    "A wild-type call cannot be confirmed.",
+                    self.gene.name,
+                    sample,
+                )
         return norm, muts
 
     def _load_dump(self, dump_path: str):
@@ -305,31 +342,29 @@ class Sample:
 
         log.debug("[dump] path= {}", os.path.abspath(dump_path))
         if dump_path.endswith(".tar.gz"):
-            tar = tarfile.open(dump_path, "r:gz")
-
-            f = [i for i in tar.getnames() if i.endswith(f".{self.gene.name}.dump")]
-            if not f:
-                raise AldyException("Invalid dump file")
-            log.debug("Found {} in the archive", f[0])
-            data = tar.extractfile(f[0])
-            assert data, "Malformed dump file"
-            fd = gzip.open(data)
+            with tarfile.open(dump_path, "r:gz") as tar:
+                f = [i for i in tar.getnames() if i.endswith(f".{self.gene.name}.dump")]
+                if not f:
+                    raise AldyException("Invalid dump file")
+                log.debug("Found {} in the archive", f[0])
+                stream = tar.extractfile(f[0])
+                assert stream, "Malformed dump file"
+                data = stream.read()
+            fd = gzip.GzipFile(fileobj=io.BytesIO(data), mode="rb")
         else:
-            fd = gzip.open(dump_path, "rb")
-
-        log.warn("Loading debug dump from {}", dump_path)
-        (
-            self.name,
-            self.profile,
-            self._dump_cn,
-            norm,
-            muts,
-            phases,
-            self._fusion_counter,
-            self._indel_sites,
-        ) = pickle.load(
-            fd
-        )  # type: ignore
+            fd = gzip.open(dump_path, "rb")  # noqa: SIM115
+        with fd:
+            log.warn("Loading debug dump from {}", dump_path)
+            (
+                self.name,
+                self.profile,
+                self._dump_cn,
+                norm,
+                muts,
+                phases,
+                self._fusion_counter,
+                self._indel_sites,
+            ) = pickle.load(fd)  # type: ignore
         self.profile.display_format = False
         self.profile.debug_probe = ""
         self.profile.debug_novel = False
@@ -362,7 +397,7 @@ class Sample:
             self._prefix = ""  # no chr prefix assumed
             self.name = os.path.splitext(os.path.basename(path))[0]
             for line in f:
-                if line.startswith("#") or line.startswith("probeset_id\t"):
+                if line.startswith(("#", "probeset_id\t")):
                     continue
                 line = line.strip().split("\t")
                 (
@@ -373,7 +408,7 @@ class Sample:
                     start,
                     stop,
                     _,
-                    rsid,
+                    _,
                     _,
                     _,
                     _,
@@ -400,8 +435,7 @@ class Sample:
                         ref, alt = alt, ref
                     if self.gene[start:stop] != ref:
                         log.debug(
-                            f"Issue: REF {ref} (ALT {alt}) "
-                            f"does not match {self.gene[start:stop]}"
+                            f"Issue: REF {ref} (ALT {alt}) does not match {self.gene[start:stop]}"
                         )
                         ref = self.gene[start:stop]  # only for PScan/TPMT
                 alt = alt.split("//")
@@ -528,9 +562,7 @@ class Sample:
                     x = len(on_target & prev_indel[2])
                     self._indel_sites[pos, op] = [off + x, on - x]
                 if self._indel_sites[pos, op][1]:
-                    log.debug(
-                        "[indel] {}:{} -> {}", pos + 1, op, self._indel_sites[pos, op]
-                    )
+                    log.debug("[indel] {}:{} -> {}", pos + 1, op, self._indel_sites[pos, op])
                     prev_indel = (pos, op, on_target)
             except (IndexError, ValueError):
                 log.error(
@@ -559,7 +591,7 @@ class Sample:
             except ValueError:
                 raise AldyException(f"Cannot check index of {self.path}")
 
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]  # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
             self._prefix = chr_prefix(self.gene.chr, sam_chrs)
@@ -587,7 +619,7 @@ class Sample:
     def _make_coverage(self, norm, muts):
         """Populate coverage data."""
 
-        coverage: Dict[int, Dict[str, List]] = dict()
+        coverage: dict[int, dict[str, list]] = {}
         for pos, cov in norm.items():
             if len(cov) == 0:
                 continue
@@ -692,10 +724,7 @@ class Sample:
             elif op in [0, 7, 8]:  # M, X and =
                 for i in range(size):
                     q = qual[s_start + i] if qual else prev_q
-                    if (
-                        start + i in self.gene
-                        and self.gene[start + i] != seq[s_start + i]
-                    ):
+                    if start + i in self.gene and self.gene[start + i] != seq[s_start + i]:
                         mut = (start + i, f"{self.gene[start + i]}>{seq[s_start + i]}")
                         dump_arr.append(mut)
                         muts[mut].append((bin_quality(mq), bin_quality(q)))
@@ -714,11 +743,7 @@ class Sample:
             if pos not in dump_arr_pos:
                 continue
             l, r = op.split(">")
-            if all(
-                (pos + p, f"{l[p]}>{r[p]}") in dump_arr
-                for p in range(len(l))
-                if l[p] != "."
-            ):
+            if all((pos + p, f"{l[p]}>{r[p]}") in dump_arr for p in range(len(l)) if l[p] != "."):
                 items = []
                 for p in range(len(l)):
                     if l[p] != ".":
@@ -726,9 +751,7 @@ class Sample:
                         if p:  # no idea why...
                             norm[pos + p].append(items[-1])
                 # TODO: use sth else instead of mean?
-                muts[pos, op].append(
-                    (mean(mq for mq, _ in items), mean(q for _, q in items))
-                )
+                muts[pos, op].append((mean(mq for mq, _ in items), mean(q for _, q in items)))
 
         if self._indel_sites_eqs:  # long-read hack
             for pos, op in self._indel_sites:
@@ -789,19 +812,19 @@ class Sample:
                     (s, pos),
                 )
                 self._fusion_counter[n] = [0, 0]
-                if (
-                    sig[0][1] in self.gene.unique_regions
-                    or sig[1][1] in self.gene.unique_regions
-                ):
+                if sig[0][1] in self.gene.unique_regions or sig[1][1] in self.gene.unique_regions:
                     self._fusion_signatures[sig] = n
 
             log.debug("[sam] PacBio remapping enabled")
 
-        with pysam.AlignmentFile(  # type: ignore
-            sam_path, reference_filename=reference
-        ) as sam, Timing("[sam] Remap"):
+        with (
+            pysam.AlignmentFile(  # type: ignore
+                sam_path, reference_filename=reference
+            ) as sam,
+            Timing("[sam] Remap"),
+        ):
             # Assumes SAM index exists
-            sam_chrs = [x["SN"] for x in sam.header["SQ"]]
+            sam_chrs = [x["SN"] for x in sam.header["SQ"]]  # type: ignore
             if "chrM" in sam_chrs and self.gene.chr == "MT":
                 self.gene.chr = "M"  # UCSC fix
             self._prefix = chr_prefix(self.gene.chr, sam_chrs)
@@ -819,7 +842,7 @@ class Sample:
             counter = 0
             iter = sam.fetch(region=rng.samtools(prefix=self._prefix))
             for read in iter:
-                if not read.cigartuples or "H" in read.cigarstring:
+                if not read.cigartuples or (read.cigarstring and "H" in read.cigarstring):
                     continue
                 if read.reference_start >= rng.end or read.reference_end < rng.start:
                     continue
@@ -839,19 +862,11 @@ class Sample:
                         s = seq[s_start:]
                         q = qual[s_start:]
                         h = self._map(self._index, s)
-                        if (
-                            h
-                            and h.r_st <= gene_bnd < h.r_en
-                            and gene_bnd - h.r_st > 100
-                        ):
+                        if h and h.r_st <= gene_bnd < h.r_en and gene_bnd - h.r_st > 100:
                             s = seq[s_start : s_start + (gene_bnd - h.r_st)]
                             q = qual[s_start : s_start + (gene_bnd - h.r_st)]
                             h = self._map(self._index, s)
-                        elif (
-                            h
-                            and h.r_st <= pseudo_bnd < h.r_en
-                            and pseudo_bnd - h.r_st > 100
-                        ):
+                        elif h and h.r_st <= pseudo_bnd < h.r_en and pseudo_bnd - h.r_st > 100:
                             s = seq[s_start : s_start + (pseudo_bnd - h.r_st)]
                             q = qual[s_start : s_start + (pseudo_bnd - h.r_st)]
                             h = self._map(self._index, s)
@@ -909,9 +924,7 @@ class Sample:
             """Reverse CIGAR tuples for pysam/mappy compatibility."""
             return [(op, size) for (size, op) in c]
 
-        regs = self._get_gene_regions(
-            hit.r_st + self._seq_range[0] - 1, _rev_cigar(hit.cigar)
-        )
+        regs = self._get_gene_regions(hit.r_st + self._seq_range[0] - 1, _rev_cigar(hit.cigar))
         if regs:
             splits = []
             for fs, fn in self._fusion_signatures.items():
@@ -996,13 +1009,49 @@ class Sample:
                     )
                 self.gene.mutations.setdefault(
                     (pos, op),
-                    (e, f"NOVEL:{pos+1}.{op}", pos, pos, op),
+                    (e, f"NOVEL:{pos + 1}.{op}", pos, pos, op),
                 )
                 self.gene.random_mutations.add(Mutation(pos, op))
                 ni += 1
 
+    @staticmethod
+    def mutation_to_vcf(gene, mutation):
+        """Return left-aligned, one-based POS, REF and ALT for an Aldy mutation."""
+        pos, op = mutation
+        if ">" in op:
+            ref, alt = op.split(">")
+            ref = gene[pos : pos + len(ref)]
+            alt = "".join(r if a == "." else a for r, a in zip(ref, alt))
+        elif op.startswith("ins"):
+            ref, alt = "", op[3:]
+        elif op.startswith("del"):
+            deleted, _, alt = op[3:].partition("ins")
+            ref = gene[pos : pos + len(deleted)]
+        else:
+            raise ValueError(f"Unsupported VCF mutation: {mutation}")
 
-def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
+        # Remove redundant context before left-aligning insertions/deletions.
+        while ref and alt and ref[0] == alt[0]:
+            pos, ref, alt = pos + 1, ref[1:], alt[1:]
+        while ref and alt and ref[-1] == alt[-1]:
+            ref, alt = ref[:-1], alt[:-1]
+        if not ref or not alt:
+            while pos > 0 and (ref or alt)[-1:] == gene[pos - 1]:
+                anchor = gene[pos - 1]
+                ref = anchor + ref[:-1] if ref else ""
+                alt = anchor + alt[:-1] if alt else ""
+                pos -= 1
+            if pos > 0:
+                pos -= 1
+                ref, alt = gene[pos] + ref, gene[pos] + alt
+            else:
+                # VCF requires right padding when no preceding base exists.
+                anchor = gene[pos + len(ref)]
+                ref, alt = ref + anchor, alt + anchor
+        return pos + 1, ref, alt
+
+
+def detect_genome(sam_path: str) -> tuple[str, str | None]:
     """Detect file type and the reference genome."""
 
     try:
@@ -1013,18 +1062,16 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
             except AttributeError:
                 pass  # SAM files do not have an index. BAMs might also lack it
             except ValueError:
-                raise AldyException(
-                    f"File {sam_path} has no index (it must be indexed)"
-                )
+                raise AldyException(f"File {sam_path} has no index (it must be indexed)")
 
             #: str: Check if we need to append 'chr' or not
-            _prefix = chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])
+            _prefix = chr_prefix("1", [x["SN"] for x in sam.header["SQ"]])  # type: ignore
             # Detect the genome
             hg19_lens = {"1": 249250621, "10": 135534747, "22": 51304566}
             hg38_lens = {"1": 248956422, "10": 133797422, "22": 50818468}
-            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}
+            chrs = {x["SN"]: int(x["LN"]) for x in sam.header["SQ"]}  # type: ignore
             is_hg19, is_hg38 = True, True
-            for c in "1 10 22".split():
+            for c in ["1", "10", "22"]:
                 if _prefix + c in chrs:
                     is_hg19 &= chrs[_prefix + c] == hg19_lens[c]
                     is_hg38 &= chrs[_prefix + c] == hg38_lens[c]
@@ -1040,14 +1087,14 @@ def detect_genome(sam_path: str) -> Tuple[str, Optional[str]]:
                 return "vcf", None
         except (ValueError, OSError):
             if sam_path.endswith(".tar.gz"):
-                tar = tarfile.open(sam_path, "r:gz")
-                f = [i for i in tar.getnames() if i.endswith(".genome")]
-                if not f:
-                    raise AldyException("Invalid dump file")
-                data = tar.extractfile(f[0])
-                if data:
-                    genome = data.read().decode("utf-8").strip()
-                    return "dump", genome
+                with tarfile.open(sam_path, "r:gz") as tar:
+                    f = [i for i in tar.getnames() if i.endswith(".genome")]
+                    if not f:
+                        raise AldyException("Invalid dump file")
+                    data = tar.extractfile(f[0])
+                    if data:
+                        genome = data.read().decode("utf-8").strip()
+                        return "dump", genome
             if sam_path.endswith(".txt") and os.path.exists(sam_path):
                 with open(sam_path) as f:
                     if f.readline().startswith("##batch-folder"):

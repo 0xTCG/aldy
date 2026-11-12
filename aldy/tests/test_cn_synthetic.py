@@ -13,7 +13,7 @@ from aldy.common import SOLUTION_PRECISION
 
 def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0.0):
     profile = Profile("test")
-    profile.gap = gap
+    profile.cn_gap = gap
     sols = solve_cn_model(
         gene,
         profile,
@@ -28,9 +28,7 @@ def assert_cn(gene, solver, expected, cov, expected_obj=None, gap=0.0):
             assert abs(s.score - expected_obj) < SOLUTION_PRECISION, "Score mismatch"
     best_sol_score = min(sols, key=lambda s: s.score).score
     for s in sols:
-        assert (
-            s.score - best_sol_score * (1 + gap)
-        ) < SOLUTION_PRECISION, "Gap violation"
+        assert (s.score - best_sol_score * (1 + gap)) < SOLUTION_PRECISION, "Gap violation"
     sols = sorted([sorted(s.solution.items()) for s in sols])
     expected = sorted([sorted(s.items()) for s in expected])
     print(sols)

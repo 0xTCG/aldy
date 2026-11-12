@@ -10,6 +10,7 @@ import re
 import subprocess
 import platform
 import datetime
+import pysam
 
 from tempfile import NamedTemporaryFile as tmpfile
 
@@ -59,7 +60,10 @@ def assert_file(monkeypatch, file, solver, expected, params=None, warn=False):
         },
         **(params or {}),
     }
-    main(["genotype", file] + [i for k, v in args.items() for i in [k, v]])
+    argv = ["genotype", file]
+    for key, value in args.items():
+        argv += [key] + (value if isinstance(value, list) else [value])
+    main(argv)
     expected = "\n".join(e.strip() for e in expected.strip().split("\n"))
     lines = "\n".join(escape_ansi(l).strip() for l in lines).strip()
     assert lines == expected
@@ -141,9 +145,7 @@ def test_NA10860_debug(monkeypatch, solver):
             # Check logs
             with open(out_log.name) as f:
                 log = f.read()
-            s = "    rs1058172    42523528.C>T    3267G>A    "
-            s += "(cov=  17, cn= 0.8; region=e7; impact=R365H; )\n"
-            s = "[major] status= optimal; opt= 1.47; solution= 1x*1, 1x*4, 1x*4.021"
+            s = "[major] status= optimal; opt= 1.47; solution= 1x*1, 1x*4, 1x*4.021X\n"
             assert s in log
         out = subprocess.check_output(f"tar tzf {tmp.name}", shell=True).decode("utf-8")
         out = "\n".join(i.strip() for i in sorted(out.strip().split("\n")))
@@ -152,9 +154,7 @@ def test_NA10860_debug(monkeypatch, solver):
 
 def test_NA10860_hg38(monkeypatch, solver):
     file = script_path("aldy.tests.resources/NA10860_hg38.bam")
-    assert_file(
-        monkeypatch, file, solver, EXPECTED_NA10860.replace("NA10860", "NA10860_hg38")
-    )
+    assert_file(monkeypatch, file, solver, EXPECTED_NA10860.replace("NA10860", "NA10860_hg38"))
 
 
 def test_NA10860_gap(monkeypatch, solver):
@@ -179,29 +179,47 @@ def test_NA10860_gap(monkeypatch, solver):
     8: 1x*4.021X, 1x*4J, 1x*39 (confidence: 100%)
     9: 1x*4.021X, 1x*4M, 1x*10 (confidence: 100%)
     10: 1x*4.021X2, 1x*4NX, 1x*74 (confidence: 100%)
+    11: 1x*1, 1x*4, 1x*4.021 (confidence: 76%)
+    12: 1x*4, 1x*4.021X2, 1x*74 (confidence: 76%)
+    13: 1x*4.021, 1x*4C, 1x*185 (confidence: 76%)
+    14: 1x*4.021, 1x*4J, 1x*39 (confidence: 76%)
+    15: 1x*4.021, 1x*4M, 1x*10 (confidence: 76%)
+    16: 2x*4, 1x*139 (confidence: 76%)
+    17: 1x*4, 1x*4.021X, 1x*61 (confidence: 74%)
+    18: 1x*4, 1x*4.021X, 1x*83X (confidence: 74%)
+    19: 1x*4.021, 1x*4NX, 1x*61 (confidence: 74%)
+    20: 1x*4.021, 1x*4NX, 1x*83X (confidence: 74%)
+    21: 1x*4.021X, 1x*4NX, 1x*39 (confidence: 74%)
+    22: 1x*4.021, 2x*61 (confidence: 25%)
     Potential CYP2D6 star-alleles for NA10860:
-    1: *1 / *4 + *4.021X (confidence=100%)
-        Minor alleles: *(1.018 +rs28371713), *(4.001 +rs111564371 +rs112568578 +rs113889384), *(4.021X -rs28371738)
-    2: *1 / *4.021 + *4NX (confidence=100%)
-        Minor alleles: *(1.018 +rs28371713), *(4.013X -rs28371738), *(4.021 +rs111564371 +rs112568578 +rs113889384)
+    1: *1 / *4.021 + *4NX (confidence=100%)
+        Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713), *(4.013X -rs28371738), *4.021
+    2: *1 / *4 + *4.021X (confidence=100%)
+        Minor alleles: *(1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713), *4.001, *(4.021X -rs28371738)
     CYP2D6 results:
-    - *1 / *4 + *4.021X
-        Minor: [*1.018 +rs28371713] / [*4.001 +rs111564371 +rs112568578 +rs113889384] + [*4.021X -rs28371738]
-        Legacy notation: [*1.018 +rs28371713] / [*4A +rs111564371 +rs112568578 +rs113889384] + [*4.021X -rs28371738]
-        CPIC functionality: intermediate (activity score = 1.0)
-        Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
-        Estimated activity for *4: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2557 for details)
-        Estimated activity for *4.021X: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2566 for details)
     - *1 / *4.021 + *4NX
-        Minor: [*1.018 +rs28371713] / [*4.021 +rs111564371 +rs112568578 +rs113889384] + [*4.013X -rs28371738]
-        Legacy notation: [*1.018 +rs28371713] / [*4.021 +rs111564371 +rs112568578 +rs113889384] + [*4NX -rs28371738]
+        Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4.013X -rs28371738]
+        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.021] + [*4NX -rs28371738]
         CPIC functionality: intermediate (activity score = 1.0)
         Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
         Estimated activity for *4.021: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2566 for details)
         Estimated activity for *4NX: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2559 for details)
+    - *1 / *4 + *4.021X
+        Minor: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4.001] + [*4.021X -rs28371738]
+        Legacy notation: [*1.018 +rs111564371 +rs112568578 +rs113889384 +rs28371713] / [*4A] + [*4.021X -rs28371738]
+    CPIC functionality: intermediate (activity score = 1.0)
+    Estimated activity for *1: normal (score: 1.0); evidence: D (see https://www.pharmvar.org/haplotype/662 for details)
+    Estimated activity for *4: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2557 for details)
+    Estimated activity for *4.021X: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/2566 for details)
     """
     file = script_path("aldy.tests.resources/NA10860.bam")
-    assert_file(monkeypatch, file, solver, expected, {"--param": "gap=0.3"})
+    assert_file(
+        monkeypatch,
+        file,
+        solver,
+        expected,
+        {"--param": ["gap=0.1", "cn_gap=0.3"]},
+    )
 
 
 def test_NA10860_cn(monkeypatch, solver):
@@ -241,6 +259,67 @@ def test_NA10860_vcf_out(monkeypatch, solver):
         assert produced == expected.replace("aldy-v4.8", f"aldy-v{__version__}")
 
 
+with open(script_path("aldy.tests.resources/vcf-input.vcf")) as f:
+    VCF_SAMPLES = next(line for line in f if line.startswith("#CHROM")).strip().split("\t")[9:]
+
+
+@pytest.mark.parametrize("sample_idx,sample", enumerate(VCF_SAMPLES), ids=VCF_SAMPLES)
+def test_vcf_input_output(monkeypatch, tmp_path, solver, sample_idx, sample):
+    warnings = []
+    monkeypatch.setattr(log, "warn", lambda *args: warnings.append(str.format(*args)))
+    gene = sample.split("_", 1)[0]
+    chrom = {
+        "CYP2C9": "10",
+        "UGT1A1": "2",
+        "CYP2D6": "22",
+        "CYP2A6": "19",
+        "SLCO1B1": "12",
+    }[gene]
+    input_path = str(tmp_path / "input.vcf.gz")
+    pysam.tabix_compress(script_path("aldy.tests.resources/vcf-input.vcf"), input_path)
+    pysam.tabix_index(input_path, preset="vcf")
+    output_path = tmp_path / "output.vcf"
+    main(
+        [
+            "genotype",
+            input_path,
+            "--gene",
+            gene,
+            "--genome",
+            "hg19",
+            "--solver",
+            solver,
+            "--output",
+            str(output_path),
+            "--param",
+            f"vcf_sample_idx={sample_idx}",
+            "max_minor_solutions=3",
+            "gap=0",
+        ]
+    )
+
+    # Project this sample's column from the one combined expected VCF.
+    expected = []
+    with open(script_path("aldy.tests.resources/vcf-output.vcf.expected")) as f:
+        for line in f:
+            if line.startswith("##source=") and f"(gene: {gene}-" not in line:
+                continue
+            if line.startswith("##contig=") and line.strip() != f"##contig=<ID={chrom}>":
+                continue
+            if line.startswith("##"):
+                expected.append(line)
+            else:
+                fields = line.rstrip("\n").split("\t")
+                if fields[0] == "#CHROM":
+                    column = fields.index(sample)
+                if fields[0] == "#CHROM" or fields[column] != ".":
+                    expected.append("\t".join(fields[:9] + [fields[column]]) + "\n")
+    assert output_path.read_text() == "".join(expected).replace("aldy-v4.8", f"aldy-v{__version__}")
+    # Explicit reference genotypes count as data, including the reference-only
+    # sample; a lack of alternate alleles must not trigger this warning.
+    assert not any("No usable VCF records found" in warning for warning in warnings)
+
+
 def test_fusion(monkeypatch, solver):
     # NA19785 pgrnseq-v1
     expected = f"""
@@ -248,10 +327,14 @@ def test_fusion(monkeypatch, solver):
     Genotyping sample HARD.dump.tar.gz...
     Potential CYP2D6 gene structures for NA19785:
     1: 2x*1,1x*79 (confidence: 100%)
+    2: 2x*1,1x*80 (confidence: 98%)
     Potential major CYP2D6 star-alleles for NA19785:
     1: 1x*1, 1x*2, 1x*79#2 (confidence: 100%)
-    2: 1x*2, 1x*34, 1x*79#10 (confidence: 100%)
-    3: 2x*2, 1x*79#1 (confidence: 100%)
+    2: 1x*1, 1x*2, 1x*80#2 (confidence: 100%)
+    3: 1x*2, 1x*34, 1x*79#10 (confidence: 100%)
+    4: 1x*2, 1x*34, 1x*80#10 (confidence: 100%)
+    5: 2x*2, 1x*79#1 (confidence: 100%)
+    6: 2x*2, 1x*80#1 (confidence: 100%)
     Potential CYP2D6 star-alleles for NA19785:
     1: *1 / *79 + *2 (confidence=100%)
         Minor alleles: *1, *2, *79#11
@@ -348,6 +431,44 @@ def test_NA07000_vcf_in(monkeypatch, solver):
     )
 
 
+@pytest.mark.parametrize(
+    "filename,sample",
+    [
+        ("NA07000_SLCO1B1.vcf.gz", "NA07000"),  # Chromosome present, gene absent.
+        ("vcf-input.vcf", "CYP2C9_heterozygous"),  # Chromosome absent too.
+    ],
+)
+def test_vcf_missing_gene(monkeypatch, tmp_path, solver, filename, sample):
+    warnings = []
+    monkeypatch.setattr(log, "warn", lambda *args: warnings.append(str.format(*args)))
+    input_path = script_path("aldy.tests.resources/" + filename)
+    if not filename.endswith(".gz"):
+        compressed = str(tmp_path / "input.vcf.gz")
+        pysam.tabix_compress(input_path, compressed)
+        pysam.tabix_index(compressed, preset="vcf")
+        input_path = compressed
+    main(
+        [
+            "genotype",
+            input_path,
+            "--gene",
+            "cftr",
+            "--profile",
+            "illumina",
+            "--genome",
+            "hg19",
+            "--solver",
+            solver,
+            "--output",
+            str(tmp_path / "output.vcf"),
+        ]
+    )
+    assert [warning for warning in warnings if "No usable VCF records found" in warning] == [
+        f"WARNING: No usable VCF records found for CFTR in sample {sample}. "
+        "A wild-type call cannot be confirmed."
+    ]
+
+
 def test_fix_insertions(monkeypatch, solver):
     expected = f"""
     {HEADER}
@@ -437,9 +558,7 @@ def test_profile(monkeypatch, capsys):
     Scanning MT:1-2700...
     Scanning X:154528390-154553572...
     """
-    main(
-        ["profile", script_path("aldy.tests.resources/NA10860.bam"), "--genome", "hg38"]
-    )
+    main(["profile", script_path("aldy.tests.resources/NA10860.bam"), "--genome", "hg38"])
     lines = "\n".join(escape_ansi(l).strip() for l in lines).strip()
     expected = "\n".join(e.strip() for e in expected.strip().split("\n"))
     assert lines == expected
@@ -470,9 +589,7 @@ def test_pacbio(monkeypatch, solver):
         Estimated activity for *40: none (score: 0.0); evidence: D (see https://www.pharmvar.org/haplotype/231 for details)
     """
     file = script_path("aldy.tests.resources/HG03166.pb.bam")
-    assert_file(
-        monkeypatch, file, solver, expected, {"--profile": "pacbio-hifi-targeted"}
-    )
+    assert_file(monkeypatch, file, solver, expected, {"--profile": "pacbio-hifi-targeted"})
 
 
 def test_load_all_genes(monkeypatch, solver):

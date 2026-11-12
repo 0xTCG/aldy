@@ -1,29 +1,29 @@
-#!/usr/bin/env python
 # 786
 # Aldy source: __main__.py
 #   This file is subject to the terms and conditions defined in
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Optional, Any
-import logbook
-import logbook.more
-import logbook.base
 import argparse
-import os
-import sys
-import platform
-import yaml
 import datetime
+import os
+import platform
+import sys
 import tempfile
 import traceback
+from typing import Any
+
+import logbook
+import logbook.base
+import logbook.more
 import pytest
+import yaml
 
 from . import common
-from .common import log, script_path, AldyException, td, parse_cn_region
+from .common import AldyException, log, parse_cn_region, script_path, td
 from .gene import Gene
-from .profile import Profile
 from .genotype import genotype
+from .profile import Profile
 from .query import query
 from .version import __version__
 
@@ -34,11 +34,7 @@ def get_version():
         (
             platform.platform()[6:]
             if platform.system() == "Linux"
-            else (
-                platform.mac_ver()[0]
-                if platform.system() == "Darwin"
-                else platform.platform()
-            )
+            else (platform.mac_ver()[0] if platform.system() == "Darwin" else platform.platform())
         ),
     )
 
@@ -53,15 +49,11 @@ def main(argv):
     # Set the logging verbosity
     level = (args.verbosity if "verbosity" in args else "I").lower()
     level = next(
-        v
-        for k, v in logbook.base._reverse_level_names.items()
-        if k.lower().startswith(level)
+        v for k, v in logbook.base._reverse_level_names.items() if k.lower().startswith(level)
     )
 
     # Set the command-line logging
-    sh = logbook.more.ColorizedStderrHandler(
-        format_string="{record.message}", level=level
-    )
+    sh = logbook.more.ColorizedStderrHandler(format_string="{record.message}", level=level)
     sh.push_application()
 
     log.info(
@@ -73,7 +65,7 @@ def main(argv):
     log.info(
         "   (c) 2016-{} Aldy Authors. All rights reserved.\n"
         + "   Free for non-commercial/academic use only.",
-        datetime.datetime.now().year,
+        datetime.datetime.now().astimezone().year,
     )
 
     try:
@@ -91,7 +83,7 @@ def main(argv):
                 gene, q = q, ""
             if args.gene:
                 gene = args.gene
-            db_file = script_path("aldy.resources.genes/{}.yml".format(gene.lower()))
+            db_file = script_path(f"aldy.resources.genes/{gene.lower()}.yml")
             if not os.path.exists(db_file):
                 db_file = gene
             with open(db_file):  # Check if file exists
@@ -119,40 +111,42 @@ def main(argv):
         elif args.subparser in ["genotype", "g"]:
             # Prepare the output file
             output = args.output
-            if output == "-":
-                output = sys.stdout
-            elif output:
-                output = open(output, "w")
-            _genotype(args.gene, output, args)
-            if output and output != sys.stdout:
-                output.close()
+            if not output:
+                _genotype(args.gene, None, args)
+            elif output == "-":
+                _genotype(args.gene, sys.stdout, args)
+            else:
+                with open(output, "w") as fo:
+                    _genotype(args.gene, fo, args)
         else:
             raise AldyException("Invalid sub-command " + args.subparser)
-    except IOError as ex:
+    except OSError as ex:
         if ex.filename is not None:
             log.critical("ERROR: {} cannot be accessed", ex.filename)
         else:
             log.critical("ERROR: {} cannot be accessed", str(ex))
         log.debug(ex)
         log.debug(traceback.format_exc())
-        exit(1)
+        sys.exit(1)
     except SystemExit as ex:
         log.debug(repr(ex))
         log.debug(traceback.format_exc())
-        exit(ex.code)
+        sys.exit(ex.code)
     except Exception as ex:
         gene = "" if "gene" not in args else f"gene= {args.gene}, "
         log.critical(f"ERROR: {gene}file= {args.file if 'file' in args else '-'}")
         log.critical(repr(ex))
         log.warn(traceback.format_exc())
-        exit(1)
+        sys.exit(1)
+    except KeyboardInterrupt:
+        pass
     except:  # noqa
         gene = "" if "gene" not in args else f"gene= {args.gene}, "
         exc = sys.exc_info()[0]
         log.critical(f"ERROR: {gene}file= {args.file if 'file' in args else '-'}")
         log.critical("Unrecoverable error: {}", repr(exc))
         log.warn(traceback.format_exc())
-        exit(1)
+        sys.exit(1)
 
 
 def _get_args(argv):
@@ -188,9 +182,7 @@ def _get_args(argv):
         help="Call the most likely genotype and diplotype within a sample.",
         parents=[base],
     )
-    genotype_parser.add_argument(
-        "file", nargs="?", help="Input file in SAM, BAM or CRAM format."
-    )
+    genotype_parser.add_argument("file", nargs="?", help="Input file in SAM, BAM or CRAM format.")
     genotype_parser.add_argument(
         "--gene",
         "-g",
@@ -256,8 +248,7 @@ def _get_args(argv):
     genotype_parser.add_argument(
         "--debug",
         default=None,
-        help="Create a directory that will contain the debug information "
-        + "and core dumps.",
+        help="Create a directory that will contain the debug information " + "and core dumps.",
     )
     genotype_parser.add_argument(
         "--cn",
@@ -334,9 +325,7 @@ def _get_args(argv):
     )
     profile_parser.add_argument("--param", action="append", nargs="+")
 
-    _ = subparsers.add_parser(
-        "help", parents=[base], help="Show program usage and exit."
-    )
+    _ = subparsers.add_parser("help", parents=[base], help="Show program usage and exit.")
 
     return parser, parser.parse_args(argv)
 
@@ -350,7 +339,7 @@ def _print_licence():
             print(ll.strip())
 
 
-def _genotype(gene: str, output: Optional[Any], args) -> None:
+def _genotype(gene: str, output: Any | None, args) -> None:
     """
     Genotype a file.
 
@@ -407,14 +396,15 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 **{k: v for k, v in params.items() if v is not None},
             )
         except AldyException as ex:
-            log.critical(
-                f"ERROR: gene= {gene}, profile= {args.profile}, file= {args.file}"
-            )
+            log.critical(f"ERROR: gene= {gene}, profile= {args.profile}, file= {args.file}")
             log.error(str(ex))
 
     if args.log:
         fh = logbook.FileHandler(
-            args.log, mode="w", bubble=True, level="TRACE"  # type: ignore
+            args.log,
+            mode="w",
+            bubble=True,
+            level="TRACE",  # type: ignore
         )
         fh.formatter = lambda record, _: record.message  # type: ignore
         fh.push_application()
@@ -425,13 +415,15 @@ def _genotype(gene: str, output: Optional[Any], args) -> None:
                 prefix = f"{tmp}/{os.path.splitext(os.path.basename(args.file))[0]}"
                 log_output = f"{prefix}.log"
                 fh = logbook.FileHandler(
-                    log_output, mode="w", bubble=True, level="TRACE"  # type: ignore
+                    log_output,
+                    mode="w",
+                    bubble=True,
+                    level="TRACE",  # type: ignore
                 )
-                fh.formatter = lambda record, _: "[{}:{}/{}] {}".format(  # type: ignore
-                    record.level_name[0],
-                    os.path.splitext(os.path.basename(record.filename))[0],
-                    record.func_name,
-                    record.message,
+                fh.formatter = lambda record, _: (  # type: ignore
+                    f"[{record.level_name[0]}:"
+                    f"{os.path.splitext(os.path.basename(record.filename))[0]}/{record.func_name}] "
+                    f"{record.message}"
                 )
                 fh.push_application()
                 log.debug(f"Using {tmp} as temporary debug directory")
