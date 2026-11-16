@@ -8,6 +8,7 @@
 ##FORMAT=<ID=CGT,Number=.,Type=String,Description="Candidate copy genotypes (|)">
 ##FORMAT=<ID=MA,Number=.,Type=String,Description="Candidate major calls (|)">
 ##FORMAT=<ID=MI,Number=.,Type=String,Description="Candidate minor calls (|)">
+##aldy_diplotype=<id=CYP2D6.NA10860,gene="CYP2D6",sample="NA10860",diplotype1="*1/*4.021+*4NX",diplotype2="*1/*4+*4.021X">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA10860
 22	42522392	rs28371738	G	A	0	PASS	EFFECT=none;GENE=CYP2D6	GT:DP:CGT:MA:MI	0/0/1:24:0|1|0,0|1|0:*1|*4.021|*4NX,*1|*4|*4.021X:*1.018|*4.021|*4.013X,*1.018|*4.001|*4.021X
 22	42522613	rs1135840	C	G	0	PASS	EFFECT=S486T;GENE=CYP2D6	GT:DP:CGT:MA:MI	0/0/1:26:0|1|0,0|1|0:*1|*4.021|*4NX,*1|*4|*4.021X:*1.018|*4.021|*4.013X,*1.018|*4.001|*4.021X

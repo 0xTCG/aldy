@@ -120,6 +120,17 @@ def write_vcf(sample: str, gene: Gene, coverage: Coverage, minors: list[MinorSol
     ##FORMAT=<ID=MI,Number=.,Type=String,Description="Candidate minor calls (|)">
     """
 
+    def candidate_key(minor: MinorSolution) -> str:
+        # Candidate order must be stable
+        majors = "|".join(natsorted(f"*{a.major}" for a in minor.solution))
+        minors = "|".join(natsorted(f"*{a.minor}" for a in minor.solution))
+        return (
+            f"{majors};{minors};"
+            f"{minor.get_major_diplotype()};{minor.get_minor_diplotype()}"
+        )
+
+    minors = natsorted(minors, key=candidate_key)
+
     all_mutations: dict[Mutation, list[dict]] = {}
     for mi, minor in enumerate(minors):
         for ai, a in enumerate(minor.solution):
@@ -133,8 +144,21 @@ def write_vcf(sample: str, gene: Gene, coverage: Coverage, minors: list[MinorSol
                 if m not in all_mutations:
                     all_mutations[m] = [collections.defaultdict(int) for _ in minors]
                 all_mutations[m][mi][ai] = 1
+    header_text = td(header).strip()
+    diplotypes = [m.get_major_diplotype().replace(" ", "") for m in minors] or ["*1/*1"]
+    if len(diplotypes) == 1:
+        diplotype_fields = f'diplotype="{diplotypes[0]}"'
+    else:
+        diplotype_fields = ",".join(
+            f'diplotype{i}="{diplotype}"'
+            for i, diplotype in enumerate(diplotypes, start=1)
+        )
+    header_text += (
+        f'\n##aldy_diplotype=<id={gene.name}.{sample},gene="{gene.name}",'
+        f'sample="{sample}",{diplotype_fields}>'
+    )
     print(
-        td(header).strip()
+        header_text
         + "\n"
         + "\t".join(
             ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"] + [sample]
