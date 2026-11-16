@@ -733,10 +733,15 @@ alleles and were added by the Aldy authors. These alleles do not exist in the so
 Change log
 ==========
 
+- Aldy v4.9 (Nov 2026)
+   - Separate copy-number search tolerance via ``cn_gap`` (default ``0.1``)
+   - Improved copy-number and major-allele search and fusion scoring
+   - Changed (and improved) VCF reporting
+   - VCF indel normalization
+
 - Aldy v4.8.3 (Jan 2026)
    - *DPYD*\*7 fix
    - Fix handling of `chrM`
-
 
 - Aldy v4.8.2 (Aug 2025)
    - Removal of obsolete Pharmacoscan definitions
