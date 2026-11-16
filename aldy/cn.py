@@ -96,11 +96,6 @@ def estimate_cn(
 def complementary_fusions(gene):
     regions = gene.unique_regions
     normal = gene.cn_configs["1"].cn
-    fusions = [
-        (name, config)
-        for name, config in gene.cn_configs.items()
-        if config.kind in (CNConfigType.LEFT_FUSION, CNConfigType.RIGHT_FUSION)
-    ]
     for left_name, left_config in gene.cn_configs.items():
         if left_config.kind not in (CNConfigType.LEFT_FUSION, CNConfigType.RIGHT_FUSION):
             continue

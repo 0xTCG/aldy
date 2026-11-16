@@ -261,9 +261,7 @@ def test_NA10860_vcf_out(monkeypatch, solver):
 
 def test_vcf_no_variant_multiple_diplotypes(real_gene):
     reference_minor = next(
-        name
-        for name, minor in real_gene.alleles["1"].minors.items()
-        if not minor.neutral_muts
+        name for name, minor in real_gene.alleles["1"].minors.items() if not minor.neutral_muts
     )
     solutions = []
     for copies, cn_configs in [(["1", "1"], ["1", "1"]), (["1"], ["1"])]:

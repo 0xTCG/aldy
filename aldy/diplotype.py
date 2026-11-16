@@ -124,10 +124,7 @@ def write_vcf(sample: str, gene: Gene, coverage: Coverage, minors: list[MinorSol
         # Candidate order must be stable
         majors = "|".join(natsorted(f"*{a.major}" for a in minor.solution))
         minors = "|".join(natsorted(f"*{a.minor}" for a in minor.solution))
-        return (
-            f"{majors};{minors};"
-            f"{minor.get_major_diplotype()};{minor.get_minor_diplotype()}"
-        )
+        return f"{majors};{minors};{minor.get_major_diplotype()};{minor.get_minor_diplotype()}"
 
     minors = natsorted(minors, key=candidate_key)
 
@@ -150,8 +147,7 @@ def write_vcf(sample: str, gene: Gene, coverage: Coverage, minors: list[MinorSol
         diplotype_fields = f'diplotype="{diplotypes[0]}"'
     else:
         diplotype_fields = ",".join(
-            f'diplotype{i}="{diplotype}"'
-            for i, diplotype in enumerate(diplotypes, start=1)
+            f'diplotype{i}="{diplotype}"' for i, diplotype in enumerate(diplotypes, start=1)
         )
     header_text += (
         f'\n##aldy_diplotype=<id={gene.name}.{sample},gene="{gene.name}",'

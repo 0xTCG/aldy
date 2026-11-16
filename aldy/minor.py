@@ -644,6 +644,7 @@ def _prepare_phase_modes(coverages, mutations, max_alleles):
 
     # Select by RefSeq coordinates so that different genome versions hash to same thing.
     gene = coverage.gene
+
     def sampling_key(pattern):
         canonical = []
         for pos, op in pattern:
