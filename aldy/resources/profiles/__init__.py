@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # 786
 
 # Aldy source: __init__.py

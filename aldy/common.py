@@ -4,15 +4,17 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Iterable, Any, List
-import importlib_resources
-import re
-import time
-import pprint
-import logbook
-import textwrap
 import collections
+import pprint
+import re
+import textwrap
+import time
+from collections.abc import Iterable
+from typing import Any, TypeVar
 
+import importlib_resources
+import logbook
+import natsort
 
 PROTEINS = {
     "TTT": "F",
@@ -101,8 +103,6 @@ precision are considered equal).
 class AldyException(Exception):
     """Aldy exception class."""
 
-    pass
-
 
 class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
     """Reference genome range (e.g. `chr22:10-20`). Immutable."""
@@ -114,9 +114,7 @@ class GRange(collections.namedtuple("GRange", ["chr", "start", "end"])):
         :param pad_right: Right padding.
         :param prefix: Chromosome prefix."""
 
-        return "{}:{}-{}".format(
-            prefix + self.chr, max(1, self.start - pad_left), self.end + pad_right
-        )
+        return f"{prefix + self.chr}:{max(1, self.start - pad_left)}-{self.end + pad_right}"
 
     def __str__(self):
         return self.samtools(0, 0, "")
@@ -138,9 +136,7 @@ def rev_comp(seq: str) -> str:
 def seq_to_amino(seq: str) -> str:
     """:returns: Protein sequence formed from the provided DNA sequence."""
 
-    return "".join(
-        PROTEINS[seq[i : i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3)
-    )
+    return "".join(PROTEINS[seq[i : i + 3]] for i in range(0, len(seq) - len(seq) % 3, 3))
 
 
 def freezekey(x):
@@ -227,13 +223,12 @@ def parse_cn_region(cn_region):
                 + "Must be chr:start-end (where start and end are numbers)"
             )
         ch = r.group(1)
-        if ch.startswith("chr"):
-            ch = ch[3:]
+        ch = ch.removeprefix("chr")
         return GRange(ch, int(r.group(2)), int(r.group(3)))
     return None
 
 
-def chr_prefix(ch: str, chrs: List[str]) -> str:
+def chr_prefix(ch: str, chrs: list) -> str:
     """
     Check if a chromosome needs "chr" prefix given the available chromosomes.
     :returns: Chromosome prefix if the chromosome does not have it.
@@ -256,3 +251,10 @@ class JsonDict(dict):
 
 
 json: Any = JsonDict()
+
+
+T = TypeVar("T")
+
+
+def natsorted(what: Iterable[T], key=None) -> list[T]:
+    return natsort.natsorted(what, key=key)  # type: ignore

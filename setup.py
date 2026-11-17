@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
-from setuptools.extension import Extension
 from Cython.Build import cythonize
 from Cython.Distutils import build_ext
 from pysam import get_include as pysam_get_include
+from setuptools import find_packages, setup
+from setuptools.extension import Extension
 
 extra_compile_args = ["-Wno-unused-function"]
 extensions = [

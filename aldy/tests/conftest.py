@@ -6,8 +6,8 @@
 
 import pytest
 
-from aldy.gene import Gene
 from aldy.common import script_path
+from aldy.gene import Gene
 
 
 @pytest.fixture

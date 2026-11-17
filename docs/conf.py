@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -26,9 +25,9 @@ copyright = "2025, Ibrahim Numanagić"
 author = "Ibrahim Numanagić"
 
 # The short X.Y version
-version = "4.8.2"
+version = "4.9.0"
 # The full version, including alpha/beta/rc tags
-release = "4.8.2"
+release = "4.9.0"
 
 
 # -- General configuration ---------------------------------------------------

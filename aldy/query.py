@@ -6,9 +6,8 @@
 
 import sys
 import textwrap
-from natsort import natsorted
 
-from .common import AldyException, log
+from .common import AldyException, log, natsorted
 from .gene import Gene
 
 
@@ -70,7 +69,7 @@ def query(gene: Gene, query: str):
     log.info("Copy number support: {}", "Yes" if gene.do_copy_number else "No")
     log.info("Structural alleles (deletions, conservations and fusions):")
     for c, cn in gene.cn_configs.items():
-        log.info(f"  {'*'+c+':':>8} {cn.description} ({cn.vector})")
+        log.info(f"  {'*' + c + ':':>8} {cn.description} ({cn.vector})")
 
     log.info("Major star-alleles:")
     for a, allele in natsorted(gene.alleles.items()):
@@ -123,9 +122,7 @@ def print_majors(gene: Gene, major: str):
     elif len(activities) > 1:
         log.info(f"  Activity: {' or '.join(activities)} (please check minor alleles)")
 
-    ms = ",\n                 ".join(
-        _print_mutation(gene, m) for m in sorted(allele.func_muts)
-    )
+    ms = ",\n                 ".join(_print_mutation(gene, m) for m in sorted(allele.func_muts))
     log.info(f"  Key mutations: {ms if ms else 'none'}")
 
     log.info("  Minor star-alleles:")
@@ -163,9 +160,7 @@ def print_minors(gene: Gene, major: str, minor: str):
     ms = ",\n                 ".join(_print_mutation(gene, m) for m in allele.func_muts)
     log.info(f"  Key mutations: {ms if ms else 'none'}")
 
-    m = ",\n                    ".join(
-        _print_mutation(gene, m) for m in sorted(mn.neutral_muts)
-    )
+    m = ",\n                    ".join(_print_mutation(gene, m) for m in sorted(mn.neutral_muts))
     log.info(f"  Silent mutations: {m if m else 'none'}")
 
 

@@ -3,7 +3,7 @@ version: pharmgkb
 generated: '2024-07-01'
 ensembl: ENSG00000196218
 alleles:
-  RYR1*ference:
+  RYR1*REF:
     label: Reference
     mutations: []
   RYR1*38TG:

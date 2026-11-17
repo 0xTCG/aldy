@@ -4,18 +4,17 @@
 #   file 'LICENSE', which is part of this source code package.
 
 
-from typing import Optional, Dict, Tuple, Iterable, Callable
-import importlib
 import collections
+import importlib
+from collections.abc import Callable, Iterable
 
-from .common import log, sorted_tuple, SOLUTION_PRECISION, AldyException
-
+from .common import SOLUTION_PRECISION, AldyException, log, sorted_tuple
 
 SOLVER_PRECISON = 1e-5
 """Default solver precision"""
 
 
-def escape_name(s: str, d: Optional[dict] = None) -> str:
+def escape_name(s: str, d: dict | None = None) -> str:
     """
     Escape variable names to conform with the various solver requirements.
     """
@@ -30,8 +29,6 @@ def escape_name(s: str, d: Optional[dict] = None) -> str:
 
 class NoSolutionsError(Exception):
     """Raised if a model is infeasible."""
-
-    pass
 
 
 class Gurobi:  # pragma: no cover
@@ -93,11 +90,7 @@ class Gurobi:  # pragma: no cover
         self.objective = objective
         self.model.setObjective(
             self.objective,
-            (
-                self.gurobipy.GRB.MINIMIZE
-                if method == "min"
-                else self.gurobipy.GRB.MAXIMIZE
-            ),
+            (self.gurobipy.GRB.MINIMIZE if method == "min" else self.gurobipy.GRB.MAXIMIZE),
         )
         self.update()
 
@@ -119,7 +112,7 @@ class Gurobi:  # pragma: no cover
         """Return a variable name."""
         return var.varName
 
-    def abssum(self, vars: Iterable, coeffs: Optional[Dict[str, float]] = None):
+    def abssum(self, vars: Iterable, coeffs: dict[str, float] | None = None):
         r"""
         Return the absolute sum of `vars`: e.g.
            :math:`\sum_i |c_i x_i|` for the set :math:`{x_1,...}`.
@@ -151,7 +144,7 @@ class Gurobi:  # pragma: no cover
         self.addConstr(res >= self.quicksum(terms) - (len(terms) - 1), name="PROD")
         return res
 
-    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
+    def solve(self, init: Callable | None = None) -> tuple[str, float]:
         """
         Solve the model. Assumes that the objective is set.
 
@@ -181,7 +174,7 @@ class Gurobi:  # pragma: no cover
         if hasattr(var, "vtype") and var.vtype == self.gurobipy.GRB.BINARY:
             return round(var.x) > 0
         if hasattr(var, "vtype") and var.vtype == self.gurobipy.GRB.INTEGER:
-            return int(round(var.x))
+            return round(var.x)
         elif hasattr(var, "x"):
             return var.x
         else:
@@ -202,10 +195,10 @@ class Gurobi:  # pragma: no cover
     def solutions(
         self,
         gap: float = 0,
-        best_obj: Optional[float] = None,
+        best_obj: float | None = None,
         limit=None,
         iteration=0,
-        init: Optional[Callable] = None,
+        init: Callable | None = None,
     ):
         """
         Solve the model and returns the list of all optimal solutions.
@@ -255,9 +248,7 @@ class CBC(Gurobi):
 
     def __init__(self, name):
         self.ortools = importlib.import_module("ortools.linear_solver.pywraplp")
-        self.model = self.ortools.Solver(
-            name, self.ortools.Solver.CBC_MIXED_INTEGER_PROGRAMMING
-        )
+        self.model = self.ortools.Solver(name, self.ortools.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
         self.INF = self.model.infinity()
         self.STATUS = collections.defaultdict(
             lambda: "UNKNOWN",
@@ -302,7 +293,7 @@ class CBC(Gurobi):
     def quicksum(self, expr):
         return self.model.Sum(expr)
 
-    def solve(self, init: Optional[Callable] = None) -> Tuple[str, float]:
+    def solve(self, init: Callable | None = None) -> tuple[str, float]:
         if init is not None:
             init(self.model)
         status = self.model.Solve()
@@ -319,11 +310,8 @@ class CBC(Gurobi):
     def getValue(self, var):
         x = var.solution_value()
         if hasattr(var, "integer") and var.integer():
-            x = int(round(x))
-            if (
-                abs(var.lb()) < SOLUTION_PRECISION
-                and abs(1 - var.ub()) < SOLUTION_PRECISION
-            ):
+            x = round(x)
+            if abs(var.lb()) < SOLUTION_PRECISION and abs(1 - var.ub()) < SOLUTION_PRECISION:
                 return x > 0
             else:
                 return x
@@ -386,9 +374,7 @@ def model(name: str, solver: str):
         if fname in locals():
             m = locals()[fname](name)
             if not m:
-                raise AldyException(
-                    "ILP solver {} cannot be initialized".format(solver)
-                )
+                raise AldyException(f"ILP solver {solver} cannot be initialized")
             return m
         else:
-            raise AldyException("ILP solver {} is not supported".format(solver))
+            raise AldyException(f"ILP solver {solver} is not supported")
