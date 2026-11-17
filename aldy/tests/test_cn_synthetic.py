@@ -100,7 +100,7 @@ def test_left_fusion(toy_gene, solver):
         solver,
         [{"4": 2}],
         make_coverage(toy_gene, zip([0, 0, 0, 2, 2], [2, 2, 2, 0, 0])),
-        0 + 0 + 0.5 * ((base * 1.5) + (base * 1.5)),
+        base * 1.25,
     )
     # Test one fused and one normal (*1) allele
     # Note: each left fusion operates on the whole genic region;
@@ -110,7 +110,7 @@ def test_left_fusion(toy_gene, solver):
         solver,
         [{"4": 2, "1": 1}],
         make_coverage(toy_gene, zip([1, 1, 1, 3, 3], [2, 2, 2, 0, 0])),
-        0 + 0 + 0.5 * (base + (base * 1.5) + (base * 1.5)),
+        base * 1.75,
     )
 
 

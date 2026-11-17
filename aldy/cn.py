@@ -298,7 +298,9 @@ def solve_cn_model(
     lookup = {model.varName(v): a for (a, _), v in VCN.items()}
     result: dict = {}
     for status, opt, sol in model.solutions(profile.cn_gap):
-        sol_tuple = sorted_tuple(lookup[v] for v in sol if lookup[v] not in [del_allele, "PSEUDO"])
+        sol_tuple = sorted_tuple(
+            lookup[v] for v in sol if v in lookup and lookup[v] not in [del_allele, "PSEUDO"]
+        )
         if sol_tuple not in result:
             pars = model.getValue(o_pars)
             result[sol_tuple] = CNSolution(gene, opt, list(sol_tuple))
